@@ -7,9 +7,6 @@ import com.silverhetch.clotho.Source
  */
 class AllDiary(private val dao: DiaryDao) : Source<List<Diary>> {
     override fun value(): List<Diary> {
-        val dbResult = dao.all()
-        return Array(dbResult.size){
-            RoomDiary(dbResult[it])
-        }.toList()
+        return DiaryFromRDiary(dao.all()).value()
     }
 }

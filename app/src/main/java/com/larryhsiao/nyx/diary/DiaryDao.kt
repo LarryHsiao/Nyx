@@ -12,6 +12,9 @@ interface DiaryDao {
     @Query("SELECT * FROM diary")
     fun all(): List<RDiary>
 
+    @Query("SELECT * FROM diary WHERE strftime('%d-%m-%Y', datetime(timestamp/1000, 'unixepoch')) =  strftime('%d-%m-%Y', datetime((:targetTimestamp/1000)-1, 'unixepoch')) ")
+    fun byDate(targetTimestamp: Long): List<RDiary>
+
     @Insert(onConflict = REPLACE)
     fun create(diary: RDiary): Long
 

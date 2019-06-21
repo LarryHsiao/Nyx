@@ -8,10 +8,10 @@ import com.silverhetch.clotho.Source
 class NewDiary(
     private val dao: DiaryDao,
     private val title: String,
-    private val long: Long
+    private val utcTimestamp: Long
 ) : Source<Diary> {
     override fun value(): Diary {
-        val newId = dao.create(RDiary(0, title, long))
-        return RoomDiary(RDiary(newId, title, long))
+        val newId = dao.create(RDiary(0, title, utcTimestamp))
+        return RoomDiary(RDiary(newId, title, utcTimestamp))
     }
 }
