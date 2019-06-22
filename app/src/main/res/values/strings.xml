@@ -3,4 +3,5 @@
 
     <string name="what_is_in_your_mind">What is in your mind.</string>
     <string name="save">Save</string>
+    <string name="title_should_not_empty">Title should not empty.</string>
 </resources>

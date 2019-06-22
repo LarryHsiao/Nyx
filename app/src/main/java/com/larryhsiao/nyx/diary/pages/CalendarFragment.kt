@@ -2,6 +2,8 @@ package com.larryhsiao.nyx.diary.pages
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.applandeo.materialcalendarview.CalendarUtils
 import com.applandeo.materialcalendarview.EventDay
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
@@ -16,6 +19,7 @@ import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.dialog.InputDialog
 import com.silverhetch.aura.view.fab.FabBehavior
+import com.silverhetch.aura.view.measures.DP
 import com.silverhetch.clotho.time.ToUTCTimestamp
 import kotlinx.android.synthetic.main.fragment_calendar.*
 import java.util.*
@@ -71,9 +75,19 @@ class CalendarFragment : AuraFragment() {
         viewModel.diaries().value?.also { diaries ->
             calendar_calendarView.setEvents(
                 Array(diaries.size) {
-                    EventDay(Calendar.getInstance().also { calendar ->
-                        calendar.timeInMillis = diaries[it].timestamp()
-                    }, resources.getDrawable(R.drawable.ic_object))
+                    val title = diaries[it].title()
+                    EventDay(
+                        Calendar.getInstance().also { calendar ->
+                            calendar.timeInMillis = diaries[it].timestamp()
+                        },
+                        CalendarUtils.getDrawableText(
+                            context,
+                            title,
+                            Typeface.DEFAULT,
+                            R.color.colorPrimaryDark,
+                            10
+                        )
+                    )
                 }.toList()
             )
         }

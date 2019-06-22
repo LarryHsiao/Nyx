@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.diary.pages
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
@@ -26,8 +27,13 @@ class NewDiaryActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
 
         newDiary_saveButton.setOnClickListener {
-            viewModel.newDiary(newDiary_newDiaryContent.text.toString(), ToUTCTimestamp(calendar.timeInMillis).value())
-            finish()
+            val title = newDiary_newDiaryContent.text.toString()
+            if (title.isNotEmpty()) {
+                viewModel.newDiary(title, ToUTCTimestamp(calendar.timeInMillis).value())
+                finish()
+            } else {
+                Toast.makeText(this, R.string.title_should_not_empty, Toast.LENGTH_SHORT).show()
+            }
         }
 
         newDiary_date.setOnClickListener {
@@ -44,7 +50,7 @@ class NewDiaryActivity : AppCompatActivity() {
         updateDateIndicator()
     }
 
-    private fun updateDateIndicator(){
+    private fun updateDateIndicator() {
         newDiary_date.text = SimpleDateFormat.getDateInstance().format(Date().apply { time = calendar.timeInMillis })
     }
 }
