@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.diary.fragment
+package com.larryhsiao.nyx.diary.pages
 
 import android.app.Activity
 import android.content.Intent
@@ -20,6 +20,9 @@ import com.silverhetch.clotho.time.ToUTCTimestamp
 import kotlinx.android.synthetic.main.fragment_calendar.*
 import java.util.*
 
+/**
+ * Diary calendar fragment.
+ */
 class CalendarFragment : AuraFragment() {
     companion object {
         private const val REQUEST_CODE_INPUT = 1000
@@ -37,12 +40,13 @@ class CalendarFragment : AuraFragment() {
         viewModel.diaries().observe(this, Observer<List<Diary>> {
             updateEvents()
         })
-        fabControl().attachFab(object : FabBehavior {
+        attachFab(object : FabBehavior {
             override fun onClick() {
                 InputDialog.newInstance(
                     getString(R.string.what_is_in_your_mind)
                 ).also {
-                    it.setTargetFragment(this@CalendarFragment,
+                    it.setTargetFragment(
+                        this@CalendarFragment,
                         REQUEST_CODE_INPUT
                     )
                 }.show(requireFragmentManager(), null)

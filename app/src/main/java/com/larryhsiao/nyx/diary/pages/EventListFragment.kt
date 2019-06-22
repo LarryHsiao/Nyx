@@ -1,8 +1,7 @@
-package com.larryhsiao.nyx.diary.fragment
+package com.larryhsiao.nyx.diary.pages
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -55,12 +54,12 @@ class EventListFragment : AuraFragment(), FabBehavior {
 
     override fun onResume() {
         super.onResume()
-        fabControl().attachFab(this)
+        attachFab(this)
     }
 
     override fun onPause() {
         super.onPause()
-        fabControl().detachFab(this)
+        detachFab(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
