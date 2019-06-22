@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.diary.pages
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,11 +11,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
-import com.larryhsiao.nyx.R
-import com.silverhetch.aura.view.dialog.InputDialog
 
 /**
  * Fragment shows all event list by dateTime
@@ -64,29 +62,24 @@ class EventListFragment : AuraFragment(), FabBehavior {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.byDate(arguments?.getLong(ARG_DATETIME) ?: 0L).observe(this, Observer {
-            adapter.load(it)
-        })
+        loadData()
     }
 
     override fun onClick() {
-        InputDialog.newInstance(
-            getString(R.string.what_is_in_your_mind),
-            0
-        ).also {
-            it.setTargetFragment(this, REQEUST_CODE_NEW_DIARY)
-        }.show(requireFragmentManager(), null)
+        startActivityForResult(Intent(context, NewDiaryActivity::class.java), REQEUST_CODE_NEW_DIARY )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQEUST_CODE_NEW_DIARY && resultCode == Activity.RESULT_OK) {
-            viewModel.newDiary(data?.getStringExtra("INPUT_FIELD") ?: "")
-                .observe(this, Observer {
-                    adapter.newDiary(it)
-                    list.scrollToPosition(adapter.itemCount - 1)
-                })
+        if (requestCode == REQEUST_CODE_NEW_DIARY) {
+            loadData()
         }
+    }
+
+    private fun loadData(){
+        viewModel.byDate(arguments?.getLong(ARG_DATETIME) ?: 0L).observe(this, Observer {
+            adapter.load(it)
+        })
     }
 
     override fun icon(): Int {
