@@ -8,8 +8,15 @@ import com.larryhsiao.nyx.diary.DiaryDao
 import com.larryhsiao.nyx.diary.RDiary
 import com.silverhetch.clotho.Source
 
+/**
+ * Database implemented with Room
+ */
 @Database(entities = [RDiary::class], version = 1)
 abstract class RDatabase : RoomDatabase() {
+
+    /**
+     * Obtain the Dao for diary. Constructed by Room framework.
+     */
     abstract fun diaryDao(): DiaryDao
 
     /**

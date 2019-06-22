@@ -10,10 +10,15 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+/**
+ * Test for [AllDiary]
+ */
 @RunWith(RobolectricTestRunner::class)
 class AllDiaryTest {
     private lateinit var db: RDatabase
-
+    /**
+     * construct the database in memory for testing.
+     */
     @Before
     fun initDb() {
         db = Room.inMemoryDatabaseBuilder(
@@ -22,6 +27,9 @@ class AllDiaryTest {
         ).allowMainThreadQueries().build()
     }
 
+    /**
+     * Release database
+     */
     @After
     fun releaseDb() {
         db.close()
