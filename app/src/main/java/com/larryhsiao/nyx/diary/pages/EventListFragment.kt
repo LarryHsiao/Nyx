@@ -66,7 +66,7 @@ class EventListFragment : AuraFragment(), FabBehavior {
     }
 
     override fun onClick() {
-        startActivityForResult(Intent(context, NewDiaryActivity::class.java), REQEUST_CODE_NEW_DIARY )
+        startActivityForResult(Intent(context, NewDiaryActivity::class.java), REQEUST_CODE_NEW_DIARY)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -76,7 +76,7 @@ class EventListFragment : AuraFragment(), FabBehavior {
         }
     }
 
-    private fun loadData(){
+    private fun loadData() {
         viewModel.byDate(arguments?.getLong(ARG_DATETIME) ?: 0L).observe(this, Observer {
             adapter.load(it)
         })

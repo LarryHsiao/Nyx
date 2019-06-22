@@ -29,13 +29,16 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
     /**
      * Create new diary
      */
-    fun newDiary(title: String): LiveData<Diary> {
+    fun newDiary(
+        title: String,
+        timestamp: Long = Calendar.getInstance(TimeZone.getTimeZone("UTC")).timeInMillis
+    ): LiveData<Diary> {
         val result = MutableLiveData<Diary>()
         GlobalScope.launch {
             NewDiary(
                 db.diaryDao(),
                 title,
-                Calendar.getInstance(TimeZone.getTimeZone("UTC")).timeInMillis
+                timestamp
             ).value().also { newDiary ->
                 result.postValue(newDiary)
                 diary.postValue(diary.value?.toMutableList()?.also {
