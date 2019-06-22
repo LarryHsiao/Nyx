@@ -34,7 +34,7 @@ class CalendarFragment : AuraFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-        viewModel.events().observe(this, Observer<List<Diary>> {
+        viewModel.diaries().observe(this, Observer<List<Diary>> {
             updateEvents()
         })
         fabControl().attachFab(object : FabBehavior {
@@ -64,7 +64,7 @@ class CalendarFragment : AuraFragment() {
     }
 
     private fun updateEvents() {
-        viewModel.events().value?.also { diaries ->
+        viewModel.diaries().value?.also { diaries ->
             calendar_calendarView.setEvents(
                 Array(diaries.size) {
                     EventDay(Calendar.getInstance().also { calendar ->

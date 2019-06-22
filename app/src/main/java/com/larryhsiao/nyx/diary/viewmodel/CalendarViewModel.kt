@@ -26,6 +26,9 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * Create new diary
+     */
     fun newDiary(title: String): LiveData<Diary> {
         val result = MutableLiveData<Diary>()
         GlobalScope.launch {
@@ -42,10 +45,16 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
         return result
     }
 
-    fun events(): LiveData<List<Diary>> {
+    /**
+     * All diaries
+     */
+    fun diaries(): LiveData<List<Diary>> {
         return diary
     }
 
+    /**
+     * All diaries by date.
+     */
     fun byDate(dateTimestamp: Long): LiveData<List<Diary>> {
         val result = MutableLiveData<List<Diary>>()
         GlobalScope.launch {
