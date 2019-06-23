@@ -4,8 +4,10 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.view.activity.TransparentSource
 import com.silverhetch.clotho.time.ToUTCTimestamp
@@ -29,8 +31,9 @@ class NewDiaryActivity : AppCompatActivity() {
         newDiary_saveButton.setOnClickListener {
             val title = newDiary_newDiaryContent.text.toString()
             if (title.isNotEmpty()) {
-                viewModel.newDiary(title, ToUTCTimestamp(calendar.timeInMillis).value())
-                finish()
+                viewModel.newDiary(title, ToUTCTimestamp(calendar.timeInMillis).value()).observe(this, Observer<Diary>{
+                    finish()
+                })
             } else {
                 Toast.makeText(this, R.string.title_should_not_empty, Toast.LENGTH_SHORT).show()
             }
