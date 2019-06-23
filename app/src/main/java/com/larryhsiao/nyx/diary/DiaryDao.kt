@@ -12,13 +12,13 @@ interface DiaryDao {
     /**
      * Select all the diary in database
      */
-    @Query("SELECT * FROM diary")
+    @Query("SELECT * FROM diary  ORDER BY timestamp DESC")
     fun all(): List<RDiary>
 
     /**
      * Select diaries by timestamp rang
      */
-    @Query("SELECT * FROM diary WHERE timestamp>=:start AND timestamp<:end")
+    @Query("SELECT * FROM diary WHERE timestamp>=:start AND timestamp<:end ORDER BY timestamp DESC")
     fun byTimestamp(start: Long, end:Long): List<RDiary>
 
     /**
