@@ -3,19 +3,22 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+def nyxVersionName = "v1.0.0"
+def nyxVersionCode = 10000
+
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.larryhsiao.nyx"
         minSdkVersion 26
-        targetSdkVersion 28
-        versionCode 10
-        versionName "1.0"
+        targetSdkVersion 29
+        versionCode nyxVersionCode
+        versionName nyxVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -37,7 +40,8 @@ dependencies {
     def room_version = "2.1.0"
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.silverhetch:aura:1.8.0"
-    implementation "com.google.android.material:material:1.0.0-rc01"
+    implementation "com.silverhetch:clotho:1.6.0"
+    implementation "com.google.android.material:material:1.1.0-alpha07"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:1.1.0-beta01"
     implementation "androidx.core:core-ktx:1.2.0-alpha02"
