@@ -27,7 +27,7 @@ import java.util.*
 /**
  * Diary calendar fragment.
  */
-class CalendarFragment : AuraFragment() {
+class CalendarFragment : AuraFragment(), FabBehavior {
     companion object {
         private const val REQUEST_CODE_INPUT = 1000
     }
@@ -44,31 +44,20 @@ class CalendarFragment : AuraFragment() {
         viewModel.diaries().observe(this, Observer<List<Diary>> {
             updateEvents()
         })
-        attachFab(object : FabBehavior {
-            override fun onClick() {
-                InputDialog.newInstance(
-                    getString(R.string.what_is_in_your_mind)
-                ).also {
-                    it.setTargetFragment(
-                        this@CalendarFragment,
-                        REQUEST_CODE_INPUT
-                    )
-                }.show(requireFragmentManager(), null)
-            }
-
-            override fun icon(): Int {
-                return R.drawable.ic_plus
-            }
-        })
 
         calendar_calendarView.setOnDayClickListener {
-            viewModel.byDate(ToUTCTimestamp(it.calendar.timeInMillis).value()).observe(
-                this@CalendarFragment,
-                Observer<List<Diary>> {
-                    Toast.makeText(context!!, "size ${it.size}", Toast.LENGTH_LONG).show()
-                }
-            )
+            nextPage(EventListFragment.newInstance(it.calendar.timeInMillis))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        attachFab(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        detachFab(this)
     }
 
     private fun updateEvents() {
@@ -98,5 +87,20 @@ class CalendarFragment : AuraFragment() {
         if (requestCode == REQUEST_CODE_INPUT && resultCode == Activity.RESULT_OK) {
             viewModel.newDiary(data?.getStringExtra("INPUT_FIELD") ?: "")
         }
+    }
+
+    override fun onClick() {
+        InputDialog.newInstance(
+            getString(R.string.what_is_in_your_mind)
+        ).also {
+            it.setTargetFragment(
+                this@CalendarFragment,
+                REQUEST_CODE_INPUT
+            )
+        }.show(requireFragmentManager(), null)
+    }
+
+    override fun icon(): Int {
+        return R.drawable.ic_plus
     }
 }

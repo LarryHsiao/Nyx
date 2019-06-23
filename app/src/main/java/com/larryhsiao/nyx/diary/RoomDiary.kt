@@ -1,5 +1,7 @@
 package com.larryhsiao.nyx.diary
 
+import java.util.*
+
 /**
  * The room implementation of diary.
  */
@@ -13,6 +15,10 @@ class RoomDiary(private val RDiary: RDiary) : Diary {
     }
 
     override fun timestamp(): Long {
-        return RDiary.timestamp ?: 0L
+        return Calendar.getInstance().also {
+            it.timeZone = TimeZone.getTimeZone("UTC")
+            it.timeInMillis = RDiary.timestamp ?: 0L
+            it.timeZone = TimeZone.getDefault()
+        }.timeInMillis
     }
 }
