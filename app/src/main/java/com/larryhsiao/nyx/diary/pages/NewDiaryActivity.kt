@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
-import com.silverhetch.aura.view.activity.TransparentSource
 import com.silverhetch.clotho.time.ToUTCTimestamp
 import kotlinx.android.synthetic.main.activity_new_diary.*
 import java.text.SimpleDateFormat
