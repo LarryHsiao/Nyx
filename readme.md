@@ -13,8 +13,6 @@ Instant diary app on Android.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-TODO
-------
 
 - @todo #1 Take picture
 - @todo #2 Record voice
