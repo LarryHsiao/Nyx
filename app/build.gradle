@@ -8,6 +8,18 @@ def nyxVersionCode = 10000
 
 android {
     compileSdkVersion 28
+
+    signingConfigs {
+        if (System.getenv('UPLOAD_STORE_PATH') != null) {
+            release {
+                storeFile file(System.getenv('UPLOAD_STORE_PATH'));
+                keyAlias System.getenv('UPLOAD_KEY_ALIAS');
+                keyPassword System.getenv('UPLOAD_KEY_PASSWORD');
+                storePassword System.getenv('UPLOAD_STORE_PASSWORD');
+            }
+            buildTypes.release.signingConfig signingConfigs.release
+        }
+    }
     defaultConfig {
         applicationId "com.larryhsiao.nyx"
         minSdkVersion 26
