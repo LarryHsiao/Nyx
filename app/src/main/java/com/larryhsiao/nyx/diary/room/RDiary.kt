@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.diary
+package com.larryhsiao.nyx.diary.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.diary
 
+import com.larryhsiao.nyx.diary.room.RDiary
 import com.silverhetch.clotho.Source
 
 /**

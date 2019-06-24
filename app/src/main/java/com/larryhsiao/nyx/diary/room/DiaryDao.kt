@@ -1,7 +1,8 @@
-package com.larryhsiao.nyx.diary
+package com.larryhsiao.nyx.diary.room
 
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
+import com.larryhsiao.nyx.diary.room.RDiary
 
 
 /**

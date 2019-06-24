@@ -1,5 +1,7 @@
 package com.larryhsiao.nyx.diary
 
+import com.larryhsiao.nyx.diary.room.DiaryDao
+import com.larryhsiao.nyx.diary.room.RDiary
 import com.silverhetch.clotho.Source
 import java.lang.RuntimeException
 

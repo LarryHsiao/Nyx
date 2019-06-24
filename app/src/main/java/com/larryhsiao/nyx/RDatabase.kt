@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.larryhsiao.nyx.diary.DiaryDao
-import com.larryhsiao.nyx.diary.RDiary
+import com.larryhsiao.nyx.diary.room.DiaryDao
+import com.larryhsiao.nyx.diary.room.RDiary
 import com.silverhetch.clotho.Source
 
 /**

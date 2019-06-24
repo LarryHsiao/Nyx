@@ -1,8 +1,7 @@
 package com.larryhsiao.nyx.diary
 
+import com.larryhsiao.nyx.diary.room.DiaryDao
 import com.silverhetch.clotho.Source
-import java.time.ZoneOffset
-import java.util.*
 
 /**
  * Source that generates the [RDiary] from database by timestamp which is at same date of given [utcTimestamp].
