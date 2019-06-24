@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.diary
 
 import com.larryhsiao.nyx.diary.room.DiaryDao
+import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.diary.room.RDiary
 import com.silverhetch.clotho.Source
 import java.lang.RuntimeException
@@ -17,7 +18,7 @@ class NewDiary(
         if (title.isBlank()){
             throw RuntimeException("The title should not be empty")
         }
-        val newId = dao.create(RDiary(0, title, utcTimestamp))
-        return RoomDiary(RDiary(newId, title, utcTimestamp))
+        val newId = dao.create(DiaryEntity(0, title, utcTimestamp))
+        return RoomDiary(RDiary(DiaryEntity(newId, title, utcTimestamp), listOf()))
     }
 }

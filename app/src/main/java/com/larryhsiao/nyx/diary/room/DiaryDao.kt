@@ -2,7 +2,6 @@ package com.larryhsiao.nyx.diary.room
 
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import com.larryhsiao.nyx.diary.room.RDiary
 
 
 /**
@@ -26,11 +25,11 @@ interface DiaryDao {
      * Create a diary entry
      */
     @Insert(onConflict = REPLACE)
-    fun create(diary: RDiary): Long
+    fun create(diaryEntity: DiaryEntity): Long
 
     /**
      * Delete given diary.
      */
     @Delete
-    fun delete(diary: RDiary)
+    fun delete(diaryEntity: DiaryEntity)
 }

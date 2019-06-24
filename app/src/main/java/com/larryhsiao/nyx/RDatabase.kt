@@ -5,13 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.larryhsiao.nyx.diary.room.DiaryDao
-import com.larryhsiao.nyx.diary.room.RDiary
+import com.larryhsiao.nyx.diary.room.DiaryEntity
+import com.larryhsiao.nyx.diary.room.MediaEntity
 import com.silverhetch.clotho.Source
 
 /**
  * Database implemented with Room
  */
-@Database(entities = [RDiary::class], version = 1)
+@Database(entities = [DiaryEntity::class, MediaEntity::class], version = 1)
 abstract class RDatabase : RoomDatabase() {
 
     /**

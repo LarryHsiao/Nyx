@@ -6,19 +6,19 @@ import java.util.*
 /**
  * The room implementation of diary.
  */
-class RoomDiary(private val RDiary: RDiary) : Diary {
+class RoomDiary(private val roomDiary: RDiary) : Diary {
     override fun id(): Long {
-        return RDiary.id
+        return roomDiary.diary.id
     }
 
     override fun title(): String {
-        return RDiary.title ?: ""
+        return roomDiary.diary.title ?: ""
     }
 
     override fun timestamp(): Long {
         return Calendar.getInstance().also {
             it.timeZone = TimeZone.getTimeZone("UTC")
-            it.timeInMillis = RDiary.timestamp ?: 0L
+            it.timeInMillis = roomDiary.diary.timestamp ?: 0L
             it.timeZone = TimeZone.getDefault()
         }.timeInMillis
     }
