@@ -1,10 +1,14 @@
+plugins {
+    id 'com.github.triplet.play' version '2.2.1'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-def nyxVersionName = "v1.0.0"
-def nyxVersionCode = 10000
+def nyxVersionName = "v1.0.1"
+def nyxVersionCode = 10001
 
 android {
     compileSdkVersion 28
@@ -70,5 +74,12 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
     androidTestImplementation "androidx.test:runner:1.2.0"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
+}
 
+play {
+    track = "alpha"
+    releaseStatus = "completed"
+    defaultToAppBundles = true
+    serviceAccountEmail = System.getenv("PUBLISH_ACCOUNT_EMAIL")
+    serviceAccountCredentials = file(System.getenv("PUBLISH_P12"))
 }
