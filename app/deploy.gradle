@@ -1,0 +1,23 @@
+if (System.getenv("PUBLISH_P12") != null) {
+    apply plugin: "com.github.triplet.play"
+    play {
+        track = "alpha"
+        releaseStatus = "completed"
+        defaultToAppBundles = true
+        serviceAccountEmail = System.getenv("PUBLISH_ACCOUNT_EMAIL")
+        serviceAccountCredentials = file(System.getenv("PUBLISH_P12"))
+    }
+
+
+    android {
+        signingConfigs {
+            release {
+                storeFile file(System.getenv('UPLOAD_STORE_PATH'));
+                keyAlias System.getenv('UPLOAD_KEY_ALIAS');
+                keyPassword System.getenv('UPLOAD_KEY_PASSWORD');
+                storePassword System.getenv('UPLOAD_STORE_PASSWORD');
+            }
+            buildTypes.release.signingConfig signingConfigs.release
+        }
+    }
+}
