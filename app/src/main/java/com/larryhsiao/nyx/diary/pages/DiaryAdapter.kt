@@ -15,7 +15,7 @@ import kotlin.collections.ArrayList
 /**
  * Recycler view adapter for for diary.
  */
-class DiaryAdapter : RecyclerView.Adapter<ViewHolder>() {
+class DiaryAdapter(private val onItemClicked: (item: Diary) -> Unit) : RecyclerView.Adapter<ViewHolder>() {
     private val diaries = ArrayList<Diary>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -33,8 +33,14 @@ class DiaryAdapter : RecyclerView.Adapter<ViewHolder>() {
         @SuppressLint("SetTextI18n")
         holder.rootView.findViewById<TextView>(R.id.itemDiary_title).text = """
             ${diaries[position].title()}
-            ${SimpleDateFormat.getDateInstance().format(Calendar.getInstance().also { it.timeInMillis = diaries[position].timestamp()}.timeInMillis)}
+            ${SimpleDateFormat.getDateInstance().format(Calendar.getInstance().also {
+            it.timeInMillis = diaries[position].timestamp()
+        }.timeInMillis)}
         """.trimIndent()
+
+        holder.rootView.setOnClickListener {
+            onItemClicked(diaries[holder.adapterPosition])
+        }
     }
 
     /**

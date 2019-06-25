@@ -5,10 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.larryhsiao.nyx.RDatabase
-import com.larryhsiao.nyx.diary.AllDiary
-import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.diary.DiaryByDate
-import com.larryhsiao.nyx.diary.NewDiary
+import com.larryhsiao.nyx.diary.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -67,6 +64,19 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
                     db.diaryDao(),
                     dateTimestamp
                 ).value()
+            )
+        }
+        return result
+    }
+
+    /**
+     * Diary by ID
+     */
+    fun byId(id: Long): LiveData<Diary> {
+        val result = MutableLiveData<Diary>()
+        GlobalScope.launch {
+            result.postValue(
+                DiaryById(db.diaryDao(), id).value()
             )
         }
         return result

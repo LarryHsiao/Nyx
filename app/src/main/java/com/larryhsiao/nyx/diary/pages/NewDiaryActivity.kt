@@ -10,7 +10,7 @@ import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
 import com.silverhetch.clotho.time.ToUTCTimestamp
-import kotlinx.android.synthetic.main.activity_new_diary.*
+import kotlinx.android.synthetic.main.page_diary.*
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.*
@@ -23,7 +23,7 @@ class NewDiaryActivity : AppCompatActivity() {
     private var calendar = getInstance()
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_new_diary)
+        setContentView(R.layout.page_diary)
 
         viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
 

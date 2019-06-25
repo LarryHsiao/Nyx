@@ -34,7 +34,9 @@ class EventListFragment : AuraFragment(), FabBehavior {
 
     private lateinit var viewModel: CalendarViewModel
     private lateinit var list: RecyclerView
-    private val adapter = DiaryAdapter()
+    private val adapter = DiaryAdapter(){
+        nextPage(DiaryFragment.newInstance(it.id()))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

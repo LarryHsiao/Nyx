@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="android.view.View" />
+        <import type="java.text.SimpleDateFormat"/>
+
+        <variable
+            name="editable"
+            type="Boolean" />
+        <variable
+            name="diary"
+            type="com.larryhsiao.nyx.diary.Diary"/>
+    </data>
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/frameLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent">
+
+            <Button
+                android:id="@+id/newDiary_saveButton"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="@string/save"
+                android:visibility="@{editable?View.VISIBLE:View.INVISIBLE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/newDiary_newDiaryContent"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:padding="16dp"
+                android:enabled="@{editable}"
+                android:text="@{diary.title()}"
+                android:background="@drawable/bg_edit_field"
+                app:layout_constraintBottom_toTopOf="@id/newDiary_saveButton"
+                app:layout_constraintTop_toBottomOf="@id/newDiary_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/newDiary_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:datetime="@{diary.timestamp()}"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:clickable="@{editable}"
+                android:padding="8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="2019/02/21" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</layout>
