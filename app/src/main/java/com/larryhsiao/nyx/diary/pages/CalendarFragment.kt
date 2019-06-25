@@ -90,14 +90,7 @@ class CalendarFragment : AuraFragment(), FabBehavior {
     }
 
     override fun onClick() {
-        InputDialog.newInstance(
-            getString(R.string.what_is_in_your_mind)
-        ).also {
-            it.setTargetFragment(
-                this@CalendarFragment,
-                REQUEST_CODE_INPUT
-            )
-        }.show(requireFragmentManager(), null)
+        startActivity(Intent(context, NewDiaryActivity::class.java))
     }
 
     override fun icon(): Int {
