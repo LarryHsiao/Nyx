@@ -3,8 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-def nyxVersionName = "v1.0.1"
-def nyxVersionCode = 10001
+def nyxVersionName = "v1.1.0"
+def nyxVersionCode = 10100
 
 android {
     compileSdkVersion 28
@@ -44,7 +44,7 @@ dependencies {
     def lifecycle_version = "2.0.0"
     def room_version = "2.1.0"
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.silverhetch:aura:1.8.0"
+    implementation "com.silverhetch:aura:1.9.1"
     implementation "com.silverhetch:clotho:1.6.0"
     implementation "com.google.android.material:material:1.1.0-alpha07"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

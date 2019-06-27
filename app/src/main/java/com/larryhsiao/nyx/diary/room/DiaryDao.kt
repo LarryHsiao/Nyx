@@ -28,8 +28,17 @@ interface DiaryDao {
     @Insert(onConflict = REPLACE)
     fun create(diaryEntity: DiaryEntity): Long
 
+    /**
+     * Update exist [Diary]
+     */
+    @Update
+    fun update(diary: DiaryEntity)
+
+    /**
+     * Query diary by id
+     */
     @Query("SELECT * FROM diary WHERE id=:id")
-    fun byId(id: Long):RDiary
+    fun byId(id: Long): RDiary
 
     /**
      * Delete given diary.

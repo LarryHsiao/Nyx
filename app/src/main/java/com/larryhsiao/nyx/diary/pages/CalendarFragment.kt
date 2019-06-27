@@ -57,7 +57,7 @@ class CalendarFragment : AuraFragment(), FabBehavior {
 
     override fun onPause() {
         super.onPause()
-        detachFab(this)
+        detachFab()
     }
 
     private fun updateEvents() {

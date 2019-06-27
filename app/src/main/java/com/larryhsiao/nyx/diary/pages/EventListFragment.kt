@@ -59,7 +59,7 @@ class EventListFragment : AuraFragment(), FabBehavior {
 
     override fun onPause() {
         super.onPause()
-        detachFab(this)
+        detachFab()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

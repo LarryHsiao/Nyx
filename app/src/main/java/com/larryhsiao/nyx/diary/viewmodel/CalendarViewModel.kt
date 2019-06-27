@@ -47,6 +47,26 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
+     * Update exist diary.
+     */
+    fun updateDiary(
+        diary: Diary,
+        title: String,
+        timestamp: Long
+    ): LiveData<Diary> {
+        val result = MutableLiveData<Diary>()
+        GlobalScope.launch {
+            UpdateDiary(
+                db.diaryDao(),
+                diary.id(),
+                title,
+                timestamp
+            ).value()
+        }
+        return result
+    }
+
+    /**
      * All diaries
      */
     fun diaries(): LiveData<List<Diary>> {
