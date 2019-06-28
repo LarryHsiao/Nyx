@@ -15,6 +15,9 @@ import org.robolectric.RobolectricTestRunner
  */
 @RunWith(RobolectricTestRunner::class)
 class DiaryByDateTest {
+    companion object{
+        private const val ARG_TITLE = "title"
+    }
     private lateinit var db: RDatabase
     /**
      * construct the database in memory for testing.
@@ -42,7 +45,7 @@ class DiaryByDateTest {
     fun allDiary() {
         NewDiary(
             db.diaryDao(),
-            "Title",
+            ARG_TITLE,
             1234567890
         ).value().id()
 
@@ -60,19 +63,19 @@ class DiaryByDateTest {
     fun diaryByDateTimestamp() {
         NewDiary(
             db.diaryDao(),
-            "Title",
+            ARG_TITLE,
             1561190477
         ).value().id()
 
         NewDiary(
             db.diaryDao(),
-            "Title",
+            ARG_TITLE,
             1551190477
         ).value().id()
 
         NewDiary(
             db.diaryDao(),
-            "Title",
+            ARG_TITLE,
             1551190477
         ).value().id()
 

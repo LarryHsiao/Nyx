@@ -28,10 +28,6 @@ import java.util.*
  * Diary calendar fragment.
  */
 class CalendarFragment : AuraFragment(), FabBehavior {
-    companion object {
-        private const val REQUEST_CODE_INPUT = 1000
-    }
-
     private lateinit var viewModel: CalendarViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -41,9 +37,6 @@ class CalendarFragment : AuraFragment(), FabBehavior {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-        viewModel.diaries().observe(this, Observer<List<Diary>> {
-            updateEvents()
-        })
 
         calendar_calendarView.setOnDayClickListener {
             nextPage(EventListFragment.newInstance(it.calendar.timeInMillis))
@@ -52,6 +45,9 @@ class CalendarFragment : AuraFragment(), FabBehavior {
 
     override fun onResume() {
         super.onResume()
+        updateEvents()
+
+
         attachFab(this)
     }
 
@@ -61,32 +57,14 @@ class CalendarFragment : AuraFragment(), FabBehavior {
     }
 
     private fun updateEvents() {
-        viewModel.diaries().value?.also { diaries ->
+        viewModel.diaries().observe(this, Observer<List<Diary>> { diaries ->
             calendar_calendarView.setEvents(
                 Array(diaries.size) {
-                    val title = diaries[it].title()
-                    EventDay(
-                        Calendar.getInstance().also { calendar ->
-                            calendar.timeInMillis = diaries[it].timestamp()
-                        },
-                        CalendarUtils.getDrawableText(
-                            context,
-                            title,
-                            Typeface.DEFAULT,
-                            R.color.colorPrimaryDark,
-                            10
-                        )
-                    )
+                    eventDay(diaries[it])
                 }.toList()
             )
-        }
-    }
+        })
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_INPUT && resultCode == Activity.RESULT_OK) {
-            viewModel.newDiary(data?.getStringExtra("INPUT_FIELD") ?: "")
-        }
     }
 
     override fun onClick() {
@@ -95,5 +73,20 @@ class CalendarFragment : AuraFragment(), FabBehavior {
 
     override fun icon(): Int {
         return R.drawable.ic_plus
+    }
+
+    private fun eventDay(diary: Diary): EventDay {
+        return EventDay(
+            Calendar.getInstance().also { calendar ->
+                calendar.timeInMillis = diary.timestamp()
+            },
+            CalendarUtils.getDrawableText(
+                context,
+                diary.title(),
+                Typeface.DEFAULT,
+                R.color.colorPrimaryDark,
+                10
+            )
+        )
     }
 }

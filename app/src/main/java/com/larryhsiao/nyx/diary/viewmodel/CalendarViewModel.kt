@@ -15,13 +15,6 @@ import java.util.*
  */
 class CalendarViewModel(app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Factory(app).value()
-    private val diary: MutableLiveData<List<Diary>> by lazy {
-        MutableLiveData<List<Diary>>().apply {
-            GlobalScope.launch {
-                postValue(AllDiary(db.diaryDao()).value())
-            }
-        }
-    }
 
     /**
      * Create new diary
@@ -38,9 +31,6 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
                 timestamp
             ).value().also { newDiary ->
                 result.postValue(newDiary)
-                diary.postValue(diary.value?.toMutableList()?.also {
-                    it.add(newDiary)
-                })
             }
         }
         return result
@@ -70,23 +60,27 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
      * All diaries
      */
     fun diaries(): LiveData<List<Diary>> {
-        return diary
+        return MutableLiveData<List<Diary>>().apply {
+            GlobalScope.launch {
+                postValue(AllDiary(db.diaryDao()).value())
+            }
+        }
     }
 
     /**
      * All diaries by date.
      */
     fun byDate(dateTimestamp: Long): LiveData<List<Diary>> {
-        val result = MutableLiveData<List<Diary>>()
-        GlobalScope.launch {
-            result.postValue(
-                DiaryByDate(
-                    db.diaryDao(),
-                    dateTimestamp
-                ).value()
-            )
+        return MutableLiveData<List<Diary>>().apply {
+            GlobalScope.launch {
+                postValue(
+                    DiaryByDate(
+                        db.diaryDao(),
+                        dateTimestamp
+                    ).value()
+                )
+            }
         }
-        return result
     }
 
     /**
