@@ -16,7 +16,7 @@ class NewDiary(
 ) : Source<Diary> {
     override fun value(): Diary {
         if (title.isBlank()){
-            throw RuntimeException("The title should not be empty")
+            throw IllegalArgumentException("The title should not be empty")
         }
         val newId = dao.create(DiaryEntity(0, title, utcTimestamp))
         return RoomDiary(RDiary(DiaryEntity(newId, title, utcTimestamp), listOf()))

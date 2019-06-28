@@ -26,6 +26,10 @@ import java.util.*
 class DiaryFragment : AuraFragment() {
     companion object {
         private const val ARG_ID = "ARG_ID"
+
+        /**
+         * Factory method
+         */
         fun newInstance(id: Long): Fragment {
             return DiaryFragment().apply {
                 arguments = Bundle().also {

@@ -23,6 +23,10 @@ class EventListFragment : AuraFragment(), FabBehavior {
     companion object {
         private const val ARG_DATETIME = "ARG_DATETIME"
         private const val REQEUST_CODE_NEW_DIARY = 1000
+
+        /**
+         * Factory method
+         */
         fun newInstance(dateTime: Long): Fragment {
             return EventListFragment().apply {
                 arguments = Bundle().apply {
