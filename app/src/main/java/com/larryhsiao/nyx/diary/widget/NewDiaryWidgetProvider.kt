@@ -8,6 +8,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.pages.NewDiaryActivity
+import com.larryhsiao.nyx.diary.pages.NewDiaryWidgetActivity
 
 /**
  * Provider for widget new diary.
@@ -27,7 +28,7 @@ class NewDiaryWidgetProvider : AppWidgetProvider() {
                         PendingIntent.getActivity(
                             context,
                             0,
-                            Intent(context, NewDiaryActivity::class.java),
+                            Intent(context, NewDiaryWidgetActivity::class.java),
                             0
                         )
                     )

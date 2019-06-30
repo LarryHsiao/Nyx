@@ -26,21 +26,23 @@ import java.util.*
 class DiaryFragment : AuraFragment() {
     companion object {
         private const val ARG_ID = "ARG_ID"
+        private const val ARG_EDITABLE = "ARG_EDITABLE"
 
         /**
          * Factory method
          */
-        fun newInstance(id: Long): Fragment {
+        fun newInstance(id: Long, editable: Boolean = false): Fragment {
             return DiaryFragment().apply {
                 arguments = Bundle().also {
                     it.putLong(ARG_ID, id)
+                    it.putBoolean(ARG_EDITABLE, editable)
                 }
             }
         }
     }
 
     private lateinit var viewModel: CalendarViewModel
-    private var editable = MutableLiveData<Boolean>().also { it.value = false }
+    private lateinit var editable: MutableLiveData<Boolean>
     private var calendar: Calendar = Calendar.getInstance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -49,13 +51,16 @@ class DiaryFragment : AuraFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        editable = MutableLiveData<Boolean>().also {
+            it.value = arguments?.getBoolean(ARG_EDITABLE) ?: false
+        }
         viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
         viewModel.byId(arguments?.getLong(ARG_ID) ?: 0L).observe(this, Observer<Diary> { diary ->
             val binding = DataBindingUtil.findBinding<PageDiaryBinding>(view)
             binding?.diary = diary
             editable.observe(this, Observer<Boolean> {
                 binding?.editable = it
-
+                newDiary_imageGrid.addable(it)
                 if (!it) {
                     editableFab()
                 }
@@ -81,6 +86,13 @@ class DiaryFragment : AuraFragment() {
                         updateDateIndicator()
                     }
                 }.show()
+        }
+        newDiary_imageGrid.setCallback { index, isAddingButton ->
+            if (isAddingButton) {
+                TODO()
+            } else {
+                TODO()
+            }
         }
     }
 
