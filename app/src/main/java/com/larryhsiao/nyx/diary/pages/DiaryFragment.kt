@@ -1,6 +1,13 @@
 package com.larryhsiao.nyx.diary.pages
 
+import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
+import android.content.Intent
+import android.content.Intent.ACTION_GET_CONTENT
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,10 +22,14 @@ import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
+import com.silverhetch.aura.intent.ChooserIntent
 import com.silverhetch.aura.view.fab.FabBehavior
+import com.silverhetch.aura.view.images.ImageActivity
+import com.silverhetch.clotho.Source
 import kotlinx.android.synthetic.main.page_diary.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Fragment to show the exist diary.
@@ -27,6 +38,7 @@ class DiaryFragment : AuraFragment() {
     companion object {
         private const val ARG_ID = "ARG_ID"
         private const val ARG_EDITABLE = "ARG_EDITABLE"
+        private const val REQUEST_CODE_ADD_IMAGE = 1000
 
         /**
          * Factory method
@@ -44,6 +56,7 @@ class DiaryFragment : AuraFragment() {
     private lateinit var viewModel: CalendarViewModel
     private lateinit var editable: MutableLiveData<Boolean>
     private var calendar: Calendar = Calendar.getInstance()
+    private val images = ArrayList<Uri>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return DataBindingUtil.inflate<PageDiaryBinding>(inflater, R.layout.page_diary, container, false).root
@@ -55,7 +68,8 @@ class DiaryFragment : AuraFragment() {
             it.value = arguments?.getBoolean(ARG_EDITABLE) ?: false
         }
         viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-        viewModel.byId(arguments?.getLong(ARG_ID) ?: 0L).observe(this, Observer<Diary> { diary ->
+        viewModel.byId(arguments?.getLong(ARG_ID)
+            ?: 0L).observe(this, Observer<Diary> { diary ->
             val binding = DataBindingUtil.findBinding<PageDiaryBinding>(view)
             binding?.diary = diary
             editable.observe(this, Observer<Boolean> {
@@ -89,13 +103,44 @@ class DiaryFragment : AuraFragment() {
         }
         newDiary_imageGrid.setCallback { index, isAddingButton ->
             if (isAddingButton) {
-                TODO()
+                startActivityForResult(
+                    ChooserIntent(
+                        getString(R.string.add_image),
+                        Intent(ACTION_GET_CONTENT).also {
+                            it.type = "image/*"
+                        }
+                    ).value(),
+                    REQUEST_CODE_ADD_IMAGE
+                )
             } else {
-                TODO()
+                startActivity(
+                    ImageActivity.newIntent(view.context, images[index].toString())
+                )
             }
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_ADD_IMAGE && resultCode == RESULT_OK) {
+            val uri = data?.data
+            if (uri != null) {
+                images.add(uri)
+            }
+            newDiary_imageGrid.initImages(*Array<Source<Drawable>>(images.size) {
+                object : Source<Drawable> {
+                    override fun value(): Drawable {
+                        return BitmapDrawable(
+                            resources,
+                            BitmapFactory.decodeStream(
+                                newDiary_imageGrid.context.contentResolver.openInputStream(images[it])
+                            )
+                        )
+                    }
+                }
+            })
+        }
+    }
 
     private fun updateDateIndicator() {
         newDiary_date.text = SimpleDateFormat.getDateInstance().format(Date().apply { time = calendar.timeInMillis })
