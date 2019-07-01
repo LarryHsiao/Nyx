@@ -24,6 +24,7 @@ import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.intent.ChooserIntent
 import com.silverhetch.aura.view.fab.FabBehavior
+import com.silverhetch.aura.view.images.CRImage
 import com.silverhetch.aura.view.images.ImageActivity
 import com.silverhetch.clotho.Source
 import kotlinx.android.synthetic.main.page_diary.*
@@ -56,7 +57,6 @@ class DiaryFragment : AuraFragment() {
     private lateinit var viewModel: CalendarViewModel
     private lateinit var editable: MutableLiveData<Boolean>
     private var calendar: Calendar = Calendar.getInstance()
-    private val images = ArrayList<Uri>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return DataBindingUtil.inflate<PageDiaryBinding>(inflater, R.layout.page_diary, container, false).root
@@ -101,6 +101,7 @@ class DiaryFragment : AuraFragment() {
                     }
                 }.show()
         }
+        newDiary_imageGrid.initImages(arrayListOf())
         newDiary_imageGrid.setCallback { index, isAddingButton ->
             if (isAddingButton) {
                 startActivityForResult(
@@ -114,7 +115,7 @@ class DiaryFragment : AuraFragment() {
                 )
             } else {
                 startActivity(
-                    ImageActivity.newIntent(view.context, images[index].toString())
+                    ImageActivity.newIntent(view.context, index.id())
                 )
             }
         }
@@ -125,20 +126,8 @@ class DiaryFragment : AuraFragment() {
         if (requestCode == REQUEST_CODE_ADD_IMAGE && resultCode == RESULT_OK) {
             val uri = data?.data
             if (uri != null) {
-                images.add(uri)
+                newDiary_imageGrid.addImage(CRImage(newDiary_imageGrid.context, uri))
             }
-            newDiary_imageGrid.initImages(*Array<Source<Drawable>>(images.size) {
-                object : Source<Drawable> {
-                    override fun value(): Drawable {
-                        return BitmapDrawable(
-                            resources,
-                            BitmapFactory.decodeStream(
-                                newDiary_imageGrid.context.contentResolver.openInputStream(images[it])
-                            )
-                        )
-                    }
-                }
-            })
         }
     }
 
