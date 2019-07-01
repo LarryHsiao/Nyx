@@ -18,6 +18,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".diary.pages.NewDiaryActivity" />
+        <activity android:name=".diary.pages.NewDiaryWidgetActivity"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:clearTaskOnLaunch="true"
+            />
 
         <receiver android:name=".diary.widget.NewDiaryWidgetProvider">
             <intent-filter>
