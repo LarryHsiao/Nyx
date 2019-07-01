@@ -34,7 +34,7 @@ class NewDiaryFragment : AuraFragment() {
             val title = newDiary_newDiaryContent.text.toString()
             if (title.isNotEmpty()) {
                 viewModel.newDiary(title, ToUTCTimestamp(calendar.timeInMillis).value()).observe(this, Observer<Diary> {
-                    activity!!.onBackPressed()
+                    activity?.onBackPressed()
                 })
             } else {
                 Toast.makeText(inflater.context, R.string.title_should_not_empty, Toast.LENGTH_SHORT).show()
