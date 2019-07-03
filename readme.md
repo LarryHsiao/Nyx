@@ -15,6 +15,11 @@ Instant diary app on Android.
 
 
 @todo #1 Take picture
+
 @todo #1-1 Picture View for create diary
+
 @todo #2 Record voice
+
 @todo #3 Record video
+
+@todo #4 Note booke like background
