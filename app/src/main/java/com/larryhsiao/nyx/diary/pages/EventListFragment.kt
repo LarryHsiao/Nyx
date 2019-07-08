@@ -22,7 +22,8 @@ import com.silverhetch.aura.view.fab.FabBehavior
 class EventListFragment : AuraFragment(), FabBehavior {
     companion object {
         private const val ARG_DATETIME = "ARG_DATETIME"
-        private const val REQEUST_CODE_NEW_DIARY = 1000
+        private const val REQUEST_CODE_NEW_DIARY = 1000
+        private const val REQUEST_CODE_DIARY = 1001
 
         /**
          * Factory method
@@ -39,7 +40,12 @@ class EventListFragment : AuraFragment(), FabBehavior {
     private lateinit var viewModel: CalendarViewModel
     private lateinit var list: RecyclerView
     private val adapter = DiaryAdapter(){
-        nextPage(DiaryFragment.newInstance(it.id()))
+        nextPage(DiaryFragment.newInstance(it.id()).also { fragment ->
+            fragment.setTargetFragment(
+                this,
+                REQUEST_CODE_DIARY
+            )
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,15 +78,21 @@ class EventListFragment : AuraFragment(), FabBehavior {
     }
 
     override fun onClick() {
-        startActivityForResult(Intent(context, NewDiaryActivity::class.java), REQEUST_CODE_NEW_DIARY)
+        startActivityForResult(Intent(context, NewDiaryActivity::class.java), REQUEST_CODE_NEW_DIARY)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQEUST_CODE_NEW_DIARY) {
+        if (requestCode == REQUEST_CODE_NEW_DIARY) {
+            loadData()
+        }
+        if (requestCode == REQUEST_CODE_DIARY){
+            activity?.onBackPressed()
             loadData()
         }
     }
+
+
 
     private fun loadData() {
         viewModel.byDate(arguments?.getLong(ARG_DATETIME) ?: 0L).observe(this, Observer {

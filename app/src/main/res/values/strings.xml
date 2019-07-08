@@ -5,4 +5,6 @@
     <string name="save">Save</string>
     <string name="title_should_not_empty">Title should not empty.</string>
     <string name="add_image">Add image</string>
+    <string name="delete">Delete</string>
+    <string name="delete_this_diary">Delete this diary?</string>
 </resources>

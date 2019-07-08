@@ -1,13 +1,14 @@
 package com.larryhsiao.nyx.diary.pages
 
+import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -33,6 +34,7 @@ class DiaryFragment : AuraFragment() {
     companion object {
         private const val ARG_ID = "ARG_ID"
         private const val ARG_EDITABLE = "ARG_EDITABLE"
+
         private const val REQUEST_CODE_ADD_IMAGE = 1000
 
         /**
@@ -51,6 +53,29 @@ class DiaryFragment : AuraFragment() {
     private lateinit var viewModel: DiaryViewModel
     private lateinit var editable: MutableLiveData<Boolean>
     private var calendar: Calendar = Calendar.getInstance()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.diaryMenu_delete -> {
+                AlertDialog.Builder(context!!)
+                    .setMessage(R.string.delete_this_diary)
+                    .setPositiveButton(android.R.string.yes) { _, _ ->
+                        viewModel.delete().observe(this, Observer {
+                            activity?.onBackPressed()
+                        })
+                    }.setNegativeButton(android.R.string.no) { _, _ ->
+                        // leave it empty
+                    }
+                    .show()
+                true
+            }
+            else -> false
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -123,6 +148,11 @@ class DiaryFragment : AuraFragment() {
                 )
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.diary, menu)
     }
 
     override fun onActivityResult(

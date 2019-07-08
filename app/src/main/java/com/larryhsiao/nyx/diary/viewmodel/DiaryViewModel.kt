@@ -78,16 +78,19 @@ class DiaryViewModel(app: Application) : AndroidViewModel(app) {
     /**
      * Delete the diary present by this view model
      */
-    fun delete() {
+    fun delete(): LiveData<Boolean> {
         // @todo #feature-4 delete diary with clear media files
+        val result = MutableLiveData<Boolean>().also { it.value = false }
         GlobalScope.launch {
             diary.value?.also {
                 DiaryDeletion(
                     db.diaryDao(),
                     id = it.id()
-                )
+                ).fire()
             }
-            diary.value = PhantomDiary()
+            diary.postValue(PhantomDiary())
+            result.postValue(true)
         }
+        return result
     }
 }
