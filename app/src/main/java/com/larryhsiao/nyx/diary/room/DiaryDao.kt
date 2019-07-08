@@ -45,4 +45,10 @@ interface DiaryDao {
      */
     @Delete
     fun delete(diaryEntity: DiaryEntity)
+
+    /**
+     * Delete diary by given id.
+     */
+    @Query("DELETE FROM diary WHERE id=:id;")
+    fun delete(id:Long)
 }

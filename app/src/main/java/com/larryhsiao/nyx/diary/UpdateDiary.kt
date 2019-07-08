@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.diary
 
 import com.larryhsiao.nyx.diary.room.DiaryDao
 import com.larryhsiao.nyx.diary.room.DiaryEntity
+import com.silverhetch.clotho.Action
 import com.silverhetch.clotho.Source
 import java.lang.IllegalArgumentException
 
@@ -13,8 +14,8 @@ class UpdateDiary(
     private val id: Long,
     private val title: String,
     private val timestamp: Long
-) : Source<Diary> {
-    override fun value(): Diary {
+) : Action {
+    override fun fire() {
         if (title.isBlank()) {
             throw IllegalArgumentException("The title should not be empty/blank")
         }
@@ -25,6 +26,6 @@ class UpdateDiary(
                 timestamp
             )
         )
-        return RoomDiary(dao.byId(id))
+        RoomDiary(dao.byId(id))
     }
 }

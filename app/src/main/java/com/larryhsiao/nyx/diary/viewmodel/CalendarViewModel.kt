@@ -51,7 +51,7 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
                 diary.id(),
                 title,
                 timestamp
-            ).value()
+            ).fire()
         }
         return result
     }

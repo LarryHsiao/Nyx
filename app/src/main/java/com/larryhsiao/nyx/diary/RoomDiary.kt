@@ -4,7 +4,7 @@ import com.larryhsiao.nyx.diary.room.RDiary
 import java.util.*
 
 /**
- * The room implementation of diary.
+ * The [RDiary] adapter of diary.
  */
 class RoomDiary(private val roomDiary: RDiary) : Diary {
     override fun id(): Long {
