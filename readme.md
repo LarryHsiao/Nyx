@@ -23,3 +23,7 @@ Instant diary app on Android.
 @todo #3 Record video
 
 @todo #4 Note booke like background
+
+@todo #5 tagging
+
+@todo #6 searching
