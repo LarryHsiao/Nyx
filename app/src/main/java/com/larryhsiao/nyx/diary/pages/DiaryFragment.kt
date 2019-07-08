@@ -4,10 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,17 +16,15 @@ import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
+import com.larryhsiao.nyx.diary.viewmodel.DiaryViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.intent.ChooserIntent
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.images.CRImage
 import com.silverhetch.aura.view.images.ImageActivity
-import com.silverhetch.clotho.Source
 import kotlinx.android.synthetic.main.page_diary.*
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Fragment to show the exist diary.
@@ -54,12 +48,21 @@ class DiaryFragment : AuraFragment() {
         }
     }
 
-    private lateinit var viewModel: CalendarViewModel
+    private lateinit var viewModel: DiaryViewModel
     private lateinit var editable: MutableLiveData<Boolean>
     private var calendar: Calendar = Calendar.getInstance()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return DataBindingUtil.inflate<PageDiaryBinding>(inflater, R.layout.page_diary, container, false).root
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return DataBindingUtil.inflate<PageDiaryBinding>(
+            inflater,
+            R.layout.page_diary,
+            container,
+            false
+        ).root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,9 +70,8 @@ class DiaryFragment : AuraFragment() {
         editable = MutableLiveData<Boolean>().also {
             it.value = arguments?.getBoolean(ARG_EDITABLE) ?: false
         }
-        viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-        viewModel.byId(arguments?.getLong(ARG_ID)
-            ?: 0L).observe(this, Observer<Diary> { diary ->
+        viewModel = ViewModelProviders.of(this).get(DiaryViewModel::class.java)
+        viewModel.diary().observe(this, Observer<Diary> { diary ->
             val binding = DataBindingUtil.findBinding<PageDiaryBinding>(view)
             binding?.diary = diary
             editable.observe(this, Observer<Boolean> {
@@ -82,14 +84,16 @@ class DiaryFragment : AuraFragment() {
 
             calendar.time = Date().also { it.time = diary.timestamp() }
             newDiary_saveButton.setOnClickListener {
-                viewModel.updateDiary(
-                    diary,
+                viewModel.update(
                     newDiary_newDiaryContent.text.toString(),
-                    calendar.time.time
+                    calendar.time.time,
+                    listOf()
                 )
                 editable.value = false
             }
         })
+        viewModel.loadUp(arguments?.getLong(ARG_ID) ?: 0L)
+
         newDiary_date.setOnClickListener {
             DatePickerDialog(it.context)
                 .apply {
@@ -121,18 +125,28 @@ class DiaryFragment : AuraFragment() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ADD_IMAGE && resultCode == RESULT_OK) {
             val uri = data?.data
             if (uri != null) {
-                newDiary_imageGrid.addImage(CRImage(newDiary_imageGrid.context, uri))
+                newDiary_imageGrid.addImage(
+                    CRImage(
+                        newDiary_imageGrid.context,
+                        uri
+                    )
+                )
             }
         }
     }
 
     private fun updateDateIndicator() {
-        newDiary_date.text = SimpleDateFormat.getDateInstance().format(Date().apply { time = calendar.timeInMillis })
+        newDiary_date.text = SimpleDateFormat.getDateInstance()
+            .format(Date().apply { time = calendar.timeInMillis })
     }
 
     override fun onResume() {
