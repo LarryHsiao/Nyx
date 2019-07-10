@@ -1,8 +1,7 @@
 package com.larryhsiao.nyx
 
 import android.os.Bundle
-import com.larryhsiao.nyx.diary.pages.CalendarFragment
-import com.larryhsiao.nyx.diary.pages.EventListFragment
+import com.larryhsiao.nyx.view.diary.CalendarFragment
 import com.silverhetch.aura.AuraActivity
 import kotlinx.android.synthetic.main.activity_main.*
 

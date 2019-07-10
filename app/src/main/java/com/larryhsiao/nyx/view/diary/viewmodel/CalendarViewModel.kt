@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.diary.viewmodel
+package com.larryhsiao.nyx.view.diary.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

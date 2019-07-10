@@ -1,9 +1,10 @@
-package com.larryhsiao.nyx.diary.viewmodel
+package com.larryhsiao.nyx.view.diary.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.larryhsiao.nyx.ConfigImpl
 import com.larryhsiao.nyx.RDatabase
 import com.larryhsiao.nyx.diary.*
 import com.larryhsiao.nyx.diary.room.DiaryEntity
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
  */
 class DiaryViewModel(app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Factory(app).value()
+    private val config = ConfigImpl(app)
     private val diary = MutableLiveData<Diary>().apply {
         value = PhantomDiary()
     }
@@ -62,6 +64,7 @@ class DiaryViewModel(app: Application) : AndroidViewModel(app) {
                 message,
                 timestamp
             ).fire()
+
             diary.postValue(
                 RoomDiary(
                     RDiary(

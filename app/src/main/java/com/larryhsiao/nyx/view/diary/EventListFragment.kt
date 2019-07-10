@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.diary.pages
+package com.larryhsiao.nyx.view.diary
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.larryhsiao.nyx.R
-import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
+import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 
@@ -39,13 +39,16 @@ class EventListFragment : AuraFragment(), FabBehavior {
 
     private lateinit var viewModel: CalendarViewModel
     private lateinit var list: RecyclerView
-    private val adapter = DiaryAdapter(){
-        nextPage(DiaryFragment.newInstance(it.id()).also { fragment ->
-            fragment.setTargetFragment(
-                this,
-                REQUEST_CODE_DIARY
-            )
-        })
+    private val adapter = DiaryAdapter() {
+        nextPage(
+            DiaryFragment.newInstance(
+                it.id()
+            ).also { fragment ->
+                fragment.setTargetFragment(
+                    this,
+                    REQUEST_CODE_DIARY
+                )
+            })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +81,9 @@ class EventListFragment : AuraFragment(), FabBehavior {
     }
 
     override fun onClick() {
-        startActivityForResult(Intent(context, NewDiaryActivity::class.java), REQUEST_CODE_NEW_DIARY)
+        startActivityForResult(Intent(context, NewDiaryActivity::class.java),
+            REQUEST_CODE_NEW_DIARY
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

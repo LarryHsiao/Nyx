@@ -1,10 +1,8 @@
-package com.larryhsiao.nyx.diary.pages
+package com.larryhsiao.nyx.view.diary
 
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.os.Bundle
@@ -17,7 +15,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.diary.viewmodel.DiaryViewModel
+import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.intent.ChooserIntent
 import com.silverhetch.aura.view.fab.FabBehavior
@@ -109,10 +107,13 @@ class DiaryFragment : AuraFragment() {
 
             calendar.time = Date().also { it.time = diary.timestamp() }
             newDiary_saveButton.setOnClickListener {
+                val images = newDiary_imageGrid.sources().keys.toTypedArray()
                 viewModel.update(
                     newDiary_newDiaryContent.text.toString(),
                     calendar.time.time,
-                    listOf()
+                    Array(images.size) {
+                        images[it]
+                    }.toList()
                 )
                 editable.value = false
             }

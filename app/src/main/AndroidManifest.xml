@@ -17,14 +17,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".diary.pages.NewDiaryActivity" />
-        <activity android:name=".diary.pages.NewDiaryWidgetActivity"
+        <activity android:name="com.larryhsiao.nyx.view.diary.NewDiaryActivity" />
+        <activity android:name="com.larryhsiao.nyx.view.diary.NewDiaryWidgetActivity"
             android:taskAffinity=""
             android:excludeFromRecents="true"
             android:clearTaskOnLaunch="true"
             />
 
-        <receiver android:name=".diary.widget.NewDiaryWidgetProvider">
+        <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

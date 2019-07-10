@@ -1,26 +1,20 @@
-package com.larryhsiao.nyx.diary.pages
+package com.larryhsiao.nyx.view.diary
 
-import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.applandeo.materialcalendarview.CalendarUtils
 import com.applandeo.materialcalendarview.EventDay
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
+import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
-import com.silverhetch.aura.view.dialog.InputDialog
 import com.silverhetch.aura.view.fab.FabBehavior
-import com.silverhetch.aura.view.measures.DP
-import com.silverhetch.clotho.time.ToUTCTimestamp
 import kotlinx.android.synthetic.main.fragment_calendar.*
 import java.util.*
 
@@ -39,7 +33,11 @@ class CalendarFragment : AuraFragment(), FabBehavior {
         viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
 
         calendar_calendarView.setOnDayClickListener {
-            nextPage(EventListFragment.newInstance(it.calendar.timeInMillis))
+            nextPage(
+                EventListFragment.newInstance(
+                    it.calendar.timeInMillis
+                )
+            )
         }
     }
 

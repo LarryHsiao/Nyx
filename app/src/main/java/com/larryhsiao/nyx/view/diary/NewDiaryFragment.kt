@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.diary.pages
+package com.larryhsiao.nyx.view.diary
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.diary.viewmodel.CalendarViewModel
+import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.clotho.time.ToUTCTimestamp
 import kotlinx.android.synthetic.main.page_diary.*

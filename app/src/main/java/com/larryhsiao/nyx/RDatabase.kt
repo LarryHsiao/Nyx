@@ -4,10 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.larryhsiao.nyx.diary.room.DiaryDao
-import com.larryhsiao.nyx.diary.room.DiaryEntity
-import com.larryhsiao.nyx.diary.room.MediaEntity
-import com.larryhsiao.nyx.diary.room.TagEntity
+import com.larryhsiao.nyx.diary.room.*
+import com.larryhsiao.nyx.media.room.MediaDao
+import com.larryhsiao.nyx.media.room.MediaEntity
 import com.silverhetch.clotho.Source
 
 /**
@@ -17,9 +16,14 @@ import com.silverhetch.clotho.Source
 abstract class RDatabase : RoomDatabase() {
 
     /**
-     * Obtain the Dao for diary. Constructed by Room framework.
+     * Obtain the Diary dao.
      */
     abstract fun diaryDao(): DiaryDao
+
+    /**
+     * Obtain the Media dao.
+     */
+    abstract fun mediaDao(): MediaDao
 
     /**
      * Source generate [RDatabase] for Nyx.

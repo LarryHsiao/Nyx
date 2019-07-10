@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.diary.room
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.larryhsiao.nyx.media.room.MediaEntity
 
 /**
  * Diary query from room with relations.

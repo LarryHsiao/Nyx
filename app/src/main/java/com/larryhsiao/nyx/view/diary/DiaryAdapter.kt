@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.diary.pages
+package com.larryhsiao.nyx.view.diary
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

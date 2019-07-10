@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.diary.widget
+package com.larryhsiao.nyx.view.diary.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -7,8 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.larryhsiao.nyx.R
-import com.larryhsiao.nyx.diary.pages.NewDiaryActivity
-import com.larryhsiao.nyx.diary.pages.NewDiaryWidgetActivity
+import com.larryhsiao.nyx.view.diary.NewDiaryWidgetActivity
 
 /**
  * Provider for widget new diary.
