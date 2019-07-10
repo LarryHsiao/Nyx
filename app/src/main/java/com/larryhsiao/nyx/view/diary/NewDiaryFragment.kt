@@ -27,10 +27,10 @@ class NewDiaryFragment : AuraFragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.page_diary, container, false)
+        val rootView = inflater.inflate(R.layout.page_diary, container, false)
         viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
 
-        view.newDiary_saveButton.setOnClickListener {
+        rootView.newDiary_saveButton.setOnClickListener {
             val title = newDiary_newDiaryContent.text.toString()
             if (title.isNotEmpty()) {
                 viewModel.newDiary(title, ToUTCTimestamp(calendar.timeInMillis).value()).observe(this, Observer<Diary> {
@@ -41,19 +41,19 @@ class NewDiaryFragment : AuraFragment() {
             }
         }
 
-        view.newDiary_date.setOnClickListener {
+        rootView.newDiary_date.setOnClickListener {
             DatePickerDialog(it.context)
                 .apply {
-                    setOnDateSetListener { view, year, month, dayOfMonth ->
+                    setOnDateSetListener { _, year, month, dayOfMonth ->
                         calendar.set(Calendar.YEAR, year)
                         calendar.set(Calendar.MONTH, month)
                         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                        updateDateIndicator(view)
+                        updateDateIndicator(rootView)
                     }
                 }.show()
         }
-        updateDateIndicator(view)
-        return view
+        updateDateIndicator(rootView)
+        return rootView
     }
 
     private fun updateDateIndicator(view: View) {

@@ -37,26 +37,6 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Update exist diary.
-     */
-    fun updateDiary(
-        diary: Diary,
-        title: String,
-        timestamp: Long
-    ): LiveData<Diary> {
-        val result = MutableLiveData<Diary>()
-        GlobalScope.launch {
-            UpdateDiary(
-                db.diaryDao(),
-                diary.id(),
-                title,
-                timestamp
-            ).fire()
-        }
-        return result
-    }
-
-    /**
      * All diaries
      */
     fun diaries(): LiveData<List<Diary>> {
@@ -81,19 +61,6 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
                 )
             }
         }
-    }
-
-    /**
-     * Diary by ID
-     */
-    fun byId(id: Long): LiveData<Diary> {
-        val result = MutableLiveData<Diary>()
-        GlobalScope.launch {
-            result.postValue(
-                DiaryById(db.diaryDao(), id).value()
-            )
-        }
-        return result
     }
 
     override fun onCleared() {

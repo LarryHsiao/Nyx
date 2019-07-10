@@ -106,6 +106,13 @@ class DiaryFragment : AuraFragment() {
             })
 
             calendar.time = Date().also { it.time = diary.timestamp() }
+            val uris = diary.imageUris()
+            newDiary_imageGrid.initImages(Array(uris.size){
+                CRImage(
+                    view.context,
+                    uris[it]
+                )
+            }.toList())
             newDiary_saveButton.setOnClickListener {
                 val images = newDiary_imageGrid.sources().keys.toTypedArray()
                 viewModel.update(

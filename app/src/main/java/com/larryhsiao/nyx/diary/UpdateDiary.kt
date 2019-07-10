@@ -3,8 +3,6 @@ package com.larryhsiao.nyx.diary
 import com.larryhsiao.nyx.diary.room.DiaryDao
 import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.silverhetch.clotho.Action
-import com.silverhetch.clotho.Source
-import java.lang.IllegalArgumentException
 
 /**
  * Update the exist diary.

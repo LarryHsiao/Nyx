@@ -10,7 +10,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "media")
 data class MediaEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
-    @ColumnInfo(name="diary_id")val diaryId: Long,
-    val meta: String,
-    val value: String
+    @ColumnInfo(name = "diary_id") val diaryId: Long,
+    val uri: String
 )

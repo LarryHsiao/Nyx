@@ -12,7 +12,7 @@ import com.silverhetch.clotho.Source
 /**
  * Database implemented with Room
  */
-@Database(entities = [DiaryEntity::class, MediaEntity::class, TagEntity::class], version = 1)
+@Database(entities = [DiaryEntity::class, MediaEntity::class, TagEntity::class], version = 2)
 abstract class RDatabase : RoomDatabase() {
 
     /**

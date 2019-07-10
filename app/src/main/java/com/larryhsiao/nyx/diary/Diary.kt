@@ -1,5 +1,7 @@
 package com.larryhsiao.nyx.diary
 
+import android.net.Uri
+
 /**
  * Represents a diary.
  */
@@ -18,4 +20,9 @@ interface Diary {
      * The record timestamp
      */
     fun timestamp(): Long
+
+    /**
+     * Image uris
+     */
+    fun imageUris():Array<Uri>
 }

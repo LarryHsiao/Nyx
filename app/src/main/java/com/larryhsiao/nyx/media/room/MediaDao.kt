@@ -17,8 +17,26 @@ interface MediaDao {
     fun create(entity: MediaEntity): Long
 
     /**
+     * Create media entities.
+     */
+    @Insert(onConflict = REPLACE)
+    fun create(entity: List<MediaEntity>): List<Long>
+
+    /**
      * Delete media row by given media id.
      */
     @Query("DELETE FROM media WHERE id=:id")
     fun delete(id: Long)
+
+    /**
+     * Delete media rows by given diary id.
+     */
+    @Query("DELETE FROM media WHERE diary_id=:diaryId")
+    fun deleteByDiaryId(diaryId:Long)
+
+    /**
+     * Query Medias by diary id.
+     */
+    @Query("SELECT * FROM media WHERE diary_id=:diaryId;")
+    fun byDiaryId(diaryId: Long): List<MediaEntity>
 }

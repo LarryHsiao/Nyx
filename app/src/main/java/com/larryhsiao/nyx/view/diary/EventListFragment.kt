@@ -53,10 +53,15 @@ class EventListFragment : AuraFragment(), FabBehavior {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+        viewModel =
+            ViewModelProviders.of(this).get(CalendarViewModel::class.java)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return RecyclerView(inflater.context).also {
             list = it
             list.adapter = adapter
@@ -81,28 +86,33 @@ class EventListFragment : AuraFragment(), FabBehavior {
     }
 
     override fun onClick() {
-        startActivityForResult(Intent(context, NewDiaryActivity::class.java),
+        startActivityForResult(
+            Intent(context, NewDiaryActivity::class.java),
             REQUEST_CODE_NEW_DIARY
         )
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_NEW_DIARY) {
             loadData()
         }
-        if (requestCode == REQUEST_CODE_DIARY){
+        if (requestCode == REQUEST_CODE_DIARY) {
             activity?.onBackPressed()
             loadData()
         }
     }
 
 
-
     private fun loadData() {
-        viewModel.byDate(arguments?.getLong(ARG_DATETIME) ?: 0L).observe(this, Observer {
-            adapter.load(it)
-        })
+        viewModel.byDate(arguments?.getLong(ARG_DATETIME) ?: 0L)
+            .observe(this, Observer {
+                adapter.load(it)
+            })
     }
 
     override fun icon(): Int {

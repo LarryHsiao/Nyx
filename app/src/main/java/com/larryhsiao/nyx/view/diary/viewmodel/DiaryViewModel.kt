@@ -4,20 +4,19 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.larryhsiao.nyx.ConfigImpl
 import com.larryhsiao.nyx.RDatabase
 import com.larryhsiao.nyx.diary.*
 import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.diary.room.RDiary
+import com.larryhsiao.nyx.media.NewMedias
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 /**
  * View Model for single diary.
  */
-class DiaryViewModel(app: Application) : AndroidViewModel(app) {
+class DiaryViewModel(private val app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Factory(app).value()
-    private val config = ConfigImpl(app)
     private val diary = MutableLiveData<Diary>().apply {
         value = PhantomDiary()
     }
@@ -58,6 +57,7 @@ class DiaryViewModel(app: Application) : AndroidViewModel(app) {
     ) {
         GlobalScope.launch {
             val id = diary.value?.id() ?: -1
+            // @todo #1 merge media entity operation code into same object(maybe UpdateDiary)
             UpdateDiary(
                 db.diaryDao(),
                 id,
@@ -69,11 +69,15 @@ class DiaryViewModel(app: Application) : AndroidViewModel(app) {
                 RoomDiary(
                     RDiary(
                         DiaryEntity(id, message, timestamp),
-                        listOf()
+                        NewMedias(
+                            app,
+                            db.mediaDao(),
+                            id,
+                            mediaUri
+                        ).value()
                     )
                 )
             )
-            // @todo #feature-3 update diary with media.
         }
 
     }
@@ -82,13 +86,13 @@ class DiaryViewModel(app: Application) : AndroidViewModel(app) {
      * Delete the diary present by this view model
      */
     fun delete(): LiveData<Boolean> {
-        // @todo #feature-4 delete diary with clear media files
         val result = MutableLiveData<Boolean>().also { it.value = false }
         GlobalScope.launch {
             diary.value?.also {
                 DiaryDeletion(
                     db.diaryDao(),
-                    id = it.id()
+                    db.mediaDao(),
+                    it.id()
                 ).fire()
             }
             diary.postValue(PhantomDiary())
