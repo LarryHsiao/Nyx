@@ -2,7 +2,7 @@ package com.larryhsiao.nyx.diary
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.larryhsiao.nyx.RDatabase
+import com.larryhsiao.nyx.database.RDatabase
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before

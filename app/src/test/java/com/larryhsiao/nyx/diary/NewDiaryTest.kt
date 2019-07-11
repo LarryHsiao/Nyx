@@ -2,8 +2,7 @@ package com.larryhsiao.nyx.diary
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.platform.app.InstrumentationRegistry
-import com.larryhsiao.nyx.RDatabase
+import com.larryhsiao.nyx.database.RDatabase
 import org.junit.After
 import org.junit.Assert.assertNotEquals
 import org.junit.Before

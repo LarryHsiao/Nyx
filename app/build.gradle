@@ -44,6 +44,9 @@ android {
             includeAndroidResources = true
         }
     }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
 }
 
 dependencies {
@@ -67,8 +70,11 @@ dependencies {
     testImplementation "androidx.test:core:1.2.0"
     testImplementation "org.robolectric:robolectric:4.3"
     testImplementation "androidx.room:room-testing:$room_version"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation "androidx.test:runner:1.2.0"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
+    androidTestImplementation "android.arch.persistence.room:testing:$room_version"
+
 }
 
 apply from: 'deploy.gradle'

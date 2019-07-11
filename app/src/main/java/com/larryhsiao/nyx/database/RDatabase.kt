@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx
+package com.larryhsiao.nyx.database
 
 import android.content.Context
 import androidx.room.Database
@@ -36,8 +36,9 @@ abstract class RDatabase : RoomDatabase() {
         override fun value(): RDatabase {
             return Room.databaseBuilder(
                 context,
-                RDatabase::class.java, DATABASE_NAME
-            ).build()
+                RDatabase::class.java,
+                DATABASE_NAME
+            ).addMigrations(Migration1To2()).build()
         }
     }
 }

@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.larryhsiao.nyx.RDatabase
+import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.diary.*
 import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.diary.room.RDiary
