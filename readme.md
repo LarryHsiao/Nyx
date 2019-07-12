@@ -14,7 +14,7 @@ Instant diary app on Android.
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 
-@todo #1 Take picture
+@todo #7 Use high resolution image with Camera output 
 
 @todo #2 Record voice
 
