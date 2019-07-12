@@ -44,9 +44,11 @@ class DiaryByDateTest {
     @Test
     fun allDiary() {
         NewDiary(
-            db.diaryDao(),
+            ApplicationProvider.getApplicationContext(),
+            db,
             ARG_TITLE,
-            1234567890
+            1234567890,
+            listOf()
         ).value().id()
 
         assertEquals(
@@ -62,21 +64,27 @@ class DiaryByDateTest {
     @Test
     fun diaryByDateTimestamp() {
         NewDiary(
-            db.diaryDao(),
+            ApplicationProvider.getApplicationContext(),
+            db,
             ARG_TITLE,
-            1561190477
+            1561190477,
+            listOf()
         ).value().id()
 
         NewDiary(
-            db.diaryDao(),
+            ApplicationProvider.getApplicationContext(),
+            db,
             ARG_TITLE,
-            1551190477
+            1551190477,
+            listOf()
         ).value().id()
 
         NewDiary(
-            db.diaryDao(),
+            ApplicationProvider.getApplicationContext(),
+            db,
             ARG_TITLE,
-            1551190477
+            1551190477,
+            listOf()
         ).value().id()
 
         assertEquals(

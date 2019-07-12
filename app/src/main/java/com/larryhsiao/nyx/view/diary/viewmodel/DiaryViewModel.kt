@@ -64,7 +64,7 @@ class DiaryViewModel(private val app: Application) : AndroidViewModel(app) {
                 message,
                 timestamp
             ).fire()
-
+            db.mediaDao().deleteByDiaryId(id)
             diary.postValue(
                 RoomDiary(
                     RDiary(

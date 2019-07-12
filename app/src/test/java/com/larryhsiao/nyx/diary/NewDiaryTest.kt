@@ -44,9 +44,11 @@ class NewDiaryTest {
         assertNotEquals(
             0,
             NewDiary(
-                db.diaryDao(),
+                ApplicationProvider.getApplicationContext(),
+                db,
                 "Title",
-                1234567890
+                1234567890,
+                listOf()
             ).value().id()
         )
     }

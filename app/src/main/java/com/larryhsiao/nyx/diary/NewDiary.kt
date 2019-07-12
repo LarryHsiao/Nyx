@@ -1,24 +1,37 @@
 package com.larryhsiao.nyx.diary
 
-import com.larryhsiao.nyx.diary.room.DiaryDao
+import android.content.Context
+import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.diary.room.RDiary
+import com.larryhsiao.nyx.media.NewMedias
 import com.silverhetch.clotho.Source
-import java.lang.RuntimeException
 
 /**
  * Create or update new diary.
  */
 class NewDiary(
-    private val dao: DiaryDao,
+    private val context:Context,
+    private val db: RDatabase,
     private val title: String,
-    private val utcTimestamp: Long
+    private val utcTimestamp: Long,
+    private val mediaUri: List<String>
 ) : Source<Diary> {
     override fun value(): Diary {
-        if (title.isBlank()){
+        if (title.isBlank()) {
             throw IllegalArgumentException("The title should not be empty")
         }
-        val newId = dao.create(DiaryEntity(0, title, utcTimestamp))
-        return RoomDiary(RDiary(DiaryEntity(newId, title, utcTimestamp), listOf()))
+        val newId = db.diaryDao().create(DiaryEntity(0, title, utcTimestamp))
+        return RoomDiary(
+            RDiary(
+                DiaryEntity(newId, title, utcTimestamp),
+                NewMedias(
+                    context,
+                    db.mediaDao(),
+                    newId,
+                    mediaUri
+                ).value()
+            )
+        )
     }
 }

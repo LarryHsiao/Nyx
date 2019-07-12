@@ -5,8 +5,11 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore.ACTION_IMAGE_CAPTURE
 import android.view.*
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -15,12 +18,15 @@ import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
+import com.larryhsiao.nyx.media.storage.NewMediaFile
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.intent.ChooserIntent
+import com.silverhetch.aura.media.BitmapStream
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.images.CRImage
 import com.silverhetch.aura.view.images.ImageActivity
+import com.silverhetch.clotho.file.ToFile
 import kotlinx.android.synthetic.main.page_diary.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,6 +40,7 @@ class DiaryFragment : AuraFragment() {
         private const val ARG_EDITABLE = "ARG_EDITABLE"
 
         private const val REQUEST_CODE_ADD_IMAGE = 1000
+
 
         /**
          * Factory method
@@ -112,7 +119,7 @@ class DiaryFragment : AuraFragment() {
                     view.context,
                     uris[it]
                 )
-            }.toList())
+            }.toList(),false)
             newDiary_saveButton.setOnClickListener {
                 val images = newDiary_imageGrid.sources().keys.toTypedArray()
                 viewModel.update(
@@ -138,22 +145,15 @@ class DiaryFragment : AuraFragment() {
                     }
                 }.show()
         }
-        newDiary_imageGrid.initImages(arrayListOf())
+        newDiary_imageGrid.initImages(arrayListOf(), false)
         newDiary_imageGrid.setCallback { index, isAddingButton ->
             if (isAddingButton) {
                 startActivityForResult(
-                    ChooserIntent(
-                        getString(R.string.add_image),
-                        Intent(ACTION_GET_CONTENT).also {
-                            it.type = "image/*"
-                        }
-                    ).value(),
+                    FindImageIntent(view.context).value(),
                     REQUEST_CODE_ADD_IMAGE
                 )
             } else {
-                startActivity(
-                    ImageActivity.newIntent(view.context, index.id())
-                )
+                startActivity(ImageActivity.newIntent(view.context, index.id()))
             }
         }
     }
@@ -176,6 +176,21 @@ class DiaryFragment : AuraFragment() {
                     CRImage(
                         newDiary_imageGrid.context,
                         uri
+                    )
+                )
+            }
+
+            val extraData= data?.extras?.get("data")
+            if (extraData is Bitmap){
+                val newMedia = NewMediaFile(view!!.context).value()
+                ToFile(
+                    BitmapStream(extraData).value(),
+                    newMedia
+                ){/* leave progress empty */}.fire()
+                newDiary_imageGrid.addImage(
+                    CRImage(
+                        newDiary_imageGrid.context,
+                        newMedia.toUri()
                     )
                 )
             }

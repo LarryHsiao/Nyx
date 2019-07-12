@@ -13,7 +13,7 @@ import java.util.*
 /**
  * View model for presenting the calendar events
  */
-class CalendarViewModel(app: Application) : AndroidViewModel(app) {
+class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Factory(app).value()
 
     /**
@@ -21,14 +21,17 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun newDiary(
         title: String,
-        timestamp: Long = Calendar.getInstance(TimeZone.getTimeZone("UTC")).timeInMillis
+        timestamp: Long = Calendar.getInstance(TimeZone.getTimeZone("UTC")).timeInMillis,
+        mediaUris: List<String>
     ): LiveData<Diary> {
         val result = MutableLiveData<Diary>()
         GlobalScope.launch {
             NewDiary(
-                db.diaryDao(),
+                app,
+                db,
                 title,
-                timestamp
+                timestamp,
+                mediaUris
             ).value().also { newDiary ->
                 result.postValue(newDiary)
             }
