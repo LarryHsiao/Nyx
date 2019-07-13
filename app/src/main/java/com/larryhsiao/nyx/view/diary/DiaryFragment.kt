@@ -4,11 +4,10 @@ import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
-import android.content.Intent.ACTION_GET_CONTENT
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.provider.MediaStore.ACTION_IMAGE_CAPTURE
 import android.view.*
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -19,9 +18,10 @@ import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.media.storage.NewMediaFile
+import com.larryhsiao.nyx.view.diary.image.FindImageIntent
+import com.larryhsiao.nyx.view.diary.image.ResultUri
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
 import com.silverhetch.aura.AuraFragment
-import com.silverhetch.aura.intent.ChooserIntent
 import com.silverhetch.aura.media.BitmapStream
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.images.CRImage
@@ -109,19 +109,19 @@ class DiaryFragment : AuraFragment() {
                 newDiary_imageGrid.addable(it)
                 if (!it) {
                     editableFab()
-                }else{
+                } else {
                     saveFab()
                 }
             })
 
             calendar.time = Date().also { it.time = diary.timestamp() }
             val uris = diary.imageUris()
-            newDiary_imageGrid.initImages(Array(uris.size){
+            newDiary_imageGrid.initImages(Array(uris.size) {
                 CRImage(
                     view.context,
                     uris[it]
                 )
-            }.toList(),false)
+            }.toList(), false)
         })
         viewModel.loadUp(arguments?.getLong(ARG_ID) ?: 0L)
 
@@ -160,30 +160,26 @@ class DiaryFragment : AuraFragment() {
         data: Intent?
     ) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_ADD_IMAGE && resultCode == RESULT_OK) {
-            val uri = data?.data
-            if (uri != null) {
+        if (requestCode == REQUEST_CODE_ADD_IMAGE
+            && resultCode == RESULT_OK
+            && data != null
+        ) {
+            try {
                 newDiary_imageGrid.addImage(
                     CRImage(
                         newDiary_imageGrid.context,
-                        uri
+                        ResultUri(
+                            newDiary_imageGrid.context,
+                            data
+                        ).value()
                     )
                 )
-            }
-
-            val extraData= data?.extras?.get("data")
-            if (extraData is Bitmap){
-                val newMedia = NewMediaFile(view!!.context).value()
-                ToFile(
-                    BitmapStream(extraData).value(),
-                    newMedia
-                ){/* leave progress empty */}.fire()
-                newDiary_imageGrid.addImage(
-                    CRImage(
-                        newDiary_imageGrid.context,
-                        newMedia.toUri()
-                    )
-                )
+            } catch (e: Exception) {
+                Toast.makeText(
+                    newDiary_imageGrid.context,
+                    R.string.unsupported_image_format,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -210,8 +206,8 @@ class DiaryFragment : AuraFragment() {
         })
     }
 
-    private fun saveFab(){
-        attachFab(object: FabBehavior{
+    private fun saveFab() {
+        attachFab(object : FabBehavior {
             override fun onClick() {
                 val images = newDiary_imageGrid.sources().keys.toTypedArray()
                 viewModel.update(

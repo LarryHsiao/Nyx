@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.view.diary
+package com.larryhsiao.nyx.view.diary.image
 
 import android.content.Context
 import android.content.Intent

@@ -1,6 +1,6 @@
 package com.larryhsiao.nyx.view.diary
 
-import android.app.Activity
+import android.app.Activity.*
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -15,6 +15,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.media.storage.NewMediaFile
+import com.larryhsiao.nyx.view.diary.image.FindImageIntent
+import com.larryhsiao.nyx.view.diary.image.ResultUri
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.media.BitmapStream
@@ -33,7 +35,7 @@ import java.util.*
  */
 class NewDiaryFragment : AuraFragment() {
     companion object {
-        private const val REQUEST_CODE_FIND_IMAGE = 1000
+        private const val REQUEST_CODE_ADD_IMAGE = 1000
     }
 
     private lateinit var viewModel: CalendarViewModel
@@ -49,7 +51,7 @@ class NewDiaryFragment : AuraFragment() {
         viewModel =
             ViewModelProviders.of(this).get(CalendarViewModel::class.java)
         attachFab(
-            object:FabBehavior{
+            object : FabBehavior {
                 override fun onClick() {
                     val title = newDiary_newDiaryContent.text.toString()
                     if (title.isNotEmpty()) {
@@ -93,7 +95,7 @@ class NewDiaryFragment : AuraFragment() {
             if (isAddingButton) {
                 startActivityForResult(
                     FindImageIntent(rootView.context).value(),
-                    REQUEST_CODE_FIND_IMAGE
+                    REQUEST_CODE_ADD_IMAGE
                 )
             } else {
                 startActivity(
@@ -113,30 +115,26 @@ class NewDiaryFragment : AuraFragment() {
         data: Intent?
     ) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_FIND_IMAGE && resultCode == Activity.RESULT_OK) {
-            val uri = data?.data
-            if (uri != null) {
+        if (requestCode == REQUEST_CODE_ADD_IMAGE
+            && resultCode == RESULT_OK
+            && data != null
+        ) {
+            try {
                 newDiary_imageGrid.addImage(
                     CRImage(
                         newDiary_imageGrid.context,
-                        uri
+                        ResultUri(
+                            newDiary_imageGrid.context,
+                            data
+                        ).value()
                     )
                 )
-            }
-
-            val extraData= data?.extras?.get("data")
-            if (extraData is Bitmap){
-                val newMedia = NewMediaFile(view!!.context).value()
-                ToFile(
-                    BitmapStream(extraData).value(),
-                    newMedia
-                ){/* leave progress empty */}.fire()
-                newDiary_imageGrid.addImage(
-                    CRImage(
-                        newDiary_imageGrid.context,
-                        newMedia.toUri()
-                    )
-                )
+            } catch (e: Exception) {
+                Toast.makeText(
+                    newDiary_imageGrid.context,
+                    R.string.unsupported_image_format,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
