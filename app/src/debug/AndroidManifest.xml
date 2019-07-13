@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+
+        <meta-data
+                tools:replace="android:value"
+                android:name="firebase_crashlytics_collection_enabled"
+                android:value="true"/>
+    </application>
+</manifest>
