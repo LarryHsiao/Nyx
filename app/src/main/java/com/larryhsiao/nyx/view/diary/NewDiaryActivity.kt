@@ -15,7 +15,7 @@ import com.silverhetch.aura.view.measures.DP
 /**
  * Create Diary Activity with Transparent background.
  */
-class NewDiaryActivity : AuraActivity() {
+open class NewDiaryActivity : AuraActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(FrameLayout(this).apply {
