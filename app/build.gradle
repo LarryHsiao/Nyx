@@ -3,8 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-def nyxVersionName = "v1.2.0"
-def nyxVersionCode = 10201
+def nyxVersionName = "v1.3.0"
+def nyxVersionCode = 10300
 
 android {
     compileSdkVersion 28
