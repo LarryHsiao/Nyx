@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:dist="http://schemas.android.com/apk/distribution"
-    package="com.larryhsiao.nyx">
+          xmlns:dist="http://schemas.android.com/apk/distribution"
+          package="com.larryhsiao.nyx">
 
     <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+            android:name=".NyxApplication"
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.larryhsiao.nyx.view.diary.NewDiaryActivity" />
-        <activity android:name="com.larryhsiao.nyx.view.diary.NewDiaryWidgetActivity"
-            android:taskAffinity=""
-            android:excludeFromRecents="true"
-            android:clearTaskOnLaunch="true"
-            />
+        <activity
+                android:name="com.larryhsiao.nyx.view.diary.NewDiaryActivity"/>
+        <activity
+                android:name="com.larryhsiao.nyx.view.diary.NewDiaryWidgetActivity"
+                android:taskAffinity=""
+                android:excludeFromRecents="true"
+                android:clearTaskOnLaunch="true"
+        />
 
-        <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
+        <receiver
+                android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
             <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_new_diary" />
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/widget_new_diary"/>
         </receiver>
 
     </application>
 
-    <dist:module dist:instant="true" />
+    <dist:module dist:instant="true"/>
 
 </manifest>
