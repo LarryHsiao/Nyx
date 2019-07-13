@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.view.diary
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.applandeo.materialcalendarview.CalendarUtils
 import com.applandeo.materialcalendarview.EventDay
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.TintDrawable
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
@@ -24,13 +26,18 @@ import java.util.*
 class CalendarFragment : AuraFragment(), FabBehavior {
     private lateinit var viewModel: CalendarViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_calendar, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+        viewModel =
+            ViewModelProviders.of(this).get(CalendarViewModel::class.java)
 
         calendar_calendarView.setOnDayClickListener {
             nextPage(
@@ -78,13 +85,10 @@ class CalendarFragment : AuraFragment(), FabBehavior {
             Calendar.getInstance().also { calendar ->
                 calendar.timeInMillis = diary.timestamp()
             },
-            CalendarUtils.getDrawableText(
-                context,
-                diary.title(),
-                Typeface.DEFAULT,
-                R.color.colorPrimaryDark,
-                10
-            )
+            TintDrawable(
+                resources.getDrawable(R.drawable.ic_dot),
+                Color.GREEN
+            ).value()
         )
     }
 }
