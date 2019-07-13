@@ -29,16 +29,6 @@
             android:layout_gravity="center"
             android:background="@android:color/transparent">
 
-            <Button
-                android:id="@+id/newDiary_saveButton"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:text="@string/save"
-                android:visibility="@{editable?View.VISIBLE:View.INVISIBLE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/newDiary_newDiaryContent"
                 android:layout_width="250dp"
@@ -56,8 +46,8 @@
                 android:id="@+id/newDiary_imageGrid"
                 android:layout_width="0dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/newDiary_saveButton"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/newDiary_newDiaryContent"
                 android:layout_height="wrap_content" />
 
             <TextView

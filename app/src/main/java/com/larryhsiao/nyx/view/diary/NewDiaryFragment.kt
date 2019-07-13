@@ -18,6 +18,7 @@ import com.larryhsiao.nyx.media.storage.NewMediaFile
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.media.BitmapStream
+import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.images.CRImage
 import com.silverhetch.aura.view.images.ImageActivity
 import com.silverhetch.clotho.file.ToFile
@@ -47,25 +48,32 @@ class NewDiaryFragment : AuraFragment() {
         val rootView = inflater.inflate(R.layout.page_diary, container, false)
         viewModel =
             ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+        attachFab(
+            object:FabBehavior{
+                override fun onClick() {
+                    val title = newDiary_newDiaryContent.text.toString()
+                    if (title.isNotEmpty()) {
+                        viewModel.newDiary(
+                            title,
+                            ToUTCTimestamp(calendar.timeInMillis).value(),
+                            newDiary_imageGrid.sources().keys.toList()
+                        ).observe(this@NewDiaryFragment, Observer<Diary> {
+                            activity?.onBackPressed()
+                        })
+                    } else {
+                        Toast.makeText(
+                            inflater.context,
+                            R.string.title_should_not_empty,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
 
-        rootView.newDiary_saveButton.setOnClickListener {
-            val title = newDiary_newDiaryContent.text.toString()
-            if (title.isNotEmpty()) {
-                viewModel.newDiary(
-                    title,
-                    ToUTCTimestamp(calendar.timeInMillis).value(),
-                    newDiary_imageGrid.sources().keys.toList()
-                ).observe(this, Observer<Diary> {
-                    activity?.onBackPressed()
-                })
-            } else {
-                Toast.makeText(
-                    inflater.context,
-                    R.string.title_should_not_empty,
-                    Toast.LENGTH_SHORT
-                ).show()
+                override fun icon(): Int {
+                    return R.drawable.ic_save
+                }
             }
-        }
+        )
 
         rootView.newDiary_date.setOnClickListener {
             DatePickerDialog(it.context)

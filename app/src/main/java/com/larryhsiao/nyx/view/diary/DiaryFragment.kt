@@ -109,6 +109,8 @@ class DiaryFragment : AuraFragment() {
                 newDiary_imageGrid.addable(it)
                 if (!it) {
                     editableFab()
+                }else{
+                    saveFab()
                 }
             })
 
@@ -120,17 +122,6 @@ class DiaryFragment : AuraFragment() {
                     uris[it]
                 )
             }.toList(),false)
-            newDiary_saveButton.setOnClickListener {
-                val images = newDiary_imageGrid.sources().keys.toTypedArray()
-                viewModel.update(
-                    newDiary_newDiaryContent.text.toString(),
-                    calendar.time.time,
-                    Array(images.size) {
-                        images[it]
-                    }.toList()
-                )
-                editable.value = false
-            }
         })
         viewModel.loadUp(arguments?.getLong(ARG_ID) ?: 0L)
 
@@ -215,6 +206,26 @@ class DiaryFragment : AuraFragment() {
 
             override fun icon(): Int {
                 return R.drawable.ic_pencil
+            }
+        })
+    }
+
+    private fun saveFab(){
+        attachFab(object: FabBehavior{
+            override fun onClick() {
+                val images = newDiary_imageGrid.sources().keys.toTypedArray()
+                viewModel.update(
+                    newDiary_newDiaryContent.text.toString(),
+                    calendar.time.time,
+                    Array(images.size) {
+                        images[it]
+                    }.toList()
+                )
+                editable.value = false
+            }
+
+            override fun icon(): Int {
+                return R.drawable.ic_save
             }
         })
     }
