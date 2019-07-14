@@ -191,8 +191,10 @@ class DiaryFragment : AuraFragment() {
             .format(Date().apply { time = calendar.timeInMillis })
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onBackPress(): Boolean {
+        return (editable.value?:false).also {
+            if (it){ editable.value = false }
+        }
     }
 
     private fun editableFab() {
