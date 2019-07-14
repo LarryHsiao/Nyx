@@ -1,5 +1,8 @@
 package com.larryhsiao.nyx.view.diary
 
+import android.Manifest
+import android.Manifest.permission.*
+import android.Manifest.permission_group.*
 import android.app.Activity.*
 import android.app.DatePickerDialog
 import android.content.Intent
@@ -93,10 +96,7 @@ class NewDiaryFragment : AuraFragment() {
         rootView.newDiary_imageGrid.initImages(listOf(), true)
         rootView.newDiary_imageGrid.setCallback { item, isAddingButton ->
             if (isAddingButton) {
-                startActivityForResult(
-                    FindImageIntent(rootView.context).value(),
-                    REQUEST_CODE_ADD_IMAGE
-                )
+                requestPermissionsByObj(arrayOf(READ_EXTERNAL_STORAGE))
             } else {
                 startActivity(
                     ImageActivity.newIntent(
@@ -107,6 +107,15 @@ class NewDiaryFragment : AuraFragment() {
             }
         }
         return rootView
+    }
+
+    override fun onPermissionGranted() {
+        super.onPermissionGranted()
+
+        startActivityForResult(
+            FindImageIntent(context!!).value(),
+            REQUEST_CODE_ADD_IMAGE
+        )
     }
 
     override fun onActivityResult(

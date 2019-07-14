@@ -1,14 +1,15 @@
 package com.larryhsiao.nyx.view.diary
 
+import android.Manifest
+import android.Manifest.permission.*
+import android.Manifest.permission_group.STORAGE
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -17,16 +18,13 @@ import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.media.storage.NewMediaFile
 import com.larryhsiao.nyx.view.diary.image.FindImageIntent
 import com.larryhsiao.nyx.view.diary.image.ResultUri
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
 import com.silverhetch.aura.AuraFragment
-import com.silverhetch.aura.media.BitmapStream
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.images.CRImage
 import com.silverhetch.aura.view.images.ImageActivity
-import com.silverhetch.clotho.file.ToFile
 import kotlinx.android.synthetic.main.page_diary.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,7 +38,6 @@ class DiaryFragment : AuraFragment() {
         private const val ARG_EDITABLE = "ARG_EDITABLE"
 
         private const val REQUEST_CODE_ADD_IMAGE = 1000
-
 
         /**
          * Factory method
@@ -139,14 +136,19 @@ class DiaryFragment : AuraFragment() {
         newDiary_imageGrid.initImages(arrayListOf(), false)
         newDiary_imageGrid.setCallback { index, isAddingButton ->
             if (isAddingButton) {
-                startActivityForResult(
-                    FindImageIntent(view.context).value(),
-                    REQUEST_CODE_ADD_IMAGE
-                )
+                requestPermissionsByObj(arrayOf(READ_EXTERNAL_STORAGE))
             } else {
                 startActivity(ImageActivity.newIntent(view.context, index.id()))
             }
         }
+    }
+
+    override fun onPermissionGranted() {
+        super.onPermissionGranted()
+        startActivityForResult(
+            FindImageIntent(view!!.context).value(),
+            REQUEST_CODE_ADD_IMAGE
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
