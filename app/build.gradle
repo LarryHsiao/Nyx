@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.larryhsiao.nyx"
-        minSdkVersion 26
+        minSdkVersion 25
         targetSdkVersion 28
         versionCode nyxVersionCode
         versionName nyxVersionName
