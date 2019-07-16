@@ -26,7 +26,7 @@ class EventListFragment : AuraFragment(), FabBehavior {
         private const val REQUEST_CODE_DIARY = 1001
 
         /**
-         * Factory method
+         * @param dateTime The specific date in timestamp
          */
         fun newInstance(dateTime: Long): Fragment {
             return EventListFragment().apply {
@@ -107,12 +107,11 @@ class EventListFragment : AuraFragment(), FabBehavior {
         }
     }
 
-
     private fun loadData() {
-        viewModel.byDate(arguments?.getLong(ARG_DATETIME) ?: 0L)
-            .observe(this, Observer {
-                adapter.load(it)
-            })
+        val date = arguments?.getLong(ARG_DATETIME) ?: 0L
+        // @todo #10 scroll to the given date first time load up.
+        viewModel.diaries()
+            .observe(this, Observer { adapter.load(it) })
     }
 
     override fun icon(): Int {

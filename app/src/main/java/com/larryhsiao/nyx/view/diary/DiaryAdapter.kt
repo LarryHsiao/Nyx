@@ -2,12 +2,16 @@ package com.larryhsiao.nyx.view.diary
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.larryhsiao.nyx.diary.Diary
 import com.silverhetch.aura.view.ViewHolder
 import com.larryhsiao.nyx.R
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.item_diary.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -15,9 +19,13 @@ import kotlin.collections.ArrayList
 /**
  * Recycler view adapter for for diary.
  */
-class DiaryAdapter(private val onItemClicked: (item: Diary) -> Unit) : RecyclerView.Adapter<ViewHolder>() {
+class DiaryAdapter(private val onItemClicked: (item: Diary) -> Unit) :
+    RecyclerView.Adapter<ViewHolder>() {
     private val diaries = ArrayList<Diary>()
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.item_diary, parent, false
@@ -31,12 +39,24 @@ class DiaryAdapter(private val onItemClicked: (item: Diary) -> Unit) : RecyclerV
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         @SuppressLint("SetTextI18n")
-        holder.rootView.findViewById<TextView>(R.id.itemDiary_title).text = """
+        holder.rootView.itemDiary_title.text = """
             ${diaries[position].title()}
             ${SimpleDateFormat.getDateInstance().format(Calendar.getInstance().also {
             it.timeInMillis = diaries[position].timestamp()
         }.timeInMillis)}
         """.trimIndent()
+        holder.rootView.itemDiary_image.also {
+            if (diaries[position].imageUris().isEmpty()) {
+                it.visibility = View.GONE
+            } else {
+                it.visibility = View.VISIBLE
+                Picasso.get().load(diaries[position].imageUris()[0])
+                    .placeholder(CircularProgressDrawable(it.context).apply{
+                        setStyle(CircularProgressDrawable.LARGE)
+                    }).into(it)
+            }
+        }
+
 
         holder.rootView.setOnClickListener {
             onItemClicked(diaries[holder.adapterPosition])
