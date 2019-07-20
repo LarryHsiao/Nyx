@@ -50,7 +50,7 @@ class DiaryAdapter(private val onItemClicked: (item: Diary) -> Unit) :
                 it.visibility = View.GONE
             } else {
                 it.visibility = View.VISIBLE
-                Picasso.get().load(diaries[position].imageUris()[0])
+                Picasso.get().load(diaries[position].imageUris().filter { it.toString().startsWith("file:") }[0])
                     .placeholder(CircularProgressDrawable(it.context).apply{
                         setStyle(CircularProgressDrawable.LARGE)
                     }).into(it)

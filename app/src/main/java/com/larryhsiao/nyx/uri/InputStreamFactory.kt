@@ -18,7 +18,7 @@ class InputStreamFactory(
             uri.startsWith("content://") -> {
                 context.contentResolver.openInputStream(Uri.parse(uri))
             }
-            else -> throw UnsupportedOperationException("Not support this type of uri")
+            else -> throw UnsupportedOperationException("Not support this type of uri: $uri")
         }
     }
 }
