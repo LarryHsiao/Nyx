@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.view.diary
 import android.Manifest.permission.*
 import android.app.Activity.*
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -106,10 +107,12 @@ class NewDiaryFragment : AuraFragment() {
     override fun onPermissionGranted() {
         super.onPermissionGranted()
 
-        startActivityForResult(
-            FindAttachmentIntent(context!!).value(),
-            REQUEST_CODE_ADD_IMAGE
-        )
+        context?.also { context ->
+            startActivityForResult(
+                FindAttachmentIntent(context).value(),
+                REQUEST_CODE_ADD_IMAGE
+            )
+        }
     }
 
     override fun onActivityResult(
@@ -123,14 +126,9 @@ class NewDiaryFragment : AuraFragment() {
             && data != null
         ) {
             try {
-                ResultProcessor(context!!) {
-                    newDiary_imageGrid.addImage(
-                        ImageFactory(
-                            context!!,
-                            it
-                        ).value()
-                    )
-                }.proceed(data)
+                context?.also {context->
+                    handlingResult(context, data)
+                }
             } catch (e: Exception) {
                 Toast.makeText(
                     newDiary_imageGrid.context,
@@ -139,6 +137,17 @@ class NewDiaryFragment : AuraFragment() {
                 ).show()
             }
         }
+    }
+
+    private fun handlingResult(context: Context, data: Intent) {
+        ResultProcessor(context) {
+            newDiary_imageGrid.addImage(
+                ImageFactory(
+                    context,
+                    it
+                ).value()
+            )
+        }.proceed(data)
     }
 
     private fun updateDateIndicator(view: View) {
