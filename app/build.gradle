@@ -54,6 +54,14 @@ dependencies {
     def lifecycle_version = "2.0.0"
     def room_version = "2.1.0"
     implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    compile 'com.google.android.gms:play-services-auth:17.0.0'
+    compile('com.google.api-client:google-api-client-android:1.30.2') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile('com.google.apis:google-api-services-youtube:v3-rev212-1.25.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'com.schibstedspain.android:leku:6.2.1'
     implementation 'com.squareup.picasso:picasso:2.71828'

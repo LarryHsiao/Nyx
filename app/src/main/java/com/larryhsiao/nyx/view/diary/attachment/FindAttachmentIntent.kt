@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.MediaStore
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.youtube.YoutubePickerActivity
 import com.schibstedspain.leku.LocationPickerActivity
 import com.silverhetch.aura.intent.ChooserIntent
 import com.silverhetch.clotho.Source
@@ -15,7 +16,7 @@ class FindAttachmentIntent(private val context: Context) : Source<Intent> {
     override fun value(): Intent {
         return ChooserIntent(
             context,
-            context.getString(R.string.add_image),
+            context.getString(R.string.attachment),
             Intent(Intent.ACTION_GET_CONTENT).also { it.type = "image/*" },
             Intent(MediaStore.ACTION_IMAGE_CAPTURE),
             LocationPickerActivity.Builder()
@@ -24,7 +25,8 @@ class FindAttachmentIntent(private val context: Context) : Source<Intent> {
                 .withCityHidden()
                 .withZipCodeHidden()
                 .withSatelliteViewHidden()
-                .build(context)
+                .build(context),
+            Intent(context, YoutubePickerActivity::class.java)
         ).value()
     }
 }

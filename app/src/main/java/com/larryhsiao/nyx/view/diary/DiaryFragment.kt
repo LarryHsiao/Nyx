@@ -21,7 +21,7 @@ import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.view.diary.attachment.FindAttachmentIntent
 import com.larryhsiao.nyx.view.diary.attachment.ImageFactory
 import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
-import com.larryhsiao.nyx.view.diary.attachment.ViewAttachementIntent
+import com.larryhsiao.nyx.view.diary.attachment.ViewAttachmentIntent
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
@@ -139,7 +139,7 @@ class DiaryFragment : AuraFragment() {
                 requestPermissionsByObj(arrayOf(READ_EXTERNAL_STORAGE))
             } else {
                 startActivity(
-                    ViewAttachementIntent(
+                    ViewAttachmentIntent(
                         newDiary_imageGrid.context,
                         Uri.parse(item.id())
                     ).value()

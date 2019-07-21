@@ -19,9 +19,6 @@ import com.larryhsiao.nyx.view.diary.attachment.*
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
-import com.silverhetch.aura.view.images.CRImage
-import com.silverhetch.aura.view.images.ImageActivity
-import com.silverhetch.clotho.processor.Processors
 import com.silverhetch.clotho.time.ToUTCTimestamp
 import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
@@ -94,7 +91,7 @@ class NewDiaryFragment : AuraFragment() {
                 requestPermissionsByObj(arrayOf(READ_EXTERNAL_STORAGE))
             } else {
                 startActivity(
-                    ViewAttachementIntent(
+                    ViewAttachmentIntent(
                         rootView.context,
                         Uri.parse(item.id())
                     ).value()
