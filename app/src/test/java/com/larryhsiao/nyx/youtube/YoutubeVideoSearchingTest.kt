@@ -11,6 +11,9 @@ import org.robolectric.RobolectricTestRunner
  */
 @RunWith(RobolectricTestRunner::class)
 class YoutubeVideoSearchingTest {
+    /**
+     * Check the youtube searching have some result
+     */
     @Test
     fun simple() {
         assertNotEquals(
