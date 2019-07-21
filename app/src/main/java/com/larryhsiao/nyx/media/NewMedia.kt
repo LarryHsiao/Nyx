@@ -36,7 +36,7 @@ class NewMedia(
     }
 
     private fun targetUri(): String {
-        if (IsInternalFile(context, uri).value()) {
+        if (IsInternalFile(context, uri).value() || uri.startsWith("geo:")) {
             return uri
         }
         val dstFile = File(

@@ -1,32 +1,27 @@
 package com.larryhsiao.nyx.view.diary
 
-import android.Manifest
 import android.Manifest.permission.*
-import android.Manifest.permission_group.*
 import android.app.Activity.*
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.media.storage.NewMediaFile
-import com.larryhsiao.nyx.view.diary.image.FindImageIntent
-import com.larryhsiao.nyx.view.diary.image.ResultUri
+import com.larryhsiao.nyx.view.diary.attachment.*
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
-import com.silverhetch.aura.media.BitmapStream
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.images.CRImage
 import com.silverhetch.aura.view.images.ImageActivity
-import com.silverhetch.clotho.file.ToFile
+import com.silverhetch.clotho.processor.Processors
 import com.silverhetch.clotho.time.ToUTCTimestamp
 import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
@@ -112,10 +107,12 @@ class NewDiaryFragment : AuraFragment() {
     override fun onPermissionGranted() {
         super.onPermissionGranted()
 
-        startActivityForResult(
-            FindImageIntent(context!!).value(),
-            REQUEST_CODE_ADD_IMAGE
-        )
+        context?.also { context ->
+            startActivityForResult(
+                FindAttachmentIntent(context).value(),
+                REQUEST_CODE_ADD_IMAGE
+            )
+        }
     }
 
     override fun onActivityResult(
@@ -129,15 +126,9 @@ class NewDiaryFragment : AuraFragment() {
             && data != null
         ) {
             try {
-                newDiary_imageGrid.addImage(
-                    CRImage(
-                        newDiary_imageGrid.context,
-                        ResultUri(
-                            newDiary_imageGrid.context,
-                            data
-                        ).value()
-                    )
-                )
+                context?.also {context->
+                    handlingResult(context, data)
+                }
             } catch (e: Exception) {
                 Toast.makeText(
                     newDiary_imageGrid.context,
@@ -146,6 +137,17 @@ class NewDiaryFragment : AuraFragment() {
                 ).show()
             }
         }
+    }
+
+    private fun handlingResult(context: Context, data: Intent) {
+        ResultProcessor(context) {
+            newDiary_imageGrid.addImage(
+                ImageFactory(
+                    context,
+                    it
+                ).value()
+            )
+        }.proceed(data)
     }
 
     private fun updateDateIndicator(view: View) {

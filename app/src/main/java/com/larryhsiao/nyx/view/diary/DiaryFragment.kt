@@ -1,12 +1,12 @@
 package com.larryhsiao.nyx.view.diary
 
-import android.Manifest
-import android.Manifest.permission.*
-import android.Manifest.permission_group.STORAGE
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -18,13 +18,12 @@ import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.view.diary.image.FindImageIntent
-import com.larryhsiao.nyx.view.diary.image.ResultUri
+import com.larryhsiao.nyx.view.diary.attachment.FindAttachmentIntent
+import com.larryhsiao.nyx.view.diary.attachment.ImageFactory
+import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
-import com.silverhetch.aura.view.images.CRImage
-import com.silverhetch.aura.view.images.ImageActivity
 import kotlinx.android.synthetic.main.page_diary.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -63,7 +62,7 @@ class DiaryFragment : AuraFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.diaryMenu_delete -> {
-                AlertDialog.Builder(context!!)
+                AlertDialog.Builder(context)
                     .setMessage(R.string.delete_this_diary)
                     .setPositiveButton(android.R.string.yes) { _, _ ->
                         viewModel.delete().observe(this, Observer {
@@ -114,10 +113,10 @@ class DiaryFragment : AuraFragment() {
             calendar.time = Date().also { it.time = diary.timestamp() }
             val uris = diary.imageUris()
             newDiary_imageGrid.initImages(Array(uris.size) {
-                CRImage(
+                ImageFactory(
                     view.context,
                     uris[it]
-                )
+                ).value()
             }.toList(), false)
         })
         viewModel.loadUp(arguments?.getLong(ARG_ID) ?: 0L)
@@ -134,21 +133,25 @@ class DiaryFragment : AuraFragment() {
                 }.show()
         }
         newDiary_imageGrid.initImages(arrayListOf(), false)
-        newDiary_imageGrid.setCallback { index, isAddingButton ->
+        newDiary_imageGrid.setCallback { item, isAddingButton ->
             if (isAddingButton) {
                 requestPermissionsByObj(arrayOf(READ_EXTERNAL_STORAGE))
             } else {
-                startActivity(ImageActivity.newIntent(view.context, index.id()))
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse(item.id()))
+                )
             }
         }
     }
 
     override fun onPermissionGranted() {
         super.onPermissionGranted()
-        startActivityForResult(
-            FindImageIntent(view!!.context).value(),
-            REQUEST_CODE_ADD_IMAGE
-        )
+        context?.also {
+            startActivityForResult(
+                FindAttachmentIntent(it).value(),
+                REQUEST_CODE_ADD_IMAGE
+            )
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -167,15 +170,9 @@ class DiaryFragment : AuraFragment() {
             && data != null
         ) {
             try {
-                newDiary_imageGrid.addImage(
-                    CRImage(
-                        newDiary_imageGrid.context,
-                        ResultUri(
-                            newDiary_imageGrid.context,
-                            data
-                        ).value()
-                    )
-                )
+                context?.also { context ->
+                    resultHandling(context, data)
+                }
             } catch (e: Exception) {
                 Toast.makeText(
                     newDiary_imageGrid.context,
@@ -186,14 +183,27 @@ class DiaryFragment : AuraFragment() {
         }
     }
 
+    private fun resultHandling(context: Context, data: Intent) {
+        ResultProcessor(context) {
+            newDiary_imageGrid.addImage(
+                ImageFactory(
+                    context,
+                    it
+                ).value()
+            )
+        }.proceed(data)
+    }
+
     private fun updateDateIndicator() {
         newDiary_date.text = SimpleDateFormat.getDateInstance()
             .format(Date().apply { time = calendar.timeInMillis })
     }
 
     override fun onBackPress(): Boolean {
-        return (editable.value?:false).also {
-            if (it){ editable.value = false }
+        return (editable.value ?: false).also {
+            if (it) {
+                editable.value = false
+            }
         }
     }
 
