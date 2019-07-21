@@ -17,7 +17,10 @@ class DiaryDeletion(
     override fun fire() {
         diaryDao.delete(diaryId)
         mediaDao.byDiaryId(diaryId).forEach {
-            File(URI(it.uri)).delete()
+            if (it.uri.startsWith("file:")) {
+                File(URI(it.uri)).delete()
+            }
+
         }
         mediaDao.deleteByDiaryId(diaryId)
     }
