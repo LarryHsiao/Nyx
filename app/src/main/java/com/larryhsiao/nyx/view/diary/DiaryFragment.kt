@@ -4,6 +4,7 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,19 +15,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.google.android.gms.maps.model.LatLng
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.view.diary.attachment.*
+import com.larryhsiao.nyx.view.diary.attachment.FindAttachmentIntent
+import com.larryhsiao.nyx.view.diary.attachment.ImageFactory
+import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
-import com.schibstedspain.leku.LocationPickerActivity
-import com.schibstedspain.leku.locale.SearchZoneRect
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
-import com.silverhetch.aura.view.images.CRImage
-import com.silverhetch.aura.view.images.ImageActivity
-import com.silverhetch.clotho.processor.Processors
 import kotlinx.android.synthetic.main.page_diary.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -65,7 +62,7 @@ class DiaryFragment : AuraFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.diaryMenu_delete -> {
-                AlertDialog.Builder(context!!)
+                AlertDialog.Builder(context)
                     .setMessage(R.string.delete_this_diary)
                     .setPositiveButton(android.R.string.yes) { _, _ ->
                         viewModel.delete().observe(this, Observer {
@@ -117,7 +114,7 @@ class DiaryFragment : AuraFragment() {
             val uris = diary.imageUris()
             newDiary_imageGrid.initImages(Array(uris.size) {
                 ImageFactory(
-                    context!!,
+                    view.context,
                     uris[it]
                 ).value()
             }.toList(), false)
@@ -149,10 +146,12 @@ class DiaryFragment : AuraFragment() {
 
     override fun onPermissionGranted() {
         super.onPermissionGranted()
-        startActivityForResult(
-            FindAttachmentIntent(context!!).value(),
-            REQUEST_CODE_ADD_IMAGE
-        )
+        context?.also {
+            startActivityForResult(
+                FindAttachmentIntent(it).value(),
+                REQUEST_CODE_ADD_IMAGE
+            )
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -171,14 +170,9 @@ class DiaryFragment : AuraFragment() {
             && data != null
         ) {
             try {
-                ResultProcessor(context!!) {
-                    newDiary_imageGrid.addImage(
-                        ImageFactory(
-                            context!!,
-                            it
-                        ).value()
-                    )
-                }.proceed(data)
+                context?.also { context ->
+                    resultHandling(context, data)
+                }
             } catch (e: Exception) {
                 Toast.makeText(
                     newDiary_imageGrid.context,
@@ -187,6 +181,17 @@ class DiaryFragment : AuraFragment() {
                 ).show()
             }
         }
+    }
+
+    private fun resultHandling(context: Context, data: Intent) {
+        ResultProcessor(context) {
+            newDiary_imageGrid.addImage(
+                ImageFactory(
+                    context,
+                    it
+                ).value()
+            )
+        }.proceed(data)
     }
 
     private fun updateDateIndicator() {

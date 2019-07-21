@@ -9,6 +9,11 @@ import com.silverhetch.clotho.processor.Processor
 import com.silverhetch.clotho.processor.Processors
 import kotlinx.android.synthetic.main.page_diary.*
 
+/**
+ * Processor to extract the uri from result of attachment Intent
+ *
+ * @see FindAttachmentIntent
+ */
 class ResultProcessor(
     private val context: Context,
     private val result: (uri: Uri) -> Unit
