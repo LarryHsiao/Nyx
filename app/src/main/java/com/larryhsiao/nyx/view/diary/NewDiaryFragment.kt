@@ -94,10 +94,10 @@ class NewDiaryFragment : AuraFragment() {
                 requestPermissionsByObj(arrayOf(READ_EXTERNAL_STORAGE))
             } else {
                 startActivity(
-                    ImageActivity.newIntent(
+                    ViewAttachementIntent(
                         rootView.context,
-                        item.id()
-                    )
+                        Uri.parse(item.id())
+                    ).value()
                 )
             }
         }
@@ -126,7 +126,7 @@ class NewDiaryFragment : AuraFragment() {
             && data != null
         ) {
             try {
-                context?.also {context->
+                context?.also { context ->
                     handlingResult(context, data)
                 }
             } catch (e: Exception) {
