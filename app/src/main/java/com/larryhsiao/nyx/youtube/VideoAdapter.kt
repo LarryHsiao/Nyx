@@ -1,11 +1,15 @@
 package com.larryhsiao.nyx.youtube
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.silverhetch.aura.view.ViewHolder
 import com.larryhsiao.nyx.R
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.item_video.view.*
 
 /**
  * RecyclerView adapter to show [Video].
@@ -20,7 +24,7 @@ class VideoAdapter(
     ): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                android.R.layout.simple_list_item_1,
+                R.layout.item_video,
                 parent,
                 false
             )
@@ -32,13 +36,16 @@ class VideoAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val root = holder.rootView
-        if (root is TextView) {
-            root.text = items[position].title()
-            root.setOnClickListener {
-                onClick(items[holder.adapterPosition])
-            }
+        holder.rootView.textView.text = items[position].title()
+        holder.rootView.setOnClickListener {
+            onClick(items[holder.adapterPosition])
         }
+        Picasso.get()
+            .load(Uri.parse(items[position].thumbnailUrl()))
+            .placeholder(CircularProgressDrawable(holder.rootView.context).also {
+                it.setStyle(CircularProgressDrawable.DEFAULT)
+            })
+            .into(holder.rootView.imageView)
     }
 
     /**

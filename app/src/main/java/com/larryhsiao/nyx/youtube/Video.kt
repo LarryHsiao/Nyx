@@ -1,7 +1,21 @@
 package com.larryhsiao.nyx.youtube
 
-
+/**
+ * Represent a video
+ */
 interface Video {
-    fun id():String
-    fun title():String
+    /**
+     * Id of the video
+     */
+    fun id(): String
+
+    /**
+     * The title of the video
+     */
+    fun title(): String
+
+    /**
+     * Thumbnail uri of the video.
+     */
+    fun thumbnailUrl(): String
 }

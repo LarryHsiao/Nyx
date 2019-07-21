@@ -13,4 +13,8 @@ class YoutubeVideo(private val result: SearchResult) : Video {
     override fun title(): String {
         return result.snippet.title
     }
+
+    override fun thumbnailUrl(): String {
+        return result.snippet.thumbnails.default.url
+    }
 }
