@@ -9,7 +9,7 @@ import java.lang.UnsupportedOperationException
 /**
  * Factory to generate [InputStream] from uri
  */
-class InputStreamFactory(
+class InputStreamSource(
     private val context: Context,
     private val uri: String
 ) : Source<InputStream> {

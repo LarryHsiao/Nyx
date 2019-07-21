@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import com.larryhsiao.nyx.media.room.MediaDao
 import com.larryhsiao.nyx.media.room.MediaEntity
-import com.larryhsiao.nyx.uri.InputStreamFactory
+import com.larryhsiao.nyx.uri.InputStreamSource
 import com.larryhsiao.nyx.uri.IsInternalFile
 import com.silverhetch.clotho.Source
 import com.silverhetch.clotho.file.ToFile
@@ -36,7 +36,7 @@ class NewMedia(
     }
 
     private fun targetUri(): String {
-        if (IsInternalFile(context, uri).value() || uri.startsWith("geo:")) {
+        if (!uri.startsWith("content:")) {
             return uri
         }
         val dstFile = File(
@@ -48,7 +48,7 @@ class NewMedia(
         }
         val dstUri = dstFile.toUri().toString()
         ToFile(
-            InputStreamFactory(
+            InputStreamSource(
                 context,
                 uri
             ).value(),

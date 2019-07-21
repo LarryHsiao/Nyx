@@ -46,12 +46,16 @@ class DiaryAdapter(private val onItemClicked: (item: Diary) -> Unit) :
         }.timeInMillis)}
         """.trimIndent()
         holder.rootView.itemDiary_image.also {
-            if (diaries[position].imageUris().isEmpty()) {
+            val images = diaries[position].imageUris()
+                .filter { imageUri ->
+                    imageUri.toString().startsWith("file:")
+                }
+            if (images.isEmpty()) {
                 it.visibility = View.GONE
             } else {
                 it.visibility = View.VISIBLE
-                Picasso.get().load(diaries[position].imageUris().filter { it.toString().startsWith("file:") }[0])
-                    .placeholder(CircularProgressDrawable(it.context).apply{
+                Picasso.get().load(images[0])
+                    .placeholder(CircularProgressDrawable(it.context).apply {
                         setStyle(CircularProgressDrawable.LARGE)
                     }).into(it)
             }

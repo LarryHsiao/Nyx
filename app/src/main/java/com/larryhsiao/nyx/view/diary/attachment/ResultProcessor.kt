@@ -23,7 +23,7 @@ class ResultProcessor(
         BitmapProcessor(context) {
             result(Uri.parse(it.toString()))
         },
-        LekuGeoProcessor() {
+        LekuGeoProcessor {
             result(Uri.parse(it.toString()))
         }
     )

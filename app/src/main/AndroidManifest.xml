@@ -3,7 +3,11 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.larryhsiao.nyx">
 
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".NyxApplication"
@@ -36,13 +40,14 @@
             android:clearTaskOnLaunch="true" />
         <activity
             android:name="com.schibstedspain.leku.LocationPickerActivity"
-            android:label="@string/leku_title_activity_location_picker"
+            android:label="@string/pick_location"
+            android:icon="@drawable/ic_location_png"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-            android:parentActivityName=".MainActivity">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
 
             <meta-data
                 android:name="android.app.searchable"
@@ -51,6 +56,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity
+            android:name="com.larryhsiao.nyx.youtube.YoutubePickerActivity"
+            android:icon="@drawable/ic_youtube_png"
+            android:label="@string/pick_youtube" />
 
         <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
             <intent-filter>

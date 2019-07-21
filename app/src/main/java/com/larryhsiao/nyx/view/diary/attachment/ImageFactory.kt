@@ -12,11 +12,15 @@ import com.silverhetch.clotho.Source
 class ImageFactory(
     private val context: Context,
     private val uri: Uri
-) :
-    Source<MnemeItem> {
+) : Source<MnemeItem> {
     override fun value(): MnemeItem {
         if (uri.toString().startsWith("geo:")) {
             return GeoImage(context, uri)
+        }
+
+        if (uri.scheme?.contains("http") == true
+            && uri.host?.contains("youtube.com") == true) {
+            return YoutubeImage(context, uri)
         }
 
         return CRImage(context, uri)

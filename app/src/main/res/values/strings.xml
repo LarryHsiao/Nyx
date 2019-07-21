@@ -8,4 +8,9 @@
     <string name="delete">Delete</string>
     <string name="delete_this_diary">Delete this diary?</string>
     <string name="unsupported_image_format">Unsupported image format.</string>
+    <string name="search">Search</string>
+    <string name="pick_youtube">Pick Youtube</string>
+    <string name="attachment">Attachment</string>
+    <string name="pick_location">Pick Location</string>
+    <string name="keyword_for_search">Keyword for search</string>
 </resources>
