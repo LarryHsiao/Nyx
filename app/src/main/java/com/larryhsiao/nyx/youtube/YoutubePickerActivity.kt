@@ -37,9 +37,8 @@ class YoutubePickerActivity : AuraActivity() {
         viewModel = ViewModelProviders.of(this)
             .get(YoutubeSearchViewModel::class.java)
         viewModel.data().observe(this, Observer { adapter.loadUp(it) })
-        viewModel.search("")
-        editText.addTextChangedListener {
-            viewModel.search(it.toString())
+        searchButton.setOnClickListener {
+            viewModel.search(editText.text.toString())
         }
         viewModel.error().observe(this, Observer{
             AlertDialog.Builder(listView.context)
