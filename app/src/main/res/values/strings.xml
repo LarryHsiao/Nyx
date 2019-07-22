@@ -13,4 +13,6 @@
     <string name="attachment">Attachment</string>
     <string name="pick_location">Pick Location</string>
     <string name="keyword_for_search">Keyword for search</string>
+    <string name="fetching_failed">Fetching failed</string>
+    <string name="error">Error</string>
 </resources>

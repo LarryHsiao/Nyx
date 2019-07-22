@@ -1,6 +1,8 @@
 package com.larryhsiao.nyx.youtube
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -39,5 +41,14 @@ class YoutubePickerActivity : AuraActivity() {
         editText.addTextChangedListener {
             viewModel.search(it.toString())
         }
+        viewModel.error().observe(this, Observer{
+            AlertDialog.Builder(listView.context)
+                .setTitle(R.string.error)
+                .setMessage(R.string.fetching_failed)
+                .setPositiveButton(android.R.string.ok){ _: DialogInterface, i: Int ->
+                    finish()
+                }
+                .show()
+        })
     }
 }
