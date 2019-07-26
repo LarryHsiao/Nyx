@@ -25,3 +25,5 @@ Instant diary app on Android.
 @todo #5 tagging
 
 @todo #6 searching
+
+@todo #8 Auto/clould backup
