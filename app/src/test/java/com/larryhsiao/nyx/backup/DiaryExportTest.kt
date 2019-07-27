@@ -4,14 +4,12 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.diary.room.DiaryEntity
-import com.silverhetch.clotho.file.FileText
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.nio.file.Files
 
 /**
  * Test for com.larryhsiao.nyx.backup.DiaryExport
@@ -43,8 +41,6 @@ class DiaryExportTest {
      */
     @Test
     fun checkResult() {
-        val target = Files.createTempFile("prefix", "")
-
         db.diaryDao().create(
             DiaryEntity(
                 0,
@@ -60,14 +56,16 @@ class DiaryExportTest {
             )
         )
 
+        val string = StringBuilder()
         DiaryExport(
-            db,
-            target.toFile()
-        ).fire()
+            db.diaryDao()
+        ).value().forEach {
+            string.append(it.json())
+        }
 
         assertEquals(
-            """[{"id":2,"title":"Test2","timestamp":2000},{"id":1,"title":"Test1","timestamp":1000}]""",
-            FileText(target.toFile()).value()
+            """{"id":2,"title":"Test2","timestamp":2000}{"id":1,"title":"Test1","timestamp":1000}""",
+            string.toString()
         )
     }
 }

@@ -5,8 +5,7 @@ import com.google.gson.stream.JsonReader
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.silverhetch.clotho.Action
-import java.io.File
-import java.io.FileInputStream
+import java.io.InputStream
 import java.io.InputStreamReader
 
 /**
@@ -14,15 +13,11 @@ import java.io.InputStreamReader
  */
 class DiaryImport(
     private val db: RDatabase,
-    private val jsonFile: File
+    private val jsonStream: InputStream
 ) : Action {
     override fun fire() {
         val gson = Gson()
-        JsonReader(
-            InputStreamReader(
-                FileInputStream(jsonFile)
-            )
-        ).use { reader ->
+        JsonReader(InputStreamReader(jsonStream)).use { reader ->
             reader.beginArray()
             while (reader.hasNext()) {
                 db.diaryDao().create(

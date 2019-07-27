@@ -11,6 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.File
+import java.io.FileInputStream
 
 /**
  * Test for com.larryhsiao.nyx.backup.DiaryImport
@@ -49,7 +50,7 @@ class DiaryImportTest {
 
         DiaryImport(
             db,
-            jsonFile
+            FileInputStream(jsonFile)
         ).fire()
 
         val diaryList =db.diaryDao().all()
