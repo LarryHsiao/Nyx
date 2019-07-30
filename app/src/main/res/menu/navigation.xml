@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="@string/calendar"
+        android:id="@+id/navigation_calendar"
+        android:icon="@drawable/ic_calendar" />
+    <item
+        android:id="@+id/navigation_jotted"
+        android:icon="@drawable/ic_agenda"
+        android:title="@string/jotted" />
+    <item
+        android:id="@+id/navigation_restore"
+        android:icon="@drawable/ic_restore"
+        android:title="@string/restore" />
+</menu>

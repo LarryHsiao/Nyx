@@ -54,7 +54,6 @@ class RestoreTest {
                 "Temp",
                 ""
             ).toFile().also { TextFile(it, sampleText).value() }
-        val exportedDir = Files.createTempDirectory("temp").toFile()
         NewBackup(
             db.also { db ->
                 db.diaryDao().create(DiaryEntity(0, "title1", 0L))
@@ -66,12 +65,12 @@ class RestoreTest {
                     )
                 )
             },
-            exportedDir
+            config.backupRoot()
         ).fire()
 
         Restore(
-            exportedDir.listFiles()[0],
-            config,
+            config.backupRoot().listFiles()[0],
+            config.mediaRoot(),
             db
         ).fire()
 

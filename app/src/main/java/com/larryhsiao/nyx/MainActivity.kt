@@ -2,6 +2,8 @@ package com.larryhsiao.nyx
 
 import android.os.Bundle
 import com.larryhsiao.nyx.view.backup.BackupListFragment
+import com.larryhsiao.nyx.view.diary.CalendarFragment
+import com.larryhsiao.nyx.view.diary.EventListFragment
 import com.silverhetch.aura.AuraActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -16,7 +18,22 @@ class MainActivity : AuraActivity() {
         setupFabControl(main_fab)
         setupPageControl(R.id.main_fragmentContainer)
 
-        rootPage(BackupListFragment())
+        main_bottomNavigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.navigation_calendar -> {
+                    rootPage(CalendarFragment())
+                }
+                R.id.navigation_jotted->{
+                    rootPage(EventListFragment())
+                }
+                R.id.navigation_restore -> {
+                    rootPage(BackupListFragment())
+                }
+            }
+
+            true
+        }
+        main_bottomNavigation.selectedItemId = R.id.navigation_jotted
     }
 }
 

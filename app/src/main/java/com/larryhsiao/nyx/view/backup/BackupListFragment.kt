@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -22,7 +23,16 @@ import com.silverhetch.aura.view.fab.FabBehavior
  */
 class BackupListFragment : AuraFragment() {
     private lateinit var list: RecyclerView
-    private val adapter = BackupListAdapter()
+    private val adapter = BackupListAdapter {
+        context?.also { context ->
+            AlertDialog.Builder(context)
+                .setMessage(getString(R.string.restore_with_, it.title()))
+                .setPositiveButton(R.string.confirm) { _, _ ->
+                    viewModel.restore(it)
+                }.setNegativeButton(R.string.cancel) { _, _ -> }
+                .show()
+        }
+    }
     private lateinit var viewModel: BackupsViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,5 +92,10 @@ class BackupListFragment : AuraFragment() {
                 return R.drawable.ic_save
             }
         })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        detachFab()
     }
 }

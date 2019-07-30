@@ -11,6 +11,10 @@ import java.io.File
  */
 class BackupRootSource : Source<File> {
     override fun value(): File {
-        return File(Environment.getExternalStorageDirectory(), "jotted_backup")
+        return File(Environment.getExternalStorageDirectory(), "jotted_backup").also {
+            if (it.exists().not()) {
+                it.mkdirs()
+            }
+        }
     }
 }

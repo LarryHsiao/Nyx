@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx
 
 import android.content.Context
+import com.larryhsiao.nyx.backup.local.BackupRootSource
 import java.io.File
 
 /**
@@ -17,5 +18,9 @@ class ConfigImpl(private val context: Context) : Config {
                 it.mkdirs()
             }
         }
+    }
+
+    override fun backupRoot(): File {
+        return BackupRootSource().value()
     }
 }

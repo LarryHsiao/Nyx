@@ -10,4 +10,9 @@ interface Config {
      * The media root file.
      */
     fun mediaRoot(): File
+
+    /**
+     * Backup root file
+     */
+    fun backupRoot():File
 }

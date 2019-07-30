@@ -54,7 +54,7 @@ class ReplaceTest{
                 "Temp",
                 ""
             ).toFile().also { TextFile(it, sampleText).value() }
-        val exportedDir = Files.createTempDirectory("temp").toFile()
+
         NewBackup(
             db.also { db ->
                 db.diaryDao().create(DiaryEntity(0, "title1", 0L))
@@ -66,12 +66,12 @@ class ReplaceTest{
                     )
                 )
             },
-            exportedDir
+            config.backupRoot()
         ).fire()
 
         Replace(
-            exportedDir.listFiles()[0],
-            config,
+            config.backupRoot().listFiles()[0],
+            config.mediaRoot(),
             db
         ).fire()
 

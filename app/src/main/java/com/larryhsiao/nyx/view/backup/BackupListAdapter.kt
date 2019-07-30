@@ -10,7 +10,8 @@ import com.silverhetch.aura.view.ViewHolder
 /**
  * Adapter for list of backup list.
  */
-class BackupListAdapter : RecyclerView.Adapter<ViewHolder>() {
+class BackupListAdapter(private val onclick: (backup: Backup) -> Unit) :
+    RecyclerView.Adapter<ViewHolder>() {
     private val items = ArrayList<Backup>()
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -33,6 +34,9 @@ class BackupListAdapter : RecyclerView.Adapter<ViewHolder>() {
         val root = holder.rootView
         if (root is TextView) {
             root.text = items[position].title()
+            root.setOnClickListener {
+                onclick(items[holder.adapterPosition])
+            }
         }
     }
 

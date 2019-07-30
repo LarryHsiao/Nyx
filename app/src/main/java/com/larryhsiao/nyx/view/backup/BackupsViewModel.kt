@@ -9,9 +9,11 @@ import com.larryhsiao.nyx.backup.Backup
 import com.larryhsiao.nyx.backup.local.Allbackups
 import com.larryhsiao.nyx.backup.local.BackupRootSource
 import com.larryhsiao.nyx.backup.local.NewBackup
+import com.larryhsiao.nyx.backup.local.Replace
 import com.larryhsiao.nyx.database.RDatabase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.File
 import java.io.IOException
 
 /**
@@ -58,5 +60,16 @@ class BackupsViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-
+    /**
+     * Restore app with given [Backup]
+     */
+    fun restore(backup: Backup) {
+        GlobalScope.launch {
+            Replace(
+                File(config.backupRoot(), backup.title()),
+                config.mediaRoot(),
+                db
+            ).fire()
+        }
+    }
 }
