@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="InvalidPackage">
+        <!-- Can not control apache library includes javax-->
+        <ignore path="*/httpclient-*.jar" />
+    </issue>
+</lint>
