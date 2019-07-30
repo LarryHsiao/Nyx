@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx
 
 import android.os.Bundle
-import com.larryhsiao.nyx.view.diary.CalendarFragment
+import com.larryhsiao.nyx.view.backup.BackupListFragment
 import com.silverhetch.aura.AuraActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -16,7 +16,7 @@ class MainActivity : AuraActivity() {
         setupFabControl(main_fab)
         setupPageControl(R.id.main_fragmentContainer)
 
-        rootPage(CalendarFragment())
+        rootPage(BackupListFragment())
     }
 }
 

@@ -2,20 +2,18 @@ package com.larryhsiao.nyx.view.diary
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.applandeo.materialcalendarview.CalendarUtils
 import com.applandeo.materialcalendarview.EventDay
 import com.larryhsiao.nyx.R
-import com.larryhsiao.nyx.TintDrawable
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.silverhetch.aura.AuraFragment
+import com.silverhetch.aura.view.TintDrawable
 import com.silverhetch.aura.view.fab.FabBehavior
 import kotlinx.android.synthetic.main.fragment_calendar.*
 import java.util.*

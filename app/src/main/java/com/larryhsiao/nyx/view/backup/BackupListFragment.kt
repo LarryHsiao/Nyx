@@ -1,26 +1,26 @@
 package com.larryhsiao.nyx.view.backup
 
-import android.content.Intent
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.larryhsiao.nyx.R
 import com.silverhetch.aura.AuraFragment
+import com.silverhetch.aura.view.fab.FabBehavior
 
 
 /**
  * List of backup instance, currently available source: Google.
  */
 class BackupListFragment : AuraFragment() {
-    companion object {
-        private const val REQUEST_CODE_SIGN_IN = 1000
-    }
-
     private lateinit var list: RecyclerView
     private val adapter = BackupListAdapter()
     private lateinit var viewModel: BackupsViewModel
@@ -52,13 +52,35 @@ class BackupListFragment : AuraFragment() {
         viewModel.fetch()
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_SIGN_IN) {
-        }
+    override fun onPermissionGranted() {
+        super.onPermissionGranted()
+        viewModel.newBackup()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        attachFab(object : FabBehavior {
+            override fun onClick() {
+                context?.also {
+                    if (ContextCompat.checkSelfPermission(
+                            it,
+                            WRITE_EXTERNAL_STORAGE
+                        ) == PERMISSION_GRANTED
+                    ) {
+                        viewModel.newBackup()
+                    } else {
+                        requestPermissionsByObj(
+                            arrayOf(
+                                WRITE_EXTERNAL_STORAGE
+                            )
+                        )
+                    }
+                }
+            }
+
+            override fun icon(): Int {
+                return R.drawable.ic_save
+            }
+        })
     }
 }
