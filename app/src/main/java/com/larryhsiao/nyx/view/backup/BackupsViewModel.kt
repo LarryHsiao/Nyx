@@ -13,10 +13,16 @@ class BackupsViewModel(private val app: Application) : AndroidViewModel(app) {
     private val backups =
         MutableLiveData<List<Backup>>().apply { value = listOf() }
 
+    /**
+     * Live data of backup list
+     */
     fun backups(): LiveData<List<Backup>> {
         return backups
     }
 
+    /**
+     * Do the fetching backup list.
+     */
     fun fetch() {
 //        GlobalScope.launch {
 //            try {

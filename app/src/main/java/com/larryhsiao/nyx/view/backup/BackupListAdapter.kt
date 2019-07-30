@@ -30,9 +30,15 @@ class BackupListAdapter : RecyclerView.Adapter<ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        (holder.rootView as TextView).text = items[position].title()
+        val root = holder.rootView
+        if (root is TextView) {
+            root.text = items[position].title()
+        }
     }
 
+    /**
+     * Load up backup list with given backup instance.
+     */
     fun loadUp(new: List<Backup>) {
         items.clear()
         items.addAll(new)

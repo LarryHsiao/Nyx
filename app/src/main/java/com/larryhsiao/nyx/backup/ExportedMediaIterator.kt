@@ -14,6 +14,9 @@ class ExportedMediaIterator(private val mediaIterator: Iterator<MediaEntity>) :
     }
 
     override fun next(): ExportedMedia {
+        if (hasNext().not()){
+            throw NoSuchElementException()
+        }
         return ExportedMediaImpl(gson, mediaIterator.next())
     }
 }
