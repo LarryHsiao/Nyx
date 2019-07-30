@@ -9,7 +9,7 @@ import java.io.File
  *
  * Note: This class requires Permissions for reading/writing External storage.
  */
-class BackupRootSource() : Source<File> {
+class BackupRootSource : Source<File> {
     override fun value(): File {
         return File(Environment.getExternalStorageDirectory(), "jotted_backup")
     }
