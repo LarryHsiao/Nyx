@@ -58,8 +58,13 @@ class BackupListFragment : AuraFragment() {
         viewModel.backups().observe(this, Observer {
             adapter.loadUp(it)
         })
-
-        viewModel.fetch()
+        if (ContextCompat.checkSelfPermission(
+                view.context,
+                WRITE_EXTERNAL_STORAGE
+            ) == PERMISSION_GRANTED
+        ) {
+            viewModel.fetch()
+        }
     }
 
     override fun onPermissionGranted() {
