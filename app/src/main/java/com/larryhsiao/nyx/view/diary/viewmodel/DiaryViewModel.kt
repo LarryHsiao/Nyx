@@ -16,14 +16,13 @@ import kotlinx.coroutines.launch
  * View Model for single diary.
  */
 class DiaryViewModel(private val app: Application) : AndroidViewModel(app) {
-    private val db = RDatabase.Factory(app).value()
+    private val db = RDatabase.Singleton(app).value()
     private val diary = MutableLiveData<Diary>().apply {
         value = PhantomDiary()
     }
 
     override fun onCleared() {
         super.onCleared()
-        db.close()
     }
 
     /**

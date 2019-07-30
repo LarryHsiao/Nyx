@@ -20,7 +20,6 @@ class DiaryDeletion(
             if (it.uri.startsWith("file:")) {
                 File(URI(it.uri)).delete()
             }
-
         }
         mediaDao.deleteByDiaryId(diaryId)
     }

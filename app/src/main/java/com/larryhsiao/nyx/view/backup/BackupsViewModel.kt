@@ -20,7 +20,7 @@ import java.io.IOException
  * View Model of backups, represent the backup instances.
  */
 class BackupsViewModel(app: Application) : AndroidViewModel(app) {
-    private val db = RDatabase.Factory(app).value()
+    private val db = RDatabase.Singleton(app).value()
     private val config = ConfigImpl(app)
     private val backups =
         MutableLiveData<List<Backup>>().apply { value = listOf() }

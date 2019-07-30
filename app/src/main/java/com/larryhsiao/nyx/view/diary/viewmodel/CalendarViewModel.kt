@@ -5,7 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.larryhsiao.nyx.database.RDatabase
-import com.larryhsiao.nyx.diary.*
+import com.larryhsiao.nyx.diary.AllDiary
+import com.larryhsiao.nyx.diary.Diary
+import com.larryhsiao.nyx.diary.DiaryByDate
+import com.larryhsiao.nyx.diary.NewDiary
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -14,7 +17,7 @@ import java.util.*
  * View model for presenting the calendar events
  */
 class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
-    private val db = RDatabase.Factory(app).value()
+    private val db = RDatabase.Singleton(app).value()
 
     /**
      * Create new diary
@@ -68,6 +71,5 @@ class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
 
     override fun onCleared() {
         super.onCleared()
-        db.close()
     }
 }

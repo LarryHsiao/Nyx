@@ -22,6 +22,7 @@ class Restore(
         private const val DIARY_JSON = "diary.json"
         private const val MEDIA_JSON = "media.json"
     }
+
     private val diaryIdMapping = LongSparseArray<Long>()
 
     override fun fire() {
@@ -52,6 +53,12 @@ class Restore(
             Array<ExportedMedia>::class.java
         ).forEach {
             diaryIdMapping[it.media.diaryId]?.also { diaryId ->
+                if (it.exportedFileName.isEmpty()) {
+                    db.mediaDao().create(
+                        MediaEntity(0, diaryId, it.media.uri)
+                    )
+                    return
+                }
                 val mediaFile = File(
                     mediaRoot,
                     it.exportedFileName
