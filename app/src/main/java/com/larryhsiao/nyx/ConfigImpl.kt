@@ -12,6 +12,10 @@ class ConfigImpl(private val context: Context) : Config {
     }
 
     override fun mediaRoot(): File {
-        return File(context.filesDir, PATH_MEDIA)
+        return File(context.filesDir, PATH_MEDIA).also {
+            if (it.exists().not()) {
+                it.mkdirs()
+            }
+        }
     }
 }

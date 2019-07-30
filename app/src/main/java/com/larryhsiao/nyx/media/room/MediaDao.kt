@@ -45,4 +45,10 @@ interface MediaDao {
      */
     @Query("SELECT * FROM media;")
     fun all():List<MediaEntity>
+
+    /**
+     * Remove all rows
+     */
+    @Query("DELETE FROM media;")
+    fun clear()
 }
