@@ -39,4 +39,16 @@ interface MediaDao {
      */
     @Query("SELECT * FROM media WHERE diary_id=:diaryId;")
     fun byDiaryId(diaryId: Long): List<MediaEntity>
+
+    /**
+     * Query all medias
+     */
+    @Query("SELECT * FROM media;")
+    fun all():List<MediaEntity>
+
+    /**
+     * Remove all rows
+     */
+    @Query("DELETE FROM media;")
+    fun clear()
 }

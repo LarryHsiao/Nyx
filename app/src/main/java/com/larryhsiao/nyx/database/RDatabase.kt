@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.larryhsiao.nyx.diary.room.*
+import com.larryhsiao.nyx.diary.room.DiaryDao
+import com.larryhsiao.nyx.diary.room.DiaryEntity
+import com.larryhsiao.nyx.diary.room.TagEntity
 import com.larryhsiao.nyx.media.room.MediaDao
 import com.larryhsiao.nyx.media.room.MediaEntity
 import com.silverhetch.clotho.Source
@@ -12,7 +14,10 @@ import com.silverhetch.clotho.Source
 /**
  * Database implemented with Room
  */
-@Database(entities = [DiaryEntity::class, MediaEntity::class, TagEntity::class], version = 2)
+@Database(
+    entities = [DiaryEntity::class, MediaEntity::class, TagEntity::class],
+    version = 2
+)
 abstract class RDatabase : RoomDatabase() {
 
     /**
@@ -28,17 +33,28 @@ abstract class RDatabase : RoomDatabase() {
     /**
      * Source generate [RDatabase] for Nyx.
      */
-    class Factory(private val context: Context) : Source<RDatabase> {
+    class Singleton(private val context: Context) : Source<RDatabase> {
         companion object {
             private const val DATABASE_NAME = "database_nyx"
+            private lateinit var database: RDatabase
+
+            private fun db(context: Context): RDatabase {
+                return if (::database.isInitialized) {
+                    database
+                } else {
+                    Room.databaseBuilder(
+                        context,
+                        RDatabase::class.java,
+                        DATABASE_NAME
+                    ).addMigrations(Migration1To2())
+                        .build()
+                        .also { database = it }
+                }
+            }
         }
 
         override fun value(): RDatabase {
-            return Room.databaseBuilder(
-                context,
-                RDatabase::class.java,
-                DATABASE_NAME
-            ).addMigrations(Migration1To2()).build()
+            return db(context)
         }
     }
 }

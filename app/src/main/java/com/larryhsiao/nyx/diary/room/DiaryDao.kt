@@ -51,4 +51,10 @@ interface DiaryDao {
      */
     @Query("DELETE FROM diary WHERE id=:id;")
     fun delete(id:Long)
+
+    /**
+     * Remove all rows
+     */
+    @Query("DELETE FROM diary")
+    fun clear()
 }

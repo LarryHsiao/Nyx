@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx
 
 import android.content.Context
+import com.larryhsiao.nyx.backup.local.BackupRootSource
 import java.io.File
 
 /**
@@ -12,6 +13,14 @@ class ConfigImpl(private val context: Context) : Config {
     }
 
     override fun mediaRoot(): File {
-        return File(context.filesDir, PATH_MEDIA)
+        return File(context.filesDir, PATH_MEDIA).also {
+            if (it.exists().not()) {
+                it.mkdirs()
+            }
+        }
+    }
+
+    override fun backupRoot(): File {
+        return BackupRootSource().value()
     }
 }
