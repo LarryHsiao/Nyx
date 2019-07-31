@@ -13,4 +13,10 @@
         android:id="@+id/navigation_restore"
         android:icon="@drawable/ic_restore"
         android:title="@string/restore" />
+
+    <item
+        android:id="@+id/navigation_setting"
+        android:icon="@drawable/ic_gear"
+        android:title="@string/settings"
+        />
 </menu>

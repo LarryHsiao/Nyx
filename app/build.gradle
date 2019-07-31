@@ -4,8 +4,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
-def nyxVersionName = "v1.6.0"
-def nyxVersionCode = 10600
+def nyxVersionName = "v1.7.0"
+def nyxVersionCode = 10700
 
 android {
     compileSdkVersion 28
@@ -79,9 +79,11 @@ dependencies {
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation "com.silverhetch:aura:1.14.1"
     implementation "com.silverhetch:clotho:1.11.3"
+    implementation 'androidx.biometric:biometric:1.0.0-alpha04'
+    implementation "androidx.preference:preference:1.1.0-rc01"
     implementation "androidx.emoji:emoji:1.0.0"
     implementation "androidx.emoji:emoji-bundled:1.0.0"
-    implementation "com.google.android.material:material:1.1.0-alpha08"
+    implementation "com.google.android.material:material:1.1.0-alpha09"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:1.1.0-rc01"
     implementation "androidx.core:core-ktx:1.2.0-alpha02"

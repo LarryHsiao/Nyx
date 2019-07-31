@@ -22,4 +22,7 @@
     <string name="restore_with_">Restore with %s?</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
+    <string name="bio_authorization">Biometric authorization</string>
+    <string name="fingerprint_auth">Fingerprint authorization</string>
+    <string name="authorization">Authorization</string>
 </resources>
