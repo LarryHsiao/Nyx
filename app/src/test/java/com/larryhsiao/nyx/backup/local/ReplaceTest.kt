@@ -48,12 +48,6 @@ class ReplaceTest{
     fun restoreWithBackupOutput() {
         val sampleText = "sample "
         val config = ConfigImpl(ApplicationProvider.getApplicationContext())
-        val tempMediaFile =
-            Files.createTempFile(
-                config.mediaRoot().toPath(),
-                "Temp",
-                ""
-            ).toFile().also { TextFile(it, sampleText).value() }
 
         NewBackup(
             db.also { db ->
@@ -62,7 +56,22 @@ class ReplaceTest{
                     MediaEntity(
                         0,
                         1,
-                        tempMediaFile.toURI().toASCIIString()
+                        Files.createTempFile(
+                            config.mediaRoot().toPath(),
+                            "Temp",
+                            ""
+                        ).toFile().also { TextFile(it, sampleText).value() }.toURI().toASCIIString()
+                    )
+                )
+                db.mediaDao().create(
+                    MediaEntity(
+                        0,
+                        1,
+                        Files.createTempFile(
+                            config.mediaRoot().toPath(),
+                            "Temp",
+                            ""
+                        ).toFile().also { TextFile(it, sampleText).value() }.toURI().toASCIIString()
                     )
                 )
             },
@@ -75,9 +84,10 @@ class ReplaceTest{
             db
         ).fire()
 
-        assertEquals(1, db.mediaDao().all().size)
+        assertEquals(2, db.mediaDao().all().size)
         assertEquals(1, db.diaryDao().all().size)
-        assertEquals(1, config.mediaRoot().listFiles().size)
+        assertEquals(2, db.diaryDao().all()[0].mediaEntities.size)
+        assertEquals(2, config.mediaRoot().listFiles().size)
         config.mediaRoot().listFiles().forEach {
             assertEquals(
                 sampleText,
