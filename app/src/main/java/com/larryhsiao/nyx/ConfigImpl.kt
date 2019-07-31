@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx
 
 import android.content.Context
+import android.preference.PreferenceManager
 import com.larryhsiao.nyx.backup.local.BackupRootSource
 import java.io.File
 
@@ -22,5 +23,13 @@ class ConfigImpl(private val context: Context) : Config {
 
     override fun backupRoot(): File {
         return BackupRootSource().value()
+    }
+
+    override fun bioAuthEnabled(): Boolean {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(
+                context.getString(R.string.prefKey_fingerprintAuth),
+                false
+            )
     }
 }
