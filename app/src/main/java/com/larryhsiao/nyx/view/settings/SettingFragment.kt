@@ -34,14 +34,16 @@ class SettingFragment : PreferenceFragmentCompat() {
             isVisible = fingerprint.isSupported()
             setOnPreferenceChangeListener { preference, obj ->
                 if (obj is Boolean && obj) {
-                    BioAuth(activity!!){ _, err ->
-                        fingerprintPref.isChecked = false
-                        Toast.makeText(
-                            context,
-                            err,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }.fire()
+                    activity?.also {
+                        BioAuth(it) { _, err ->
+                            fingerprintPref.isChecked = false
+                            Toast.makeText(
+                                context,
+                                err,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }.fire()
+                    }
                 }
                 true
             }
