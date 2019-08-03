@@ -6,16 +6,24 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.larryhsiao.nyx.diary.room.DiaryDao
 import com.larryhsiao.nyx.diary.room.DiaryEntity
-import com.larryhsiao.nyx.diary.room.TagEntity
+import com.larryhsiao.nyx.tag.room.TagEntity
 import com.larryhsiao.nyx.media.room.MediaDao
 import com.larryhsiao.nyx.media.room.MediaEntity
+import com.larryhsiao.nyx.tag.room.TagDao
+import com.larryhsiao.nyx.tag.room.TagDiaryDao
+import com.larryhsiao.nyx.tag.room.TagDiaryEntity
 import com.silverhetch.clotho.Source
 
 /**
  * Database implemented with Room
  */
 @Database(
-    entities = [DiaryEntity::class, MediaEntity::class, TagEntity::class],
+    entities = arrayOf(
+        DiaryEntity::class,
+        MediaEntity::class,
+        TagEntity::class,
+        TagDiaryEntity::class
+    ),
     version = 2
 )
 abstract class RDatabase : RoomDatabase() {
@@ -29,6 +37,16 @@ abstract class RDatabase : RoomDatabase() {
      * Obtain the Media dao.
      */
     abstract fun mediaDao(): MediaDao
+
+    /**
+     * Obtain the tag dao.
+     */
+    abstract fun tagDao(): TagDao
+
+    /**
+     * Obtain the tag-diary relation dao
+     */
+    abstract fun tagDiaryDao(): TagDiaryDao
 
     /**
      * Source generate [RDatabase] for Nyx.
