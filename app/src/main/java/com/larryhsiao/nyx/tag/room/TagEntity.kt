@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.diary.room
+package com.larryhsiao.nyx.tag.room
 
 import androidx.room.Entity
 import androidx.room.Index

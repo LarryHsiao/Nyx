@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "00771da5216449b4feeff9c4ef4c8fd7",
+    "identityHash": "9c415bb023cdde06dd07a7bd9a72e8b4",
     "entities": [
       {
         "tableName": "diary",
@@ -102,12 +102,54 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "tag_diary",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `diary_id` INTEGER NOT NULL, `tag_id` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "diaryId",
+            "columnName": "diary_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tagId",
+            "columnName": "tag_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_tag_diary_diary_id_tag_id",
+            "unique": true,
+            "columnNames": [
+              "diary_id",
+              "tag_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_tag_diary_diary_id_tag_id` ON `${TABLE_NAME}` (`diary_id`, `tag_id`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '00771da5216449b4feeff9c4ef4c8fd7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9c415bb023cdde06dd07a7bd9a72e8b4')"
     ]
   }
 }
