@@ -12,6 +12,8 @@ import kotlinx.android.synthetic.main.page_diary.*
 /**
  * Processor to extract the uri from result of attachment Intent
  *
+ * @todo #10 The result might have multiple output, use the proper one(e.g. Camera capture)
+ *
  * @see FindAttachmentIntent
  */
 class ResultProcessor(
