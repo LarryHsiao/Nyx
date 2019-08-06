@@ -1,11 +1,13 @@
 package com.larryhsiao.nyx
 
 import android.os.Bundle
+import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.view.backup.BackupListFragment
 import com.larryhsiao.nyx.view.diary.CalendarFragment
 import com.larryhsiao.nyx.view.diary.EventListFragment
 import com.larryhsiao.nyx.view.settings.BioAuth
 import com.larryhsiao.nyx.view.settings.SettingFragment
+import com.larryhsiao.nyx.web.TakesAccess
 import com.silverhetch.aura.AuraActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -59,6 +61,7 @@ class MainActivity : AuraActivity() {
 
     override fun onResume() {
         super.onResume()
+        TakesAccess(RDatabase.Singleton(this).value()).enable()
         if (bioAuth.not() && ConfigImpl(this).bioAuthEnabled()) {
             BioAuth(this, { bioAuth = true }) { _, err ->
                 finishAffinity()
