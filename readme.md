@@ -27,3 +27,5 @@ Instant diary app on Android.
 @todo #6 searching
 
 @todo #8 Auto/clould backup
+
+@todo #10 PC access
