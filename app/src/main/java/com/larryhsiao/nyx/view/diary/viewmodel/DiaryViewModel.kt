@@ -89,8 +89,7 @@ class DiaryViewModel(private val app: Application) : AndroidViewModel(app) {
         GlobalScope.launch {
             diary.value?.also {
                 DiaryDeletion(
-                    db.diaryDao(),
-                    db.mediaDao(),
+                    db,
                     it.id()
                 ).fire()
             }
