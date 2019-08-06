@@ -14,13 +14,13 @@ Instant diary app on Android.
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 
-@todo #7 Use high resolution image with Camera output 
+@todo #7 Use high resolution image with Camera output
 
 @todo #2 Record voice
 
 @todo #3 Record video
 
-@todo #4 Note booke like background
+@todo #4 Notebook-like background
 
 @todo #5 tagging
 
@@ -29,3 +29,8 @@ Instant diary app on Android.
 @todo #8 Auto/clould backup
 
 @todo #10 PC access
+ - @todo #10-1 authorization
+ - @todo #10-2 list view
+ - @todo #10-3 new diary page 
+ - @todo #10-4 diary detail
+ - @todo #10-5 create/edit diary 
