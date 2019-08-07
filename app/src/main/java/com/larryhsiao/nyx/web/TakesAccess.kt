@@ -32,6 +32,13 @@ class TakesAccess(private val db: RDatabase) : WebAccess {
                         TkFork(
                             FkMethods("GET", TkDiaries(db))
                         )
+                    ),
+                    FkRegex(
+                        "^/diaries/\\d+\$",
+                        TkFork(
+                            FkMethods("GET", TkDiaryById(db)),
+                            FkMethods("DELETE", TkDiaryDeleteById(db))
+                        )
                     )
                 ),
                 8080
