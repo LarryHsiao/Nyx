@@ -1,6 +1,8 @@
 package com.larryhsiao.nyx.web
 
+import android.content.Context
 import com.larryhsiao.nyx.database.RDatabase
+import com.silverhetch.clotho.Source
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.takes.facets.fork.FkMethods
@@ -42,5 +44,29 @@ class TakesAccess(private val db: RDatabase) : WebAccess {
             return
         }
         enabled = false
+    }
+
+    override fun isRunning(): Boolean {
+        return enabled
+    }
+
+    /**
+     * Source to build [WebAccess].
+     */
+    class Singleton(private val db: RDatabase) : Source<WebAccess> {
+        companion object {
+            private lateinit var instance: WebAccess
+
+            private fun obtain(db: RDatabase): WebAccess {
+                if (::instance.isInitialized) {
+                    return instance
+                }
+                return TakesAccess(db).apply { instance = this }
+            }
+        }
+
+        override fun value(): WebAccess {
+            return obtain(db)
+        }
     }
 }

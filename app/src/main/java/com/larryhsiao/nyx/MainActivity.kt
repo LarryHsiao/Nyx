@@ -8,6 +8,7 @@ import com.larryhsiao.nyx.view.diary.EventListFragment
 import com.larryhsiao.nyx.view.settings.BioAuth
 import com.larryhsiao.nyx.view.settings.SettingFragment
 import com.larryhsiao.nyx.web.TakesAccess
+import com.larryhsiao.nyx.web.WebAccess
 import com.silverhetch.aura.AuraActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -20,6 +21,7 @@ class MainActivity : AuraActivity() {
         private const val SAVED_STATE_BIO_AUTH = "SAVED_STATE_BIO_AUTH"
     }
 
+    private lateinit var webAccess: WebAccess
     private var bioAuth = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +46,12 @@ class MainActivity : AuraActivity() {
             }
             true
         }
-        if (savedInstanceState==null) {
+        if (savedInstanceState == null) {
             main_bottomNavigation.selectedItemId = R.id.navigation_jotted
         }
+        webAccess = TakesAccess.Singleton(
+            RDatabase.Singleton(this).value()
+        ).value()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -61,12 +66,18 @@ class MainActivity : AuraActivity() {
 
     override fun onResume() {
         super.onResume()
-        TakesAccess(RDatabase.Singleton(this).value()).enable()
+        webAccess.enable()
+
         if (bioAuth.not() && ConfigImpl(this).bioAuthEnabled()) {
             BioAuth(this, { bioAuth = true }) { _, err ->
                 finishAffinity()
             }.fire()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        webAccess.disable()
     }
 }
 
