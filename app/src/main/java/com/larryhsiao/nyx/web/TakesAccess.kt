@@ -30,7 +30,8 @@ class TakesAccess(private val db: RDatabase) : WebAccess {
                     FkRegex(
                         "/diaries",
                         TkFork(
-                            FkMethods("GET", TkDiaries(db))
+                            FkMethods("GET", TkDiaries(db)),
+                            FkMethods("POST", TkDiaryNew(db))
                         )
                     ),
                     FkRegex(
