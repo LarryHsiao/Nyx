@@ -50,6 +50,7 @@ class MainActivity : AuraActivity() {
             main_bottomNavigation.selectedItemId = R.id.navigation_jotted
         }
         webAccess = TakesAccess.Singleton(
+            this,
             RDatabase.Singleton(this).value()
         ).value()
     }

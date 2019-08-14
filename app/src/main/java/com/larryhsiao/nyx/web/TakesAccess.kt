@@ -15,9 +15,17 @@ import org.takes.http.FtBasic
 /**
  * Access implementation with [takes](https://github.com/yegor256/takes)
  */
-class TakesAccess(private val db: RDatabase) : WebAccess {
+class TakesAccess(
+    context: Context,
+    private val db: RDatabase
+) : WebAccess {
+    companion object {
+        private const val PORT = 8080
+    }
+
     private var enabled = false
     private var exit = Exit { enabled.not() }
+    private val context: Context = context.applicationContext
 
     override fun enable() {
         if (enabled) {
@@ -27,6 +35,24 @@ class TakesAccess(private val db: RDatabase) : WebAccess {
         GlobalScope.launch {
             FtBasic(
                 TkFork(
+                    FkRegex(
+                        "/",
+                        TkAndroidAssets(
+                            context,
+                            "http://localhost:$PORT",
+                            "index.html",
+                            "text/html"
+                        )
+                    ),
+                    FkRegex(
+                        "/tacit-css.min.css",
+                        TkAndroidAssets(
+                            context,
+                            "http://localhost:$PORT",
+                            "tacit-css.min.css",
+                            "text/css"
+                        )
+                    ),
                     FkRegex(
                         "/diaries",
                         TkFork(
@@ -42,7 +68,7 @@ class TakesAccess(private val db: RDatabase) : WebAccess {
                         )
                     )
                 ),
-                8080
+                PORT
             ).start(exit)
         }
     }
@@ -61,20 +87,21 @@ class TakesAccess(private val db: RDatabase) : WebAccess {
     /**
      * Source to build [WebAccess].
      */
-    class Singleton(private val db: RDatabase) : Source<WebAccess> {
+    class Singleton(private val context: Context, private val db: RDatabase) :
+        Source<WebAccess> {
         companion object {
             private lateinit var instance: WebAccess
 
-            private fun obtain(db: RDatabase): WebAccess {
+            private fun obtain(context: Context, db: RDatabase): WebAccess {
                 if (::instance.isInitialized) {
                     return instance
                 }
-                return TakesAccess(db).apply { instance = this }
+                return TakesAccess(context, db).apply { instance = this }
             }
         }
 
         override fun value(): WebAccess {
-            return obtain(db)
+            return obtain(context, db)
         }
     }
 }

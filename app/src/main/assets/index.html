@@ -6,5 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 <body>
+<ul id="diary_list">
+</ul>
 </body>
+
+<script>
+    var Http = new XMLHttpRequest();
+    Http.open("GET", "/diaries");
+    Http.send();
+    Http.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            var list = document.getElementById("diary_list");
+            var body = JSON.parse(Http.responseText);
+            for (i in body) {
+                var row = document.createElement("LI");
+                row.appendChild(document.createTextNode(body[i].title));
+                list.appendChild(row)
+            }
+        }
+    }
+</script>
 </html>
