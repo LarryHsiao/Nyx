@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.larryhsiao.nyx">
 
 
@@ -18,18 +19,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
+            <!-- The assetlinks.json is managed out of source which might have other app`s information. -->
+            <tools:validation testUrl="https://larryhsiao.com/nyx" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <action android:name="android.intent.action.VIEW" />
                 <data
-                    android:scheme="nyx"
-                    android:host="larryhsiao.com" />
+                    android:scheme="https"
+                    android:host="larryhsiao.com"
+                    android:path="/nyx" />
             </intent-filter>
         </activity>
         <activity android:name="com.larryhsiao.nyx.view.diary.NewDiaryActivity" />
