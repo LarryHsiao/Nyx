@@ -1,11 +1,9 @@
 package com.larryhsiao.nyx.media
 
 import android.content.Context
-import androidx.core.net.toUri
 import com.larryhsiao.nyx.media.room.MediaDao
 import com.larryhsiao.nyx.media.room.MediaEntity
 import com.larryhsiao.nyx.uri.InputStreamSource
-import com.larryhsiao.nyx.uri.IsInternalFile
 import com.silverhetch.clotho.Source
 import com.silverhetch.clotho.file.ToFile
 import java.io.File
@@ -46,7 +44,7 @@ class NewMedia(
             it.parentFile.mkdirs()
             it.createNewFile()
         }
-        val dstUri = dstFile.toUri().toString()
+        val dstUri = dstFile.toURI().toString()
         ToFile(
             InputStreamSource(
                 context,

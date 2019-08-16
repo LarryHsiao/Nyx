@@ -24,11 +24,11 @@
             var body = JSON.parse(http.responseText);
             for (i in body) {
                 var row = document.createElement("LI");
-                row.appendChild(document.createTextNode(body[i].title));
+                row.appendChild(document.createTextNode(body[i].diary.title));
                 var deleteButton = document.createElement("button")
                 deleteButton.innerText = "Delete";
                 deleteButton.addEventListener("click", function () {
-                    deleteByid(body[i].id);
+                    deleteByid(body[i].diary.id);
                 });
                 row.appendChild(deleteButton);
                 list.appendChild(row)

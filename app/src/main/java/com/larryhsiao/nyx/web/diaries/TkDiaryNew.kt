@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.web.diaries
 import com.google.api.client.http.HttpStatusCodes.*
 import com.google.gson.Gson
 import com.larryhsiao.nyx.database.RDatabase
+import com.larryhsiao.nyx.diary.NewDiary
 import com.larryhsiao.nyx.diary.room.DiaryEntity
 import org.takes.Request
 import org.takes.Response
