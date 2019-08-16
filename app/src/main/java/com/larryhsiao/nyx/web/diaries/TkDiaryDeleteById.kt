@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.web
+package com.larryhsiao.nyx.web.diaries
 
 import com.google.api.client.http.HttpStatusCodes.STATUS_CODE_NO_CONTENT
 import com.larryhsiao.nyx.database.RDatabase

@@ -1,6 +1,5 @@
-package com.larryhsiao.nyx.web
+package com.larryhsiao.nyx.web.diaries
 
-import com.google.api.client.http.HttpStatusCodes
 import com.google.api.client.http.HttpStatusCodes.*
 import com.google.gson.Gson
 import com.larryhsiao.nyx.database.RDatabase
@@ -12,7 +11,6 @@ import org.takes.rq.RqHref
 import org.takes.rq.RqPrint
 import org.takes.rs.RsWithHeader
 import org.takes.rs.RsWithStatus
-import java.io.InputStreamReader
 import java.io.StringReader
 
 /**

@@ -2,6 +2,10 @@ package com.larryhsiao.nyx.web
 
 import android.content.Context
 import com.larryhsiao.nyx.database.RDatabase
+import com.larryhsiao.nyx.web.diaries.TkDiaries
+import com.larryhsiao.nyx.web.diaries.TkDiaryById
+import com.larryhsiao.nyx.web.diaries.TkDiaryDeleteById
+import com.larryhsiao.nyx.web.diaries.TkDiaryNew
 import com.silverhetch.clotho.Source
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -56,15 +60,25 @@ class TakesAccess(
                     FkRegex(
                         "/diaries",
                         TkFork(
-                            FkMethods("GET", TkDiaries(db)),
-                            FkMethods("POST", TkDiaryNew(db))
+                            FkMethods("GET",
+                                TkDiaries(db)
+                            ),
+                            FkMethods("POST",
+                                TkDiaryNew(db)
+                            )
                         )
                     ),
                     FkRegex(
                         "^/diaries/\\d+\$",
                         TkFork(
-                            FkMethods("GET", TkDiaryById(db)),
-                            FkMethods("DELETE", TkDiaryDeleteById(db))
+                            FkMethods("GET",
+                                TkDiaryById(db)
+                            ),
+                            FkMethods("DELETE",
+                                TkDiaryDeleteById(
+                                    db
+                                )
+                            )
                         )
                     )
                 ),
