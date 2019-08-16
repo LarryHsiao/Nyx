@@ -9,9 +9,11 @@ import org.takes.Request
 import org.takes.Response
 import org.takes.Take
 import org.takes.rq.RqHref
+import org.takes.rq.RqPrint
 import org.takes.rs.RsWithHeader
 import org.takes.rs.RsWithStatus
 import java.io.InputStreamReader
+import java.io.StringReader
 
 /**
  * Create a new diary.
@@ -21,7 +23,7 @@ class TkDiaryNew(private val db: RDatabase) : Take {
         return req?.let { req ->
             val id = db.diaryDao().create(
                 Gson().fromJson(
-                    InputStreamReader(req.body()),
+                    StringReader(RqPrint(req).printBody()),
                     DiaryEntity::class.java
                 )
             )

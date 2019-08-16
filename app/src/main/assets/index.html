@@ -6,24 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 <body>
+<form action="javascript:newDiary(this)" name="newDiary">
+    <input type="text" name="content"><br>
+    <input type="submit" value="New">
+</form>
 <ul id="diary_list">
 </ul>
 </body>
 
 <script>
-    var Http = new XMLHttpRequest();
-    Http.open("GET", "/diaries");
-    Http.send();
-    Http.onreadystatechange = function () {
+    var http = new XMLHttpRequest();
+    http.open("GET", "/diaries");
+    http.send();
+    http.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             var list = document.getElementById("diary_list");
-            var body = JSON.parse(Http.responseText);
+            var body = JSON.parse(http.responseText);
             for (i in body) {
                 var row = document.createElement("LI");
                 row.appendChild(document.createTextNode(body[i].title));
+                var deleteButton = document.createElement("button")
+                deleteButton.innerText = "Delete";
+                deleteButton.addEventListener("click", function () {
+                    deleteByid(body[i].id);
+                });
+                row.appendChild(deleteButton);
                 list.appendChild(row)
             }
         }
+    };
+
+    function newDiary() {
+        var http = new XMLHttpRequest();
+        http.open("POST", "/diaries", true);
+        http.setRequestHeader("Content-Type", "application/json");
+        http.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 201) {
+                location.reload()
+            }
+        };
+        http.send(JSON.stringify({
+            "title": document.forms["newDiary"]["content"].value,
+            "timestamp": new Date().getTime()
+        }));
+    }
+
+    function deleteByid(id) {
+        var http = new XMLHttpRequest();
+        http.open("DELETE", "/diaries/" + id, true);
+        http.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 204) {
+                location.reload()
+            }
+        };
+        http.send(JSON.stringify({
+            "title": document.forms["newDiary"]["content"].value,
+            "timestamp": new Date().getTime()
+        }));
     }
 </script>
 </html>
