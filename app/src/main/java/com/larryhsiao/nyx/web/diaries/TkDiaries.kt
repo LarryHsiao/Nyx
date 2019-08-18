@@ -12,7 +12,6 @@ import org.takes.Take
  */
 class TkDiaries(private val db: RDatabase) : Take {
     override fun act(req: Request?): Response {
-        val diaries = db.diaryDao().all()
-        return RsJson(Gson().toJson(diaries))
+        return RsJson(DiaryView(db.diaryDao().all()).value())
     }
 }

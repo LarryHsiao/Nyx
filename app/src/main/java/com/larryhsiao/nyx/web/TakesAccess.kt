@@ -111,7 +111,7 @@ class TakesAccess(
                 "/diaries",
                 TkFork(
                     FkMethods("GET", TkDiaries(db)),
-                    FkMethods("POST", TkDiaryNew(db))
+                    FkMethods("POST", TkDiaryNew(context, config ,db))
                 )
             ),
             FkRegex(

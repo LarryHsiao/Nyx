@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 <body>
-<form action="javascript:newDiary(this)" name="newDiary">
+<form action="javascript:newDiaryWithFile(this)" name="newDiary">
     <input type="text" name="content"><br>
+    <input type="file" name="file"><br>
     <input type="submit" value="New">
 </form>
 <ul id="diary_list">
@@ -24,11 +25,13 @@
             var body = JSON.parse(http.responseText);
             for (i in body) {
                 var row = document.createElement("LI");
-                row.appendChild(document.createTextNode(body[i].diary.title));
+                row.appendChild(document.createTextNode(body[i].title));
                 var deleteButton = document.createElement("button")
                 deleteButton.innerText = "Delete";
                 deleteButton.addEventListener("click", function () {
-                    deleteByid(body[i].diary.id);
+                    if (confirm("Delete this diary?")) {
+                        deleteByid(body[i].id);
+                    }
                 });
                 row.appendChild(deleteButton);
                 list.appendChild(row)
@@ -36,7 +39,8 @@
         }
     };
 
-    function newDiary() {
+    function newDiary(file) {
+        console.log("File: " + document.forms["newDiary"]["file"].value);
         var http = new XMLHttpRequest();
         http.open("POST", "/diaries", true);
         http.setRequestHeader("Content-Type", "application/json");
@@ -47,7 +51,8 @@
         };
         http.send(JSON.stringify({
             "title": document.forms["newDiary"]["content"].value,
-            "timestamp": new Date().getTime()
+            "timestamp": new Date().getTime(),
+            "file": file
         }));
     }
 
@@ -63,6 +68,21 @@
             "title": document.forms["newDiary"]["content"].value,
             "timestamp": new Date().getTime()
         }));
+    }
+
+    function newDiaryWithFile() {
+        var file = document.forms["newDiary"]["file"].files[0];
+        var http = new XMLHttpRequest();
+        http.open("POST", "/files", true);
+        http.setRequestHeader("fileName", file.name);
+        var body = new FormData();
+        body.append("file", file);
+        http.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 204) {
+                newDiary(file.name)
+            }
+        };
+        http.send(body);
     }
 </script>
 </html>
