@@ -35,6 +35,10 @@
                     android:scheme="https"
                     android:host="larryhsiao.com"
                     android:path="/nyx" />
+                <data
+                    android:scheme="http"
+                    android:host="larryhsiao.com"
+                    android:path="/nyx" />
             </intent-filter>
         </activity>
         <activity android:name="com.larryhsiao.nyx.view.diary.NewDiaryActivity" />
