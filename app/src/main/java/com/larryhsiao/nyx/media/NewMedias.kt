@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.media
 
 import android.content.Context
-import com.larryhsiao.nyx.ConfigImpl
+import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.media.room.MediaDao
 import com.larryhsiao.nyx.media.room.MediaEntity
 import com.silverhetch.clotho.Source

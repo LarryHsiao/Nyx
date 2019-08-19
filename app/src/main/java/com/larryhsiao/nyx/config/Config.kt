@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx
+package com.larryhsiao.nyx.config
 
 import java.io.File
 

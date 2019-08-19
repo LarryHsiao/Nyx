@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="prefKey_fingerprintAuth">fingerprint_auth</string>
+    <string name="prefKey_webAccess">web_access</string>
 </resources>

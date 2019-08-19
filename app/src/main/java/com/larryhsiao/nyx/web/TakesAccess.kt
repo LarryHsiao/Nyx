@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.web
 
 import android.content.Context
-import com.larryhsiao.nyx.ConfigImpl
+import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.web.diaries.TkDiaries
 import com.larryhsiao.nyx.web.diaries.TkDiaryById
@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import org.takes.facets.fork.*
 import org.takes.http.Exit
 import org.takes.http.FtBasic
-import java.io.File
 
 
 /**

@@ -1,12 +1,15 @@
 package com.larryhsiao.nyx.view.settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.web.WebAccessService
 import com.silverhetch.aura.fingerprint.FingerprintImpl
 import com.silverhetch.aura.storage.SPCeres
 
@@ -43,6 +46,25 @@ class SettingFragment : PreferenceFragmentCompat() {
                                 Toast.LENGTH_LONG
                             ).show()
                         }.fire()
+                    }
+                }
+                true
+            }
+        }
+        findPreference<SwitchPreference>(
+            getString(R.string.prefKey_webAccess)
+        )?.apply {
+            this.setOnPreferenceChangeListener { preference, obj ->
+                activity?.also {
+                    if (obj is Boolean && obj) {
+                        it.startService(
+                            Intent(
+                                it,
+                                WebAccessService::class.java
+                            )
+                        )
+                    } else {
+                        it.stopService(Intent(it, WebAccessService::class.java))
                     }
                 }
                 true

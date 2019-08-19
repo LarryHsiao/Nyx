@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.media.storage
 
 import android.content.Context
-import com.larryhsiao.nyx.ConfigImpl
+import com.larryhsiao.nyx.config.ConfigImpl
 import com.silverhetch.clotho.Source
 import java.io.File
 import java.util.*

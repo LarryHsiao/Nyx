@@ -91,6 +91,7 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
+        <service android:name=".web.WebAccessService" />
     </application>
 
     <dist:module dist:instant="true" />
