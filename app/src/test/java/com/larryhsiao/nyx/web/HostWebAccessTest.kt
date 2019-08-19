@@ -3,15 +3,19 @@ package com.larryhsiao.nyx.web
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.larryhsiao.nyx.database.RDatabase
-import org.joda.time.Minutes
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 
+/**
+ * Local Web access test for development purpose.
+ * This test is ignored in building process which have no asset statement and
+ * take many minutes to finish.
+ */
+@Ignore
 @RunWith(RobolectricTestRunner::class)
 class HostWebAccessTest {
     private lateinit var db: RDatabase

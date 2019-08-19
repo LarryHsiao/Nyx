@@ -29,8 +29,8 @@ Instant diary app on Android.
 @todo #8 Auto/clould backup
 
 @todo #10 PC access
- - @todo #10-1 authorization
- - @todo #10-2 list view
- - @todo #10-3 new diary page 
- - @todo #10-4 diary detail
- - @todo #10-5 create/edit diary 
+- @todo #10-1 authorization
+- @todo #10-2 list view
+- @todo #10-3 new diary page 
+- @todo #10-4 diary detail
+- @todo #10-5 create/edit diary 
