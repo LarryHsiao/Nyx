@@ -12,7 +12,7 @@ class IsInternalFile(
     private val uri: String
 ) : Source<Boolean> {
     override fun value(): Boolean {
-        val rootPath = context.filesDir.absoluteFile.toUri().toString()
+        val rootPath = context.filesDir.absoluteFile.toURI().toString()
         return uri.replace("///", "/")
             .startsWith(rootPath.replace("///", "/"))
     }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="tacit-css.min.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<form action="javascript:newDiaryWithFile(this)" name="newDiary">
+    <input type="text" name="content"><br>
+    <input type="file" name="file"><br>
+    <input type="submit" value="New">
+</form>
+<ul id="diary_list">
+</ul>
+</body>
+
+<script>
+    var http = new XMLHttpRequest();
+    http.open("GET", "/diaries");
+    http.send();
+    http.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            var list = document.getElementById("diary_list");
+            var body = JSON.parse(http.responseText);
+            for (i in body) {
+                var row = document.createElement("LI");
+                row.appendChild(document.createTextNode(body[i].title));
+                var image = new Image();
+                image.onload = function () {
+                    row.appendChild(image);
+                };
+                image.src = "/files/"+ body[i].attachments[0];
+                var deleteButton = document.createElement("button")
+                deleteButton.innerText = "Delete";
+                deleteButton.addEventListener("click", function () {
+                    if (confirm("Delete this diary?")) {
+                        deleteByid(body[i].id);
+                    }
+                });
+                row.appendChild(deleteButton);
+                list.appendChild(row)
+            }
+        }
+    };
+
+    function newDiary(file) {
+        console.log("File: " + document.forms["newDiary"]["file"].value);
+        var http = new XMLHttpRequest();
+        http.open("POST", "/diaries", true);
+        http.setRequestHeader("Content-Type", "application/json");
+        http.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 201) {
+                location.reload()
+            }
+        };
+        http.send(JSON.stringify({
+            "title": document.forms["newDiary"]["content"].value,
+            "timestamp": new Date().getTime(),
+            "file": file
+        }));
+    }
+
+    function deleteByid(id) {
+        var http = new XMLHttpRequest();
+        http.open("DELETE", "/diaries/" + id, true);
+        http.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 204) {
+                location.reload()
+            }
+        };
+        http.send(JSON.stringify({
+            "title": document.forms["newDiary"]["content"].value,
+            "timestamp": new Date().getTime()
+        }));
+    }
+
+    function newDiaryWithFile() {
+        var file = document.forms["newDiary"]["file"].files[0];
+        var http = new XMLHttpRequest();
+        http.open("POST", "/files", true);
+        http.setRequestHeader("fileName", file.name);
+        var body = new FormData();
+        body.append("file", file);
+        http.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 204) {
+                newDiary(file.name)
+            }
+        };
+        http.send(body);
+    }
+</script>
+</html>

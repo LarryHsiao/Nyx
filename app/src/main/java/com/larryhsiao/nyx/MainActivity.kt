@@ -1,12 +1,22 @@
 package com.larryhsiao.nyx
 
+import android.app.Service
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
+import com.larryhsiao.nyx.config.ConfigImpl
+import com.larryhsiao.nyx.config.IsWebAccessEnabled
 import com.larryhsiao.nyx.view.backup.BackupListFragment
 import com.larryhsiao.nyx.view.diary.CalendarFragment
 import com.larryhsiao.nyx.view.diary.EventListFragment
 import com.larryhsiao.nyx.view.settings.BioAuth
 import com.larryhsiao.nyx.view.settings.SettingFragment
+import com.larryhsiao.nyx.web.WebAccess
+import com.larryhsiao.nyx.web.WebAccessService
 import com.silverhetch.aura.AuraActivity
+import io.grpc.Context
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -42,7 +52,7 @@ class MainActivity : AuraActivity() {
             }
             true
         }
-        if (savedInstanceState==null) {
+        if (savedInstanceState == null) {
             main_bottomNavigation.selectedItemId = R.id.navigation_jotted
         }
     }
@@ -60,10 +70,21 @@ class MainActivity : AuraActivity() {
     override fun onResume() {
         super.onResume()
         if (bioAuth.not() && ConfigImpl(this).bioAuthEnabled()) {
-            BioAuth(this, { bioAuth = true }) { _, err ->
+            BioAuth(this, {
+                bioAuth = true
+                if (IsWebAccessEnabled(this).value()) {
+                    // Do the webAccess service binding only when preference is enabled
+                    startService(Intent(this, WebAccessService::class.java))
+                }
+            }) { _, err ->
                 finishAffinity()
             }.fire()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopService(Intent(this, WebAccessService::class.java))
     }
 }
 

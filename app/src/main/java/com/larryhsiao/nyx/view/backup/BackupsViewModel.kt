@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.larryhsiao.nyx.ConfigImpl
+import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.backup.Backup
 import com.larryhsiao.nyx.backup.local.Allbackups
 import com.larryhsiao.nyx.backup.local.BackupRootSource

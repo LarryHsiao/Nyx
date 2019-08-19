@@ -3,6 +3,10 @@
     <SwitchPreference
         android:id="@+id/preference_bioAuth"
         android:key="@string/prefKey_fingerprintAuth"
-        android:title="@string/fingerprint_auth"
-        />
+        android:title="@string/fingerprint_auth" />
+
+    <SwitchPreference
+        android:id="@+id/preference_webAccess"
+        android:key="@string/prefKey_webAccess"
+        android:title="@string/web_access" />
 </PreferenceScreen>

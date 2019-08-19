@@ -2,7 +2,7 @@ package com.larryhsiao.nyx.backup.local
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.larryhsiao.nyx.ConfigImpl
+import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.media.room.MediaEntity
@@ -47,7 +47,8 @@ class RestoreTest {
     @Test
     fun restoreWithBackupOutput() {
         val sampleText = "sample "
-        val config = ConfigImpl(ApplicationProvider.getApplicationContext())
+        val config =
+            ConfigImpl(ApplicationProvider.getApplicationContext())
         val tempMediaFile =
             Files.createTempFile(
                 config.mediaRoot().toPath(),

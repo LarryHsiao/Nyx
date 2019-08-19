@@ -27,7 +27,7 @@ class IsInternalFileTest{
                 File(
                     ApplicationProvider.getApplicationContext<Application>().filesDir,
                     "child"
-                ).toUri().toString()
+                ).toURI().toString()
             ).value()
         )
     }
