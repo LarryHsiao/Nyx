@@ -3,5 +3,6 @@
     <issue id="InvalidPackage">
         <!-- Can not control apache library includes javax-->
         <ignore path="*/httpclient-*.jar" />
+        <ignore path="*/takes-*.jar" />
     </issue>
 </lint>
