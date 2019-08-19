@@ -26,6 +26,11 @@
             for (i in body) {
                 var row = document.createElement("LI");
                 row.appendChild(document.createTextNode(body[i].title));
+                var image = new Image();
+                image.onload = function () {
+                    row.appendChild(image);
+                };
+                image.src = "/files/"+ body[i].attachments[0];
                 var deleteButton = document.createElement("button")
                 deleteButton.innerText = "Delete";
                 deleteButton.addEventListener("click", function () {

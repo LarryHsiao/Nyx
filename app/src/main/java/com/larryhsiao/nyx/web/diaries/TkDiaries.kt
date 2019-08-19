@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.web.diaries
 
-import com.google.gson.Gson
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.web.RsJson
 import org.takes.Request
@@ -12,6 +11,6 @@ import org.takes.Take
  */
 class TkDiaries(private val db: RDatabase) : Take {
     override fun act(req: Request?): Response {
-        return RsJson(DiaryView(db.diaryDao().all()).value())
+        return RsJson(DiaryListView(db.diaryDao().all()).value().toString())
     }
 }
