@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.view.diary
 
+import affan.ahmad.tags.TagsListener
 import android.Manifest.permission.*
 import android.app.Activity.*
 import android.app.DatePickerDialog
@@ -15,8 +16,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
+import com.larryhsiao.nyx.tag.Tag
 import com.larryhsiao.nyx.view.diary.attachment.*
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
+import com.larryhsiao.nyx.view.diary.viewmodel.DiaryTagViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.clotho.time.ToUTCTimestamp
@@ -24,6 +27,8 @@ import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * Page for creating new diary.
@@ -33,7 +38,8 @@ class NewDiaryFragment : AuraFragment() {
         private const val REQUEST_CODE_ADD_IMAGE = 1000
     }
 
-    private lateinit var viewModel: CalendarViewModel
+    private lateinit var calendarVM: CalendarViewModel
+    private lateinit var tagViewVM: DiaryTagViewModel
     private var calendar = Calendar.getInstance()
 
 
@@ -43,14 +49,14 @@ class NewDiaryFragment : AuraFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.page_diary, container, false)
-        viewModel =
-            ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+        calendarVM = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+        tagViewVM = ViewModelProviders.of(this).get(DiaryTagViewModel::class.java)
         attachFab(
             object : FabBehavior {
                 override fun onClick() {
                     val title = newDiary_newDiaryContent.text.toString()
                     if (title.isNotEmpty()) {
-                        viewModel.newDiary(
+                        calendarVM.newDiary(
                             title,
                             ToUTCTimestamp(calendar.timeInMillis).value(),
                             newDiary_imageGrid.sources().keys.toList()
@@ -98,6 +104,13 @@ class NewDiaryFragment : AuraFragment() {
                 )
             }
         }
+        rootView.newDiary_tagEditText.setOnTagChangeListener(object : TagsListener {
+            override fun onTagCreated(tag: String) {
+            }
+
+            override fun onTagRemoved(index: Int) {
+            }
+        })
         return rootView
     }
 

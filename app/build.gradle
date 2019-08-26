@@ -60,6 +60,8 @@ dependencies {
     def lifecycle_version = "2.0.0"
     def room_version = "2.1.0"
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'com.github.anonymous-ME:TagsEditText:0.5.0'
+    implementation 'com.google.android:flexbox:1.1.0'
     implementation 'com.google.auth:google-auth-library-oauth2-http:0.16.2'
     implementation 'com.google.api-client:google-api-client:1.30.2'
     implementation 'com.google.apis:google-api-services-drive:v3-rev110-1.23.0'

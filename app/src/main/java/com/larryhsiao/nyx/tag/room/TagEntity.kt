@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.tag.room
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -11,10 +12,7 @@ import androidx.room.PrimaryKey
  */
 @Entity(
     tableName = "tag",
-    indices = [Index(
-        value = ["title"],
-        unique = true
-    )]
+    indices = [Index(value = ["title"], unique = true)]
 )
 data class TagEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
