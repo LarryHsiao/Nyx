@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.view.diary.viewmodel
+package com.larryhsiao.nyx.view.tag.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
  * View model for tag title input.
  * This ViewModel will find/create tags by title.
  */
-class TagViewModel(app: Application) : AndroidViewModel(app) {
+class NewDiaryTagViewModel(app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Singleton(app).value()
     private val tagIdMap = HashMap<String, Tag>()
 
