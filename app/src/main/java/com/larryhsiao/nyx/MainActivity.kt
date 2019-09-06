@@ -13,6 +13,7 @@ import com.larryhsiao.nyx.view.diary.CalendarFragment
 import com.larryhsiao.nyx.view.diary.EventListFragment
 import com.larryhsiao.nyx.view.settings.BioAuth
 import com.larryhsiao.nyx.view.settings.SettingFragment
+import com.larryhsiao.nyx.view.tag.TagListFragment
 import com.larryhsiao.nyx.web.WebAccess
 import com.larryhsiao.nyx.web.WebAccessService
 import com.silverhetch.aura.AuraActivity
@@ -37,18 +38,11 @@ class MainActivity : AuraActivity() {
 
         main_bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_calendar -> {
-                    rootPage(CalendarFragment())
-                }
-                R.id.navigation_jotted -> {
-                    rootPage(EventListFragment())
-                }
-                R.id.navigation_restore -> {
-                    rootPage(BackupListFragment())
-                }
-                R.id.navigation_setting -> {
-                    rootPage(SettingFragment())
-                }
+                R.id.navigation_calendar -> rootPage(CalendarFragment())
+                R.id.navigation_jotted -> rootPage(EventListFragment())
+                R.id.navigation_tag -> rootPage(TagListFragment())
+                R.id.navigation_restore -> rootPage(BackupListFragment())
+                R.id.navigation_setting -> rootPage(SettingFragment())
             }
             true
         }
