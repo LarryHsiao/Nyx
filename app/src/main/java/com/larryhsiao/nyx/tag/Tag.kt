@@ -1,7 +1,5 @@
 package com.larryhsiao.nyx.tag
 
-import java.net.URI
-
 /**
  * Represents a Tag
  */

@@ -1,8 +1,8 @@
 package com.larryhsiao.nyx.view.diary
 
-import affan.ahmad.tags.TagsListener
-import android.Manifest.permission.*
-import android.app.Activity.*
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -11,15 +11,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import co.lujun.androidtagview.TagView
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.tag.Tag
-import com.larryhsiao.nyx.view.diary.attachment.*
+import com.larryhsiao.nyx.view.diary.attachment.FindAttachmentIntent
+import com.larryhsiao.nyx.view.diary.attachment.ImageFactory
+import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
+import com.larryhsiao.nyx.view.diary.attachment.ViewAttachmentIntent
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
-import com.larryhsiao.nyx.view.diary.viewmodel.DiaryTagViewModel
+import com.larryhsiao.nyx.view.diary.viewmodel.TagViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.clotho.time.ToUTCTimestamp
@@ -27,8 +32,6 @@ import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Page for creating new diary.
@@ -39,7 +42,7 @@ class NewDiaryFragment : AuraFragment() {
     }
 
     private lateinit var calendarVM: CalendarViewModel
-    private lateinit var tagViewVM: DiaryTagViewModel
+    private lateinit var tagViewVM: TagViewModel
     private var calendar = Calendar.getInstance()
 
 
@@ -49,8 +52,9 @@ class NewDiaryFragment : AuraFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.page_diary, container, false)
-        calendarVM = ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-        tagViewVM = ViewModelProviders.of(this).get(DiaryTagViewModel::class.java)
+        calendarVM =
+            ViewModelProviders.of(this).get(CalendarViewModel::class.java)
+        tagViewVM = ViewModelProviders.of(this).get(TagViewModel::class.java)
         attachFab(
             object : FabBehavior {
                 override fun onClick() {
@@ -61,7 +65,10 @@ class NewDiaryFragment : AuraFragment() {
                             ToUTCTimestamp(calendar.timeInMillis).value(),
                             newDiary_imageGrid.sources().keys.toList()
                         ).observe(this@NewDiaryFragment, Observer<Diary> {
-                            activity?.onBackPressed()
+                            tagViewVM.attachToDiary(it.id()).observe(
+                                this@NewDiaryFragment, Observer<List<Tag>> {
+                                    activity?.onBackPressed()
+                                })
                         })
                     } else {
                         Toast.makeText(
@@ -77,7 +84,6 @@ class NewDiaryFragment : AuraFragment() {
                 }
             }
         )
-
         rootView.newDiary_date.setOnClickListener {
             DatePickerDialog(it.context)
                 .apply {
@@ -104,14 +110,55 @@ class NewDiaryFragment : AuraFragment() {
                 )
             }
         }
-        rootView.newDiary_tagEditText.setOnTagChangeListener(object : TagsListener {
-            override fun onTagCreated(tag: String) {
+        rootView.newDiary_newtagButton.setOnClickListener {
+            createTagByInput()
+        }
+
+        rootView.newDiary_tag.setOnTagClickListener(object : TagView.OnTagClickListener {
+            override fun onSelectedTagDrag(position: Int, text: String?) {
             }
 
-            override fun onTagRemoved(index: Int) {
+            override fun onTagLongClick(position: Int, text: String?) {
+            }
+
+            override fun onTagClick(position: Int, text: String?) {
+                if (text.isNullOrEmpty()) {
+                    return
+                }
+                AlertDialog.Builder(context)
+                    .setTitle(R.string.delete)
+                    .setMessage(R.string.delete)
+                    .setPositiveButton(R.string.confirm) { _, _ ->
+                        tagViewVM.removeTag(text)
+                        rootView.newDiary_tag.removeTag(position)
+                    }
+                    .setNegativeButton(R.string.cancel) { _, _ -> }
+                    .show()
+            }
+
+            override fun onTagCrossClick(position: Int) {
             }
         })
+        rootView.newDiary_inputTag.setOnEditorActionListener { v, actionId, event ->
+            when (actionId) {
+                EditorInfo.IME_ACTION_DONE -> {
+                    createTagByInput()
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
+        }
         return rootView
+    }
+
+    private fun createTagByInput() {
+        val tagName = newDiary_inputTag.text.toString()
+        if (!newDiary_tag.tags.contains(tagName) && !tagName.isEmpty()) {
+            tagViewVM.preferTag(tagName)
+            newDiary_tag.addTag(tagName)
+        }
     }
 
     override fun onPermissionGranted() {

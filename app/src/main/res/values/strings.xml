@@ -26,4 +26,5 @@
     <string name="fingerprint_auth">Fingerprint authorization</string>
     <string name="authorization">Authorization</string>
     <string name="web_access">Web Access</string>
+    <string name="new_tag">New Tag</string>
 </resources>

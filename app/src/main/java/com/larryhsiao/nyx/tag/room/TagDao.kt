@@ -43,6 +43,12 @@ interface TagDao {
     fun delete(id: Long)
 
     /**
+     * Query tag by id
+     */
+    @Query("SELECT * FROM tag WHERE id=:id")
+    fun byId(id: Long): TagEntity
+
+    /**
      * All tags which attached on diary that matched the given id.
      */
     @Query("SELECT * FROM tag LEFT JOIN tag_diary WHERE diary_id=:id")

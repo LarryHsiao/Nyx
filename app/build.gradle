@@ -60,8 +60,7 @@ dependencies {
     def lifecycle_version = "2.0.0"
     def room_version = "2.1.0"
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'com.github.anonymous-ME:TagsEditText:0.5.0'
-    implementation 'com.google.android:flexbox:1.1.0'
+    implementation 'co.lujun:androidtagview:1.1.7'
     implementation 'com.google.auth:google-auth-library-oauth2-http:0.16.2'
     implementation 'com.google.api-client:google-api-client:1.30.2'
     implementation 'com.google.apis:google-api-services-drive:v3-rev110-1.23.0'
@@ -76,13 +75,13 @@ dependencies {
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'com.schibstedspain.android:leku:6.2.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.google.firebase:firebase-core:17.0.1'
-    implementation 'com.google.firebase:firebase-perf:18.0.1'
-    implementation 'com.google.firebase:firebase-config:18.0.0'
+    implementation 'com.google.firebase:firebase-core:17.2.0'
+    implementation 'com.google.firebase:firebase-perf:19.0.0'
+    implementation 'com.google.firebase:firebase-config:19.0.0'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-    implementation "com.silverhetch:aura:1.15.3"
+    implementation "com.silverhetch:aura:1.17.0"
     implementation "com.silverhetch:clotho:1.11.3"
-    implementation 'androidx.biometric:biometric:1.0.0-alpha04'
+    implementation 'androidx.biometric:biometric:1.0.0-beta01'
     implementation "androidx.preference:preference:1.1.0-rc01"
     implementation "androidx.emoji:emoji:1.0.0"
     implementation "androidx.emoji:emoji-bundled:1.0.0"

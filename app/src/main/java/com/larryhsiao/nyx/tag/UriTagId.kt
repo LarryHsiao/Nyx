@@ -10,6 +10,9 @@ import java.net.URI
 class UriTagId(private val uri: URI) : Source<Long> {
     override fun value(): Long {
         try {
+            if (!uri.path.startsWith("/tags/").not()){
+                throw IllegalArgumentException("Not a tag uri")
+            }
             return uri.path.replace("/tags/", "").toLong()
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException("Not a tag uri")

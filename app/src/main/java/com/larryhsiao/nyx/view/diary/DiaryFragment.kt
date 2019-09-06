@@ -1,7 +1,5 @@
 package com.larryhsiao.nyx.view.diary
 
-import affan.ahmad.tags.TagsEditText
-import affan.ahmad.tags.TagsListener
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
@@ -17,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.google.android.flexbox.FlexDirection
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
@@ -60,7 +57,6 @@ class DiaryFragment : AuraFragment() {
     private val tags = ArrayList<TagEntity>()
     private lateinit var viewModel: DiaryViewModel
     private lateinit var editable: MutableLiveData<Boolean>
-    private lateinit var tagView: TagsEditText
     private var calendar: Calendar = Calendar.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,16 +97,7 @@ class DiaryFragment : AuraFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        tagView = newDiary_tagEditText
-        tagView.setOnTagChangeListener(object : TagsListener {
-            override fun onTagCreated(tag: String) {
-                viewModel
-            }
 
-            override fun onTagRemoved(index: Int) {
-
-            }
-        })
         editable = MutableLiveData<Boolean>().also {
             it.value = arguments?.getBoolean(ARG_EDITABLE) ?: false
         }
