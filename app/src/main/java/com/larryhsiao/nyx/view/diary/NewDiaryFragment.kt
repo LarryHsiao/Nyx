@@ -24,7 +24,7 @@ import com.larryhsiao.nyx.view.diary.attachment.ImageFactory
 import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
 import com.larryhsiao.nyx.view.diary.attachment.ViewAttachmentIntent
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
-import com.larryhsiao.nyx.view.tag.viewmodel.NewDiaryTagViewModel
+import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.clotho.time.ToUTCTimestamp
@@ -42,7 +42,7 @@ class NewDiaryFragment : AuraFragment() {
     }
 
     private lateinit var calendarVM: CalendarViewModel
-    private lateinit var newDiaryTagViewVM: NewDiaryTagViewModel
+    private lateinit var tagViewVM: TagAttachmentVM
     private var calendar = Calendar.getInstance()
 
 
@@ -54,7 +54,7 @@ class NewDiaryFragment : AuraFragment() {
         val rootView = inflater.inflate(R.layout.page_diary, container, false)
         calendarVM =
             ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-        newDiaryTagViewVM = ViewModelProviders.of(this).get(NewDiaryTagViewModel::class.java)
+        tagViewVM = ViewModelProviders.of(this).get(TagAttachmentVM::class.java)
         attachFab(
             object : FabBehavior {
                 override fun onClick() {
@@ -65,7 +65,7 @@ class NewDiaryFragment : AuraFragment() {
                             ToUTCTimestamp(calendar.timeInMillis).value(),
                             newDiary_imageGrid.sources().keys.toList()
                         ).observe(this@NewDiaryFragment, Observer<Diary> {
-                            newDiaryTagViewVM.attachToDiary(it.id()).observe(
+                            tagViewVM.attachToDiary(it.id()).observe(
                                 this@NewDiaryFragment, Observer<List<Tag>> {
                                     activity?.onBackPressed()
                                 })
@@ -129,7 +129,7 @@ class NewDiaryFragment : AuraFragment() {
                     .setTitle(R.string.delete)
                     .setMessage(R.string.delete)
                     .setPositiveButton(R.string.confirm) { _, _ ->
-                        newDiaryTagViewVM.removeTag(text)
+                        tagViewVM.removeTag(text)
                         rootView.newDiary_tag.removeTag(position)
                     }
                     .setNegativeButton(R.string.cancel) { _, _ -> }
@@ -156,7 +156,7 @@ class NewDiaryFragment : AuraFragment() {
     private fun createTagByInput() {
         val tagName = newDiary_inputTag.text.toString()
         if (!newDiary_tag.tags.contains(tagName) && !tagName.isEmpty()) {
-            newDiaryTagViewVM.preferTag(tagName)
+            tagViewVM.preferTag(tagName)
             newDiary_tag.addTag(tagName)
         }
     }

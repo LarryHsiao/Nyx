@@ -5,9 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.larryhsiao.nyx.database.RDatabase
-import com.larryhsiao.nyx.tag.Tag
-import com.larryhsiao.nyx.tag.TagSource
-import com.larryhsiao.nyx.tag.AttachedTags
+import com.larryhsiao.nyx.tag.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -15,9 +13,16 @@ import kotlinx.coroutines.launch
  * View model for tag title input.
  * This ViewModel will find/create tags by title.
  */
-class NewDiaryTagViewModel(app: Application) : AndroidViewModel(app) {
+class TagAttachmentVM(app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Singleton(app).value()
     private val tagIdMap = HashMap<String, Tag>()
+
+    /**
+     * Setup the initial tags
+     */
+    fun load(tags: List<Tag>) {
+        tags.forEach { tagIdMap[it.title()] = it }
+    }
 
     /**
      * Record the given tag name.
@@ -46,11 +51,12 @@ class NewDiaryTagViewModel(app: Application) : AndroidViewModel(app) {
     fun attachToDiary(diaryId: Long): LiveData<List<Tag>> {
         val liveData = MutableLiveData<List<Tag>>()
         GlobalScope.launch {
+            DettachAllTagByDiary(db, diaryId).fire()
             db.tagDiaryDao().create(
                 diaryId,
                 tagIdMap.values.mapTo(ArrayList(), { it.id() })
             )
-            liveData.value = AttachedTags(db, diaryId).value()
+            liveData.postValue(AttachedTags(db, diaryId).value())
         }
         return liveData
     }

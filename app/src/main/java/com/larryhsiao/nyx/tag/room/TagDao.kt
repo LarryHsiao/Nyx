@@ -51,7 +51,7 @@ interface TagDao {
     /**
      * All tags which attached on diary that matched the given id.
      */
-    @Query("SELECT * FROM tag LEFT JOIN tag_diary WHERE diary_id=:id")
+    @Query("SELECT * FROM tag_diary JOIN tag on tag_diary.tag_id=tag.id WHERE diary_id=:id")
     fun byDiaryId(id: Long): List<TagEntity>
 
     @Query("SELECT * FROM tag WHERE title=:title")

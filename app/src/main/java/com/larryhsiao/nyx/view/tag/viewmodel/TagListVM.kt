@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 /**
  * View model to present a tag list
  */
-class TagListViewModel(app: Application) : AndroidViewModel(app) {
+class TagListVM(app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Singleton(app).value()
     private val tags = ArrayList<Tag>()
     private val tagLive = MutableLiveData<List<Tag>>().apply { value = tags }
@@ -43,11 +43,13 @@ class TagListViewModel(app: Application) : AndroidViewModel(app) {
     fun createTag(title: String): LiveData<Tag> {
         val live = MutableLiveData<Tag>()
         GlobalScope.launch {
-            live.postValue(
-                TagSource(
-                    db,
-                    title
-                ).value().apply { tags.add(this) })
+            if (db.tagDao().byName(title) == null) {
+                live.postValue(
+                    TagSource(
+                        db,
+                        title
+                    ).value().apply { tags.add(this) })
+            }
         }
         return live
     }
