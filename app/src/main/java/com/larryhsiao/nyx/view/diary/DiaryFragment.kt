@@ -186,6 +186,9 @@ class DiaryFragment : AuraFragment() {
             }
 
             override fun onTagClick(position: Int, text: String?) {
+                if (editable.value == false){
+                   return
+                }
                 AlertDialog.Builder(view.context)
                     .setTitle(R.string.delete)
                     .setMessage(R.string.delete)
