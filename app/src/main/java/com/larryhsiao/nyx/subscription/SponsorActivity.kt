@@ -3,7 +3,7 @@ package com.larryhsiao.nyx.subscription
 import android.os.Bundle
 import com.android.billingclient.api.*
 import com.android.billingclient.api.BillingClient.BillingResponseCode.OK
-import com.android.billingclient.api.BillingClient.SkuType.INAPP
+import com.android.billingclient.api.BillingClient.SkuType.SUBS
 import com.silverhetch.aura.AuraActivity
 import com.larryhsiao.nyx.R
 
@@ -27,10 +27,14 @@ class SponsorActivity : AuraActivity(), PurchasesUpdatedListener {
             }
 
             override fun onBillingSetupFinished(billingResult: BillingResult?) {
+                if (billingResult?.responseCode != OK) {
+                    return
+                }
+
                 client.querySkuDetailsAsync(
                     SkuDetailsParams.newBuilder()
                         .setSkusList(listOf(PRODUCT_ID_SPONSOR))
-                        .setType(INAPP)
+                        .setType(SUBS)
                         .build()
                 ) { result, skus ->
                     if (result.responseCode == OK && skus != null) {
@@ -47,7 +51,6 @@ class SponsorActivity : AuraActivity(), PurchasesUpdatedListener {
     }
 
     private fun updateSponsor(sku: SkuDetails?) {
-
     }
 
     override fun onPurchasesUpdated(
