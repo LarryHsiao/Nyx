@@ -8,6 +8,9 @@ import org.junit.Test
  * Tests for [com.larryhsiao.nyx.uri.nyx.TagUri]
  */
 class TagUriTest {
+    /**
+     * Check output
+     */
     @Test
     fun simple() {
         assertEquals(

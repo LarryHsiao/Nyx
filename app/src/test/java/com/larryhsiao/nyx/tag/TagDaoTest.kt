@@ -11,6 +11,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+/**
+ * Test for TagDao
+ */
 @RunWith(RobolectricTestRunner::class)
 class TagDaoTest {
     private lateinit var db: RDatabase
