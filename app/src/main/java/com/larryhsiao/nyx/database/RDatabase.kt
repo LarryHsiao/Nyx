@@ -24,7 +24,7 @@ import com.silverhetch.clotho.Source
         TagEntity::class,
         TagDiaryEntity::class
     ),
-    version = 2
+    version = 3
 )
 abstract class RDatabase : RoomDatabase() {
 

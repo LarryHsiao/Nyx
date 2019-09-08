@@ -17,8 +17,11 @@ class RDatabaseTest {
         RDatabase::class.java.name
     )
 
+    /**
+     * Migration test from 1 to 2
+     */
     @Test
-    fun migration() {
+    fun migration1To2() {
         helper.also {
             it.createDatabase("test", 1)
             it.runMigrationsAndValidate(
@@ -26,6 +29,23 @@ class RDatabaseTest {
                 2,
                 true,
                 Migration1To2()
+            )
+            assertTrue(true)
+        }
+    }
+
+    /**
+     * Migration test from 2 to 3
+     */
+    @Test
+    fun migration2To3() {
+        helper.also {
+            it.createDatabase("test", 2)
+            it.runMigrationsAndValidate(
+                "test",
+                3,
+                true,
+                Migration2To3()
             )
             assertTrue(true)
         }
