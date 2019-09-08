@@ -140,9 +140,11 @@ class NewDiaryFragment : AuraFragment() {
 
         rootView.newDiary_tag.setOnTagClickListener(object : TagView.OnTagClickListener {
             override fun onSelectedTagDrag(position: Int, text: String?) {
+                /*Leave it empty*/
             }
 
             override fun onTagLongClick(position: Int, text: String?) {
+                /*Leave it empty*/
             }
 
             override fun onTagClick(position: Int, text: String?) {
@@ -161,6 +163,7 @@ class NewDiaryFragment : AuraFragment() {
             }
 
             override fun onTagCrossClick(position: Int) {
+                /*Leave it empty*/
             }
         })
         rootView.newDiary_inputTag.setOnEditorActionListener { v, actionId, event ->
