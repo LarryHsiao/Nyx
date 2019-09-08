@@ -10,6 +10,11 @@
         android:icon="@drawable/ic_agenda"
         android:title="@string/jotted" />
     <item
+        android:id="@+id/navigation_tag"
+        android:icon="@drawable/ic_tag"
+        android:title="@string/tag"
+        />
+    <item
         android:id="@+id/navigation_restore"
         android:icon="@drawable/ic_restore"
         android:title="@string/restore" />

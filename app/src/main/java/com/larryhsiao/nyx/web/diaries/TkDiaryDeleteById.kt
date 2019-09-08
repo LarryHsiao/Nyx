@@ -16,8 +16,7 @@ class TkDiaryDeleteById(private val db: RDatabase) : Take {
     override fun act(req: Request?): Response {
         val id = RqHref.Smart(req).href().path().split('/').last()
         DiaryDeletion(
-            db.diaryDao(),
-            db.mediaDao(),
+            db,
             id.toLong()
         ).fire()
         return RsWithStatus(STATUS_CODE_NO_CONTENT)

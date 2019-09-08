@@ -6,7 +6,7 @@ import android.net.Uri
 /**
  * Phantom object of [Diary]
  */
-class PhantomDiary : Diary {
+class PhantomDiary(private val timestamp: Long = -1) : Diary {
     override fun id(): Long {
         return -1
     }
@@ -16,7 +16,7 @@ class PhantomDiary : Diary {
     }
 
     override fun timestamp(): Long {
-        return -1
+        return timestamp
     }
 
     override fun imageUris(): Array<Uri> {

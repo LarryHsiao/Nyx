@@ -69,6 +69,22 @@
             android:name="com.larryhsiao.nyx.youtube.YoutubePickerActivity"
             android:icon="@drawable/ic_youtube_png"
             android:label="@string/pick_youtube" />
+        <activity android:name=".view.tag.TagInfoActivity" >
+            <intent-filter android:autoVerify="true">
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="https"
+                    android:host="larryhsiao.com"
+                    android:path="/nyx/tags/.*" />
+                <data
+                    android:scheme="http"
+                    android:host="larryhsiao.com"
+                    android:path="/nyx/tags/.*" />
+            </intent-filter>
+        </activity>
 
         <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
             <intent-filter>

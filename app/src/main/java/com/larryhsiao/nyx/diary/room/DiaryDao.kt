@@ -23,6 +23,12 @@ interface DiaryDao {
     fun byTimestamp(start: Long, end: Long): List<RDiary>
 
     /**
+     * Select diaries by timestamp rang
+     */
+    @Query("SELECT * FROM tag_diary JOIN diary ON tag_diary.diary_id=diary.id WHERE tag_diary.tag_id=:id  ORDER BY timestamp DESC")
+    fun byTagId(id: Long): List<RDiary>
+
+    /**
      * Create a diary entry
      */
     @Insert(onConflict = REPLACE)
@@ -50,7 +56,7 @@ interface DiaryDao {
      * Delete diary by given id.
      */
     @Query("DELETE FROM diary WHERE id=:id;")
-    fun delete(id:Long)
+    fun delete(id: Long)
 
     /**
      * Remove all rows

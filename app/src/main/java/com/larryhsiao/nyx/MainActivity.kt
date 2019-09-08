@@ -1,22 +1,17 @@
 package com.larryhsiao.nyx
 
-import android.app.Service
-import android.content.ComponentName
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.config.IsWebAccessEnabled
 import com.larryhsiao.nyx.view.backup.BackupListFragment
 import com.larryhsiao.nyx.view.diary.CalendarFragment
-import com.larryhsiao.nyx.view.diary.EventListFragment
+import com.larryhsiao.nyx.view.diary.DiaryListFragment
 import com.larryhsiao.nyx.view.settings.BioAuth
 import com.larryhsiao.nyx.view.settings.SettingFragment
-import com.larryhsiao.nyx.web.WebAccess
+import com.larryhsiao.nyx.view.tag.TagListFragment
 import com.larryhsiao.nyx.web.WebAccessService
 import com.silverhetch.aura.AuraActivity
-import io.grpc.Context
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -37,18 +32,11 @@ class MainActivity : AuraActivity() {
 
         main_bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_calendar -> {
-                    rootPage(CalendarFragment())
-                }
-                R.id.navigation_jotted -> {
-                    rootPage(EventListFragment())
-                }
-                R.id.navigation_restore -> {
-                    rootPage(BackupListFragment())
-                }
-                R.id.navigation_setting -> {
-                    rootPage(SettingFragment())
-                }
+                R.id.navigation_calendar -> rootPage(CalendarFragment())
+                R.id.navigation_jotted -> rootPage(DiaryListFragment())
+                R.id.navigation_tag -> rootPage(TagListFragment())
+                R.id.navigation_restore -> rootPage(BackupListFragment())
+                R.id.navigation_setting -> rootPage(SettingFragment())
             }
             true
         }

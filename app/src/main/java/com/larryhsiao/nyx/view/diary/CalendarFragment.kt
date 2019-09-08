@@ -39,7 +39,7 @@ class CalendarFragment : AuraFragment(), FabBehavior {
 
         calendar_calendarView.setOnDayClickListener {
             nextPage(
-                EventListFragment.newInstance(it.calendar.timeInMillis)
+                DiaryListFragment.newInstance(it.calendar.timeInMillis)
             )
         }
     }

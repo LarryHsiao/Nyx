@@ -16,23 +16,25 @@
             type="com.larryhsiao.nyx.diary.Diary" />
     </data>
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/frameLayout2"
+        android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@android:color/transparent">
 
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/newDiary_newDiaryContent"
-                android:layout_width="250dp"
-                android:layout_height="250dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="200dp"
                 android:padding="16dp"
                 android:focusable="@{editable}"
                 android:cursorVisible="@{editable}"
@@ -50,6 +52,8 @@
                 android:layout_width="0dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                tools:layout_height="100dp"
+                tools:background="#ff0000"
                 app:layout_constraintTop_toBottomOf="@id/newDiary_newDiaryContent"
                 android:layout_height="wrap_content" />
 
@@ -68,6 +72,40 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="2019/02/21" />
 
+            <co.lujun.androidtagview.TagContainerLayout
+                android:layout_width="0dp"
+                app:layout_constraintStart_toStartOf="@id/newDiary_imageGrid"
+                app:layout_constraintEnd_toEndOf="@id/newDiary_imageGrid"
+                android:layout_height="wrap_content"
+                android:layout_margin="0dp"
+                android:id="@+id/newDiary_tag"
+                app:layout_constraintTop_toBottomOf="@id/newDiary_imageGrid"
+                android:padding="10dp"
+                app:container_enable_drag="false"
+                app:horizontal_interval="10dp"
+                app:vertical_interval="10dp"
+                app:tag_clickable="true"
+                app:tag_theme="pure_teal" />
+
+            <AutoCompleteTextView
+                android:id="@+id/newDiary_inputTag"
+                app:layout_constraintTop_toBottomOf="@id/newDiary_tag"
+                android:layout_width="0dp"
+                android:imeOptions="actionDone"
+                android:lines="1"
+                android:singleLine="true"
+                app:layout_constraintEnd_toStartOf="@id/newDiary_newtagButton"
+                app:layout_constraintStart_toStartOf="@id/newDiary_tag"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/newDiary_newtagButton"
+                android:layout_width="wrap_content"
+                android:text="@string/new_tag"
+                android:textColor="#fff"
+                app:layout_constraintTop_toBottomOf="@id/newDiary_tag"
+                app:layout_constraintEnd_toEndOf="@id/newDiary_tag"
+                android:layout_height="wrap_content" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </FrameLayout>
+    </ScrollView>
 </layout>

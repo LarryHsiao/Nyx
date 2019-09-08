@@ -8,13 +8,18 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
+import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import co.lujun.androidtagview.TagView
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.databinding.PageDiaryBinding
 import com.larryhsiao.nyx.diary.Diary
@@ -23,6 +28,9 @@ import com.larryhsiao.nyx.view.diary.attachment.ImageFactory
 import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
 import com.larryhsiao.nyx.view.diary.attachment.ViewAttachmentIntent
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
+import com.larryhsiao.nyx.view.tag.viewmodel.DiaryTagListVM
+import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
+import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 import kotlinx.android.synthetic.main.page_diary.*
@@ -52,9 +60,27 @@ class DiaryFragment : AuraFragment() {
         }
     }
 
-    private lateinit var viewModel: DiaryViewModel
+    private val diaryId: Long by lazy { arguments?.getLong(ARG_ID) ?: 0L }
+    private lateinit var diaryVM: DiaryViewModel
+    private lateinit var diaryTagVM: DiaryTagListVM
+    private lateinit var tagVM: TagListVM
+    private lateinit var tagAttachmentVM: TagAttachmentVM
     private lateinit var editable: MutableLiveData<Boolean>
     private var calendar: Calendar = Calendar.getInstance()
+    private var tagInputWatcher = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            tagVM.loadUpTags(s?.toString() ?: "")
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            /* Leave it empty */
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            /* Leave it empty */
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -66,7 +92,7 @@ class DiaryFragment : AuraFragment() {
                 AlertDialog.Builder(context)
                     .setMessage(R.string.delete_this_diary)
                     .setPositiveButton(android.R.string.yes) { _, _ ->
-                        viewModel.delete().observe(this, Observer {
+                        diaryVM.delete().observe(this, Observer {
                             activity?.onBackPressed()
                         })
                     }.setNegativeButton(android.R.string.no) { _, _ ->
@@ -94,20 +120,30 @@ class DiaryFragment : AuraFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         editable = MutableLiveData<Boolean>().also {
             it.value = arguments?.getBoolean(ARG_EDITABLE) ?: false
         }
-        viewModel = ViewModelProviders.of(this).get(DiaryViewModel::class.java)
-        viewModel.diary().observe(this, Observer<Diary> { diary ->
+        ViewModelProviders.of(this).apply {
+            tagAttachmentVM = get(TagAttachmentVM::class.java)
+            diaryTagVM = get(DiaryTagListVM::class.java)
+            diaryVM = get(DiaryViewModel::class.java)
+            tagVM = get(TagListVM::class.java)
+        }
+        diaryVM.diary().observe(this, Observer<Diary> { diary ->
             val binding = DataBindingUtil.findBinding<PageDiaryBinding>(view)
             binding?.diary = diary
             editable.observe(this, Observer<Boolean> {
                 binding?.editable = it
                 newDiary_imageGrid.addable(it)
-                if (!it) {
-                    editableFab()
-                } else {
+                if (it) {
                     saveFab()
+                    newDiary_inputTag.visibility = View.VISIBLE
+                    newDiary_newtagButton.visibility = View.VISIBLE
+                } else {
+                    editableFab()
+                    newDiary_inputTag.visibility = View.GONE
+                    newDiary_newtagButton.visibility = View.GONE
                 }
             })
 
@@ -120,7 +156,7 @@ class DiaryFragment : AuraFragment() {
                 ).value()
             }.toList(), false)
         })
-        viewModel.loadUp(arguments?.getLong(ARG_ID) ?: 0L)
+        diaryVM.loadUp(diaryId)
 
         newDiary_date.setOnClickListener {
             DatePickerDialog(it.context)
@@ -146,6 +182,69 @@ class DiaryFragment : AuraFragment() {
                 )
             }
         }
+
+        diaryTagVM.tags().observe(this, Observer {
+            tagAttachmentVM.load(it)
+            it.forEach { tag -> newDiary_tag.addTag(tag.title()) }
+        })
+        diaryTagVM.load(diaryId)
+        newDiary_inputTag.setOnEditorActionListener { v, actionId, event ->
+            when (actionId) {
+                EditorInfo.IME_ACTION_DONE -> {
+                    newTagByInput()
+                    true
+                }
+                else -> false
+            }
+        }
+        newDiary_newtagButton.setOnClickListener { newTagByInput() }
+        newDiary_tag.setOnTagClickListener(object : TagView.OnTagClickListener {
+            override fun onSelectedTagDrag(position: Int, text: String?) {
+                /*Leave it empty*/
+            }
+
+            override fun onTagLongClick(position: Int, text: String?) {
+                /*Leave it empty*/
+            }
+
+            override fun onTagClick(position: Int, text: String?) {
+                if (editable.value == false) {
+                    return
+                }
+                AlertDialog.Builder(view.context)
+                    .setTitle(R.string.delete)
+                    .setMessage(R.string.delete)
+                    .setPositiveButton(R.string.confirm) { _, _ ->
+                        newDiary_tag.removeTag(position)
+                        tagAttachmentVM.removeTag(text ?: "")
+                    }.setNegativeButton(R.string.cancel) { _, _ -> }
+                    .show()
+            }
+
+            override fun onTagCrossClick(position: Int) {
+                /*Leave it empty*/
+            }
+        })
+        newDiary_inputTag.addTextChangedListener(tagInputWatcher)
+        tagVM.tags().observe(this, Observer {tags->
+            newDiary_inputTag.setAdapter(ArrayAdapter<String>(
+                newDiary_tag.context,
+                R.layout.item_tag,
+                R.id.tag_title,
+                Array(tags.size){
+                    tags[it].title()
+                }
+            ))
+        })
+    }
+
+    private fun newTagByInput() {
+        val tagName = newDiary_inputTag.text.toString()
+        if (tagName.isEmpty()) {
+            return
+        }
+        newDiary_tag.addTag(tagName)
+        tagAttachmentVM.preferTag(tagName)
     }
 
     override fun onPermissionGranted() {
@@ -189,12 +288,7 @@ class DiaryFragment : AuraFragment() {
 
     private fun resultHandling(context: Context, data: Intent) {
         ResultProcessor(context) {
-            newDiary_imageGrid.addImage(
-                ImageFactory(
-                    context,
-                    it
-                ).value()
-            )
+            newDiary_imageGrid.addImage(ImageFactory(context, it).value())
         }.proceed(data)
     }
 
@@ -228,13 +322,12 @@ class DiaryFragment : AuraFragment() {
         attachFab(object : FabBehavior {
             override fun onClick() {
                 val images = newDiary_imageGrid.sources().keys.toTypedArray()
-                viewModel.update(
+                diaryVM.update(
                     newDiary_newDiaryContent.text.toString(),
                     calendar.time.time,
-                    Array(images.size) {
-                        images[it]
-                    }.toList()
+                    Array(images.size) { images[it] }.toList()
                 )
+                tagAttachmentVM.attachToDiary(diaryId)
                 editable.value = false
             }
 
