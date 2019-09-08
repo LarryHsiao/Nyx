@@ -8,11 +8,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import co.lujun.androidtagview.TagView
@@ -32,6 +35,10 @@ import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
 import java.text.SimpleDateFormat
 import java.util.*
+import android.widget.AutoCompleteTextView
+import android.widget.ArrayAdapter
+import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
+
 
 /**
  * Page for creating new diary.
@@ -43,7 +50,19 @@ class NewDiaryFragment : AuraFragment() {
 
     private lateinit var calendarVM: CalendarViewModel
     private lateinit var tagViewVM: TagAttachmentVM
+    private lateinit var tagVM: TagListVM
     private var calendar = Calendar.getInstance()
+    private val tagInputWatcher = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            tagVM.loadUpTags(s?.toString() ?: "")
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        }
+    }
 
 
     override fun onCreateView(
@@ -52,9 +71,11 @@ class NewDiaryFragment : AuraFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.page_diary, container, false)
-        calendarVM =
-            ViewModelProviders.of(this).get(CalendarViewModel::class.java)
-        tagViewVM = ViewModelProviders.of(this).get(TagAttachmentVM::class.java)
+        ViewModelProviders.of(this).apply {
+            tagVM = get(TagListVM::class.java)
+            calendarVM = get(CalendarViewModel::class.java)
+            tagViewVM = get(TagAttachmentVM::class.java)
+        }
         attachFab(
             object : FabBehavior {
                 override fun onClick() {
@@ -67,8 +88,8 @@ class NewDiaryFragment : AuraFragment() {
                         ).observe(this@NewDiaryFragment, Observer<Diary> {
                             tagViewVM.attachToDiary(it.id()).observe(
                                 this@NewDiaryFragment, Observer<List<Tag>> {
-                                    activity?.onBackPressed()
-                                })
+                                activity?.onBackPressed()
+                            })
                         })
                     } else {
                         Toast.makeText(
@@ -110,6 +131,7 @@ class NewDiaryFragment : AuraFragment() {
                 )
             }
         }
+        rootView.newDiary_inputTag.addTextChangedListener(tagInputWatcher)
         rootView.newDiary_newtagButton.setOnClickListener {
             createTagByInput()
         }
@@ -150,6 +172,21 @@ class NewDiaryFragment : AuraFragment() {
                 }
             }
         }
+        tagVM.tags().observe(this, Observer { tags ->
+            if (tags.isNotEmpty()) {
+                rootView.newDiary_inputTag.apply {
+                    setAdapter(ArrayAdapter<String>(
+                        rootView.context,
+                        R.layout.item_tag,
+                        R.id.tag_title,
+                        Array(tags.size) {
+                            tags[it].title()
+                        }
+                    ))
+                }
+            }
+        })
+
         return rootView
     }
 

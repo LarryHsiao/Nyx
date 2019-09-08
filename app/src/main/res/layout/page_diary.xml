@@ -87,7 +87,7 @@
                 app:tag_clickable="true"
                 app:tag_theme="pure_teal" />
 
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/newDiary_inputTag"
                 app:layout_constraintTop_toBottomOf="@id/newDiary_tag"
                 android:layout_width="0dp"

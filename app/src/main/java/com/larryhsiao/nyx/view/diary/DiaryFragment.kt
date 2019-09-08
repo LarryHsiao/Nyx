@@ -8,8 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -27,6 +30,7 @@ import com.larryhsiao.nyx.view.diary.attachment.ViewAttachmentIntent
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
 import com.larryhsiao.nyx.view.tag.viewmodel.DiaryTagListVM
 import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
+import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 import kotlinx.android.synthetic.main.page_diary.*
@@ -58,10 +62,23 @@ class DiaryFragment : AuraFragment() {
 
     private val diaryId: Long by lazy { arguments?.getLong(ARG_ID) ?: 0L }
     private lateinit var diaryVM: DiaryViewModel
-    private lateinit var tagListVM: DiaryTagListVM
+    private lateinit var diaryTagVM: DiaryTagListVM
+    private lateinit var tagVM: TagListVM
     private lateinit var tagAttachmentVM: TagAttachmentVM
     private lateinit var editable: MutableLiveData<Boolean>
     private var calendar: Calendar = Calendar.getInstance()
+    private var tagInputWatcher = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            tagVM.loadUpTags(s?.toString() ?: "")
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -107,8 +124,9 @@ class DiaryFragment : AuraFragment() {
         }
         ViewModelProviders.of(this).apply {
             tagAttachmentVM = get(TagAttachmentVM::class.java)
-            tagListVM = get(DiaryTagListVM::class.java)
+            diaryTagVM = get(DiaryTagListVM::class.java)
             diaryVM = get(DiaryViewModel::class.java)
+            tagVM = get(TagListVM::class.java)
         }
         diaryVM.diary().observe(this, Observer<Diary> { diary ->
             val binding = DataBindingUtil.findBinding<PageDiaryBinding>(view)
@@ -163,11 +181,11 @@ class DiaryFragment : AuraFragment() {
             }
         }
 
-        tagListVM.tags().observe(this, Observer {
+        diaryTagVM.tags().observe(this, Observer {
             tagAttachmentVM.load(it)
             it.forEach { tag -> newDiary_tag.addTag(tag.title()) }
         })
-        tagListVM.load(diaryId)
+        diaryTagVM.load(diaryId)
         newDiary_inputTag.setOnEditorActionListener { v, actionId, event ->
             when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
@@ -186,8 +204,8 @@ class DiaryFragment : AuraFragment() {
             }
 
             override fun onTagClick(position: Int, text: String?) {
-                if (editable.value == false){
-                   return
+                if (editable.value == false) {
+                    return
                 }
                 AlertDialog.Builder(view.context)
                     .setTitle(R.string.delete)
@@ -201,6 +219,17 @@ class DiaryFragment : AuraFragment() {
 
             override fun onTagCrossClick(position: Int) {
             }
+        })
+        newDiary_inputTag.addTextChangedListener(tagInputWatcher)
+        tagVM.tags().observe(this, Observer {tags->
+            newDiary_inputTag.setAdapter(ArrayAdapter<String>(
+                newDiary_tag.context,
+                R.layout.item_tag,
+                R.id.tag_title,
+                Array(tags.size){
+                    tags[it].title()
+                }
+            ))
         })
     }
 
