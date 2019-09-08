@@ -54,6 +54,19 @@ interface TagDao {
     @Query("SELECT * FROM tag_diary JOIN tag on tag_diary.tag_id=tag.id WHERE diary_id=:id")
     fun byDiaryId(id: Long): List<TagEntity>
 
+    /**
+     * Query tag by title
+     */
     @Query("SELECT * FROM tag WHERE title=:title")
     fun byName(title: String): TagEntity?
+
+    /**
+     * Search Tag by given keyword
+     *
+     * @param keyword the keyword we wonder to search, if the keyword might have
+     * character before and after itself, should pass %keyword% to this parameter.
+     */
+    @Query("SELECT * FROM tag WHERE title LIKE :keyword")
+    fun searchByName(keyword: String): List<TagEntity>
+
 }

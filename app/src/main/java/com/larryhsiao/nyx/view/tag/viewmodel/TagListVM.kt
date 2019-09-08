@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.tag.AllTags
 import com.larryhsiao.nyx.tag.Tag
+import com.larryhsiao.nyx.tag.TagByKeyword
 import com.larryhsiao.nyx.tag.TagSource
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,10 +23,14 @@ class TagListVM(app: Application) : AndroidViewModel(app) {
     /**
      * Load the tags
      */
-    fun loadUpTags() {
+    fun loadUpTags(keyword:String = "") {
         GlobalScope.launch {
             tags.clear()
-            tags.addAll(AllTags(db).value())
+            tags.addAll(if (keyword.isEmpty()){
+                AllTags(db).value()
+            }else{
+                TagByKeyword(db, keyword).value()
+            })
             tagLive.postValue(tags)
         }
     }

@@ -7,8 +7,8 @@
 
     <EditText
         android:layout_width="0dp"
-        android:imeOptions="actionDone"
-        android:id="@+id/tagList_createInput"
+        android:imeOptions="actionSearch"
+        android:id="@+id/tagList_searchInput"
         android:hint="@string/enter_new_tag"
         android:gravity="center"
         android:lines="1"
@@ -24,7 +24,7 @@
         android:id="@+id/tagList_listView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tagList_createInput"
+        app:layout_constraintTop_toBottomOf="@id/tagList_searchInput"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@layout/item_tag"
         android:layout_height="0dp" />
