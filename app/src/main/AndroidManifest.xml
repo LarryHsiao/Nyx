@@ -85,6 +85,7 @@
                     android:path="/nyx/tags/.*" />
             </intent-filter>
         </activity>
+        <activity android:name=".subscription.SubscriptionActivity" />
 
         <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
             <intent-filter>
