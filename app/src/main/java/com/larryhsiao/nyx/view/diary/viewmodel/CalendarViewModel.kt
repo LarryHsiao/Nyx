@@ -5,13 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.larryhsiao.nyx.database.RDatabase
-import com.larryhsiao.nyx.diary.AllDiary
-import com.larryhsiao.nyx.diary.Diary
-import com.larryhsiao.nyx.diary.DiaryByDate
-import com.larryhsiao.nyx.diary.NewDiary
+import com.larryhsiao.nyx.diary.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * View model for presenting the calendar events
@@ -54,22 +52,29 @@ class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * All diaries by date.
+     * All diaries by given parameters.
      */
-    fun byDate(dateTimestamp: Long): LiveData<List<Diary>> {
+    fun diaries(
+        dateTimestamp: Long = -1,
+        tagId: Long = -1
+    ): LiveData<List<Diary>> {
         return MutableLiveData<List<Diary>>().apply {
             GlobalScope.launch {
                 postValue(
-                    DiaryByDate(
-                        db.diaryDao(),
-                        dateTimestamp
-                    ).value()
+                    if (dateTimestamp != -1L && tagId != -1L) {
+                        DiaryByFilteredDate(
+                            DiaryByTag(db, tagId),
+                            dateTimestamp
+                        ).value()
+                    } else if (tagId != -1L) {
+                        DiaryByTag(db, tagId).value()
+                    } else if (dateTimestamp != -1L) {
+                        DiaryByDate(db.diaryDao(), dateTimestamp).value()
+                    } else {
+                        AllDiary(db.diaryDao()).value()
+                    }
                 )
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 }

@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.item_tag.view.*
 /**
  * RecyclerView adapter for tags
  */
-class TagAdapter : RecyclerView.Adapter<ViewHolder>() {
+class TagAdapter(private val tagClicked: (tag: Tag) -> Unit) : RecyclerView.Adapter<ViewHolder>() {
     private val tags = ArrayList<Tag>();
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -32,6 +32,7 @@ class TagAdapter : RecyclerView.Adapter<ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag_title.text = tags[position].title()
+        holder.itemView.setOnClickListener { tagClicked(tags[holder.adapterPosition]) }
     }
 
     /**

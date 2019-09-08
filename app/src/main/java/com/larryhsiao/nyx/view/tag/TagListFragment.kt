@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.silverhetch.aura.AuraFragment
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.view.diary.DiaryListFragment
+import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import kotlinx.android.synthetic.main.fragment_tag_list.*
 
@@ -18,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_tag_list.*
  */
 class TagListFragment : AuraFragment() {
     private lateinit var vm: TagListVM
-    private lateinit var adapter:TagAdapter
+    private lateinit var adapter: TagAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,7 +32,9 @@ class TagListFragment : AuraFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = TagAdapter()
+        adapter = TagAdapter() {
+            nextPage(DiaryListFragment.newInstance(tagId = it.id()))
+        }
         vm = ViewModelProviders.of(this).get(TagListVM::class.java)
         tagList_listView.layoutManager = LinearLayoutManager(view.context)
         tagList_listView.adapter = adapter

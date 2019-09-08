@@ -19,19 +19,21 @@ import com.silverhetch.aura.view.fab.FabBehavior
 /**
  * Fragment shows all event list by dateTime
  */
-class EventListFragment : AuraFragment(), FabBehavior {
+class DiaryListFragment : AuraFragment(), FabBehavior {
     companion object {
         private const val ARG_DATETIME = "ARG_DATETIME"
+        private const val ARG_TAG_ID = "ARG_TAG_ID"
         private const val REQUEST_CODE_NEW_DIARY = 1000
         private const val REQUEST_CODE_DIARY = 1001
 
         /**
          * @param dateTime The specific date in timestamp
          */
-        fun newInstance(dateTime: Long): Fragment {
-            return EventListFragment().apply {
+        fun newInstance(dateTime: Long = -1L, tagId: Long = -1L): Fragment {
+            return DiaryListFragment().apply {
                 arguments = Bundle().apply {
                     putLong(ARG_DATETIME, dateTime)
+                    putLong(ARG_TAG_ID, tagId)
                 }
             }
         }
@@ -108,10 +110,10 @@ class EventListFragment : AuraFragment(), FabBehavior {
     }
 
     private fun loadData() {
-        val date = arguments?.getLong(ARG_DATETIME) ?: 0L
-        // @todo #10 scroll to the given date first time load up.
-        viewModel.diaries()
-            .observe(this, Observer { adapter.load(it) })
+        viewModel.diaries(
+            arguments?.getLong(ARG_DATETIME, -1L) ?: -1L,
+            arguments?.getLong(ARG_TAG_ID, -1L) ?: -1L
+        ).observe(this, Observer { adapter.load(it) })
     }
 
     override fun icon(): Int {
