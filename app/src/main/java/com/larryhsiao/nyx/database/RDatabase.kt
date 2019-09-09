@@ -64,8 +64,10 @@ abstract class RDatabase : RoomDatabase() {
                         context,
                         RDatabase::class.java,
                         DATABASE_NAME
-                    ).addMigrations(Migration1To2())
-                        .build()
+                    ).addMigrations(
+                        Migration1To2(),
+                        Migration2To3()
+                    ).build()
                         .also { database = it }
                 }
             }
