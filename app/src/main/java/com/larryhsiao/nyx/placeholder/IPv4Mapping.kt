@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx
+package com.larryhsiao.nyx.placeholder
 
 import com.silverhetch.clotho.Source
 import java.net.InetAddress
@@ -31,7 +31,9 @@ class IPv4Mapping : Source<Map<String, InetAddress>> {
             while (ee.hasMoreElements()) {
                 val i = ee.nextElement() as InetAddress
                 val currentAddress = i.hostAddress
-                if (!i.isLoopbackAddress && IsIPv4(currentAddress).value()) {
+                if (!i.isLoopbackAddress && IsIPv4(
+                        currentAddress
+                    ).value()) {
                     result[n.displayName] = i
                 }
             }

@@ -8,7 +8,7 @@ import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
-import com.larryhsiao.nyx.IPv4Mapping
+import com.larryhsiao.nyx.placeholder.IPv4Mapping
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.web.WebAccessService
 import com.silverhetch.aura.fingerprint.FingerprintImpl
