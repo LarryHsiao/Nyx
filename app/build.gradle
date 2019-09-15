@@ -4,8 +4,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
-def nyxVersionName = "v1.9.2"
-def nyxVersionCode = 10902
+def nyxVersionName = "v1.10.0"
+def nyxVersionCode = 11000
 
 android {
     compileSdkVersion 28
@@ -61,6 +61,7 @@ dependencies {
     def room_version = "2.1.0"
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'co.lujun:androidtagview:1.1.7'
+    implementation 'com.android.billingclient:billing:2.0.3'
     implementation 'com.google.auth:google-auth-library-oauth2-http:0.16.2'
     implementation 'com.google.api-client:google-api-client:1.30.2'
     implementation 'com.google.apis:google-api-services-drive:v3-rev110-1.23.0'

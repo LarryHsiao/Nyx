@@ -2,11 +2,19 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
         android:id="@+id/preference_bioAuth"
+        android:icon="@drawable/ic_fingerprint"
         android:key="@string/prefKey_fingerprintAuth"
         android:title="@string/fingerprint_auth" />
 
     <SwitchPreference
         android:id="@+id/preference_webAccess"
+        android:icon="@drawable/ic_web"
         android:key="@string/prefKey_webAccess"
         android:title="@string/web_access" />
+
+    <Preference android:title="@string/support_this_app" android:icon="@drawable/ic_coffee">
+        <intent
+            android:targetPackage="com.larryhsiao.nyx"
+            android:targetClass="com.larryhsiao.nyx.subscription.SponsorActivity"/>
+    </Preference>
 </PreferenceScreen>

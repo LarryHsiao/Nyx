@@ -29,4 +29,8 @@
     <string name="new_tag">New Tag</string>
     <string name="tag">Tag</string>
     <string name="enter_new_tag">Enter new tag</string>
+    <string name="want_to_support_this_app">Want to support this app? How about buy me a coffee.</string>
+    <string name="support">Support</string>
+    <string name="support_this_app">Support this app</string>
+    <string name="thanks">Thanks!</string>
 </resources>
