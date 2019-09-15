@@ -24,11 +24,9 @@ import org.takes.http.FtBasic
  */
 class TakesAccess(
     context: Context,
-    private val db: RDatabase
+    private val db: RDatabase,
+    private val port: Int
 ) : WebAccess {
-    companion object {
-        private const val PORT = 8080
-    }
 
     private val config = ConfigImpl(context)
     private var enabled = false
@@ -49,7 +47,7 @@ class TakesAccess(
                         addAll(files())
                     }
                 ),
-                PORT
+                port
             ).start(exit)
         }
     }
@@ -68,21 +66,21 @@ class TakesAccess(
     /**
      * Source to build [WebAccess].
      */
-    class Singleton(private val context: Context, private val db: RDatabase) :
+    class Singleton(private val context: Context, private val db: RDatabase,private val port: Int) :
         Source<WebAccess> {
         companion object {
             private lateinit var instance: WebAccess
 
-            private fun obtain(context: Context, db: RDatabase): WebAccess {
+            private fun obtain(context: Context, db: RDatabase, port: Int): WebAccess {
                 if (::instance.isInitialized) {
                     return instance
                 }
-                return TakesAccess(context, db).apply { instance = this }
+                return TakesAccess(context, db, port).apply { instance = this }
             }
         }
 
         override fun value(): WebAccess {
-            return obtain(context, db)
+            return obtain(context, db, port)
         }
     }
 
@@ -92,7 +90,7 @@ class TakesAccess(
                 "/",
                 TkAndroidAssets(
                     context,
-                    "http://localhost:$PORT",
+                    "http://localhost:$port",
                     "index.html",
                     "text/html"
                 )
@@ -101,7 +99,7 @@ class TakesAccess(
                 "/tacit-css.min.css",
                 TkAndroidAssets(
                     context,
-                    "http://localhost:$PORT",
+                    "http://localhost:$port",
                     "tacit-css.min.css",
                     "text/css"
                 )
@@ -110,7 +108,7 @@ class TakesAccess(
                 "/diaries",
                 TkFork(
                     FkMethods("GET", TkDiaries(db)),
-                    FkMethods("POST", TkDiaryNew(context, config ,db))
+                    FkMethods("POST", TkDiaryNew(context, config, db))
                 )
             ),
             FkRegex(

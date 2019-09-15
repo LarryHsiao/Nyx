@@ -2,12 +2,13 @@ package com.larryhsiao.nyx.view.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
-import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
+import com.larryhsiao.nyx.IPv4Mapping
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.web.WebAccessService
 import com.silverhetch.aura.fingerprint.FingerprintImpl
@@ -54,8 +55,10 @@ class SettingFragment : PreferenceFragmentCompat() {
         findPreference<SwitchPreference>(
             getString(R.string.prefKey_webAccess)
         )?.apply {
+            updateWebAccessView()
             this.setOnPreferenceChangeListener { preference, obj ->
                 activity?.also {
+                    updateWebAccessView()
                     if (obj is Boolean && obj) {
                         it.startService(
                             Intent(
@@ -68,6 +71,29 @@ class SettingFragment : PreferenceFragmentCompat() {
                     }
                 }
                 true
+            }
+        }
+    }
+
+    private fun updateWebAccessView() {
+        findPreference<SwitchPreference>(
+            getString(R.string.prefKey_webAccess)
+        )?.apply {
+            Handler().post {
+                summary = if (isChecked) {
+                    StringBuilder().apply {
+                        IPv4Mapping().value().forEach {
+                            appendln(
+                                """${String.format(
+                                    "%1\$-7s",
+                                    it.key
+                                )} : ${it.value.hostAddress}:${WebAccessService.PORT}"""
+                            )
+                        }
+                    }.toString()
+                } else {
+                    ""
+                }
             }
         }
     }
