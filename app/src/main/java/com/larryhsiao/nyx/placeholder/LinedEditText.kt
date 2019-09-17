@@ -9,6 +9,7 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.addTextChangedListener
+import com.silverhetch.aura.view.measures.DP
 
 /**
  * EditText with notebook-like under line
@@ -17,15 +18,15 @@ import androidx.core.widget.addTextChangedListener
 class LinedEditText// we need this constructor for LayoutInflater
     (context: Context, attrs: AttributeSet) :
     AppCompatEditText(context, attrs), TextWatcher {
+    private val lineWidth = DP(context, 1f).px()
 
     private val mRect: Rect = Rect()
     private val mPaint: Paint = Paint()
 
     init {
         mPaint.style = Paint.Style.STROKE
+        mPaint.strokeWidth = lineWidth
         mPaint.color = -0x7fffff01
-
-        minLines = 10
 
         addTextChangedListener(this)
     }
