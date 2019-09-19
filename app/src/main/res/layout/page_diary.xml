@@ -35,6 +35,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="200dp"
                 android:padding="16dp"
+                app:line_color="#000000"
                 android:gravity="top|start"
                 android:focusable="@{editable}"
                 android:cursorVisible="@{editable}"

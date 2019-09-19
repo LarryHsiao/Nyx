@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.placeholder
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.text.Editable
@@ -10,6 +11,7 @@ import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.addTextChangedListener
 import com.silverhetch.aura.view.measures.DP
+import com.larryhsiao.nyx.R
 
 /**
  * EditText with notebook-like under line
@@ -26,7 +28,12 @@ class LinedEditText// we need this constructor for LayoutInflater
     init {
         mPaint.style = Paint.Style.STROKE
         mPaint.strokeWidth = lineWidth
-        mPaint.color = -0x7fffff01
+        mPaint.color = context.theme.obtainStyledAttributes(
+            attrs,
+            intArrayOf(R.styleable.LinedEditText_line_color),
+            0,
+            0
+        ).getColor(0, Color.parseColor("#000000"))
 
         addTextChangedListener(this)
     }
