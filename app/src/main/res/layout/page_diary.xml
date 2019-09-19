@@ -85,6 +85,8 @@
                 android:padding="10dp"
                 app:container_enable_drag="false"
                 app:horizontal_interval="10dp"
+                app:container_background_color="#00ffffff"
+                app:container_border_color="#00ffffff"
                 app:vertical_interval="10dp"
                 app:tag_clickable="true"
                 app:tag_theme="pure_teal" />
