@@ -42,6 +42,14 @@ class LinedEditText// we need this constructor for LayoutInflater
         getLineBounds(0, mRect)
         val count = (height.toFloat() / lineHeight.toFloat()).toInt()
 
+        if (lineCount < count - 1) {
+            var append = ""
+            for (i in 0..count - lineCount) {
+                append += System.lineSeparator()
+            }
+            setText("$text$append")
+        }
+
         for (i in 0 until count) {
             canvas.drawLine(
                 mRect.left.toFloat(),
