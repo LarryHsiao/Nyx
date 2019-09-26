@@ -29,13 +29,13 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent">
 
-            <com.larryhsiao.nyx.placeholder.LinedEditText
+            <EditText
                 android:id="@+id/newDiary_newDiaryContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="200dp"
                 android:padding="16dp"
-                app:line_color="#000000"
+                android:inputType="textMultiLine"
                 android:gravity="top|start"
                 android:focusable="@{editable}"
                 android:cursorVisible="@{editable}"
