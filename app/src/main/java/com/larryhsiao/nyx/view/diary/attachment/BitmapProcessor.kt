@@ -3,7 +3,6 @@ package com.larryhsiao.nyx.view.diary.attachment
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import androidx.core.net.toUri
 import com.larryhsiao.nyx.media.storage.NewMediaFile
 import com.silverhetch.aura.media.BitmapStream
 import com.silverhetch.clotho.file.ToFile

@@ -47,8 +47,6 @@ class CalendarFragment : AuraFragment(), FabBehavior {
     override fun onResume() {
         super.onResume()
         updateEvents()
-
-
         attachFab(this)
     }
 
@@ -58,14 +56,13 @@ class CalendarFragment : AuraFragment(), FabBehavior {
     }
 
     private fun updateEvents() {
-        viewModel.diaries().observe(this, Observer<List<Diary>> { diaries ->
+        viewModel.loadUp().observe(this, Observer<List<Diary>> { diaries ->
             calendar_calendarView.setEvents(
                 Array(diaries.size) {
                     eventDay(diaries[it])
                 }.toList()
             )
         })
-
     }
 
     override fun onClick() {

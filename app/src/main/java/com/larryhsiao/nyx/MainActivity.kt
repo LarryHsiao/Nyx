@@ -14,7 +14,6 @@ import com.larryhsiao.nyx.web.WebAccessService
 import com.silverhetch.aura.AuraActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 /**
  * Main entrance of this activity.
  */
@@ -75,4 +74,3 @@ class MainActivity : AuraActivity() {
         stopService(Intent(this, WebAccessService::class.java))
     }
 }
-

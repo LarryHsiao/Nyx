@@ -1,7 +1,9 @@
 package com.larryhsiao.nyx.tag.room
 
-import androidx.room.*
-import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Transaction
 
 /**
  * Dao of tag
@@ -68,5 +70,4 @@ interface TagDao {
      */
     @Query("SELECT * FROM tag WHERE title LIKE :keyword")
     fun searchByName(keyword: String): List<TagEntity>
-
 }

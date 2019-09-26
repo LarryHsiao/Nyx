@@ -34,7 +34,7 @@ import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 import kotlinx.android.synthetic.main.page_diary.*
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.*
 
 /**
@@ -230,7 +230,7 @@ class DiaryFragment : AuraFragment() {
 
             override fun onTagClick(position: Int, text: String?) {
                 tagAttachmentVM.tempTags()[text]?.id()?.let {
-                    nextPage(DiaryListFragment.newInstance(it))
+                    nextPage(DiaryListFragment.newInstance(tagId = it))
                 }
             }
 
@@ -281,9 +281,9 @@ class DiaryFragment : AuraFragment() {
         data: Intent?
     ) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_ADD_IMAGE
-            && resultCode == RESULT_OK
-            && data != null
+        if (requestCode == REQUEST_CODE_ADD_IMAGE &&
+            resultCode == RESULT_OK &&
+            data != null
         ) {
             try {
                 context?.also { context ->
@@ -306,7 +306,7 @@ class DiaryFragment : AuraFragment() {
     }
 
     private fun updateDateIndicator() {
-        newDiary_date.text = SimpleDateFormat.getDateInstance()
+        newDiary_date.text = DateFormat.getDateInstance()
             .format(Date().apply { time = calendar.timeInMillis })
     }
 

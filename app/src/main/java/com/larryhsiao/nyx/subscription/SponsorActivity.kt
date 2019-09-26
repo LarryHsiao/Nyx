@@ -6,8 +6,8 @@ import android.widget.Toast.LENGTH_SHORT
 import com.android.billingclient.api.*
 import com.android.billingclient.api.BillingClient.BillingResponseCode.OK
 import com.android.billingclient.api.BillingClient.SkuType.SUBS
-import com.silverhetch.aura.AuraActivity
 import com.larryhsiao.nyx.R
+import com.silverhetch.aura.AuraActivity
 import kotlinx.android.synthetic.main.item_support_coffee.*
 
 /**
@@ -92,7 +92,7 @@ class SponsorActivity : AuraActivity(), PurchasesUpdatedListener {
         }
     }
 
-    private fun error(){
+    private fun error() {
         Toast.makeText(
             this,
             R.string.appError_unknown,
@@ -100,9 +100,9 @@ class SponsorActivity : AuraActivity(), PurchasesUpdatedListener {
         ).show()
     }
 
-    private fun updateSubscriptionState(){
+    private fun updateSubscriptionState() {
         client.queryPurchases(SUBS).purchasesList.forEach {
-            if (it.sku == PRODUCT_ID_SPONSOR){
+            if (it.sku == PRODUCT_ID_SPONSOR) {
                 itemSupportCoffee_supportButton.isClickable = false
                 itemSupportCoffee_supportButton.setText(R.string.thanks)
             }

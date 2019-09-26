@@ -21,7 +21,7 @@ class NewDiaryTest {
      * construct the database in memory for testing.
      */
     @Before
-    fun initDb(){
+    fun initDb() {
         db = Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext(),
             RDatabase::class.java
@@ -32,7 +32,7 @@ class NewDiaryTest {
      * Release database
      */
     @After
-    fun releaseDb(){
+    fun releaseDb() {
         db.close()
     }
 

@@ -8,6 +8,5 @@ interface Backup {
     /**
      * The title of ths backup
      */
-    fun title():String
-
+    fun title(): String
 }

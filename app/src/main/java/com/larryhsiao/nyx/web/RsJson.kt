@@ -4,7 +4,6 @@ import org.takes.rs.RsWithBody
 import org.takes.rs.RsWithStatus
 import org.takes.rs.RsWithType
 import org.takes.rs.RsWrap
-import java.net.HttpURLConnection
 import java.net.HttpURLConnection.HTTP_OK
 
 /**

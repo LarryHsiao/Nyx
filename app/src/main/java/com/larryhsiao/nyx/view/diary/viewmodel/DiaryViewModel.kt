@@ -78,7 +78,6 @@ class DiaryViewModel(private val app: Application) : AndroidViewModel(app) {
                 )
             )
         }
-
     }
 
     /**

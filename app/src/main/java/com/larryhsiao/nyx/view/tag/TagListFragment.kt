@@ -20,8 +20,6 @@ import kotlinx.android.synthetic.main.fragment_tag_list.*
  * Fragment of Tag list.
  */
 class TagListFragment : AuraFragment(), TextWatcher {
-
-
     private lateinit var vm: TagListVM
     private lateinit var adapter: TagAdapter
 

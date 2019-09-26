@@ -65,7 +65,6 @@ class MediaExportTest {
         db.mediaDao().create(MediaEntity(0, 1, "file://abc.caom"))
         db.mediaDao().create(MediaEntity(0, 1, "abc://abc.caom"))
 
-
         Assert.assertTrue(
             MediaExport(
                 db.mediaDao()

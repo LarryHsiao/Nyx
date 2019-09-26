@@ -15,7 +15,7 @@ class ExportedDiaryIterator(
     }
 
     override fun next(): ExportedDiary {
-        if (hasNext().not()){
+        if (hasNext().not()) {
             throw NoSuchElementException()
         }
         return ExportedDiaryImpl(gson, diaryIterator.next().diary)

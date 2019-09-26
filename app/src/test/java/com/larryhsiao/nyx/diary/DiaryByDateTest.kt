@@ -15,9 +15,10 @@ import org.robolectric.RobolectricTestRunner
  */
 @RunWith(RobolectricTestRunner::class)
 class DiaryByDateTest {
-    companion object{
+    companion object {
         private const val ARG_TITLE = "title"
     }
+
     private lateinit var db: RDatabase
     /**
      * construct the database in memory for testing.
@@ -56,7 +57,6 @@ class DiaryByDateTest {
             DiaryByDate(db.diaryDao(), 0).value().size
         )
     }
-
 
     /**
      * Query by date

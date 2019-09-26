@@ -4,18 +4,28 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.diary.*
+import com.larryhsiao.nyx.tag.TagById
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.text.DateFormat
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * View model for presenting the calendar events
  */
 class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Singleton(app).value()
+    private val title = MutableLiveData<String>()
+
+    /**
+     * Title of this viewModel
+     */
+    fun title(): LiveData<String> {
+        return title
+    }
 
     /**
      * Create new diary
@@ -43,7 +53,8 @@ class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
     /**
      * All diaries
      */
-    fun diaries(): LiveData<List<Diary>> {
+    fun loadUp(): LiveData<List<Diary>> {
+        title.value = app.getString(R.string.diaries)
         return MutableLiveData<List<Diary>>().apply {
             GlobalScope.launch {
                 postValue(AllDiary(db.diaryDao()).value())
@@ -54,7 +65,7 @@ class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
     /**
      * All diaries by given parameters.
      */
-    fun diaries(
+    fun loadUp(
         dateTimestamp: Long = -1,
         tagId: Long = -1
     ): LiveData<List<Diary>> {
@@ -73,6 +84,22 @@ class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
                     } else {
                         AllDiary(db.diaryDao()).value()
                     }
+                )
+
+                title.postValue(
+                    StringBuilder().apply {
+                        if (tagId != -1L) {
+                            append(TagById(db, tagId).value().title())
+                        }
+
+                        if (dateTimestamp != -1L) {
+                            append(
+                                DateFormat.getDateInstance().format(
+                                    Date(dateTimestamp)
+                                )
+                            )
+                        }
+                    }.toString()
                 )
             }
         }

@@ -2,7 +2,6 @@ package com.larryhsiao.nyx.diary
 
 import android.net.Uri
 
-
 /**
  * Phantom object of [Diary]
  */

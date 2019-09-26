@@ -8,7 +8,8 @@ import com.silverhetch.clotho.Source
  */
 class TagByKeyword(
     private val db: RDatabase,
-    private val keyword: String) : Source<List<Tag>> {
+    private val keyword: String
+) : Source<List<Tag>> {
     override fun value(): List<Tag> {
         return db.tagDao().searchByName("%$keyword%")
             .mapTo(ArrayList<Tag>()) { DbTag(db, it) }

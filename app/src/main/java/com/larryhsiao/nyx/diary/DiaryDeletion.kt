@@ -1,8 +1,6 @@
 package com.larryhsiao.nyx.diary
 
 import com.larryhsiao.nyx.database.RDatabase
-import com.larryhsiao.nyx.diary.room.DiaryDao
-import com.larryhsiao.nyx.media.room.MediaDao
 import com.silverhetch.clotho.Action
 import java.io.File
 import java.net.URI

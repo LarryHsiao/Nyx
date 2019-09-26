@@ -24,5 +24,5 @@ interface Diary {
     /**
      * Image uris
      */
-    fun imageUris():Array<Uri>
+    fun imageUris(): Array<Uri>
 }

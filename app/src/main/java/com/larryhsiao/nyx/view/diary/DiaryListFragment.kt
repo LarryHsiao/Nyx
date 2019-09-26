@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -110,7 +111,10 @@ class DiaryListFragment : AuraFragment(), FabBehavior {
     }
 
     private fun loadData() {
-        viewModel.diaries(
+        viewModel.title().observe(this, Observer {
+            (activity as AppCompatActivity?)?.supportActionBar?.title = it
+        })
+        viewModel.loadUp(
             arguments?.getLong(ARG_DATETIME, -1L) ?: -1L,
             arguments?.getLong(ARG_TAG_ID, -1L) ?: -1L
         ).observe(this, Observer { adapter.load(it) })

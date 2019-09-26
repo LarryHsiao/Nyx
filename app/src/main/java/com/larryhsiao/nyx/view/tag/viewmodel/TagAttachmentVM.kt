@@ -20,7 +20,7 @@ class TagAttachmentVM(app: Application) : AndroidViewModel(app) {
     /**
      * The Tag map for prefered Tags.
      */
-    fun tempTags():Map<String, Tag>{
+    fun tempTags(): Map<String, Tag> {
         return tempTags
     }
 

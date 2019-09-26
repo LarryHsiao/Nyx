@@ -23,14 +23,16 @@ class TagListVM(app: Application) : AndroidViewModel(app) {
     /**
      * Load the tags
      */
-    fun loadUpTags(keyword:String = "") {
+    fun loadUpTags(keyword: String = "") {
         GlobalScope.launch {
             tags.clear()
-            tags.addAll(if (keyword.isEmpty()){
-                AllTags(db).value()
-            }else{
-                TagByKeyword(db, keyword).value()
-            })
+            tags.addAll(
+                if (keyword.isEmpty()) {
+                    AllTags(db).value()
+                } else {
+                    TagByKeyword(db, keyword).value()
+                }
+            )
             tagLive.postValue(tags)
         }
     }

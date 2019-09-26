@@ -6,7 +6,6 @@ import java.net.NetworkInterface
 import java.net.SocketException
 import java.net.UnknownHostException
 
-
 /**
  * Source to build IPv4 address which current machine have.
  */

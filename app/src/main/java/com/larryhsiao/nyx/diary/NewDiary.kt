@@ -11,7 +11,7 @@ import com.silverhetch.clotho.Source
  * Create or update new diary.
  */
 class NewDiary(
-    private val context:Context,
+    private val context: Context,
     private val db: RDatabase,
     private val title: String,
     private val utcTimestamp: Long,

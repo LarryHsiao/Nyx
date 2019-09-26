@@ -32,7 +32,7 @@ interface MediaDao {
      * Delete media rows by given diary id.
      */
     @Query("DELETE FROM media WHERE diary_id=:diaryId")
-    fun deleteByDiaryId(diaryId:Long)
+    fun deleteByDiaryId(diaryId: Long)
 
     /**
      * Query Medias by diary id.
@@ -44,7 +44,7 @@ interface MediaDao {
      * Query all medias
      */
     @Query("SELECT * FROM media;")
-    fun all():List<MediaEntity>
+    fun all(): List<MediaEntity>
 
     /**
      * Remove all rows

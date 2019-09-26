@@ -21,5 +21,4 @@ class TkDiaryDeleteById(private val db: RDatabase) : Take {
         ).fire()
         return RsWithStatus(STATUS_CODE_NO_CONTENT)
     }
-
 }

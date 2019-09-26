@@ -10,7 +10,7 @@ import java.io.File
  */
 class Replace(
     private val backup: File,
-    private val mediaRoot:File,
+    private val mediaRoot: File,
     private val db: RDatabase
 ) : Action {
     override fun fire() {

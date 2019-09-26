@@ -20,7 +20,7 @@ import java.nio.file.Files
  * Test for [com.larryhsiao.nyx.backup.local.Replace]
  */
 @RunWith(RobolectricTestRunner::class)
-class ReplaceTest{
+class ReplaceTest {
     private lateinit var db: RDatabase
     /**
      * construct the database in memory for testing.
@@ -61,7 +61,12 @@ class ReplaceTest{
                             config.mediaRoot().toPath(),
                             "Temp",
                             ""
-                        ).toFile().also { TextFile(it, sampleText).value() }.toURI().toASCIIString()
+                        ).toFile().also {
+                            TextFile(
+                                it,
+                                sampleText
+                            ).value()
+                        }.toURI().toASCIIString()
                     )
                 )
                 db.mediaDao().create(
@@ -72,7 +77,12 @@ class ReplaceTest{
                             config.mediaRoot().toPath(),
                             "Temp",
                             ""
-                        ).toFile().also { TextFile(it, sampleText).value() }.toURI().toASCIIString()
+                        ).toFile().also {
+                            TextFile(
+                                it,
+                                sampleText
+                            ).value()
+                        }.toURI().toASCIIString()
                     )
                 )
             },
