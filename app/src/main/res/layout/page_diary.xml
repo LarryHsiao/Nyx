@@ -43,7 +43,7 @@
                 android:focusableInTouchMode="@{editable}"
                 android:text="@{diary.title()}"
                 app:layout_constraintBottom_toTopOf="@id/newDiary_imageGrid"
-                android:background="@null"
+                android:background="@drawable/bg_edit_field"
                 app:layout_constraintTop_toBottomOf="@id/newDiary_date"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
