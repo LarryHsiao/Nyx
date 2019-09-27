@@ -114,7 +114,7 @@ class DiaryListFragment : AuraFragment(), FabBehavior {
         viewModel.title().observe(this, Observer {
             val activityRef = activity
             if (activityRef is AppCompatActivity)
-            (activity as AppCompatActivity).supportActionBar?.title = it
+            activityRef.supportActionBar?.title = it
         })
         viewModel.loadUp(
             arguments?.getLong(ARG_DATETIME, -1L) ?: -1L,
