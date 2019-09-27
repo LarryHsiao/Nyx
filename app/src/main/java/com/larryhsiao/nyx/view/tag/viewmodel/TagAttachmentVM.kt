@@ -15,13 +15,20 @@ import kotlinx.coroutines.launch
  */
 class TagAttachmentVM(app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Singleton(app).value()
-    private val tagIdMap = HashMap<String, Tag>()
+    private val tempTags = HashMap<String, Tag>()
+
+    /**
+     * The Tag map for prefered Tags.
+     */
+    fun tempTags(): Map<String, Tag> {
+        return tempTags
+    }
 
     /**
      * Setup the initial tags
      */
     fun load(tags: List<Tag>) {
-        tags.forEach { tagIdMap[it.title()] = it }
+        tags.forEach { tempTags[it.title()] = it }
     }
 
     /**
@@ -29,7 +36,7 @@ class TagAttachmentVM(app: Application) : AndroidViewModel(app) {
      */
     fun preferTag(tagName: String) {
         GlobalScope.launch {
-            tagIdMap[tagName] = TagSource(db, tagName).value()
+            tempTags[tagName] = TagSource(db, tagName).value()
         }
     }
 
@@ -40,7 +47,7 @@ class TagAttachmentVM(app: Application) : AndroidViewModel(app) {
      * This method just remove the record in memory.
      */
     fun removeTag(tagName: String) {
-        tagIdMap.remove(tagName)
+        tempTags.remove(tagName)
     }
 
     /**
@@ -54,7 +61,7 @@ class TagAttachmentVM(app: Application) : AndroidViewModel(app) {
             DettachAllTagByDiary(db, diaryId).fire()
             db.tagDiaryDao().create(
                 diaryId,
-                tagIdMap.values.mapTo(ArrayList(), { it.id() })
+                tempTags.values.mapTo(ArrayList(), { it.id() })
             )
             liveData.postValue(AttachedTags(db, diaryId).value())
         }

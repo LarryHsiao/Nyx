@@ -10,7 +10,7 @@ import com.silverhetch.clotho.Source
 class Allbackups(private val config: Config) : Source<List<Backup>> {
     override fun value(): List<Backup> {
         val files = config.backupRoot().listFiles()
-        return Array(files.size){
+        return Array(files.size) {
             FileBackup(files[it])
         }.toList()
     }

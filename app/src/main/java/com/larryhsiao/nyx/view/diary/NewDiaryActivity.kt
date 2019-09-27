@@ -1,8 +1,8 @@
 package com.larryhsiao.nyx.view.diary
 
 import android.os.Bundle
-import android.view.Gravity
-import android.view.Gravity.*
+import android.view.Gravity.BOTTOM
+import android.view.Gravity.END
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -33,9 +33,6 @@ open class NewDiaryActivity : AuraActivity() {
                 addView(fab)
             })
         })
-
-
-
         rootPage(NewDiaryFragment())
     }
 }

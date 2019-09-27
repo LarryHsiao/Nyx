@@ -49,6 +49,5 @@ class BioAuth(
         Ignore auth failed, the promote UI will inform the failure to user.
         The error will triggered as canceled by user which is the only event user can trigger.
         */
-
     }
 }

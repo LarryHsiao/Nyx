@@ -54,5 +54,4 @@ class TkDiaryNew(
             )
         } ?: RsWithStatus(STATUS_CODE_BAD_REQUEST)
     }
-
 }

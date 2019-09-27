@@ -14,10 +14,10 @@ interface Config {
     /**
      * Backup root file
      */
-    fun backupRoot():File
+    fun backupRoot(): File
 
     /**
      * Determine if the bio auth is enabled.
      */
-    fun bioAuthEnabled():Boolean
+    fun bioAuthEnabled(): Boolean
 }

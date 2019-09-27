@@ -1,7 +1,6 @@
 package com.larryhsiao.nyx.uri
 
 import android.content.Context
-import androidx.core.net.toUri
 import com.silverhetch.clotho.Source
 
 /**
@@ -16,5 +15,4 @@ class IsInternalFile(
         return uri.replace("///", "/")
             .startsWith(rootPath.replace("///", "/"))
     }
-
 }

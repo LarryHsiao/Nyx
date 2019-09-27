@@ -1,8 +1,10 @@
 package com.larryhsiao.nyx.tag.room
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
-import com.larryhsiao.nyx.tag.Tag
+import androidx.room.Query
+import androidx.room.Transaction
 
 /**
  * Dao for tag_diary relation table.

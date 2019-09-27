@@ -1,13 +1,14 @@
 package com.larryhsiao.nyx.web
 
 import android.content.Context
-import com.google.api.client.http.HttpStatusCodes
 import com.google.api.client.http.HttpStatusCodes.STATUS_CODE_OK
 import com.silverhetch.clotho.io.ProgressedCopy
 import org.takes.Request
 import org.takes.Response
 import org.takes.Take
-import org.takes.rs.*
+import org.takes.rs.RsWithBody
+import org.takes.rs.RsWithStatus
+import org.takes.rs.RsWithType
 import java.io.ByteArrayOutputStream
 
 /**

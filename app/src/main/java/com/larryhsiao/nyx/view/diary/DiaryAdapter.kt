@@ -4,12 +4,11 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.diary.Diary
 import com.silverhetch.aura.view.ViewHolder
-import com.larryhsiao.nyx.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_diary.view.*
 import java.text.SimpleDateFormat
@@ -60,7 +59,6 @@ class DiaryAdapter(private val onItemClicked: (item: Diary) -> Unit) :
                     }).into(it)
             }
         }
-
 
         holder.rootView.setOnClickListener {
             onItemClicked(diaries[holder.adapterPosition])

@@ -7,5 +7,5 @@ interface ExportedDiary {
     /**
      * The json of diary
      */
-    fun json():String
+    fun json(): String
 }

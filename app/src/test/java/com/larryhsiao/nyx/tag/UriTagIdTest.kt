@@ -36,6 +36,5 @@ class UriTagIdTest {
         } catch (e: IllegalArgumentException) {
             assertTrue(true)
         }
-
     }
 }

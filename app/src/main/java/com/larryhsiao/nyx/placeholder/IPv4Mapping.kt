@@ -1,11 +1,10 @@
-package com.larryhsiao.nyx
+package com.larryhsiao.nyx.placeholder
 
 import com.silverhetch.clotho.Source
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
 import java.net.UnknownHostException
-
 
 /**
  * Source to build IPv4 address which current machine have.
@@ -26,13 +25,20 @@ class IPv4Mapping : Source<Map<String, InetAddress>> {
         val result = HashMap<String, InetAddress>()
         val e = NetworkInterface.getNetworkInterfaces()
         while (e.hasMoreElements()) {
-            val n = e.nextElement() as NetworkInterface
-            val ee = n.inetAddresses
-            while (ee.hasMoreElements()) {
-                val i = ee.nextElement() as InetAddress
-                val currentAddress = i.hostAddress
-                if (!i.isLoopbackAddress && IsIPv4(currentAddress).value()) {
-                    result[n.displayName] = i
+            val n = e.nextElement()
+            if (n is NetworkInterface) {
+                val ee = n.inetAddresses
+                while (ee.hasMoreElements()) {
+                    val i = ee.nextElement()
+                    if (i is InetAddress) {
+                        val currentAddress = i.hostAddress
+                        if (!i.isLoopbackAddress && IsIPv4(
+                                currentAddress
+                            ).value()
+                        ) {
+                            result[n.displayName] = i
+                        }
+                    }
                 }
             }
         }

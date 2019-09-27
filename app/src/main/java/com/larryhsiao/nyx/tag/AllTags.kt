@@ -1,7 +1,6 @@
 package com.larryhsiao.nyx.tag
 
 import com.larryhsiao.nyx.database.RDatabase
-import com.larryhsiao.nyx.tag.room.TagDao
 import com.silverhetch.clotho.Source
 
 /**

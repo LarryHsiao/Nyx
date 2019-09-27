@@ -3,7 +3,6 @@ package com.larryhsiao.nyx.diary
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.larryhsiao.nyx.database.RDatabase
-import com.silverhetch.clotho.Source
 import com.silverhetch.clotho.source.ConstSource
 import org.junit.After
 import org.junit.Assert
@@ -11,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.util.*
 
 /**
  * Tests for [com.larryhsiao.nyx.diary.DiaryByFilteredDate]

@@ -14,8 +14,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import co.lujun.androidtagview.TagView
@@ -28,6 +28,7 @@ import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
 import com.larryhsiao.nyx.view.diary.attachment.ViewAttachmentIntent
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
+import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.clotho.time.ToUTCTimestamp
@@ -35,10 +36,6 @@ import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
 import java.text.SimpleDateFormat
 import java.util.*
-import android.widget.AutoCompleteTextView
-import android.widget.ArrayAdapter
-import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
-
 
 /**
  * Page for creating new diary.
@@ -57,15 +54,24 @@ class NewDiaryFragment : AuraFragment() {
             tagVM.loadUpTags(s?.toString() ?: "")
         }
 
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        override fun beforeTextChanged(
+            s: CharSequence?,
+            start: Int,
+            count: Int,
+            after: Int
+        ) {
             /* Leave it empty */
         }
 
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        override fun onTextChanged(
+            s: CharSequence?,
+            start: Int,
+            before: Int,
+            count: Int
+        ) {
             /* Leave it empty */
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,8 +96,8 @@ class NewDiaryFragment : AuraFragment() {
                         ).observe(this@NewDiaryFragment, Observer<Diary> {
                             tagViewVM.attachToDiary(it.id()).observe(
                                 this@NewDiaryFragment, Observer<List<Tag>> {
-                                activity?.onBackPressed()
-                            })
+                                    activity?.onBackPressed()
+                                })
                         })
                     } else {
                         Toast.makeText(
@@ -138,7 +144,8 @@ class NewDiaryFragment : AuraFragment() {
             createTagByInput()
         }
 
-        rootView.newDiary_tag.setOnTagClickListener(object : TagView.OnTagClickListener {
+        rootView.newDiary_tag.setOnTagClickListener(object :
+            TagView.OnTagClickListener {
             override fun onSelectedTagDrag(position: Int, text: String?) {
                 /*Leave it empty*/
             }
@@ -220,9 +227,9 @@ class NewDiaryFragment : AuraFragment() {
         data: Intent?
     ) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_ADD_IMAGE
-            && resultCode == RESULT_OK
-            && data != null
+        if (requestCode == REQUEST_CODE_ADD_IMAGE &&
+            resultCode == RESULT_OK &&
+            data != null
         ) {
             try {
                 context?.also { context ->

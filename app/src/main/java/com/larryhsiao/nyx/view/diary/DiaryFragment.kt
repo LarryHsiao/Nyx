@@ -34,7 +34,7 @@ import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 import kotlinx.android.synthetic.main.page_diary.*
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.*
 
 /**
@@ -72,11 +72,21 @@ class DiaryFragment : AuraFragment() {
             tagVM.loadUpTags(s?.toString() ?: "")
         }
 
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        override fun beforeTextChanged(
+            s: CharSequence?,
+            start: Int,
+            count: Int,
+            after: Int
+        ) {
             /* Leave it empty */
         }
 
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        override fun onTextChanged(
+            s: CharSequence?,
+            start: Int,
+            before: Int,
+            count: Int
+        ) {
             /* Leave it empty */
         }
     }
@@ -184,6 +194,7 @@ class DiaryFragment : AuraFragment() {
         }
 
         diaryTagVM.tags().observe(this, Observer {
+            newDiary_tag.removeAllTags()
             tagAttachmentVM.load(it)
             it.forEach { tag -> newDiary_tag.addTag(tag.title()) }
         })
@@ -204,10 +215,6 @@ class DiaryFragment : AuraFragment() {
             }
 
             override fun onTagLongClick(position: Int, text: String?) {
-                /*Leave it empty*/
-            }
-
-            override fun onTagClick(position: Int, text: String?) {
                 if (editable.value == false) {
                     return
                 }
@@ -221,17 +228,23 @@ class DiaryFragment : AuraFragment() {
                     .show()
             }
 
+            override fun onTagClick(position: Int, text: String?) {
+                tagAttachmentVM.tempTags()[text]?.id()?.let {
+                    nextPage(DiaryListFragment.newInstance(tagId = it))
+                }
+            }
+
             override fun onTagCrossClick(position: Int) {
                 /*Leave it empty*/
             }
         })
         newDiary_inputTag.addTextChangedListener(tagInputWatcher)
-        tagVM.tags().observe(this, Observer {tags->
+        tagVM.tags().observe(this, Observer { tags ->
             newDiary_inputTag.setAdapter(ArrayAdapter<String>(
                 newDiary_tag.context,
                 R.layout.item_tag,
                 R.id.tag_title,
-                Array(tags.size){
+                Array(tags.size) {
                     tags[it].title()
                 }
             ))
@@ -240,7 +253,7 @@ class DiaryFragment : AuraFragment() {
 
     private fun newTagByInput() {
         val tagName = newDiary_inputTag.text.toString()
-        if (tagName.isEmpty()) {
+        if (tagName.isEmpty() || newDiary_tag.tags.contains(tagName) || tagName.isEmpty()) {
             return
         }
         newDiary_tag.addTag(tagName)
@@ -268,9 +281,9 @@ class DiaryFragment : AuraFragment() {
         data: Intent?
     ) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_ADD_IMAGE
-            && resultCode == RESULT_OK
-            && data != null
+        if (requestCode == REQUEST_CODE_ADD_IMAGE &&
+            resultCode == RESULT_OK &&
+            data != null
         ) {
             try {
                 context?.also { context ->
@@ -293,7 +306,7 @@ class DiaryFragment : AuraFragment() {
     }
 
     private fun updateDateIndicator() {
-        newDiary_date.text = SimpleDateFormat.getDateInstance()
+        newDiary_date.text = DateFormat.getDateInstance()
             .format(Date().apply { time = calendar.timeInMillis })
     }
 

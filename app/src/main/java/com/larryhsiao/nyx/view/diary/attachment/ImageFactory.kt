@@ -18,8 +18,9 @@ class ImageFactory(
             return GeoImage(context, uri)
         }
 
-        if (uri.scheme?.contains("http") == true
-            && uri.host?.contains("youtube.com") == true) {
+        if (uri.scheme?.contains("http") == true &&
+            uri.host?.contains("youtube.com") == true
+        ) {
             return YoutubeImage(context, uri)
         }
 

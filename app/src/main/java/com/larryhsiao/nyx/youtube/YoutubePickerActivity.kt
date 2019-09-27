@@ -6,8 +6,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,11 +38,11 @@ class YoutubePickerActivity : AuraActivity() {
         searchButton.setOnClickListener {
             viewModel.search(editText.text.toString())
         }
-        viewModel.error().observe(this, Observer{
+        viewModel.error().observe(this, Observer {
             AlertDialog.Builder(listView.context)
                 .setTitle(R.string.error)
                 .setMessage(R.string.fetching_failed)
-                .setPositiveButton(android.R.string.ok){ _: DialogInterface, i: Int ->
+                .setPositiveButton(android.R.string.ok) { _: DialogInterface, i: Int ->
                     finish()
                 }
                 .show()

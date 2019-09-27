@@ -17,5 +17,5 @@ interface WebAccess {
     /**
      * For determining if the access is running.
      */
-    fun isRunning():Boolean
+    fun isRunning(): Boolean
 }

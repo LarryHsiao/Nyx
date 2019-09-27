@@ -25,7 +25,7 @@ class YoutubeVideoSearchingTest {
                     "Codding"
                 ).value().size
             )
-        }catch (e:IOException){
+        } catch (e: IOException) {
             assertTrue(true) // prevent out of API requesting quota exception
         }
     }

@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.diary
 
-import com.larryhsiao.nyx.database.RDatabase
 import com.silverhetch.clotho.Source
 import com.silverhetch.clotho.SourceWrapper
 

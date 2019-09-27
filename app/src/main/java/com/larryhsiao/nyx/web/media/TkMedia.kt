@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.web.media
 
-import android.content.Context
 import com.google.gson.Gson
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.web.RsJson

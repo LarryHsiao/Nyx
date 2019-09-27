@@ -3,16 +3,19 @@ package com.larryhsiao.nyx.view.tag
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.tag.Tag
 import com.silverhetch.aura.view.ViewHolder
-import com.larryhsiao.nyx.R
 import kotlinx.android.synthetic.main.item_tag.view.*
 
 /**
  * RecyclerView adapter for tags
  */
-class TagAdapter(private val tagClicked: (tag: Tag) -> Unit) : RecyclerView.Adapter<ViewHolder>() {
-    private val tags = ArrayList<Tag>();
+class TagAdapter(
+    private val tagClicked: (tag: Tag) -> Unit
+) :
+    RecyclerView.Adapter<ViewHolder>() {
+    private val tags = ArrayList<Tag>()
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

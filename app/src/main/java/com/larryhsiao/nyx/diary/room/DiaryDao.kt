@@ -4,7 +4,6 @@ import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
 import com.larryhsiao.nyx.diary.Diary
 
-
 /**
  * Room dao required by Room, We don`t use this class directly. Wrap it with objects.
  */

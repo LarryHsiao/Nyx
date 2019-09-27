@@ -53,7 +53,7 @@ class DiaryImportTest {
             FileInputStream(jsonFile)
         ).fire()
 
-        val diaryList =db.diaryDao().all()
+        val diaryList = db.diaryDao().all()
         assertEquals(2, diaryList.size)
         assertEquals("Test1", db.diaryDao().byId(1).diary.title)
         assertEquals("Test2", db.diaryDao().byId(2).diary.title)

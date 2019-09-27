@@ -18,7 +18,6 @@ import org.takes.facets.fork.*
 import org.takes.http.Exit
 import org.takes.http.FtBasic
 
-
 /**
  * Access implementation with [takes](https://github.com/yegor256/takes)
  */
@@ -66,12 +65,20 @@ class TakesAccess(
     /**
      * Source to build [WebAccess].
      */
-    class Singleton(private val context: Context, private val db: RDatabase,private val port: Int) :
+    class Singleton(
+        private val context: Context,
+        private val db: RDatabase,
+        private val port: Int
+    ) :
         Source<WebAccess> {
         companion object {
             private lateinit var instance: WebAccess
 
-            private fun obtain(context: Context, db: RDatabase, port: Int): WebAccess {
+            private fun obtain(
+                context: Context,
+                db: RDatabase,
+                port: Int
+            ): WebAccess {
                 if (::instance.isInitialized) {
                     return instance
                 }

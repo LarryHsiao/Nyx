@@ -3,11 +3,10 @@ package com.larryhsiao.nyx.youtube
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.silverhetch.aura.view.ViewHolder
 import com.larryhsiao.nyx.R
+import com.silverhetch.aura.view.ViewHolder
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_video.view.*
 

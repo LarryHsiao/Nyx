@@ -7,7 +7,8 @@ interface Tag {
     /**
      * Id of this tag.
      */
-    fun id():Long
+    fun id(): Long
+
     /**
      * The title of this tag.
      */

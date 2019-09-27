@@ -17,7 +17,6 @@ import com.larryhsiao.nyx.R
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
 
-
 /**
  * List of backup instance, currently available source: Google.
  */

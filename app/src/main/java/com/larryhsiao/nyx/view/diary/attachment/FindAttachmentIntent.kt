@@ -20,7 +20,7 @@ class FindAttachmentIntent(private val context: Context) : Source<Intent> {
             Intent(Intent.ACTION_GET_CONTENT).also { it.type = "image/*" },
             Intent(MediaStore.ACTION_IMAGE_CAPTURE),
             LocationPickerActivity.Builder()
-                .shouldReturnOkOnBackPressed()
+                .withGooglePlacesEnabled()
                 .withStreetHidden()
                 .withCityHidden()
                 .withZipCodeHidden()

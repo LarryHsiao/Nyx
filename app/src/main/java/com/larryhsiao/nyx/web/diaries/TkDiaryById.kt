@@ -15,5 +15,4 @@ class TkDiaryById(private val db: RDatabase) : Take {
         val id = RqHref.Smart(req).href().path().split('/').last()
         return RsJson(DiaryListView(listOf(db.diaryDao().byId(id.toLong()))).value().toString())
     }
-
 }
