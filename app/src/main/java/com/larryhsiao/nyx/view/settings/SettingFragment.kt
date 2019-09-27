@@ -8,11 +8,12 @@ import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
-import com.larryhsiao.nyx.placeholder.IPv4Mapping
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.placeholder.IPv4Mapping
 import com.larryhsiao.nyx.web.WebAccessService
 import com.silverhetch.aura.fingerprint.FingerprintImpl
 import com.silverhetch.aura.storage.SPCeres
+import com.silverhetch.aura.view.activity.ActionBarTitle
 
 /**
  * Setting page of Nyx
@@ -73,6 +74,14 @@ class SettingFragment : PreferenceFragmentCompat() {
                 true
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ActionBarTitle(
+            activity,
+            getString(R.string.settings)
+        ).fire()
     }
 
     private fun updateWebAccessView() {

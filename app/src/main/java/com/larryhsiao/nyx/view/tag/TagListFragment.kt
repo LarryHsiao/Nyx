@@ -6,14 +6,14 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo.*
+import android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.silverhetch.aura.AuraFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.view.diary.DiaryListFragment
 import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
+import com.silverhetch.aura.AuraFragment
 import kotlinx.android.synthetic.main.fragment_tag_list.*
 
 /**
@@ -56,9 +56,15 @@ class TagListFragment : AuraFragment(), TextWatcher {
         vm.loadUpTags()
     }
 
+    override fun onResume() {
+        super.onResume()
+        setTitle(getString(R.string.tags))
+    }
+
     private fun searchByInput() {
         vm.loadUpTags(tagList_searchInput.text.toString())
     }
+
     override fun afterTextChanged(s: Editable?) {
         searchByInput()
     }

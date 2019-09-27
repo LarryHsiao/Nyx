@@ -99,6 +99,12 @@ class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
                                 )
                             )
                         }
+
+                        if (tagId == -1L && dateTimestamp == -1L) {
+                            this.append(
+                                app.getString(R.string.diaries)
+                            )
+                        }
                     }.toString()
                 )
             }

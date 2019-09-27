@@ -96,6 +96,11 @@ class DiaryFragment : AuraFragment() {
         setHasOptionsMenu(true)
     }
 
+    override fun onResume() {
+        super.onResume()
+        setTitle(getString(R.string.diary))
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.diaryMenu_delete -> {

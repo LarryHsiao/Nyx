@@ -34,4 +34,7 @@
     <string name="support_this_app">Support this app</string>
     <string name="thanks">Thanks!</string>
     <string name="diaries">Diaries</string>
+    <string name="diary">Diary</string>
+    <string name="backups">Backups</string>
+    <string name="tags">Tags</string>
 </resources>
