@@ -14,8 +14,7 @@ class Replace(
     private val db: RDatabase
 ) : Action {
     override fun fire() {
-        db.mediaDao().clear()
-        db.diaryDao().clear()
+        db.clearAllTables()
         FileDelete(mediaRoot).fire()
         mediaRoot.mkdir()
         Restore(

@@ -6,6 +6,8 @@ import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.media.room.MediaEntity
+import com.larryhsiao.nyx.tag.room.TagDiaryEntity
+import com.larryhsiao.nyx.tag.room.TagEntity
 import com.silverhetch.clotho.file.FileText
 import com.silverhetch.clotho.file.TextFile
 import org.junit.After
@@ -85,6 +87,9 @@ class ReplaceTest {
                         }.toURI().toASCIIString()
                     )
                 )
+                db.tagDao().create(TagEntity(0, "Tag1"))
+                db.tagDao().create(TagEntity(0, "Tag2"))
+                db.tagDiaryDao().create(TagDiaryEntity(0L, 1, 2))
             },
             config.backupRoot()
         ).fire()
@@ -96,6 +101,8 @@ class ReplaceTest {
         ).fire()
 
         assertEquals(2, db.mediaDao().all().size)
+        assertEquals(2, db.tagDao().all().size)
+        assertEquals(1, db.tagDiaryDao().all().size)
         assertEquals(1, db.diaryDao().all().size)
         assertEquals(2, db.diaryDao().all()[0].mediaEntities.size)
         assertEquals(2, config.mediaRoot().listFiles().size)

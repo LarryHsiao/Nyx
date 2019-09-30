@@ -50,4 +50,10 @@ interface TagDiaryDao {
      */
     @Query("DELETE FROM tag_diary WHERE tag_id=:tagId AND diary_id=:diaryId")
     fun delete(diaryId: Long, tagId: Long)
+
+    /**
+     * Query all tag diary.
+     */
+    @Query("SELECT * FROM tag_diary;")
+    fun all(): List<TagDiaryEntity>
 }
