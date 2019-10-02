@@ -4,9 +4,13 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.larryhsiao.nyx.backup.DiaryExport
 import com.larryhsiao.nyx.backup.MediaExport
+import com.larryhsiao.nyx.backup.tag.TagDiaryExport
+import com.larryhsiao.nyx.backup.tag.TagExport
 import com.larryhsiao.nyx.database.RDatabase
 import com.larryhsiao.nyx.diary.room.DiaryDao
 import com.larryhsiao.nyx.media.room.MediaDao
+import com.larryhsiao.nyx.tag.room.TagDao
+import com.larryhsiao.nyx.tag.room.TagDiaryDao
 import com.silverhetch.clotho.Action
 import com.silverhetch.clotho.file.ToFile
 import java.io.File
@@ -31,6 +35,8 @@ class NewBackup(
         }
         backupDiary(backupRoot, db.diaryDao())
         backupMedia(backupRoot, db.mediaDao())
+        backupTags(backupRoot, db.tagDao())
+        backupTagDiaries(backupRoot, db.tagDiaryDao())
     }
 
     private fun backupDiary(root: File, dao: DiaryDao) {
@@ -80,6 +86,40 @@ class NewBackup(
                     it.add("media", JsonParser().parse(original.json()))
                     it.addProperty("exportedFileName", exportedFileName)
                 }.toString().toByteArray())
+                counter++
+            }
+            output.write("]".toByteArray())
+        }
+    }
+
+    private fun backupTags(root: File, dao: TagDao) {
+        FileOutputStream(File(root, "tag.json").also {
+            it.createNewFile()
+        }).use { output ->
+            output.write("[".toByteArray())
+            var counter = 0
+            TagExport(dao).value().forEach {
+                if (counter > 0) {
+                    output.write(",".toByteArray())
+                }
+                output.write(it.toByteArray())
+                counter++
+            }
+            output.write("]".toByteArray())
+        }
+    }
+
+    private fun backupTagDiaries(root: File, dao: TagDiaryDao) {
+        FileOutputStream(File(root, "tag_diary.json").also {
+            it.createNewFile()
+        }).use { output ->
+            output.write("[".toByteArray())
+            var counter = 0
+            TagDiaryExport(dao).value().forEach {
+                if (counter > 0) {
+                    output.write(",".toByteArray())
+                }
+                output.write(it.toByteArray())
                 counter++
             }
             output.write("]".toByteArray())

@@ -60,4 +60,16 @@ class TagListVM(app: Application) : AndroidViewModel(app) {
         }
         return live
     }
+
+    /**
+     * Delete the given tag
+     */
+    fun deleteTag(tag: Tag): LiveData<Unit> {
+        val live = MutableLiveData<Unit>()
+        GlobalScope.launch {
+            db.tagDao().delete(tag.id())
+            live.postValue(Unit)
+        }
+        return live
+    }
 }

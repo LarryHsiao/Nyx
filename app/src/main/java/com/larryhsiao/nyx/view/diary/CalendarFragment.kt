@@ -48,6 +48,7 @@ class CalendarFragment : AuraFragment(), FabBehavior {
         super.onResume()
         updateEvents()
         attachFab(this)
+        setTitle(getString(R.string.calendar))
     }
 
     override fun onPause() {

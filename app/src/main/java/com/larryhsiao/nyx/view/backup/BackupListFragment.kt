@@ -73,6 +73,7 @@ class BackupListFragment : AuraFragment() {
 
     override fun onResume() {
         super.onResume()
+        setTitle(getString(R.string.backups))
         attachFab(object : FabBehavior {
             override fun onClick() {
                 context?.also {
