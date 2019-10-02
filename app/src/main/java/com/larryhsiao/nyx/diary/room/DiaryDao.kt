@@ -62,4 +62,10 @@ interface DiaryDao {
      */
     @Query("DELETE FROM diary")
     fun clear()
+
+    /**
+     * All diaries with location
+     */
+    @Query("SELECT diary.* FROM media LEFT JOIN diary ON media.diary_id=diary.id WHERE media.uri LIKE 'geo:%'")
+    fun allWithLocations(): List<RDiary>
 }
