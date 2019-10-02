@@ -1,5 +1,7 @@
 package com.larryhsiao.nyx.view.tag
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -33,9 +35,22 @@ class TagListFragment : AuraFragment(), TextWatcher {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = TagAdapter() {
+        adapter = TagAdapter({
             nextPage(DiaryListFragment.newInstance(tagId = it.id()))
-        }
+        }, { it, index ->
+            AlertDialog.Builder(view.context)
+                .setMessage(R.string.delete)
+                .setPositiveButton(
+                    R.string.confirm,
+                    DialogInterface.OnClickListener { dialog, which ->
+                        vm.deleteTag(it)
+                        adapter.remove(index)
+                    })
+                .setNegativeButton(
+                    R.string.cancel,
+                    DialogInterface.OnClickListener { _, _ -> })
+                .show()
+        })
         vm = ViewModelProviders.of(this).get(TagListVM::class.java)
         tagList_listView.layoutManager = LinearLayoutManager(view.context)
         tagList_listView.adapter = adapter
@@ -69,11 +84,21 @@ class TagListFragment : AuraFragment(), TextWatcher {
         searchByInput()
     }
 
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+    override fun beforeTextChanged(
+        s: CharSequence?,
+        start: Int,
+        count: Int,
+        after: Int
+    ) {
         /* Leave it empty*/
     }
 
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+    override fun onTextChanged(
+        s: CharSequence?,
+        start: Int,
+        before: Int,
+        count: Int
+    ) {
         /* Leave it empty*/
     }
 }

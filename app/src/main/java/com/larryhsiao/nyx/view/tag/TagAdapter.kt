@@ -12,7 +12,8 @@ import kotlinx.android.synthetic.main.item_tag.view.*
  * RecyclerView adapter for tags
  */
 class TagAdapter(
-    private val tagClicked: (tag: Tag) -> Unit
+    private val tagClicked: (tag: Tag) -> Unit,
+    private val tagLongClicked: (tag: Tag, position: Int) -> Unit
 ) :
     RecyclerView.Adapter<ViewHolder>() {
     private val tags = ArrayList<Tag>()
@@ -36,6 +37,10 @@ class TagAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag_title.text = tags[position].title()
         holder.itemView.setOnClickListener { tagClicked(tags[holder.adapterPosition]) }
+        holder.itemView.setOnLongClickListener {
+            tagLongClicked(tags[holder.adapterPosition], holder.adapterPosition)
+            true
+        }
     }
 
     /**
@@ -53,5 +58,13 @@ class TagAdapter(
     fun addTag(tag: Tag) {
         tags.add(0, tag)
         notifyItemInserted(0)
+    }
+
+    /**
+     * Remove tag at given index.
+     */
+    fun remove(index: Int) {
+        tags.removeAt(index)
+        notifyItemRemoved(index)
     }
 }
