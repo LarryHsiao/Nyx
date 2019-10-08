@@ -24,8 +24,17 @@ class DiaryListFragment : AuraFragment(), FabBehavior {
     companion object {
         private const val ARG_DATETIME = "ARG_DATETIME"
         private const val ARG_TAG_ID = "ARG_TAG_ID"
+        private const val ARG_DIARIES_ID = "ARG_DIARIES_ID"
         private const val REQUEST_CODE_NEW_DIARY = 1000
         private const val REQUEST_CODE_DIARY = 1001
+
+        fun newInstance(ids: LongArray): Fragment {
+            return DiaryListFragment().apply {
+                arguments = Bundle().apply {
+                    putLongArray(ARG_DIARIES_ID, ids)
+                }
+            }
+        }
 
         /**
          * @param dateTime The specific date in timestamp
@@ -38,6 +47,18 @@ class DiaryListFragment : AuraFragment(), FabBehavior {
                 }
             }
         }
+    }
+
+    private val diariesId: LongArray by lazy {
+        arguments?.getLongArray(ARG_DIARIES_ID) ?: LongArray(0)
+    }
+
+    private val dateTimestamp by lazy {
+        arguments?.getLong(ARG_DATETIME, -1L) ?: -1L
+    }
+
+    private val tagId: Long by lazy {
+        arguments?.getLong(ARG_TAG_ID, -1L) ?: -1L
     }
 
     private lateinit var viewModel: CalendarViewModel
@@ -110,16 +131,20 @@ class DiaryListFragment : AuraFragment(), FabBehavior {
         }
     }
 
+
     private fun loadData() {
         viewModel.title().observe(this, Observer {
             val activityRef = activity
             if (activityRef is AppCompatActivity)
-            activityRef.supportActionBar?.title = it
+                activityRef.supportActionBar?.title = it
         })
         viewModel.loadUp(
-            arguments?.getLong(ARG_DATETIME, -1L) ?: -1L,
-            arguments?.getLong(ARG_TAG_ID, -1L) ?: -1L
-        ).observe(this, Observer { adapter.load(it) })
+            dateTimestamp,
+            tagId,
+            diariesId
+        ).observe(this, Observer {
+            adapter.load(it)
+        })
     }
 
     override fun icon(): Int {

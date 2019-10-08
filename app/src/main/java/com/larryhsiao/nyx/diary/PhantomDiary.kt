@@ -18,7 +18,7 @@ class PhantomDiary(private val timestamp: Long = -1) : Diary {
         return timestamp
     }
 
-    override fun imageUris(): Array<Uri> {
+    override fun attachmentUris(): Array<Uri> {
         return arrayOf()
     }
 }

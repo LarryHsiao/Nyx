@@ -22,7 +22,7 @@ interface Diary {
     fun timestamp(): Long
 
     /**
-     * Image uris
+     * Attachment uris
      */
-    fun imageUris(): Array<Uri>
+    fun attachmentUris(): Array<Uri>
 }

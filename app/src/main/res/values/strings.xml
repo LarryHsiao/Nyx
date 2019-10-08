@@ -37,4 +37,6 @@
     <string name="diary">Diary</string>
     <string name="backups">Backups</string>
     <string name="tags">Tags</string>
+    <string name="diary_map">DiaryMap</string>
+    <string name="map">Map</string>
 </resources>

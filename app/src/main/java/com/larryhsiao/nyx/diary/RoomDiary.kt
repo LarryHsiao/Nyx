@@ -24,7 +24,7 @@ class RoomDiary(private val roomDiary: RDiary) : Diary {
         }.timeInMillis
     }
 
-    override fun imageUris(): Array<Uri> {
+    override fun attachmentUris(): Array<Uri> {
         val medias = roomDiary.mediaEntities
         return Array(medias.size) {
             Uri.parse(medias[it].uri)

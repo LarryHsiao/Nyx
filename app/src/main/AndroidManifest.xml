@@ -86,6 +86,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".subscription.SponsorActivity" />
+        <activity android:name=".view.backup.RestoreActivity" />
 
         <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
             <intent-filter>

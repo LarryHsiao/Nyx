@@ -67,12 +67,15 @@ class CalendarViewModel(private val app: Application) : AndroidViewModel(app) {
      */
     fun loadUp(
         dateTimestamp: Long = -1,
-        tagId: Long = -1
+        tagId: Long = -1,
+        diariesId: LongArray
     ): LiveData<List<Diary>> {
         return MutableLiveData<List<Diary>>().apply {
             GlobalScope.launch {
                 postValue(
-                    if (dateTimestamp != -1L && tagId != -1L) {
+                    if (diariesId.isNotEmpty()) {
+                        DiaryByIds(db, diariesId).value()
+                    } else if (dateTimestamp != -1L && tagId != -1L) {
                         DiaryByFilteredDate(
                             DiaryByTag(db, tagId),
                             dateTimestamp

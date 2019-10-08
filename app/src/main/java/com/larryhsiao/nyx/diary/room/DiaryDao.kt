@@ -46,6 +46,12 @@ interface DiaryDao {
     fun byId(id: Long): RDiary
 
     /**
+     * Query dicries by ids
+     */
+    @Query("SELECT * FROM diary WHERE id IN(:id)")
+    fun byIds(id: LongArray): List<RDiary>
+
+    /**
      * Delete given diary.
      */
     @Delete
@@ -54,8 +60,8 @@ interface DiaryDao {
     /**
      * Delete diary by given id.
      */
-    @Query("DELETE FROM diary WHERE id=:id;")
-    fun delete(id: Long)
+    @Query("DELETE FROM diary WHERE id=:ids;")
+    fun delete(ids: Long)
 
     /**
      * Remove all rows
