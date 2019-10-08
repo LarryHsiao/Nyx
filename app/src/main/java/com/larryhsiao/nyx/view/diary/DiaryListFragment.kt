@@ -131,7 +131,6 @@ class DiaryListFragment : AuraFragment(), FabBehavior {
         }
     }
 
-
     private fun loadData() {
         viewModel.title().observe(this, Observer {
             val activityRef = activity

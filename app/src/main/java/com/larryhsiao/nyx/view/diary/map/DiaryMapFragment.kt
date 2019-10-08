@@ -55,7 +55,6 @@ class DiaryMapFragment : AuraFragment(), FabBehavior {
         super.onCreate(savedInstanceState)
         viewModel =
             ViewModelProviders.of(this).get(LocationViewModel::class.java)
-
     }
 
     override fun onCreateView(

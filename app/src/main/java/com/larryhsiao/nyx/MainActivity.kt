@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.config.IsWebAccessEnabled
-import com.larryhsiao.nyx.view.backup.BackupListFragment
 import com.larryhsiao.nyx.view.diary.CalendarFragment
 import com.larryhsiao.nyx.view.diary.DiaryListFragment
 import com.larryhsiao.nyx.view.diary.map.DiaryMapFragment
