@@ -27,6 +27,9 @@ class DiaryItem(
         result
     }
 
+    /**
+     * The [Diary] this object represents.
+     */
     fun diary(): Diary {
         return diary
     }

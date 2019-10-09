@@ -28,6 +28,9 @@ class DiaryListFragment : AuraFragment(), FabBehavior {
         private const val REQUEST_CODE_NEW_DIARY = 1000
         private const val REQUEST_CODE_DIARY = 1001
 
+        /**
+         * Factory method to construct a [DiaryListFragment].
+         */
         fun newInstance(ids: LongArray): Fragment {
             return DiaryListFragment().apply {
                 arguments = Bundle().apply {

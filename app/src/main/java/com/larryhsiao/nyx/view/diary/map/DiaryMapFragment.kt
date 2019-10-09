@@ -124,7 +124,8 @@ class DiaryMapFragment : AuraFragment(), FabBehavior {
     }
 
     private fun loadData(data: List<Diary>) {
-        ClusterManager<DiaryItem>(context!!, map).apply {
+        val context = context ?: return
+        ClusterManager<DiaryItem>(context, map).apply {
             map.setOnCameraIdleListener(this)
             map.setOnMarkerClickListener(this)
             map.setOnInfoWindowClickListener(this)
@@ -143,7 +144,7 @@ class DiaryMapFragment : AuraFragment(), FabBehavior {
             )
 
             renderer = DefaultClusterRenderer<DiaryItem>(
-                context!!,
+                context,
                 map,
                 this
             ).apply {

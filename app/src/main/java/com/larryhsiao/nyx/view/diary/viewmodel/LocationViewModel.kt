@@ -11,7 +11,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel
+ * ViewModel of location
  */
 class LocationViewModel(app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Singleton(app).value()
