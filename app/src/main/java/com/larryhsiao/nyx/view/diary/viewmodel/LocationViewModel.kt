@@ -16,6 +16,9 @@ import kotlinx.coroutines.launch
 class LocationViewModel(app: Application) : AndroidViewModel(app) {
     private val db = RDatabase.Singleton(app).value()
 
+    /**
+     * Loadup the diaries which have location uri.
+     */
     fun loadUp(): LiveData<List<Diary>> {
         return MutableLiveData<List<Diary>>().apply {
             GlobalScope.launch { postValue(DiaryWithLocation(db).value()) }
