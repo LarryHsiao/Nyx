@@ -4,9 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.config.IsWebAccessEnabled
-import com.larryhsiao.nyx.view.backup.BackupListFragment
 import com.larryhsiao.nyx.view.diary.CalendarFragment
 import com.larryhsiao.nyx.view.diary.DiaryListFragment
+import com.larryhsiao.nyx.view.diary.map.DiaryMapFragment
 import com.larryhsiao.nyx.view.settings.BioAuth
 import com.larryhsiao.nyx.view.settings.SettingFragment
 import com.larryhsiao.nyx.view.tag.TagListFragment
@@ -33,8 +33,8 @@ class MainActivity : AuraActivity() {
             when (it.itemId) {
                 R.id.navigation_calendar -> rootPage(CalendarFragment())
                 R.id.navigation_jotted -> rootPage(DiaryListFragment())
+                R.id.navigation_map -> rootPage(DiaryMapFragment())
                 R.id.navigation_tag -> rootPage(TagListFragment())
-                R.id.navigation_restore -> rootPage(BackupListFragment())
                 R.id.navigation_setting -> rootPage(SettingFragment())
             }
             true

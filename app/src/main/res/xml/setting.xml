@@ -12,9 +12,19 @@
         android:key="@string/prefKey_webAccess"
         android:title="@string/web_access" />
 
-    <Preference android:title="@string/support_this_app" android:icon="@drawable/ic_coffee">
+    <Preference
+        android:title="@string/backups"
+        android:icon="@drawable/ic_restore">
         <intent
             android:targetPackage="com.larryhsiao.nyx"
-            android:targetClass="com.larryhsiao.nyx.subscription.SponsorActivity"/>
+            android:targetClass="com.larryhsiao.nyx.view.backup.RestoreActivity" />
+    </Preference>
+
+    <Preference
+        android:title="@string/support_this_app"
+        android:icon="@drawable/ic_coffee">
+        <intent
+            android:targetPackage="com.larryhsiao.nyx"
+            android:targetClass="com.larryhsiao.nyx.subscription.SponsorActivity" />
     </Preference>
 </PreferenceScreen>

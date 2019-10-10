@@ -45,7 +45,7 @@ class DiaryAdapter(private val onItemClicked: (item: Diary) -> Unit) :
         }.timeInMillis)}
         """.trimIndent()
         holder.rootView.itemDiary_image.also {
-            val images = diaries[position].imageUris()
+            val images = diaries[position].attachmentUris()
                 .filter { imageUri ->
                     imageUri.toString().startsWith("file:")
                 }

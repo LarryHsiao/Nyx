@@ -163,7 +163,7 @@ class DiaryFragment : AuraFragment() {
             })
 
             calendar.time = Date().also { it.time = diary.timestamp() }
-            val uris = diary.imageUris()
+            val uris = diary.attachmentUris()
             newDiary_imageGrid.initImages(Array(uris.size) {
                 ImageFactory(
                     view.context,
