@@ -119,7 +119,9 @@ class DiaryMapFragment : AuraFragment(), FabBehavior {
     private fun loadData() {
         setTitle(getString(R.string.map))
         viewModel.loadUp().observe(this, Observer {
-            loadData(it)
+            if (it.isNotEmpty()) {
+                loadData(it)
+            }
         })
     }
 
