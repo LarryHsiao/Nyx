@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -16,9 +18,7 @@
             type="com.larryhsiao.nyx.diary.Diary" />
     </data>
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <ScrollView
         android:id="@+id/frameLayout2"
         android:padding="16dp"
         android:layout_width="match_parent"
@@ -111,6 +111,14 @@
                 app:layout_constraintTop_toBottomOf="@id/newDiary_tag"
                 app:layout_constraintEnd_toEndOf="@id/newDiary_tag"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/newDiary_locationIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:drawableStart="@drawable/ic_location_2"
+                app:layout_constraintBottom_toTopOf="@+id/newDiary_imageGrid" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </layout>

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
+        android:id="@+id/preference_preloadLocation"
+        android:icon="@drawable/ic_location_2"
+        android:title="@string/preload_location"
+        android:key="@string/prefKey_preloadLocation" />
+    <SwitchPreference
         android:id="@+id/preference_bioAuth"
         android:icon="@drawable/ic_fingerprint"
         android:key="@string/prefKey_fingerprintAuth"

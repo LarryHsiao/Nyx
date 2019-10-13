@@ -14,6 +14,7 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -27,6 +28,7 @@ import com.larryhsiao.nyx.view.diary.attachment.FindAttachmentIntent
 import com.larryhsiao.nyx.view.diary.attachment.ImageFactory
 import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
 import com.larryhsiao.nyx.view.diary.attachment.ViewAttachmentIntent
+import com.larryhsiao.nyx.view.diary.viewmodel.AddressViewModel
 import com.larryhsiao.nyx.view.diary.viewmodel.DiaryViewModel
 import com.larryhsiao.nyx.view.tag.viewmodel.DiaryTagListVM
 import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
@@ -45,7 +47,7 @@ class DiaryFragment : AuraFragment() {
         private const val ARG_ID = "ARG_ID"
         private const val ARG_EDITABLE = "ARG_EDITABLE"
 
-        private const val REQUEST_CODE_ADD_IMAGE = 1000
+        private const val REQUEST_CODE_FIND_ATTACHMENT = 1000
 
         /**
          * Factory method
@@ -64,6 +66,7 @@ class DiaryFragment : AuraFragment() {
     private lateinit var diaryVM: DiaryViewModel
     private lateinit var diaryTagVM: DiaryTagListVM
     private lateinit var tagVM: TagListVM
+    private lateinit var addressVM: AddressViewModel
     private lateinit var tagAttachmentVM: TagAttachmentVM
     private lateinit var editable: MutableLiveData<Boolean>
     private var calendar: Calendar = Calendar.getInstance()
@@ -140,6 +143,7 @@ class DiaryFragment : AuraFragment() {
             it.value = arguments?.getBoolean(ARG_EDITABLE) ?: false
         }
         ViewModelProviders.of(this).apply {
+            addressVM = get(AddressViewModel::class.java)
             tagAttachmentVM = get(TagAttachmentVM::class.java)
             diaryTagVM = get(DiaryTagListVM::class.java)
             diaryVM = get(DiaryViewModel::class.java)
@@ -170,6 +174,11 @@ class DiaryFragment : AuraFragment() {
                     uris[it]
                 ).value()
             }.toList(), false)
+            uris.forEach {
+                if (it.toString().startsWith("geo:")) {
+                    addressVM.load(it.toString())
+                }
+            }
         })
         diaryVM.loadUp(diaryId)
 
@@ -197,6 +206,10 @@ class DiaryFragment : AuraFragment() {
                 )
             }
         }
+
+        addressVM.address().observe(this, Observer {
+            newDiary_locationIndicator.text = it
+        })
 
         diaryTagVM.tags().observe(this, Observer {
             newDiary_tag.removeAllTags()
@@ -270,7 +283,7 @@ class DiaryFragment : AuraFragment() {
         context?.also {
             startActivityForResult(
                 FindAttachmentIntent(it).value(),
-                REQUEST_CODE_ADD_IMAGE
+                REQUEST_CODE_FIND_ATTACHMENT
             )
         }
     }
@@ -286,7 +299,7 @@ class DiaryFragment : AuraFragment() {
         data: Intent?
     ) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_ADD_IMAGE &&
+        if (requestCode == REQUEST_CODE_FIND_ATTACHMENT &&
             resultCode == RESULT_OK &&
             data != null
         ) {
@@ -298,7 +311,7 @@ class DiaryFragment : AuraFragment() {
                 Toast.makeText(
                     newDiary_imageGrid.context,
                     R.string.unsupported_image_format,
-                    Toast.LENGTH_LONG
+                    LENGTH_LONG
                 ).show()
             }
         }
@@ -307,6 +320,9 @@ class DiaryFragment : AuraFragment() {
     private fun resultHandling(context: Context, data: Intent) {
         ResultProcessor(context) {
             newDiary_imageGrid.addImage(ImageFactory(context, it).value())
+            if (it.toString().startsWith("geo:")) {
+                addressVM.load(it.toString())
+            }
         }.proceed(data)
     }
 

@@ -39,4 +39,5 @@
     <string name="tags">Tags</string>
     <string name="diary_map">DiaryMap</string>
     <string name="map">Map</string>
+    <string name="preload_location">Preload location</string>
 </resources>

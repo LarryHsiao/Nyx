@@ -26,6 +26,7 @@ import com.larryhsiao.nyx.view.diary.attachment.FindAttachmentIntent
 import com.larryhsiao.nyx.view.diary.attachment.ImageFactory
 import com.larryhsiao.nyx.view.diary.attachment.ResultProcessor
 import com.larryhsiao.nyx.view.diary.attachment.ViewAttachmentIntent
+import com.larryhsiao.nyx.view.diary.viewmodel.AddressViewModel
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
 import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
@@ -45,6 +46,7 @@ class NewDiaryFragment : AuraFragment() {
         private const val REQUEST_CODE_ADD_IMAGE = 1000
     }
 
+    private lateinit var addressVM: AddressViewModel
     private lateinit var calendarVM: CalendarViewModel
     private lateinit var tagViewVM: TagAttachmentVM
     private lateinit var tagVM: TagListVM
@@ -80,6 +82,7 @@ class NewDiaryFragment : AuraFragment() {
     ): View? {
         val rootView = inflater.inflate(R.layout.page_diary, container, false)
         ViewModelProviders.of(this).apply {
+            addressVM = get(AddressViewModel::class.java)
             tagVM = get(TagListVM::class.java)
             calendarVM = get(CalendarViewModel::class.java)
             tagViewVM = get(TagAttachmentVM::class.java)
@@ -184,6 +187,9 @@ class NewDiaryFragment : AuraFragment() {
                 }
             }
         }
+        addressVM.address().observe(this, Observer {
+            newDiary_locationIndicator.text = it
+        })
         tagVM.tags().observe(this, Observer { tags ->
             if (tags.isNotEmpty()) {
                 rootView.newDiary_inputTag.apply {
@@ -253,6 +259,9 @@ class NewDiaryFragment : AuraFragment() {
                     it
                 ).value()
             )
+            if (it.toString().startsWith("geo:")) {
+                addressVM.load(it.toString())
+            }
         }.proceed(data)
     }
 
