@@ -8,8 +8,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
-def nyxVersionName = "v1.12.1"
-def nyxVersionCode = 11201
+def nyxVersionName = "v1.13.0"
+def nyxVersionCode = 11300
 
 android {
     compileSdkVersion 28
