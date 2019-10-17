@@ -2,4 +2,5 @@
 <resources>
     <string name="prefKey_fingerprintAuth">fingerprint_auth</string>
     <string name="prefKey_webAccess">web_access</string>
+    <string name="prefKey_preloadLocation">preload_location</string>
 </resources>

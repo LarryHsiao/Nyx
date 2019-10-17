@@ -8,8 +8,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
-def nyxVersionName = "v1.12.1"
-def nyxVersionCode = 11201
+def nyxVersionName = "v1.13.0"
+def nyxVersionCode = 11300
 
 android {
     compileSdkVersion 28
@@ -88,7 +88,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-perf:19.0.0'
     implementation 'com.google.firebase:firebase-config:19.0.2'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-    implementation "com.silverhetch:aura:1.17.4"
+    implementation "com.silverhetch:aura:1.18.0"
     implementation "com.silverhetch:clotho:1.12.2"
     implementation 'androidx.biometric:biometric:1.0.0-beta02'
     implementation "androidx.preference:preference:1.1.0"

@@ -17,7 +17,19 @@ class ViewAttachmentIntent(
         return if (uri.toString().startsWith("file")) {
             ImageActivity.newIntent(context, uri.toString())
         } else {
-            Intent(Intent.ACTION_VIEW, uri)
+            val uriStr = uri.toString()
+            if (uriStr.startsWith("geo:")) {
+                val segments = uriStr.replace("geo:", "").split(",")
+                Intent(
+                    Intent.ACTION_VIEW,
+                    uri.buildUpon().appendQueryParameter(
+                        "q",
+                        """${segments[0]},${segments[1]}('')"""
+                    ).build()
+                )
+            } else {
+                Intent(Intent.ACTION_VIEW, uri)
+            }
         }
     }
 }
