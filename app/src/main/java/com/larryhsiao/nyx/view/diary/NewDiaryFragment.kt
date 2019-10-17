@@ -4,10 +4,15 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.Service.BIND_AUTO_CREATE
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
+import android.os.IBinder
+import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -31,7 +36,9 @@ import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
 import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import com.silverhetch.aura.AuraFragment
+import com.silverhetch.aura.location.LocationService
 import com.silverhetch.aura.view.fab.FabBehavior
+import com.silverhetch.clotho.geo.GeoUri
 import com.silverhetch.clotho.time.ToUTCTimestamp
 import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
@@ -41,7 +48,7 @@ import java.util.*
 /**
  * Page for creating new diary.
  */
-class NewDiaryFragment : AuraFragment() {
+class NewDiaryFragment : AuraFragment(), ServiceConnection {
     companion object {
         private const val REQUEST_CODE_ADD_IMAGE = 1000
     }
@@ -78,7 +85,7 @@ class NewDiaryFragment : AuraFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstnceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.page_diary, container, false)
         ViewModelProviders.of(this).apply {
@@ -204,8 +211,30 @@ class NewDiaryFragment : AuraFragment() {
                 }
             }
         })
-
         return rootView
+    }
+
+    override fun onResume() {
+        super.onResume()
+        context?.bindService(
+            Intent(context, LocationService::class.java),
+            this,
+            BIND_AUTO_CREATE
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        context?.unbindService(this)
+    }
+
+    private fun haveGeoUri(): Boolean {
+        for (key in newDiary_imageGrid.sources().keys) {
+            if (key.startsWith("geo:")) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun createTagByInput() {
@@ -269,5 +298,38 @@ class NewDiaryFragment : AuraFragment() {
         view.newDiary_date.text =
             SimpleDateFormat.getDateInstance()
                 .format(Date().apply { time = calendar.timeInMillis })
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+    }
+
+    private fun shouldPreloadLcoation(): Boolean {
+        return context?.let { context ->
+            PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(
+                    getString(R.string.prefKey_preloadLocation),
+                    false
+                )
+        } ?: false
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        if (service is LocationService.Binder) {
+            service.location().observe(this, Observer {
+                if (!haveGeoUri() && shouldPreloadLcoation()) {
+                    newDiary_imageGrid.addImage(
+                        ImageFactory(
+                            context!!,
+                            Uri.parse(
+                                GeoUri(
+                                    it.longitude,
+                                    it.latitude
+                                ).value().toASCIIString()
+                            )
+                        ).value()
+                    )
+                }
+            })
+        }
     }
 }
