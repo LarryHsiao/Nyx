@@ -301,6 +301,7 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
+        // do nothing
     }
 
     private fun shouldPreloadLcoation(): Boolean {

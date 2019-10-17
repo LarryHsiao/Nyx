@@ -107,6 +107,7 @@ class SettingFragment : PreferenceFragmentCompat(), PermissionCallback {
     }
 
     override fun onPermissionGranted() {
+        // do nothing, switch turns on as normal.
     }
 
     override fun onPermissionPermanentlyDecline(permission: Array<String>) {
