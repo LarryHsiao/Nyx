@@ -6,8 +6,6 @@ import androidx.room.PrimaryKey
 
 /**
  * Tag entity for Room(Jetpack)
- *
- * @todo #tagging-1 Tagging db CRUD　for diaries.
  */
 @Entity(
     tableName = "tag",
