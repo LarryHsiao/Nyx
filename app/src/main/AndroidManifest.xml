@@ -115,6 +115,10 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
         <service android:name=".web.WebAccessService" />
+
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="label" />
     </application>
 
     <dist:module dist:instant="true" />
