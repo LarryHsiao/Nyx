@@ -1,20 +1,15 @@
 package com.larryhsiao.nyx.azure
 
-import android.app.Application
 import android.content.Context
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.larryhsiao.nyx.BuildConfig
 import com.larryhsiao.nyx.BuildConfig.AZURE_SECRET_KEY
-import com.larryhsiao.nyx.azure.IssueToken
 import com.larryhsiao.nyx.azure.translation.Translation
 import com.silverhetch.clotho.Source
 import com.silverhetch.clotho.source.CachedSource
 import com.silverhetch.clotho.storage.MemoryCeres
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
 
 /**
  * Translate labels to system language.

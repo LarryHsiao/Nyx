@@ -309,7 +309,7 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
                         TranslatedStrings(
                             context,
                             labels.map { it.text }
-                        ).value().observe(this, Observer{
+                        ).value().observe(this, Observer {
                             it.forEach {
                                 tagViewVM.preferTag(it)
                                 newDiary_tag.addTag(it)
