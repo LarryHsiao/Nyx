@@ -24,7 +24,11 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import co.lujun.androidtagview.TagView
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceImageLabelerOptions
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.azure.TranslatedStrings
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.tag.Tag
 import com.larryhsiao.nyx.view.diary.attachment.FindAttachmentIntent
@@ -290,6 +294,28 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
             )
             if (it.toString().startsWith("geo:")) {
                 addressVM.load(it.toString())
+            }
+
+            if (it.toString().startsWith("content:") || it.toString().startsWith(
+                    "file:"
+                )
+            ) {
+                FirebaseVision.getInstance().getOnDeviceImageLabeler(
+                    FirebaseVisionOnDeviceImageLabelerOptions.Builder()
+                        .setConfidenceThreshold(0.95f)
+                        .build()
+                ).processImage(FirebaseVisionImage.fromFilePath(context, it))
+                    .addOnSuccessListener { labels ->
+                        TranslatedStrings(
+                            context,
+                            labels.map { it.text }
+                        ).value().observe(this, Observer {
+                            it.forEach {
+                                tagViewVM.preferTag(it)
+                                newDiary_tag.addTag(it)
+                            }
+                        })
+                    }
             }
         }.proceed(data)
     }
