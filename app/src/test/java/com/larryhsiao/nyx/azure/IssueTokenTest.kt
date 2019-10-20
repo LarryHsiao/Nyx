@@ -1,8 +1,7 @@
 package com.larryhsiao.nyx.azure
 
-import com.larryhsiao.nyx.BuildConfig
 import com.larryhsiao.nyx.BuildConfig.AZURE_SECRET_KEY
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
