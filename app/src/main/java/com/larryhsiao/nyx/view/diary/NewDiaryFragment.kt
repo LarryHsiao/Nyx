@@ -28,6 +28,7 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceImageLabelerOptions
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.azure.TranslatedStrings
 import com.larryhsiao.nyx.diary.Diary
 import com.larryhsiao.nyx.tag.Tag
 import com.larryhsiao.nyx.view.diary.attachment.FindAttachmentIntent
@@ -303,14 +304,18 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
                     FirebaseVisionOnDeviceImageLabelerOptions.Builder()
                         .setConfidenceThreshold(0.95f)
                         .build()
-                ).processImage(
-                    FirebaseVisionImage.fromFilePath(context, it)
-                ).addOnSuccessListener { labels ->
-                    labels.forEach {
-                        tagViewVM.preferTag(it.text)
-                        newDiary_tag.addTag(it.text)
+                ).processImage(FirebaseVisionImage.fromFilePath(context, it))
+                    .addOnSuccessListener { labels ->
+                        TranslatedStrings(
+                            context,
+                            labels.map { it.text }
+                        ).value().observe(this, Observer{
+                            it.forEach {
+                                tagViewVM.preferTag(it)
+                                newDiary_tag.addTag(it)
+                            }
+                        })
                     }
-                }
             }
         }.proceed(data)
     }
