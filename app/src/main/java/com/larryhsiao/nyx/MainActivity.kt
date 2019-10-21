@@ -2,6 +2,7 @@ package com.larryhsiao.nyx
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import com.larryhsiao.nyx.config.ConfigImpl
 import com.larryhsiao.nyx.config.IsWebAccessEnabled
 import com.larryhsiao.nyx.view.diary.CalendarFragment
@@ -42,6 +43,19 @@ class MainActivity : AuraActivity() {
         if (savedInstanceState == null) {
             main_bottomNavigation.selectedItemId = R.id.navigation_jotted
         }
+
+        supportFragmentManager.addOnBackStackChangedListener {
+            supportActionBar?.setDisplayHomeAsUpEnabled(supportFragmentManager.backStackEntryCount > 0)
+            supportActionBar?.setHomeButtonEnabled(supportFragmentManager.backStackEntryCount > 0)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == android.R.id.home){
+            onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
