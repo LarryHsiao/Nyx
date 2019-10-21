@@ -24,6 +24,20 @@ Instant diary app on Android.
 
 @todo #10 PC access
 @todo #10-1 authorization
-@todo #10-3 new diary page 
 @todo #10-4 diary detail
 @todo #10-5 create/edit diary 
+@todo #10-6 notification from web access to Android UI.
+
+@todo #11 decouple the attachment uris and image view 
+
+@todo #12 machine-learning(or OCR): new diary with hand writing image.
+
+@todo #13 machine-learning: Face recognition.
+
+@todo #14 resource viewer
+@todo #14-1 all images
+@todo #14-2 all video
+@todo #14-3 image back to diary.
+
+@todo #15 Accounting
+@todo #15-1 Accounting viewer
