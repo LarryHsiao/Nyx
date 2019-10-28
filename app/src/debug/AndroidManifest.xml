@@ -1,15 +1,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application tools:ignore="GoogleAppIndexingWarning">
-        <meta-data
-                tools:replace="android:value"
-                android:name="firebase_crashlytics_collection_enabled"
-                android:value="false"/>
+        <activity android:name="com.larryhsiao.nyx.DebugActivity"
+            android:label="@string/jotted_debug"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <meta-data
-                tools:replace="android:value"
-                android:name="firebase_performance_logcat_enabled"
-                android:value="false" />
+            tools:replace="android:value"
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+
+        <meta-data
+            tools:replace="android:value"
+            android:name="firebase_performance_logcat_enabled"
+            android:value="false" />
     </application>
 </manifest>
