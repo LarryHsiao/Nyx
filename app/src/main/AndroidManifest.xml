@@ -58,7 +58,6 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
 
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/leku_searchable" />
@@ -88,6 +87,7 @@
         </activity>
         <activity android:name=".subscription.SponsorActivity" />
         <activity android:name=".view.backup.RestoreActivity" />
+        <activity android:name=".DebugActivity" />
 
         <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
             <intent-filter>
