@@ -40,4 +40,6 @@
     <string name="diary_map">DiaryMap</string>
     <string name="map">Map</string>
     <string name="preload_location">Preload location</string>
+    <string name="internal_file_explorer">Internal File Explorer</string>
+    <string name="failed_to_open_file">Failed to open file</string>
 </resources>
