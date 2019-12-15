@@ -18,6 +18,15 @@
         android:title="@string/web_access" />
 
     <Preference
+        android:title="@string/internal_file_explorer"
+        android:icon="@drawable/ic_folder">
+        <intent
+            android:targetPackage="com.larryhsiao.nyx"
+            android:targetClass="com.larryhsiao.nyx.view.internals.BrowserActivity"
+            />
+    </Preference>
+
+    <Preference
         android:title="@string/backups"
         android:icon="@drawable/ic_restore">
         <intent

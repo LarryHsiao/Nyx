@@ -88,6 +88,18 @@
         <activity android:name=".subscription.SponsorActivity" />
         <activity android:name=".view.backup.RestoreActivity" />
         <activity android:name=".DebugActivity" />
+        <activity android:name=".view.internals.BrowserActivity" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.larryhsiao.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider"
+                />
+        </provider>
 
         <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
             <intent-filter>
