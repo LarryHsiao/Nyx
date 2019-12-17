@@ -10,5 +10,6 @@ import androidx.room.PrimaryKey
 data class DiaryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val title: String?,
-    val timestamp: Long?
+    val timestamp: Long?,
+    val weather_id: Long? = 0L
 )

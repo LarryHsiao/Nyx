@@ -35,6 +35,7 @@ import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
 import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.page_diary.*
 import java.text.DateFormat
 import java.util.*
@@ -152,6 +153,7 @@ class DiaryFragment : AuraFragment() {
         diaryVM.diary().observe(this, Observer<Diary> { diary ->
             val binding = DataBindingUtil.findBinding<PageDiaryBinding>(view)
             binding?.diary = diary
+            binding?.weatherIconUri = diary.weatherIconUrl()
             editable.observe(this, Observer<Boolean> {
                 binding?.editable = it
                 newDiary_imageGrid.addable(it)

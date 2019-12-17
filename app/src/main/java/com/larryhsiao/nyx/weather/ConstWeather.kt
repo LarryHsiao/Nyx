@@ -14,4 +14,8 @@ class ConstWeather(
     override fun temperatureC(): Float {
         return tempC
     }
+
+    override fun raw(): String {
+        return ""
+    }
 }

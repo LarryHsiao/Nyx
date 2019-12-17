@@ -21,8 +21,8 @@ class WeatherByGeoTest {
             0f,
             WeatherByGeo(
                 BuildConfig.OPEN_WEATHER_API_KEY,
-                20f,
-                120f,
+                20.0,
+                120.0,
                 Locale.getDefault()
             ).value().temperatureC()
         )

@@ -50,4 +50,21 @@ class RDatabaseTest {
             assertTrue(true)
         }
     }
+
+    /**
+     * Migration test from 3 to 4
+     */
+    @Test
+    fun migration3To4() {
+        helper.also {
+            it.createDatabase("test", 3)
+            it.runMigrationsAndValidate(
+                "test",
+                4,
+                true,
+                Migration3To4()
+            )
+            assertTrue(true)
+        }
+    }
 }

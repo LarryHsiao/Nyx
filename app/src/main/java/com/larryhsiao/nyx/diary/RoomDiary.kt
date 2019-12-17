@@ -1,7 +1,10 @@
 package com.larryhsiao.nyx.diary
 
 import android.net.Uri
+import com.google.gson.JsonParser
 import com.larryhsiao.nyx.diary.room.RDiary
+import com.larryhsiao.nyx.weather.OpenWeatherWeather
+import com.larryhsiao.nyx.weather.Weather
 import java.util.*
 
 /**
@@ -29,5 +32,11 @@ class RoomDiary(private val roomDiary: RDiary) : Diary {
         return Array(medias.size) {
             Uri.parse(medias[it].uri)
         }
+    }
+
+    override fun weatherIconUrl(): String {
+        return roomDiary.weather.takeIf { it.isNotEmpty() }?.let {
+            OpenWeatherWeather(JsonParser().parse(it[0].raw)).iconUrl()
+        } ?: ""
     }
 }

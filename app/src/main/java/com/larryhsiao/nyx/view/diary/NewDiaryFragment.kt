@@ -9,6 +9,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
@@ -23,6 +25,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.lujun.androidtagview.TagView
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -39,13 +42,17 @@ import com.larryhsiao.nyx.view.diary.viewmodel.AddressViewModel
 import com.larryhsiao.nyx.view.diary.viewmodel.CalendarViewModel
 import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
 import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
+import com.larryhsiao.nyx.view.weather.WeatherViewModel
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.location.LocationService
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.clotho.geo.GeoUri
 import com.silverhetch.clotho.time.ToUTCTimestamp
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
+import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,6 +68,7 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
     private lateinit var calendarVM: CalendarViewModel
     private lateinit var tagViewVM: TagAttachmentVM
     private lateinit var tagVM: TagListVM
+    private lateinit var weatherVM: WeatherViewModel
     private var calendar = Calendar.getInstance()
     private val tagInputWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
@@ -97,6 +105,7 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
             tagVM = get(TagListVM::class.java)
             calendarVM = get(CalendarViewModel::class.java)
             tagViewVM = get(TagAttachmentVM::class.java)
+            weatherVM = get(WeatherViewModel::class.java)
         }
         attachFab(
             object : FabBehavior {
@@ -112,6 +121,7 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
                                 this@NewDiaryFragment, Observer<List<Tag>> {
                                     activity?.onBackPressed()
                                 })
+                            weatherVM.attachToDiary(it.id())
                         })
                     } else {
                         Toast.makeText(
@@ -213,6 +223,18 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
                         }
                     ))
                 }
+            }
+        })
+        weatherVM.weather().observe(this, Observer {
+            it.takeIf {
+                it.iconUrl().isNotEmpty()
+            }?.let {
+                Picasso.get()
+                    .load(it.iconUrl())
+                    .placeholder(CircularProgressDrawable(rootView.context).apply {
+                        setStyle(CircularProgressDrawable.LARGE)
+                    })
+                    .into(rootView.newDiary_weatherIcon)
             }
         })
         return rootView
@@ -355,6 +377,7 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
                             )
                         ).value()
                     )
+                    weatherVM.byGeo(it.latitude, it.longitude)
                 }
             })
         }

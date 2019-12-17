@@ -13,4 +13,9 @@ interface Weather {
      * The temperature in Celsius
      */
     fun temperatureC(): Float
+
+    /**
+     * Raw data of this weather
+     */
+    fun raw():String
 }

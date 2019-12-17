@@ -14,8 +14,8 @@ import java.util.*
  */
 class WeatherByGeo(
     private val apiKey: String,
-    private val latitude: Float,
-    private val longitude: Float,
+    private val latitude: Double,
+    private val longitude: Double,
     private val locale: Locale = Locale.getDefault()
 ) : Source<Weather> {
     companion object {

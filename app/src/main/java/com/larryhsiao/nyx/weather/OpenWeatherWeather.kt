@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.weather
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 
@@ -13,8 +14,8 @@ class OpenWeatherWeather(private val root: JsonElement) : Weather {
     private val mainObj by lazy {
         rootObj.getAsJsonObject("main") ?: JsonObject()
     }
-    private val weatherObj by lazy {
-        rootObj.getAsJsonObject("weather") ?: JsonObject()
+    private val weathersArray by lazy {
+        rootObj.getAsJsonArray("weather") ?: JsonArray()
     }
 
     private val tempCelsius by lazy {
@@ -22,7 +23,11 @@ class OpenWeatherWeather(private val root: JsonElement) : Weather {
     }
 
     private val iconCode by lazy {
-        weatherObj.get("icon")?.asString ?: ""
+        if (weathersArray.size() > 0) {
+            weathersArray.get(0).asJsonObject.get("icon")?.asString ?: ""
+        } else {
+            ""
+        }
     }
 
     override fun temperatureC(): Float {
@@ -30,6 +35,10 @@ class OpenWeatherWeather(private val root: JsonElement) : Weather {
     }
 
     override fun iconUrl(): String {
-        return """http://openweathermap.org/img/wn/$iconCode@2x.png"""
+        return """https://openweathermap.org/img/wn/$iconCode@2x.png"""
+    }
+
+    override fun raw(): String {
+        return root.toString()
     }
 }

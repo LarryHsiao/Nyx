@@ -16,6 +16,10 @@
         <variable
             name="diary"
             type="com.larryhsiao.nyx.diary.Diary" />
+
+        <variable
+            name="weatherIconUri"
+            type="String" />
     </data>
 
     <ScrollView
@@ -57,7 +61,6 @@
                 tools:background="#ff0000"
                 app:layout_constraintTop_toBottomOf="@id/newDiary_newDiaryContent"
                 android:layout_height="wrap_content" />
-
             <TextView
                 android:id="@+id/newDiary_date"
                 android:layout_width="0dp"
@@ -65,13 +68,13 @@
                 android:datetime="@{diary.timestamp()}"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="@{editable}"
+                app:layout_constraintStart_toEndOf="@id/newDiary_weatherIcon"
                 android:drawableStart="@drawable/ic_calendar"
                 android:padding="8dp"
                 android:gravity="center_vertical"
                 android:drawablePadding="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="2019/02/21" />
 
@@ -120,6 +123,20 @@
                 android:gravity="center_vertical"
                 android:drawableStart="@drawable/ic_location_2"
                 app:layout_constraintBottom_toTopOf="@+id/newDiary_imageGrid" />
+
+
+            <ImageView
+                android:layout_width="0dp"
+                tools:src="@drawable/ic_plus"
+                app:layout_constraintDimensionRatio="1:1"
+                android:adjustViewBounds="true"
+                android:scaleType="centerInside"
+                android:image_uri="@{weatherIconUri}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/newDiary_date"
+                android:id="@+id/newDiary_weatherIcon"
+                app:layout_constraintBottom_toBottomOf="@id/newDiary_date"
+                android:layout_height="0dp"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </layout>
