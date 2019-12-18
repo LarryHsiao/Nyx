@@ -7,7 +7,6 @@ import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.media.room.MediaEntity
 import com.larryhsiao.nyx.tag.room.TagDiaryEntity
 import com.larryhsiao.nyx.tag.room.TagEntity
-import com.larryhsiao.nyx.weather.Weather
 import com.larryhsiao.nyx.weather.room.WeatherEntity
 import com.silverhetch.clotho.Action
 import com.silverhetch.clotho.file.FileText

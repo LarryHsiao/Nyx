@@ -17,5 +17,5 @@ interface Weather {
     /**
      * Raw data of this weather
      */
-    fun raw():String
+    fun raw(): String
 }

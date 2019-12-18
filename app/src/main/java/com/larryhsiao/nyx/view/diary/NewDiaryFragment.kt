@@ -9,8 +9,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
@@ -49,10 +47,8 @@ import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.clotho.geo.GeoUri
 import com.silverhetch.clotho.time.ToUTCTimestamp
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.page_diary.*
 import kotlinx.android.synthetic.main.page_diary.view.*
-import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 

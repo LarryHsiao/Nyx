@@ -23,6 +23,6 @@ class PhantomDiary(private val timestamp: Long = -1) : Diary {
     }
 
     override fun weatherIconUrl(): String {
-       return ""
+        return ""
     }
 }

@@ -4,7 +4,6 @@ import android.net.Uri
 import com.google.gson.JsonParser
 import com.larryhsiao.nyx.diary.room.RDiary
 import com.larryhsiao.nyx.weather.OpenWeatherWeather
-import com.larryhsiao.nyx.weather.Weather
 import java.util.*
 
 /**

@@ -35,7 +35,6 @@ import com.larryhsiao.nyx.view.tag.viewmodel.TagAttachmentVM
 import com.larryhsiao.nyx.view.tag.viewmodel.TagListVM
 import com.silverhetch.aura.AuraFragment
 import com.silverhetch.aura.view.fab.FabBehavior
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.page_diary.*
 import java.text.DateFormat
 import java.util.*
@@ -154,7 +153,7 @@ class DiaryFragment : AuraFragment() {
             val binding = DataBindingUtil.findBinding<PageDiaryBinding>(view)
             binding?.diary = diary
             binding?.weatherIconUri = diary.weatherIconUrl()
-            if (diary.weatherIconUrl().isNotEmpty()){
+            if (diary.weatherIconUrl().isNotEmpty()) {
                 binding?.newDiaryWeatherIcon?.visibility = View.VISIBLE
             }
             editable.observe(this, Observer<Boolean> {

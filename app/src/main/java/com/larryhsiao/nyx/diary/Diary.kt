@@ -29,5 +29,5 @@ interface Diary {
     /**
      * Url for displaying the weather status
      */
-    fun weatherIconUrl():String
+    fun weatherIconUrl(): String
 }

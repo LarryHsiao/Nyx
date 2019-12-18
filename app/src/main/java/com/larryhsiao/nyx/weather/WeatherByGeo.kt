@@ -4,6 +4,7 @@ import android.net.Uri
 import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import com.silverhetch.clotho.Source
+import com.silverhetch.clotho.connection.exception.HttpException
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.InputStreamReader
@@ -40,7 +41,7 @@ class WeatherByGeo(
             ).execute()
         ) {
             if (!isSuccessful) {
-                throw RuntimeException(String(body()?.bytes() ?: ByteArray(0)))
+                throw HttpException(String(body()?.bytes() ?: ByteArray(0)))
             }
             return OpenWeatherWeather(
                 JsonParser().parse(
