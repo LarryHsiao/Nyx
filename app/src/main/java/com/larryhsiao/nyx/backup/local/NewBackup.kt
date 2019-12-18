@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.backup.local
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.larryhsiao.nyx.backup.DiaryExport
+import com.larryhsiao.nyx.backup.JsonExportedWeather
 import com.larryhsiao.nyx.backup.MediaExport
 import com.larryhsiao.nyx.backup.tag.TagDiaryExport
 import com.larryhsiao.nyx.backup.tag.TagExport
@@ -11,6 +12,7 @@ import com.larryhsiao.nyx.diary.room.DiaryDao
 import com.larryhsiao.nyx.media.room.MediaDao
 import com.larryhsiao.nyx.tag.room.TagDao
 import com.larryhsiao.nyx.tag.room.TagDiaryDao
+import com.larryhsiao.nyx.weather.room.WeatherDao
 import com.silverhetch.clotho.Action
 import com.silverhetch.clotho.file.ToFile
 import java.io.File
@@ -37,6 +39,24 @@ class NewBackup(
         backupMedia(backupRoot, db.mediaDao())
         backupTags(backupRoot, db.tagDao())
         backupTagDiaries(backupRoot, db.tagDiaryDao())
+        backupWeather(backupRoot, db.weatherDao())
+    }
+
+    private fun backupWeather(root: File, dao: WeatherDao) {
+        FileOutputStream(File(root, "weather.json").also {
+            it.createNewFile()
+        }).use { output ->
+            output.write("[".toByteArray())
+            var counter = 0
+            JsonExportedWeather(dao).value().forEach {
+                if (counter > 0) {
+                    output.write(",".toByteArray())
+                }
+                output.write(it.toByteArray())
+                counter++
+            }
+            output.write("]".toByteArray())
+        }
     }
 
     private fun backupDiary(root: File, dao: DiaryDao) {

@@ -5,6 +5,8 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Transaction;
 
+import java.util.List;
+
 /**
  * Dao that access the weather related tables.
  * <p>
@@ -24,6 +26,9 @@ public abstract class WeatherDao {
      */
     @Query("UPDATE diary SET weather_id=:weatherId WHERE id=:diaryId")
     public abstract void attachWeather(long diaryId, long weatherId);
+
+    @Query("SELECT * FROM weather;")
+    public abstract List<WeatherEntity> all();
 
     /**
      * Convenient transaction to create attached weather to dairy.

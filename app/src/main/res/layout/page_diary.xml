@@ -61,6 +61,7 @@
                 tools:background="#ff0000"
                 app:layout_constraintTop_toBottomOf="@id/newDiary_newDiaryContent"
                 android:layout_height="wrap_content" />
+
             <TextView
                 android:id="@+id/newDiary_date"
                 android:layout_width="0dp"
@@ -131,12 +132,14 @@
                 app:layout_constraintDimensionRatio="1:1"
                 android:adjustViewBounds="true"
                 android:scaleType="centerInside"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:image_uri="@{weatherIconUri}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/newDiary_date"
                 android:id="@+id/newDiary_weatherIcon"
                 app:layout_constraintBottom_toBottomOf="@id/newDiary_date"
-                android:layout_height="0dp"/>
+                android:layout_height="0dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </layout>

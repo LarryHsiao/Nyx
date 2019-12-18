@@ -235,6 +235,7 @@ class NewDiaryFragment : AuraFragment(), ServiceConnection {
                         setStyle(CircularProgressDrawable.LARGE)
                     })
                     .into(rootView.newDiary_weatherIcon)
+                rootView.newDiary_weatherIcon.visibility = View.VISIBLE
             }
         })
         return rootView
