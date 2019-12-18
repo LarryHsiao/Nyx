@@ -74,7 +74,8 @@ abstract class RDatabase : RoomDatabase() {
                         DATABASE_NAME
                     ).addMigrations(
                         Migration1To2(),
-                        Migration2To3()
+                        Migration2To3(),
+                        Migration3To4()
                     ).build()
                         .also { database = it }
                 }
