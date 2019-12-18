@@ -3,7 +3,6 @@ package com.larryhsiao.nyx.config
 import android.content.Context
 import android.preference.PreferenceManager
 import com.larryhsiao.nyx.R
-import com.larryhsiao.nyx.backup.local.BackupRootSource
 import java.io.File
 
 /**
@@ -23,10 +22,6 @@ class ConfigImpl(private val context: Context) :
                 it.mkdirs()
             }
         }
-    }
-
-    override fun backupRoot(): File {
-        return BackupRootSource().value()
     }
 
     override fun bioAuthEnabled(): Boolean {

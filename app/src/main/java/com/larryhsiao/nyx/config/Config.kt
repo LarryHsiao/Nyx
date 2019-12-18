@@ -12,11 +12,6 @@ interface Config {
     fun mediaRoot(): File
 
     /**
-     * Backup root file
-     */
-    fun backupRoot(): File
-
-    /**
      * Determine if the bio auth is enabled.
      */
     fun bioAuthEnabled(): Boolean
