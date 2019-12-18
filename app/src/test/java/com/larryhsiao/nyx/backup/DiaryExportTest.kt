@@ -64,7 +64,7 @@ class DiaryExportTest {
         }
 
         assertEquals(
-            """{"id":2,"title":"Test2","timestamp":2000}{"id":1,"title":"Test1","timestamp":1000}""",
+            """{"id":2,"title":"Test2","timestamp":2000,"weather_id":0}{"id":1,"title":"Test1","timestamp":1000,"weather_id":0}""",
             string.toString()
         )
     }

@@ -12,6 +12,8 @@ import com.larryhsiao.nyx.media.room.MediaEntity
 import com.larryhsiao.nyx.tag.room.TagDao
 import com.larryhsiao.nyx.tag.room.TagDiaryDao
 import com.larryhsiao.nyx.tag.room.TagDiaryEntity
+import com.larryhsiao.nyx.weather.room.WeatherDao
+import com.larryhsiao.nyx.weather.room.WeatherEntity
 import com.silverhetch.clotho.Source
 
 /**
@@ -22,9 +24,10 @@ import com.silverhetch.clotho.Source
         DiaryEntity::class,
         MediaEntity::class,
         TagEntity::class,
-        TagDiaryEntity::class
+        TagDiaryEntity::class,
+        WeatherEntity::class
     ),
-    version = 3
+    version = 4
 )
 abstract class RDatabase : RoomDatabase() {
 
@@ -47,6 +50,11 @@ abstract class RDatabase : RoomDatabase() {
      * Obtain the tag-diary relation dao
      */
     abstract fun tagDiaryDao(): TagDiaryDao
+
+    /**
+     * Obtain the weather dao.
+     */
+    abstract fun weatherDao(): WeatherDao
 
     /**
      * Source generate [RDatabase] for Nyx.

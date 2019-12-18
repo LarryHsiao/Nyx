@@ -8,6 +8,7 @@ import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.media.room.MediaEntity
 import com.larryhsiao.nyx.tag.room.TagDiaryEntity
 import com.larryhsiao.nyx.tag.room.TagEntity
+import com.larryhsiao.nyx.weather.room.WeatherEntity
 import com.silverhetch.clotho.file.FileText
 import com.silverhetch.clotho.file.TextFile
 import org.junit.After
@@ -68,7 +69,7 @@ class NewBackupTest {
         ).fire()
 
         assertEquals(
-            5,
+            6,
             exportedDir.listFiles()[0].listFiles().size
         )
     }
@@ -84,7 +85,7 @@ class NewBackupTest {
         val exportedDir = Files.createTempDirectory("temp").toFile()
         NewBackup(
             db.also { db ->
-                db.diaryDao().create(DiaryEntity(0, "title1", 0L))
+                db.diaryDao().create(DiaryEntity(0, "title1", 0L, 1))
                 db.mediaDao().create(
                     MediaEntity(
                         0,
@@ -94,6 +95,13 @@ class NewBackupTest {
                 )
                 db.tagDao().create(TagEntity(0, "Tag1"))
                 db.tagDiaryDao().create(TagDiaryEntity(0, 1, 1))
+                db.weatherDao().create(
+                    WeatherEntity(
+                        0,
+                        "https://phantom.com",
+                        "rawString"
+                    )
+                )
             },
             exportedDir
         ).fire()
@@ -101,7 +109,7 @@ class NewBackupTest {
         val instance = exportedDir.listFiles()[0]
         assertEquals(
             // language=JSON
-            """[{"id":1,"title":"title1","timestamp":0}]""",
+            """[{"id":1,"title":"title1","timestamp":0,"weather_id":1}]""",
             FileText(File(instance, "diary.json")).value()
         )
         assertEquals(
@@ -119,6 +127,12 @@ class NewBackupTest {
             // language=json
             """[{"id":1,"diaryId":1,"tagId":1}]""",
             FileText(File(instance, "tag_diary.json")).value()
+        )
+
+        assertEquals(
+            // language=json
+            """[{"id":1,"iconUrl":"https://phantom.com","raw":"rawString"}]""",
+            FileText(File(instance, "weather.json")).value()
         )
     }
 }

@@ -29,6 +29,7 @@ android {
         }
 
         buildConfigField("String", "AZURE_SECRET_KEY", "\"${System.env.AZURE_SECRET_KEY}\"")
+        buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"${System.env.OPEN_WEATHER_API_KEY}\"")
     }
     buildTypes {
         release {

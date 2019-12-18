@@ -152,6 +152,10 @@ class DiaryFragment : AuraFragment() {
         diaryVM.diary().observe(this, Observer<Diary> { diary ->
             val binding = DataBindingUtil.findBinding<PageDiaryBinding>(view)
             binding?.diary = diary
+            binding?.weatherIconUri = diary.weatherIconUrl()
+            if (diary.weatherIconUrl().isNotEmpty()) {
+                binding?.newDiaryWeatherIcon?.visibility = View.VISIBLE
+            }
             editable.observe(this, Observer<Boolean> {
                 binding?.editable = it
                 newDiary_imageGrid.addable(it)

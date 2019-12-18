@@ -25,4 +25,9 @@ interface Diary {
      * Attachment uris
      */
     fun attachmentUris(): Array<Uri>
+
+    /**
+     * Url for displaying the weather status
+     */
+    fun weatherIconUrl(): String
 }

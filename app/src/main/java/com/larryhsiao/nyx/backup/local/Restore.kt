@@ -7,6 +7,7 @@ import com.larryhsiao.nyx.diary.room.DiaryEntity
 import com.larryhsiao.nyx.media.room.MediaEntity
 import com.larryhsiao.nyx.tag.room.TagDiaryEntity
 import com.larryhsiao.nyx.tag.room.TagEntity
+import com.larryhsiao.nyx.weather.room.WeatherEntity
 import com.silverhetch.clotho.Action
 import com.silverhetch.clotho.file.FileText
 import com.silverhetch.clotho.file.ToFile
@@ -25,6 +26,7 @@ class Restore(
         private const val MEDIA_JSON = "media.json"
         private const val TAG_JSON = "tag.json"
         private const val TAG_DIARY_JSON = "tag_diary.json"
+        private const val WEATHER_JSON = "weather.json"
     }
 
     private val newDiaryIdMapping = LongSparseArray<Long>()
@@ -35,6 +37,22 @@ class Restore(
         restoreMedia()
         restoreTag()
         restoreTagDiary()
+        restoreWeather()
+    }
+
+    private fun restoreWeather() {
+        Gson().fromJson(
+            FileText(File(backupInstanceDir, WEATHER_JSON)).value(),
+            Array<WeatherEntity>::class.java
+        ).forEach { entity ->
+            db.weatherDao().create(
+                WeatherEntity(
+                    0,
+                    entity.iconUrl,
+                    entity.raw
+                )
+            )
+        }
     }
 
     private fun restoreDiary() {
