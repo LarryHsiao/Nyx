@@ -13,6 +13,7 @@ class DiaryView(private val it: RDiary) : Source<JsonObject> {
         return JsonObject().apply {
             addProperty("id", it.diary.id)
             addProperty("title", it.diary.title)
+            addProperty("time", it.diary.timestamp)
             add("attachments", JsonArray().apply {
                 it.mediaEntities.forEach {
                     add(it.uri.split("/").last())
