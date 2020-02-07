@@ -42,4 +42,5 @@
     <string name="preload_location">Preload location</string>
     <string name="internal_file_explorer">Internal File Explorer</string>
     <string name="failed_to_open_file">Failed to open file</string>
+    <string name="new_jot">New Jot</string>
 </resources>

@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".JotApplication"
         android:allowBackup="false"
         tools:replace="android:allowBackup"
         android:icon="@mipmap/ic_launcher"

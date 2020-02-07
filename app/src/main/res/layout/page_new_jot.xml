@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EditText xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@drawable/bg_edit_field"
+    android:layout_margin="16dp"
+    android:id="@+id/newJot_content"
+    android:layout_height="match_parent">
+</EditText>
