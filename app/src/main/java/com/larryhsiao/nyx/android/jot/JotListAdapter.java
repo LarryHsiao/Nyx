@@ -43,4 +43,12 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         this.data.addAll(data);
         notifyDataSetChanged();
     }
+
+    /**
+     * Append a Jot to list
+     */
+    public void insertJot(Jot jot) {
+        data.add(0, jot);
+        notifyItemInserted(data.size() - 1);
+    }
 }

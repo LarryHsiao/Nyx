@@ -1,31 +1,27 @@
 package com.larryhsiao.nyx.android.jot;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
+import android.view.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.jots.AllJots;
+import com.larryhsiao.nyx.jots.JotById;
+import com.larryhsiao.nyx.jots.JotUriId;
 import com.larryhsiao.nyx.jots.QueriedJots;
-import com.larryhsiao.nyx.jots.SampleJot;
-import com.silverhetch.aura.AuraFragment;
 
-import java.util.Arrays;
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Fragment for showing Jot list.
  */
 public class JotListFragment extends JotFragment {
+    private static final int REQUEST_CODE_CREATE_JOT = 1000;
     private JotListAdapter adapter;
 
     @Override
@@ -58,9 +54,22 @@ public class JotListFragment extends JotFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_newJot) {
-            nextPage(new NewJotFragment());
+            Fragment frag = new NewJotFragment();
+            frag.setTargetFragment(this, REQUEST_CODE_CREATE_JOT);
+            nextPage(frag);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_CREATE_JOT) {
+            if (resultCode == RESULT_OK) {
+                adapter.insertJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
+                getFragmentManager().popBackStack();
+            }
+        }
     }
 }

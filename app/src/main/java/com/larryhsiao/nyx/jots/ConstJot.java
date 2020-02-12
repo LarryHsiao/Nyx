@@ -14,6 +14,10 @@ public class ConstJot implements Jot {
         this.createdTime = createdTime;
     }
 
+    public ConstJot(Jot jot) {
+        this(jot.id(), jot.content(), jot.createdTime());
+    }
+
     @Override
     public long id() {
         return id;

@@ -1,26 +1,25 @@
 package com.larryhsiao.nyx.android.jot;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.EditText;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.BuildConfig;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
+import com.larryhsiao.nyx.jots.Jot;
+import com.larryhsiao.nyx.jots.JotUri;
 import com.larryhsiao.nyx.jots.NewJot;
-import com.silverhetch.aura.AuraFragment;
 
 /**
  * Fragment to create new Jot.
+ * <p>
+ * Use this fragment with
  */
 public class NewJotFragment extends JotFragment {
     @Override
@@ -51,7 +50,10 @@ public class NewJotFragment extends JotFragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_save) {
             EditText content = getView().findViewById(R.id.newJot_content);
-            new NewJot(db, content.getText().toString()).value();
+            Jot newJot = new NewJot(db, content.getText().toString()).value();
+            final Intent intent = new Intent();
+            intent.setData(Uri.parse(new JotUri(BuildConfig.URI_HOST, newJot).value().toASCIIString()));
+            sendResult(0, Activity.RESULT_OK, intent);
             return true;
         }
         return false;
