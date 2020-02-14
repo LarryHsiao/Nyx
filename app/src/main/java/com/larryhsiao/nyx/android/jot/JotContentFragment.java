@@ -8,24 +8,34 @@ import android.view.*;
 import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.larryhsiao.nyx.BuildConfig;
+import androidx.fragment.app.Fragment;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
-import com.larryhsiao.nyx.jots.Jot;
-import com.larryhsiao.nyx.jots.JotUri;
-import com.larryhsiao.nyx.jots.NewJot;
+import com.larryhsiao.nyx.jots.*;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
- * Fragment to create new Jot.
- * <p>
- * Use this fragment with
+ * Fragment that shows the Jot content.
  */
-public class NewJotFragment extends JotFragment {
+public class JotContentFragment extends JotFragment {
+    private static final String ARG_JOT_ID = "ARG_JOT_ID";
+    private EditText contentEditText;
+    private Jot jot;
+
+    public static Fragment newInstance(long jotId) {
+        final Fragment frag = new JotContentFragment();
+        Bundle args = new Bundle();
+        args.putLong(ARG_JOT_ID, jotId);
+        frag.setArguments(args);
+        return frag;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setTitle(getString(R.string.new_jot));
+        jot = new JotById(getArguments().getLong(ARG_JOT_ID), db).value();
     }
 
     @Nullable
@@ -37,6 +47,8 @@ public class NewJotFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        contentEditText = view.findViewById(R.id.newJot_content);
+        contentEditText.setText(jot.content());
     }
 
     @Override
@@ -48,14 +60,17 @@ public class NewJotFragment extends JotFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_save) {
-            EditText content = getView().findViewById(R.id.newJot_content);
-            Jot newJot = new NewJot(db, content.getText().toString()).value();
+            new UpdateJot(new UpdatedJot(
+                    jot,
+                    contentEditText.getText().toString()
+            ), db).fire();
             final Intent intent = new Intent();
-            intent.setData(Uri.parse(new JotUri(BuildConfig.URI_HOST, newJot).value().toASCIIString()));
-            sendResult(0, Activity.RESULT_OK, intent);
+            intent.setData(Uri.parse(new JotUri(
+                            jot
+                    ).value().toASCIIString()));
+            sendResult(0, RESULT_OK, intent);
             return true;
         }
         return false;
     }
 }
-

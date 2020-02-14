@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.jots;
 
+import com.larryhsiao.nyx.BuildConfig;
 import com.silverhetch.clotho.Source;
 
 import java.net.URI;
@@ -15,6 +16,8 @@ public class JotUri implements Source<URI> {
         this.host = host;
         this.jot = jot;
     }
+
+    public JotUri(Jot jot) { this(BuildConfig.URI_HOST, jot); }
 
     @Override
     public URI value() {

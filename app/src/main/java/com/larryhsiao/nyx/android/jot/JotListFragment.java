@@ -22,6 +22,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class JotListFragment extends JotFragment {
     private static final int REQUEST_CODE_CREATE_JOT = 1000;
+    private static final int REQUEST_CODE_JOT_CONTENT = 1001;
     private JotListAdapter adapter;
 
     @Override
@@ -41,14 +42,19 @@ public class JotListFragment extends JotFragment {
         super.onViewCreated(view, savedInstanceState);
         final RecyclerView list = view.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        list.setAdapter(adapter = new JotListAdapter());
+        list.setAdapter(adapter = new JotListAdapter(jot -> {
+            Fragment frag = JotContentFragment.newInstance(jot.id());
+            frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
+            nextPage(frag);
+            return null;
+        }));
         adapter.loadJots(new QueriedJots(new AllJots(db)).value());
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.list_jot, menu);
+        inflater.inflate(R.menu.jot_list, menu);
     }
 
     @Override
@@ -69,6 +75,10 @@ public class JotListFragment extends JotFragment {
             if (resultCode == RESULT_OK) {
                 adapter.insertJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
                 getFragmentManager().popBackStack();
+            }
+        } else if (requestCode == REQUEST_CODE_JOT_CONTENT) {
+            if (requestCode == RESULT_OK) {
+                adapter.updateJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
             }
         }
     }
