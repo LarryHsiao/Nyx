@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.jots.Jot;
 import com.silverhetch.aura.view.ViewHolder;
+import com.silverhetch.clotho.time.HttpTimeFormat;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
@@ -33,7 +35,10 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.getTextView(R.id.itemJot_content).setText(data.get(position).content());
+        holder.getTextView(R.id.itemJot_content).setText(
+                data.get(position).content() + "\n" +
+                new HttpTimeFormat().value().format(new Date(data.get(position).createdTime() ))
+        );
         holder.getRootView().setOnClickListener(v -> clicked.apply(
                 data.get(holder.getAdapterPosition()))
         );
