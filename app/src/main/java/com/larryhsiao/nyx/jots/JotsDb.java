@@ -23,7 +23,8 @@ public class JotsDb implements Source<Connection> {
                     "CREATE TABLE IF NOT EXISTS jots(" +
                             "id integer not null auto_increment," +
                             "content text not null, " +
-                            "createdTime timestamp with time zone not null " +
+                            "createdTime timestamp with time zone not null, " +
+                            "location geometry " +
                             ");"
             );
             return conn;

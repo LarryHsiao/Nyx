@@ -20,9 +20,9 @@ public class QueriedJots implements Source<List<Jot>> {
 
     @Override
     public List<Jot> value() {
-        try {
+        try (ResultSet res = query.value()){
             List<Jot> jots = new ArrayList<>();
-            ResultSet res = query.value();
+            ;
             while (res.next()) {
                 Timestamp timestamp = res.getTimestamp(
                         res.findColumn("createdTime"),
