@@ -1,26 +1,34 @@
 package com.larryhsiao.nyx.android.jot;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.EditText;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.jots.*;
+import com.schibstedspain.leku.LocationPickerActivity;
+import com.silverhetch.aura.location.LocationAddress;
+import com.silverhetch.clotho.source.ConstSource;
 
 import static android.app.Activity.RESULT_OK;
+import static com.schibstedspain.leku.LocationPickerActivityKt.*;
 
 /**
  * Fragment that shows the Jot content.
  */
 public class JotContentFragment extends JotFragment {
+    private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final String ARG_JOT_ID = "ARG_JOT_ID";
     private EditText contentEditText;
+    private TextView locationText;
+    private double[] currentLocation = null;
     private Jot jot;
 
     public static Fragment newInstance(long jotId) {
@@ -47,8 +55,22 @@ public class JotContentFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        contentEditText = view.findViewById(R.id.newJot_content);
+        contentEditText = view.findViewById(R.id.jot_content);
         contentEditText.setText(jot.content());
+        locationText = view.findViewById(R.id.jot_location);
+        locationText.setOnClickListener(v -> startActivityForResult(
+            new LocationPickerActivity.Builder()
+                .build(view.getContext()),
+            REQUEST_CODE_LOCATION_PICKER
+        ));
+        Location location = new Location("Constant");
+        location.setLongitude(jot.location()[0]);
+        location.setLatitude(jot.location()[1]);
+        locationText.setText(new LocationAddress(view.getContext(), location).value().getAddressLine(0));
+        currentLocation = new double[]{
+            jot.location()[0],
+            jot.location()[1]
+        };
     }
 
     @Override
@@ -61,16 +83,29 @@ public class JotContentFragment extends JotFragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_save) {
             new UpdateJot(new UpdatedJot(
-                    jot,
-                    contentEditText.getText().toString()
+                jot,
+                contentEditText.getText().toString(),
+                new ConstSource<>(currentLocation)
             ), db).fire();
             final Intent intent = new Intent();
             intent.setData(Uri.parse(new JotUri(
-                            jot
-                    ).value().toASCIIString()));
+                jot
+            ).value().toASCIIString()));
             sendResult(0, RESULT_OK, intent);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_LOCATION_PICKER && resultCode == RESULT_OK) {
+            currentLocation = new double[]{
+                data.getDoubleExtra(LONGITUDE, 0.0),
+                data.getDoubleExtra(LATITUDE, 0.0)
+            };
+            locationText.setText(data.getStringExtra(LOCATION_ADDRESS));
+        }
     }
 }

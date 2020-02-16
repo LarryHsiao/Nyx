@@ -1,8 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<EditText xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@drawable/bg_edit_field"
-    android:layout_margin="16dp"
-    android:id="@+id/newJot_content"
-    android:layout_height="match_parent">
-</EditText>
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <EditText
+        android:layout_width="match_parent"
+        android:background="@drawable/bg_edit_field"
+        android:layout_margin="16dp"
+        android:id="@+id/jot_content"
+        android:layout_height="match_parent">
+    </EditText>
+
+    <TextView android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:id="@+id/jot_location"
+              android:gravity="center_vertical"
+              android:drawableStart="@drawable/ic_location_3"
+              app:layout_constraintStart_toStartOf="@id/jot_content"
+              app:layout_constraintEnd_toEndOf="@id/jot_content"
+              app:layout_constraintBottom_toBottomOf="@id/jot_content"
+    />
+</androidx.constraintlayout.widget.ConstraintLayout>

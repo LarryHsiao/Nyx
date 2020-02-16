@@ -1,11 +1,13 @@
 package com.larryhsiao.nyx.android.jot;
 
+import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.jots.Jot;
+import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.aura.view.ViewHolder;
 import com.silverhetch.clotho.time.HttpTimeFormat;
 
@@ -29,18 +31,28 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.item_jot, parent, false
+            R.layout.item_jot, parent, false
         ));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        final Location location = new Location("Constant");
+        location.setLongitude(data.get(position).location()[0]);
+        location.setLatitude(data.get(position).location()[1]);
+        String address = new LocationAddress(holder.itemView.getContext(), location).value().getAddressLine(0);
+        if (address != null) {
+            address += "\n";
+        } else {
+            address = "";
+        }
         holder.getTextView(R.id.itemJot_content).setText(
-                data.get(position).content() + "\n" +
-                new HttpTimeFormat().value().format(new Date(data.get(position).createdTime() ))
+            data.get(position).content() + "\n" +
+                address +
+                new HttpTimeFormat().value().format(new Date(data.get(position).createdTime()))
         );
         holder.getRootView().setOnClickListener(v -> clicked.apply(
-                data.get(holder.getAdapterPosition()))
+            data.get(holder.getAdapterPosition()))
         );
     }
 

@@ -33,10 +33,11 @@ public class JotById implements Source<Jot> {
                     res.getLong("id"),
                     res.getString("content"),
                     res.getTimestamp(
-                            res.findColumn("createdTime"),
+                            "createdTime",
                             Calendar.getInstance()
-                    ).getTime()
-            );
+                    ).getTime(),
+                    new PointSource(res.getString("location"))
+                );
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

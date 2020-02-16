@@ -2,6 +2,10 @@ package com.larryhsiao.nyx.jots;
 
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,13 +27,23 @@ public class UpdateJot implements Action {
     public void fire() {
         final Connection conn = connSource.value();
         try (PreparedStatement stmt = conn.prepareStatement(
-                // language=H2
-                "UPDATE jots " +
-                        "SET content=?1 " +
-                        "WHERE id=?2;"
+            // language=H2
+            "UPDATE jots " +
+                "SET content=?1, location=?2 " +
+                "WHERE id=?3;"
         )) {
             stmt.setString(1, updated.content());
-            stmt.setLong(2, updated.id());
+            stmt.setString(2, new Point(
+                new CoordinateArraySequence(
+                    new Coordinate[]{
+                        new Coordinate(
+                            updated.location()[0],
+                            updated.location()[1]
+                        )
+                    }
+                ), new GeometryFactory()
+            ).toText());
+            stmt.setLong(3, updated.id());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.jots;
 
+import com.silverhetch.clotho.source.ConstSource;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -14,10 +15,16 @@ public class JotUriTest {
     @Test
     public void simple() {
         assertEquals(
-                "http://localhost.com/jots/1",
-                new JotUri("http://localhost.com/", new ConstJot(
-                        1, "content", 0
-                )).value().toASCIIString()
+            "http://localhost.com/jots/1",
+            new JotUri(
+                "http://localhost.com/",
+                new ConstJot(
+                    1,
+                    "content",
+                    0,
+                    new ConstSource<>(new double[]{})
+                )
+            ).value().toASCIIString()
         );
     }
 }

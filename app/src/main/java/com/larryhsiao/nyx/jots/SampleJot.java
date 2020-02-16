@@ -15,6 +15,11 @@ public class SampleJot implements Jot {
     }
 
     @Override
+    public double[] location() {
+        return new double[]{0.0, 0.0};
+    }
+
+    @Override
     public long createdTime() {
         return System.currentTimeMillis();
     }

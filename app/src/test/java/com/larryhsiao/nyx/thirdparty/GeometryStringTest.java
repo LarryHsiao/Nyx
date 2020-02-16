@@ -17,7 +17,7 @@ public class GeometryStringTest {
     @Test
     public void geometryString() {
         Assert.assertEquals(
-                "",
+                "POINT (100.5 90.5)",
                 new Point(
                         new CoordinateArraySequence(
                                 new Coordinate[]{

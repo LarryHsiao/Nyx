@@ -18,4 +18,11 @@ public interface Jot {
      * Created time
      */
     long createdTime();
+
+    /**
+     * The display location of this Jot
+     *
+     * @return length = 2, longitude and latitude.
+     */
+    double[] location();
 }

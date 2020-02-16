@@ -3,7 +3,6 @@ package com.larryhsiao.nyx;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.larryhsiao.nyx.android.jot.JotListFragment;
-import com.larryhsiao.nyx.android.jot.NewJotFragment;
 import com.silverhetch.aura.AuraActivity;
 
 /**
@@ -15,6 +14,8 @@ public class MainActivity extends AuraActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupPageControl(R.id.main_root);
-        rootPage(new JotListFragment());
+        if (savedInstanceState == null) {
+            rootPage(new JotListFragment());
+        }
     }
 }

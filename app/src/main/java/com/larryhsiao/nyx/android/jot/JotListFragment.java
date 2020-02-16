@@ -77,8 +77,9 @@ public class JotListFragment extends JotFragment {
                 getFragmentManager().popBackStack();
             }
         } else if (requestCode == REQUEST_CODE_JOT_CONTENT) {
-            if (requestCode == RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 adapter.updateJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
+                getFragmentManager().popBackStack();
             }
         }
     }
