@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import java.sql.*;
 import java.util.Calendar;
 
+import static java.lang.Double.MIN_VALUE;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 /**
@@ -21,7 +22,7 @@ public class NewJot implements Source<Jot> {
     private final double[] location;
 
     public NewJot(Source<Connection> db, String content) {
-        this(db, content, null);
+        this(db, content, new double[]{MIN_VALUE, MIN_VALUE});
     }
 
     public NewJot(Source<Connection> db, String content, double[] location) {
