@@ -1,24 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <EditText
         android:layout_width="match_parent"
         android:background="@drawable/bg_edit_field"
-        android:layout_margin="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:id="@+id/jot_content"
-        android:layout_height="match_parent">
-    </EditText>
+        android:layout_height="match_parent"></EditText>
 
-    <TextView android:layout_width="0dp"
-              android:layout_height="wrap_content"
-              android:id="@+id/jot_location"
-              android:gravity="center_vertical"
-              android:drawableStart="@drawable/ic_location_3"
-              app:layout_constraintStart_toStartOf="@id/jot_content"
-              app:layout_constraintEnd_toEndOf="@id/jot_content"
-              app:layout_constraintBottom_toBottomOf="@id/jot_content"
-    />
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:id="@+id/jot_attachment_icon"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/jot_location"
+        android:src="@drawable/ic_attachment"
+        android:layout_height="48dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        app:layout_constraintStart_toEndOf="@id/jot_attachment_icon"
+        app:layout_constraintTop_toTopOf="@id/jot_attachment_icon"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="horizontal"
+        tools:listitem="@layout/item_attachment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/jot_attachment_icon"
+        android:layout_height="0dp" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/jot_location"
+        android:gravity="center_vertical"
+        android:drawableStart="@drawable/ic_location_3"
+        app:layout_constraintStart_toStartOf="@id/jot_content"
+        app:layout_constraintEnd_toEndOf="@id/jot_content"
+        app:layout_constraintBottom_toBottomOf="@id/jot_content" />
 </androidx.constraintlayout.widget.ConstraintLayout>
