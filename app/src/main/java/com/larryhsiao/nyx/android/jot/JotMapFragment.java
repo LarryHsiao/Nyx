@@ -26,6 +26,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class JotMapFragment extends JotFragment {
     private static final int REQUEST_CODE_NEW_JOT = 1000;
+    private static final int REQUEST_CODE_UPDATE_JOT = 1001;
     private ClusterManager<JotMapItem> clusterManger;
     private GoogleMap map;
 
@@ -91,6 +92,12 @@ public class JotMapFragment extends JotFragment {
             ));
             return true;
         });
+        clusterManger.setOnClusterItemClickListener(cluster -> {
+            Fragment frag = JotContentFragment.newInstance(cluster.getId());
+            frag.setTargetFragment(this, REQUEST_CODE_UPDATE_JOT);
+            nextPage(frag);
+            return true;
+        });
     }
 
     @Override
@@ -124,12 +131,28 @@ public class JotMapFragment extends JotFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == REQUEST_CODE_NEW_JOT) && (resultCode == RESULT_OK)) {
+        if (requestCode == REQUEST_CODE_NEW_JOT && resultCode == RESULT_OK) {
             clusterManger.addItem(new JotMapItem(
                 new JotById(
                     new JotUriId(
                         data.getData().toString()).value(), db
                 ).value()
+            ));
+            getFragmentManager().popBackStack();
+        }
+
+        if (requestCode == REQUEST_CODE_UPDATE_JOT && resultCode == RESULT_OK) {
+            long updatedId = new JotUriId(data.getData().toString()).value();
+            JotMapItem updateItem = null;
+            for (JotMapItem item : clusterManger.getAlgorithm().getItems()) {
+                if (item.getId() == updatedId) {
+                    updateItem = item;
+                    break;
+                }
+            }
+            clusterManger.removeItem(updateItem);
+            clusterManger.addItem(new JotMapItem(
+                new JotById(updatedId, db).value()
             ));
             getFragmentManager().popBackStack();
         }
