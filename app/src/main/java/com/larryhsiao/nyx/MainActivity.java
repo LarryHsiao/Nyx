@@ -26,12 +26,16 @@ public class MainActivity extends AuraActivity {
             } else if (item.getItemId() == R.id.menuItem_map) {
                 rootPage(new JotMapFragment());
                 return true;
+            } else if (item.getItemId() == R.id.menuItem_calendar) {
+                rootPage(new CalendarFragment());
+                return true;
             } else {
                 return false;
             }
         });
 
         if (savedInstanceState == null) {
+            navigation.setSelectedItemId(R.id.menuItem_jots);
             rootPage(new JotListFragment());
         }
     }
