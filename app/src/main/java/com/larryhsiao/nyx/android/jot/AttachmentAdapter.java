@@ -1,7 +1,6 @@
 package com.larryhsiao.nyx.android.jot;
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
@@ -12,11 +11,13 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.jots.Jot;
 import com.silverhetch.aura.view.ViewHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.P;
@@ -26,6 +27,11 @@ import static android.os.Build.VERSION_CODES.P;
  */
 public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final List<Uri> data = new ArrayList<>();
+    private final Function<Uri, Void> clicked;
+
+    public AttachmentAdapter(Function<Uri, Void> clicked) {
+        this.clicked = clicked;
+    }
 
     @NonNull
     @Override
@@ -52,8 +58,10 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
                     iconBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
                 }
                 imageView.setImageBitmap(iconBitmap);
+                imageView.setOnClickListener(v-> clicked.apply(data.get(holder.getAdapterPosition())));
             } else {
                 imageView.setImageDrawable(null); // clear image
+                imageView.setOnClickListener(null);
             }
         } catch (IOException e) {
             e.printStackTrace();

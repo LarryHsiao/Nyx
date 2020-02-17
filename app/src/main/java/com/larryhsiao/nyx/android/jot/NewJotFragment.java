@@ -18,11 +18,13 @@ import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.JotUri;
 import com.larryhsiao.nyx.jots.NewJot;
 import com.schibstedspain.leku.LocationPickerActivity;
+import com.squareup.picasso.Picasso;
+import com.stfalcon.imageviewer.StfalconImageViewer;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Intent.ACTION_GET_CONTENT;
 import static android.content.Intent.ACTION_OPEN_DOCUMENT;
 import static com.schibstedspain.leku.LocationPickerActivityKt.*;
 import static java.lang.Double.MIN_VALUE;
@@ -68,8 +70,14 @@ public class NewJotFragment extends JotFragment {
                 .build(v.getContext()),
             REQUEST_CODE_LOCATION_PICKER
         ));
-        final RecyclerView attachments = view.findViewById(R.id.jot_attachment_list);
-        attachments.setAdapter(attachmentAdapter = new AttachmentAdapter());
+        final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
+        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter(uri -> {
+            new StfalconImageViewer.Builder<>(
+                attachmentList.getContext(),
+                Collections.singletonList(uri),
+                (imageView, image) -> Picasso.get().load(image).into(imageView)).show();
+            return null;
+        }));
     }
 
     @Override

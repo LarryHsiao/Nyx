@@ -22,7 +22,10 @@ import com.larryhsiao.nyx.jots.*;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.clotho.source.ConstSource;
+import com.squareup.picasso.Picasso;
+import com.stfalcon.imageviewer.StfalconImageViewer;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -91,7 +94,13 @@ public class JotContentFragment extends JotFragment {
             jot.location()[1]
         };
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
-        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
+        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter(uri -> {
+            new StfalconImageViewer.Builder<>(
+                attachmentList.getContext(),
+                Collections.singletonList(uri),
+                (imageView, image) -> Picasso.get().load(image).into(imageView)).show();
+            return null;
+        }));
         attachmentAdapter.loadAttachments(
             new QueriedAttachments(new AttachmentsByJotId(db, jot.id()))
                 .value()
