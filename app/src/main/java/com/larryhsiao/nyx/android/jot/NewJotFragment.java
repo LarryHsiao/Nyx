@@ -71,13 +71,7 @@ public class NewJotFragment extends JotFragment {
             REQUEST_CODE_LOCATION_PICKER
         ));
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
-        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter(uri -> {
-            new StfalconImageViewer.Builder<>(
-                attachmentList.getContext(),
-                Collections.singletonList(uri),
-                (imageView, image) -> Picasso.get().load(image).into(imageView)).show();
-            return null;
-        }));
+        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
     }
 
     @Override
