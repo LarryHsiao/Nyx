@@ -6,18 +6,28 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
+import com.larryhsiao.nyx.attachments.AttachmentsByJotId;
+import com.larryhsiao.nyx.attachments.NewAttachments;
+import com.larryhsiao.nyx.attachments.QueriedAttachments;
+import com.larryhsiao.nyx.attachments.RemovalAttachmentByJotId;
 import com.larryhsiao.nyx.jots.*;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.clotho.source.ConstSource;
 
+import java.util.stream.Collectors;
+
 import static android.app.Activity.RESULT_OK;
+import static android.content.Intent.ACTION_OPEN_DOCUMENT;
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static com.schibstedspain.leku.LocationPickerActivityKt.*;
 
 /**
@@ -25,9 +35,12 @@ import static com.schibstedspain.leku.LocationPickerActivityKt.*;
  */
 public class JotContentFragment extends JotFragment {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
+    private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final String ARG_JOT_ID = "ARG_JOT_ID";
     private EditText contentEditText;
     private TextView locationText;
+    private ImageView attachmentIcon;
+    private AttachmentAdapter attachmentAdapter;
     private double[] currentLocation = null;
     private Jot jot;
 
@@ -57,6 +70,12 @@ public class JotContentFragment extends JotFragment {
         super.onViewCreated(view, savedInstanceState);
         contentEditText = view.findViewById(R.id.jot_content);
         contentEditText.setText(jot.content());
+        attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
+        attachmentIcon.setOnClickListener(v -> {
+            final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
+        });
         locationText = view.findViewById(R.id.jot_location);
         locationText.setOnClickListener(v -> startActivityForResult(
             new LocationPickerActivity.Builder()
@@ -71,6 +90,15 @@ public class JotContentFragment extends JotFragment {
             jot.location()[0],
             jot.location()[1]
         };
+        final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
+        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
+        attachmentAdapter.loadAttachments(
+            new QueriedAttachments(new AttachmentsByJotId(db, jot.id()))
+                .value()
+                .stream()
+                .map(it -> Uri.parse(it.uri()))
+                .collect(Collectors.toList())
+        );
     }
 
     @Override
@@ -87,6 +115,16 @@ public class JotContentFragment extends JotFragment {
                 contentEditText.getText().toString(),
                 new ConstSource<>(currentLocation)
             ), db).fire();
+            new RemovalAttachmentByJotId(db, jot.id()).fire();
+            new NewAttachments(
+                db,
+                jot.id(),
+                attachmentAdapter.exportUri()
+                    .stream()
+                    .map(it -> it.toString())
+                    .collect(Collectors.toList())
+                    .toArray(new String[0])
+            ).value();
             final Intent intent = new Intent();
             intent.setData(Uri.parse(new JotUri(
                 jot
@@ -106,6 +144,12 @@ public class JotContentFragment extends JotFragment {
                 data.getDoubleExtra(LATITUDE, 0.0)
             };
             locationText.setText(data.getStringExtra(LOCATION_ADDRESS));
+        } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
+            attachmentAdapter.appendImage(data.getData());
+            getContext().getContentResolver().takePersistableUriPermission(
+                data.getData(),
+                FLAG_GRANT_READ_URI_PERMISSION
+            );
         }
     }
 }

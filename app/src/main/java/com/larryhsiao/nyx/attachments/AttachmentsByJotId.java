@@ -20,11 +20,12 @@ public class AttachmentsByJotId implements Source<ResultSet> {
 
     @Override
     public ResultSet value() {
-        try (PreparedStatement stmt = dbSource.value().prepareStatement(
-            // language=H2
-            "SELECT * FROM attachments " +
-                "WHERE jot_id=?;"
-        )) {
+        try {
+            PreparedStatement stmt = dbSource.value().prepareStatement(
+                // language=H2
+                "SELECT * FROM attachments " +
+                    "WHERE jot_id=?;"
+            );
             stmt.setLong(1, jotId);
             return stmt.executeQuery();
         } catch (Exception e) {

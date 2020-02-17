@@ -30,6 +30,7 @@
         android:layout_width="0dp"
         app:layout_constraintStart_toEndOf="@id/jot_attachment_icon"
         app:layout_constraintTop_toTopOf="@id/jot_attachment_icon"
+        android:id="@+id/jot_attachment_list"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="horizontal"
         tools:listitem="@layout/item_attachment"
