@@ -41,6 +41,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'
     implementation 'com.schibstedspain.android:leku:6.4.0'
     implementation "com.silverhetch:aura:1.20.3"

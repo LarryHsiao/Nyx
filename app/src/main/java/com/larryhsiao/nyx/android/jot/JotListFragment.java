@@ -10,10 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
-import com.larryhsiao.nyx.jots.AllJots;
-import com.larryhsiao.nyx.jots.JotById;
-import com.larryhsiao.nyx.jots.JotUriId;
-import com.larryhsiao.nyx.jots.QueriedJots;
+import com.larryhsiao.nyx.jots.*;
+
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -21,14 +20,27 @@ import static android.app.Activity.RESULT_OK;
  * Fragment for showing Jot list.
  */
 public class JotListFragment extends JotFragment {
+    private static final String ARG_JOT_IDS = "ARG_JOT_IDS";
     private static final int REQUEST_CODE_CREATE_JOT = 1000;
     private static final int REQUEST_CODE_JOT_CONTENT = 1001;
     private JotListAdapter adapter;
+
+    /**
+     * Show by jot ids.
+     */
+    public static Fragment newInstanceByJotIds(long[] jotIds) {
+        Fragment frag = new JotListFragment();
+        Bundle args = new Bundle();
+        args.putLongArray(ARG_JOT_IDS, jotIds);
+        frag.setArguments(args);
+        return frag;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setTitle(getString(R.string.jots));
     }
 
     @Nullable
@@ -48,7 +60,20 @@ public class JotListFragment extends JotFragment {
             nextPage(frag);
             return null;
         }));
-        adapter.loadJots(new QueriedJots(new AllJots(db)).value());
+        adapter.loadJots(loadJots());
+    }
+
+    private List<Jot> loadJots() {
+        final Bundle args = getArguments();
+        long[] jotIds = new long[0];
+        if (args != null && args.getLongArray(ARG_JOT_IDS) != null) {
+            jotIds = args.getLongArray(ARG_JOT_IDS);
+        }
+        if (jotIds.length != 0) {
+            return new QueriedJots(new JotsByIds(db, jotIds)).value();
+        } else {
+            return new QueriedJots(new AllJots(db)).value();
+        }
     }
 
     @Override

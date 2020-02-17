@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="@string/jots"
+        android:id="@+id/menuItem_jots"
+        android:icon="@drawable/ic_agenda"
+        app:iconTint="@color/colorPrimaryDark"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:title="@string/map"
+        android:icon="@drawable/ic_map"
+        android:id="@+id/menuItem_map"
+        app:iconTint="@color/colorPrimaryDark"
+        app:showAsAction="ifRoom" />
+
+</menu>
