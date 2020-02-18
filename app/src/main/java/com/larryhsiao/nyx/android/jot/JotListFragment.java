@@ -1,8 +1,11 @@
 package com.larryhsiao.nyx.android.jot;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
+import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -60,10 +63,10 @@ public class JotListFragment extends JotFragment {
             nextPage(frag);
             return null;
         }));
-        adapter.loadJots(loadJots());
+        adapter.loadJots(loadJotsByArg());
     }
 
-    private List<Jot> loadJots() {
+    private List<Jot> loadJotsByArg() {
         final Bundle args = getArguments();
         long[] jotIds = new long[0];
         if (args != null && args.getLongArray(ARG_JOT_IDS) != null) {
@@ -80,6 +83,44 @@ public class JotListFragment extends JotFragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.jot_list, menu);
+
+        SearchManager searchManager = ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));
+        MenuItem searchMenuItem = menu.findItem(R.id.menuItem_search);
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setOnCloseListener(() -> {
+            searchMenuItem.collapseActionView();
+            adapter.loadJots(loadJotsByArg());
+            return false;
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.loadJots(new QueriedJots(new JotsByKeyword(db, newText)).value());
+                return true;
+            }
+        });
+        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                searchView.setQuery("",true);
+                return true;
+            }
+        });
+        searchMenuItem.setOnMenuItemClickListener(item -> {
+            searchView.onActionViewExpanded();
+            return false;
+        });
     }
 
     @Override
