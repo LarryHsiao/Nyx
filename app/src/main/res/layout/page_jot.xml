@@ -9,7 +9,7 @@
     <View
         android:layout_width="match_parent"
         android:background="@drawable/bg_edit_field"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <EditText
         android:layout_width="match_parent"
@@ -22,7 +22,24 @@
         android:layout_marginTop="8dp"
         android:background="@null"
         android:id="@+id/jot_content"
-        android:layout_height="0dp"/>
+        android:layout_height="0dp" />
+
+    <ImageView
+        android:layout_width="48dp"
+        app:layout_constraintTop_toTopOf="@id/jot_tagGroup"
+        app:layout_constraintBottom_toBottomOf="@id/jot_tagGroup"
+        android:id="@+id/jot_tagIcon"
+        app:layout_constraintStart_toStartOf="@id/jot_content"
+        android:src="@drawable/ic_tag"
+        android:layout_height="48dp" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:layout_width="0dp"
+        android:id="@+id/jot_tagGroup"
+       app:layout_constraintStart_toEndOf="@id/jot_tagIcon"
+        app:layout_constraintBottom_toTopOf="@id/jot_attachment_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="wrap_content" />
 
     <ImageView
         android:layout_width="48dp"
@@ -43,9 +60,8 @@
         android:id="@+id/jot_attachment_list"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="horizontal"
-        tools:listitem="@layout/item_attachment"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="150dp" />
 
     <TextView
         android:layout_width="0dp"

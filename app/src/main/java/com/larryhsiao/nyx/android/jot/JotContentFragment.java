@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.android.jot;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -12,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.attachments.AttachmentsByJotId;
@@ -19,13 +22,11 @@ import com.larryhsiao.nyx.attachments.NewAttachments;
 import com.larryhsiao.nyx.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.attachments.RemovalAttachmentByJotId;
 import com.larryhsiao.nyx.jots.*;
+import com.larryhsiao.nyx.tags.*;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.clotho.source.ConstSource;
-import com.squareup.picasso.Picasso;
-import com.stfalcon.imageviewer.StfalconImageViewer;
 
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -40,6 +41,7 @@ public class JotContentFragment extends JotFragment {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final String ARG_JOT_ID = "ARG_JOT_ID";
+    private ChipGroup chipGroup;
     private EditText contentEditText;
     private TextView locationText;
     private ImageView attachmentIcon;
@@ -71,6 +73,7 @@ public class JotContentFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        chipGroup = view.findViewById(R.id.jot_tagGroup);
         contentEditText = view.findViewById(R.id.jot_content);
         contentEditText.setText(jot.content());
         attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
@@ -102,6 +105,49 @@ public class JotContentFragment extends JotFragment {
                 .map(it -> Uri.parse(it.uri()))
                 .collect(Collectors.toList())
         );
+
+        ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
+        tagIcon.setOnClickListener(v -> {
+            final EditText editText = new EditText(v.getContext());
+            new AlertDialog.Builder(v.getContext())
+                .setTitle(getString(R.string.new_tag))
+                .setMessage(getString(R.string.enter_tag_name))
+                .setView(editText)
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    final Tag tag = new NewTag(db, editText.getText().toString()).value();
+                    final Chip tagChip = new Chip(v.getContext());
+                    tagChip.setText(tag.title());
+                    tagChip.setLines(1);
+                    tagChip.setMaxLines(1);
+                    tagChip.setTag(tag);
+                    tagChip.setOnClickListener(v1 -> new AlertDialog.Builder(v1.getContext())
+                        .setTitle(tagChip.getText().toString())
+                        .setMessage(getString(R.string.delete))
+                        .setPositiveButton(R.string.confirm, (dialog1, which1) -> chipGroup.removeView(v1))
+                        .setNegativeButton(R.string.cancel, null)
+                        .show());
+                    chipGroup.addView(tagChip);
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .create().show();
+        });
+
+        for (Tag tag : new QueriedTags(new TagsByJotId(db, jot.id())).value()) {
+            Chip chip = new Chip(view.getContext());
+            chip.setTag(tag);
+            chip.setText(tag.title());
+            chip.setOnClickListener(v -> {
+                new AlertDialog.Builder(v.getContext())
+                    .setTitle(tag.title())
+                    .setMessage(R.string.delete)
+                    .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                        chipGroup.removeView(v);
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+            });
+            chipGroup.addView(chip);
+        }
     }
 
     @Override
@@ -128,6 +174,14 @@ public class JotContentFragment extends JotFragment {
                     .collect(Collectors.toList())
                     .toArray(new String[0])
             ).value();
+            new JotTagRemoval(db, jot.id()).fire();
+            for (int i = 0; i < chipGroup.getChildCount(); i++) {
+                new NewJotTag(
+                    db,
+                    new ConstSource<>(jot.id()),
+                    new ConstSource<>(((Tag) chipGroup.getChildAt(i).getTag()).id())
+                ).fire();
+            }
             final Intent intent = new Intent();
             intent.setData(Uri.parse(new JotUri(
                 jot
