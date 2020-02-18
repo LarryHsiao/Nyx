@@ -6,19 +6,14 @@ import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.core.widget.PopupMenuCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.jots.Jot;
 import com.silverhetch.aura.view.ViewHolder;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.imageviewer.StfalconImageViewer;
@@ -27,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.P;
@@ -71,6 +65,12 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
                 });
                 attchmentIcon.setOnLongClickListener(v -> {
                     final PopupMenu popup = new PopupMenu(attchmentIcon.getContext(), holder.itemView);
+                    popup.getMenu().add(R.string.delete).setOnMenuItemClickListener(item -> {
+                        int index = holder.getAdapterPosition();
+                        data.remove(index);
+                        notifyItemRemoved(index);
+                        return true;
+                    });
                     popup.getMenu()
                         .add(attchmentIcon.getContext().getString(R.string.properties))
                         .setOnMenuItemClickListener(item -> {
