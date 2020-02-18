@@ -18,8 +18,10 @@ import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.jots.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
+import static java.lang.Double.MIN_VALUE;
 
 /**
  * Fragment that shows jots by map.
@@ -61,22 +63,27 @@ public class JotMapFragment extends JotFragment {
     }
 
     private void loadData() {
-        final List<Jot> jots = new QueriedJots(new AllJots(db)).value();
+        final List<Jot> jots = new QueriedJots(new AllJots(db)).value()
+            .stream()
+            .filter(it-> it.location()[0]!= MIN_VALUE && it.location()[1]!= MIN_VALUE)
+            .collect(Collectors.toList());
         clusterManger = new ClusterManager<>(getContext(), map);
         map.setOnCameraIdleListener(clusterManger);
         map.setOnMarkerClickListener(clusterManger);
         map.setOnInfoWindowClickListener(clusterManger);
-        LatLngBounds.Builder bounds = LatLngBounds.builder();
-        for (Jot jot : jots) {
-            clusterManger.addItem(new JotMapItem(jot));
-            bounds.include(new LatLng(jot.location()[1], jot.location()[0]));
+        if (jots.size() > 0) {
+            LatLngBounds.Builder bounds = LatLngBounds.builder();
+            for (Jot jot : jots) {
+                clusterManger.addItem(new JotMapItem(jot));
+                bounds.include(new LatLng(jot.location()[1], jot.location()[0]));
+            }
+            map.moveCamera(
+                CameraUpdateFactory.newLatLngBounds(
+                    bounds.build(),
+                    200
+                )
+            );
         }
-        map.moveCamera(
-            CameraUpdateFactory.newLatLngBounds(
-                bounds.build(),
-                200
-            )
-        );
         final DefaultClusterRenderer<JotMapItem> renderer = new DefaultClusterRenderer<>(
             getContext(),
             map,
