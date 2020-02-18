@@ -20,6 +20,7 @@ import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.JotsByDate;
 import com.larryhsiao.nyx.jots.QueriedJots;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -31,6 +32,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class CalendarFragment extends JotFragment {
     private static final int REQUEST_CODE_DIARY_CONTENT = 1000;
+    private CalendarView calendarView;
     private JotListAdapter adapter;
 
     @Nullable
@@ -42,7 +44,8 @@ public class CalendarFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RecyclerView jotList= view.findViewById(R.id.calendar_list);
+        calendarView = view.findViewById(R.id.calendar_calendarView);
+        RecyclerView jotList = view.findViewById(R.id.calendar_list);
         adapter = new JotListAdapter(item -> {
             Fragment frag = JotContentFragment.newInstance(item.id());
             frag.setTargetFragment(this, REQUEST_CODE_DIARY_CONTENT);
@@ -51,8 +54,8 @@ public class CalendarFragment extends JotFragment {
         });
         jotList.setAdapter(adapter);
         loadJotsByDate(java.util.Calendar.getInstance());
+        setTitle(dateString());
         List<Jot> jots = new QueriedJots(new AllJots(db)).value();
-        CalendarView calendarView = view.findViewById(R.id.calendar_calendarView);
         for (Jot jot : jots) {
             final java.util.Calendar jdkCalendar = java.util.Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             jdkCalendar.setTime(new Date(jot.createdTime()));
@@ -72,15 +75,27 @@ public class CalendarFragment extends JotFragment {
 
             @Override
             public void onCalendarSelect(Calendar calendar, boolean isClick) {
+                setTitle(dateString());
                 java.util.Calendar jdkCalendar = java.util.Calendar.getInstance();
                 jdkCalendar.set(
                     calendar.getYear(),
-                    calendar.getMonth()-1,
+                    calendar.getMonth() - 1,
                     calendar.getDay()
                 );
                 loadJotsByDate(jdkCalendar);
             }
         });
+    }
+
+    private String dateString() {
+        Calendar selected = calendarView.getSelectedCalendar();
+        java.util.Calendar date = java.util.Calendar.getInstance();
+        date.set(
+            selected.getYear(),
+            selected.getMonth() - 1,
+            selected.getDay()
+        );
+        return DateFormat.getDateInstance().format(date.getTime());
     }
 
     private void loadJotsByDate(java.util.Calendar jdkCalendar) {
