@@ -1,8 +1,11 @@
 package com.larryhsiao.nyx.android.jot;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
+import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,7 +19,9 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.jots.*;
+import com.silverhetch.clotho.Source;
 
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,42 +60,24 @@ public class JotMapFragment extends JotFragment {
         SupportMapFragment mapFrag = SupportMapFragment.newInstance();
         mapFrag.getMapAsync(googleMap -> {
             map = googleMap;
-            loadData();
+            setupMap();
+            loadData(new AllJots(db));
         });
         getChildFragmentManager().beginTransaction()
             .replace(R.id.map_container, mapFrag)
             .commit();
     }
 
-    private void loadData() {
-        final List<Jot> jots = new QueriedJots(new AllJots(db)).value()
-            .stream()
-            .filter(it-> it.location()[0]!= MIN_VALUE && it.location()[1]!= MIN_VALUE &&
-                it.location()[0]!=0.0 && it.location()[1]!=0.0)
-            .collect(Collectors.toList());
+    private void setupMap() {
         clusterManger = new ClusterManager<>(getContext(), map);
         map.setOnCameraIdleListener(clusterManger);
         map.setOnMarkerClickListener(clusterManger);
         map.setOnInfoWindowClickListener(clusterManger);
-        if (jots.size() > 0) {
-            LatLngBounds.Builder bounds = LatLngBounds.builder();
-            for (Jot jot : jots) {
-                clusterManger.addItem(new JotMapItem(jot));
-                bounds.include(new LatLng(jot.location()[1], jot.location()[0]));
-            }
-            map.moveCamera(
-                CameraUpdateFactory.newLatLngBounds(
-                    bounds.build(),
-                    200
-                )
-            );
-        }
-        final DefaultClusterRenderer<JotMapItem> renderer = new DefaultClusterRenderer<>(
+        clusterManger.setRenderer(new DefaultClusterRenderer<>(
             getContext(),
             map,
             clusterManger
-        );
-        clusterManger.setRenderer(renderer);
+        ));
 
         clusterManger.setOnClusterClickListener(cluster -> {
             nextPage(JotListFragment.newInstanceByJotIds(
@@ -108,6 +95,33 @@ public class JotMapFragment extends JotFragment {
         });
     }
 
+    private void loadData(Source<ResultSet> query) {
+        final List<Jot> jots = new QueriedJots(query).value()
+            .stream()
+            .filter(it -> it.location()[0] != MIN_VALUE && it.location()[1] != MIN_VALUE &&
+                it.location()[0] != 0.0 && it.location()[1] != 0.0)
+            .collect(Collectors.toList());
+        clusterManger.clearItems();
+        clusterManger.setRenderer(new DefaultClusterRenderer<>(
+            getContext(),
+            map,
+            clusterManger
+        ));
+        if (jots.size() > 0) {
+            LatLngBounds.Builder bounds = LatLngBounds.builder();
+            for (Jot jot : jots) {
+                clusterManger.addItem(new JotMapItem(jot));
+                bounds.include(new LatLng(jot.location()[1], jot.location()[0]));
+            }
+            map.moveCamera(
+                CameraUpdateFactory.newLatLngBounds(
+                    bounds.build(),
+                    200
+                )
+            );
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -123,6 +137,53 @@ public class JotMapFragment extends JotFragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.jot_list, menu);
+
+        SearchManager searchManager = ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));
+        MenuItem searchMenuItem = menu.findItem(R.id.menuItem_search);
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setOnCloseListener(() -> {
+            searchMenuItem.collapseActionView();
+            loadData(new AllJots(db));
+            return false;
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (map != null) {
+                    loadData(new JotsByKeyword(db, newText));
+                }else{
+                    searchView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            onQueryTextChange(newText);
+                        }
+                    }, 100);
+                }
+                return true;
+            }
+        });
+        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                searchView.setQuery("", true);
+                return true;
+            }
+        });
+        searchMenuItem.setOnMenuItemClickListener(item -> {
+            searchView.onActionViewExpanded();
+            return false;
+        });
     }
 
     @Override
