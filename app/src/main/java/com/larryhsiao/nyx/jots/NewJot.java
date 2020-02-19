@@ -20,15 +20,25 @@ public class NewJot implements Source<Jot> {
     private final Source<Connection> db;
     private final String content;
     private final double[] location;
+    private final Calendar calendar;
 
     public NewJot(Source<Connection> db, String content) {
-        this(db, content, new double[]{MIN_VALUE, MIN_VALUE});
+        this(db, content, new double[]{MIN_VALUE, MIN_VALUE}, Calendar.getInstance());
+    }
+
+    public NewJot(Source<Connection> db, String content, Calendar calendar) {
+        this(db, content, new double[]{MIN_VALUE, MIN_VALUE}, calendar);
     }
 
     public NewJot(Source<Connection> db, String content, double[] location) {
+        this(db, content, location, Calendar.getInstance());
+    }
+
+    public NewJot(Source<Connection> db, String content, double[] location, Calendar calendar) {
         this.db = db;
         this.content = content;
         this.location = location;
+        this.calendar = calendar;
     }
 
     @Override
@@ -39,7 +49,6 @@ public class NewJot implements Source<Jot> {
                 "VALUES (?, ?, ?)",
             RETURN_GENERATED_KEYS
         )) {
-            final Calendar calendar = Calendar.getInstance();
             stmt.setString(1, content);
             stmt.setTimestamp(2, new Timestamp(calendar.getTimeInMillis()), calendar);
             if (this.location == null) {

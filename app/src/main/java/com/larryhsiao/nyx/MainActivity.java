@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.larryhsiao.nyx.android.jot.JotListFragment;
 import com.larryhsiao.nyx.android.jot.JotMapFragment;
+import com.larryhsiao.nyx.migration.MigrateFromV1;
 import com.silverhetch.aura.AuraActivity;
 
 /**
@@ -38,5 +39,7 @@ public class MainActivity extends AuraActivity {
             navigation.setSelectedItemId(R.id.menuItem_jots);
             rootPage(new JotListFragment());
         }
+
+        new MigrateFromV1(((JotApplication) getApplication()).db, this).fire();
     }
 }
