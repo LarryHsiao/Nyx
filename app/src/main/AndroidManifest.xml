@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.larryhsiao.nyx">
 
-
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false"  />
 
     <application
-        android:name=".NyxApplication"
+        android:name=".JotApplication"
         android:allowBackup="false"
         tools:replace="android:allowBackup"
         android:icon="@mipmap/ic_launcher"
@@ -21,117 +22,35 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
-            <!-- The assetlinks.json is managed out of source which might have other app`s information. -->
-            <tools:validation testUrl="https://larryhsiao.com/nyx" />
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
 
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="https"
-                    android:host="larryhsiao.com"
-                    android:path="/nyx" />
-                <data
-                    android:scheme="http"
-                    android:host="larryhsiao.com"
-                    android:path="/nyx" />
-            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
-        <activity android:name="com.larryhsiao.nyx.view.diary.NewDiaryActivity" />
-        <activity
-            android:name="com.larryhsiao.nyx.view.diary.NewDiaryWidgetActivity"
-            android:taskAffinity=""
-            android:excludeFromRecents="true"
-            android:clearTaskOnLaunch="true" />
+        <activity android:name=".DebugActivity" />
+
         <activity
             android:name="com.schibstedspain.leku.LocationPickerActivity"
-            android:label="@string/pick_location"
-            android:icon="@drawable/ic_location_png"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="adjustPan">
+            android:label="@string/leku_title_activity_location_picker"
+            android:theme="@style/MapTheme"
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/leku_searchable" />
+            <meta-data android:name="android.app.searchable"
+                       android:resource="@xml/leku_searchable" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity
-            android:name="com.larryhsiao.nyx.youtube.YoutubePickerActivity"
-            android:icon="@drawable/ic_youtube_png"
-            android:label="@string/pick_youtube" />
-        <activity android:name=".view.tag.TagInfoActivity" >
-            <intent-filter android:autoVerify="true">
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="https"
-                    android:host="larryhsiao.com"
-                    android:path="/nyx/tags/.*" />
-                <data
-                    android:scheme="http"
-                    android:host="larryhsiao.com"
-                    android:path="/nyx/tags/.*" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".subscription.SponsorActivity" />
-        <activity android:name=".DebugActivity" />
-        <activity android:name=".view.internals.BrowserActivity" />
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.larryhsiao.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider"
-                />
-        </provider>
-
-        <receiver android:name="com.larryhsiao.nyx.view.diary.widget.NewDiaryWidgetProvider">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_new_diary" />
-        </receiver>
-
-        <meta-data
-            android:name="firebase_crashlytics_collection_enabled"
-            android:value="true" />
-
-        <meta-data
-            android:name="firebase_performance_logcat_enabled"
-            android:value="true" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_api_key" />
-
-        <!-- Required by google map sdk -->
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-        <service android:name=".web.WebAccessService" />
-
-        <meta-data
-            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-            android:value="label" />
+            android:value="@string/google_api_key"/>
     </application>
-
-    <dist:module dist:instant="true" />
 </manifest>
