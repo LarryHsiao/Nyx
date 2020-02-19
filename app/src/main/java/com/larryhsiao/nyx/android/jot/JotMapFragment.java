@@ -65,7 +65,8 @@ public class JotMapFragment extends JotFragment {
     private void loadData() {
         final List<Jot> jots = new QueriedJots(new AllJots(db)).value()
             .stream()
-            .filter(it-> it.location()[0]!= MIN_VALUE && it.location()[1]!= MIN_VALUE)
+            .filter(it-> it.location()[0]!= MIN_VALUE && it.location()[1]!= MIN_VALUE &&
+                it.location()[0]!=0.0 && it.location()[1]!=0.0)
             .collect(Collectors.toList());
         clusterManger = new ClusterManager<>(getContext(), map);
         map.setOnCameraIdleListener(clusterManger);
