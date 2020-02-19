@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx;
+package com.larryhsiao.nyx.android.jot;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarView;
+import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.android.jot.JotContentFragment;
 import com.larryhsiao.nyx.android.jot.JotListAdapter;

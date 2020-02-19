@@ -3,6 +3,7 @@ package com.larryhsiao.nyx;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.larryhsiao.nyx.android.jot.CalendarFragment;
 import com.larryhsiao.nyx.android.jot.JotListFragment;
 import com.larryhsiao.nyx.android.jot.JotMapFragment;
 import com.larryhsiao.nyx.migration.MigrateFromV1;
