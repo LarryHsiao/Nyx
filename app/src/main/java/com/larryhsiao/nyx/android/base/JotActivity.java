@@ -1,9 +1,7 @@
 package com.larryhsiao.nyx.android.base;
 
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
-
 import com.larryhsiao.nyx.JotApplication;
 import com.silverhetch.aura.AuraActivity;
 import com.silverhetch.clotho.Source;

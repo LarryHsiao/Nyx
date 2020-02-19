@@ -28,7 +28,9 @@ public class JotById implements Source<Jot> {
         )) {
             stmt.setLong(1, id);
             ResultSet res = stmt.executeQuery();
-            res.next();
+            if (!res.next()) {
+                throw new IllegalArgumentException("Jot not found, id: "+ id);
+            }
             return new ConstJot(
                     res.getLong("id"),
                     res.getString("content"),
@@ -39,7 +41,7 @@ public class JotById implements Source<Jot> {
                     new PointSource(res.getString("location"))
                 );
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

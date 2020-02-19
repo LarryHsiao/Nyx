@@ -24,7 +24,7 @@ public class AllJots implements Source<ResultSet> {
                     "SELECT * FROM jots ORDER BY CREATEDTIME DESC;"
             );
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

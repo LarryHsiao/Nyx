@@ -31,7 +31,7 @@ public class NewJotTag implements Action {
             stmt.setLong(2, tagId.value());
             stmt.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

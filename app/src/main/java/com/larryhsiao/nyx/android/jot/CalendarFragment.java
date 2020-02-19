@@ -14,8 +14,6 @@ import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
-import com.larryhsiao.nyx.android.jot.JotContentFragment;
-import com.larryhsiao.nyx.android.jot.JotListAdapter;
 import com.larryhsiao.nyx.jots.AllJots;
 import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.JotsByDate;
@@ -72,6 +70,7 @@ public class CalendarFragment extends JotFragment {
         calendarView.setOnCalendarSelectListener(new CalendarView.OnCalendarSelectListener() {
             @Override
             public void onCalendarOutOfRange(Calendar calendar) {
+                // Do nothing
             }
 
             @Override

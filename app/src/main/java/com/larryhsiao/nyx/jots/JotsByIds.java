@@ -35,7 +35,7 @@ public class JotsByIds implements Source<ResultSet> {
                     "WHERE ID IN (" + idStr.toString() + ")"
             );
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

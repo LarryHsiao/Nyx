@@ -30,7 +30,7 @@ public class JotsByTagId implements Source<ResultSet> {
             stmt.setLong(1, tagId.value());
             return stmt.executeQuery();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

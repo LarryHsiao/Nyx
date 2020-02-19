@@ -4,7 +4,12 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,7 +18,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
-import com.larryhsiao.nyx.jots.*;
+import com.larryhsiao.nyx.jots.AllJots;
+import com.larryhsiao.nyx.jots.Jot;
+import com.larryhsiao.nyx.jots.JotById;
+import com.larryhsiao.nyx.jots.JotUriId;
+import com.larryhsiao.nyx.jots.JotsByIds;
+import com.larryhsiao.nyx.jots.JotsByKeyword;
+import com.larryhsiao.nyx.jots.QueriedJots;
 
 import java.util.List;
 
@@ -113,7 +124,7 @@ public class JotListFragment extends JotFragment {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                searchView.setQuery("",true);
+                searchView.setQuery("", true);
                 return true;
             }
         });
@@ -137,16 +148,12 @@ public class JotListFragment extends JotFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CREATE_JOT) {
-            if (resultCode == RESULT_OK) {
-                adapter.insertJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
-                getFragmentManager().popBackStack();
-            }
-        } else if (requestCode == REQUEST_CODE_JOT_CONTENT) {
-            if (resultCode == RESULT_OK) {
-                adapter.updateJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
-                getFragmentManager().popBackStack();
-            }
+        if (requestCode == REQUEST_CODE_CREATE_JOT && resultCode == RESULT_OK) {
+            adapter.insertJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
+            getFragmentManager().popBackStack();
+        } else if (requestCode == REQUEST_CODE_JOT_CONTENT && resultCode == RESULT_OK) {
+            adapter.updateJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
+            getFragmentManager().popBackStack();
         }
     }
 }

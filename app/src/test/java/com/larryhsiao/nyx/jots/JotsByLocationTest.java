@@ -4,7 +4,10 @@ import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.h2.MemoryH2Conn;
 import org.junit.Assert;
 import org.junit.Test;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
 import java.sql.Connection;

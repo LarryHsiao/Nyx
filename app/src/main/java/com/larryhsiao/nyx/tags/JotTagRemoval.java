@@ -27,7 +27,7 @@ public class JotTagRemoval implements Action {
             stmt.setLong(1, jotId);
             stmt.executeUpdate();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

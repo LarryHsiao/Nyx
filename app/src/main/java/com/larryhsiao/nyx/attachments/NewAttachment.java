@@ -34,10 +34,12 @@ public class NewAttachment implements Source<Attachment> {
             stmt.setLong(2, jotId);
             stmt.executeUpdate();
             final ResultSet res = stmt.getGeneratedKeys();
-            res.next();
+            if (!res.next()) {
+                throw new IllegalArgumentException("Creating Attachment failed, jotId: "+ jotId+", Uri: "+ uri);
+            }
             return new ConstAttachment(res.getLong(1), jotId, uri);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

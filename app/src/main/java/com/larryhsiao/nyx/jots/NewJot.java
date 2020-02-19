@@ -7,7 +7,11 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Calendar;
 
 import static java.lang.Double.MIN_VALUE;
@@ -66,14 +70,16 @@ public class NewJot implements Source<Jot> {
                 throw new SQLException("Insert failed");
             }
             final ResultSet res = stmt.getGeneratedKeys();
-            res.next();
+            if (!res.next()) {
+                throw new IllegalArgumentException("Create jot failed: " + content);
+            }
             return new ConstJot(
                 res.getInt(1),
                 content,
                 calendar.getTimeInMillis(),
                 new ConstSource<>(location));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

@@ -30,10 +30,12 @@ public class NewTag implements Source<Tag> {
             stmt.setString(1, title);
             stmt.executeUpdate();
             ResultSet res = stmt.getGeneratedKeys();
-            res.next();
+            if (!res.next()) {
+                throw new IllegalArgumentException("Creating tag failed, title: "+ title);
+            }
             return new ConstTag(res.getLong(1), title);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

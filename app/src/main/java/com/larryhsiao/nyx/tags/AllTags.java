@@ -24,7 +24,7 @@ public class AllTags implements Source<ResultSet> {
                 "SELECT * FROM TAGS;"
             );
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

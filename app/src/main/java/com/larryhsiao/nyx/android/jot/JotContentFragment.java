@@ -5,7 +5,12 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,8 +26,17 @@ import com.larryhsiao.nyx.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.attachments.NewAttachments;
 import com.larryhsiao.nyx.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.attachments.RemovalAttachmentByJotId;
-import com.larryhsiao.nyx.jots.*;
-import com.larryhsiao.nyx.tags.*;
+import com.larryhsiao.nyx.jots.Jot;
+import com.larryhsiao.nyx.jots.JotById;
+import com.larryhsiao.nyx.jots.JotUri;
+import com.larryhsiao.nyx.jots.UpdateJot;
+import com.larryhsiao.nyx.jots.UpdatedJot;
+import com.larryhsiao.nyx.tags.JotTagRemoval;
+import com.larryhsiao.nyx.tags.NewJotTag;
+import com.larryhsiao.nyx.tags.NewTag;
+import com.larryhsiao.nyx.tags.QueriedTags;
+import com.larryhsiao.nyx.tags.Tag;
+import com.larryhsiao.nyx.tags.TagsByJotId;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.clotho.source.ConstSource;
@@ -32,7 +46,9 @@ import java.util.stream.Collectors;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.ACTION_OPEN_DOCUMENT;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
-import static com.schibstedspain.leku.LocationPickerActivityKt.*;
+import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
+import static com.schibstedspain.leku.LocationPickerActivityKt.LOCATION_ADDRESS;
+import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
 
 /**
  * Fragment that shows the Jot content.
@@ -44,7 +60,6 @@ public class JotContentFragment extends JotFragment {
     private ChipGroup chipGroup;
     private EditText contentEditText;
     private TextView locationText;
-    private ImageView attachmentIcon;
     private AttachmentAdapter attachmentAdapter;
     private double[] currentLocation = null;
     private Jot jot;
@@ -76,7 +91,7 @@ public class JotContentFragment extends JotFragment {
         chipGroup = view.findViewById(R.id.jot_tagGroup);
         contentEditText = view.findViewById(R.id.jot_content);
         contentEditText.setText(jot.content());
-        attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
+        ImageView attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
         attachmentIcon.setOnClickListener(v -> {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");

@@ -32,7 +32,7 @@ public class JotsByLocation implements Source<ResultSet> {
             stmt.setString(1, geometry.toText());
             return stmt.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

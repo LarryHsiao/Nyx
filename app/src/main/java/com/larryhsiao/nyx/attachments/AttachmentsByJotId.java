@@ -29,7 +29,7 @@ public class AttachmentsByJotId implements Source<ResultSet> {
             stmt.setLong(1, jotId);
             return stmt.executeQuery();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

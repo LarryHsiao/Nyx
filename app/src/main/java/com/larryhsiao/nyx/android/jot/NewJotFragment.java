@@ -4,7 +4,12 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,7 +35,9 @@ import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.ACTION_OPEN_DOCUMENT;
-import static com.schibstedspain.leku.LocationPickerActivityKt.*;
+import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
+import static com.schibstedspain.leku.LocationPickerActivityKt.LOCATION_ADDRESS;
+import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
 import static java.lang.Double.MIN_VALUE;
 
 /**
@@ -43,7 +50,6 @@ public class NewJotFragment extends JotFragment {
     private static final int REQUEST_CODE_FILE_PICKER = 1001;
     private ChipGroup tagGroup;
     private TextView locationText;
-    private ImageView attachmentIcon;
     private AttachmentAdapter attachmentAdapter;
     private double[] currentLocation = null;
 
@@ -64,7 +70,7 @@ public class NewJotFragment extends JotFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tagGroup = view.findViewById(R.id.jot_tagGroup);
-        attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
+        ImageView attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
         attachmentIcon.setOnClickListener(v -> {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");

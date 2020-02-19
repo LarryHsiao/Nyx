@@ -30,7 +30,7 @@ public class JotsByDate implements Source<ResultSet> {
             stmt.setDate(1, date);
             return stmt.executeQuery();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

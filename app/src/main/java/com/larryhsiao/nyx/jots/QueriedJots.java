@@ -46,7 +46,7 @@ public class QueriedJots implements Source<List<Jot>> {
             }
             return jots;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

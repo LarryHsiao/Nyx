@@ -37,6 +37,10 @@ android {
 
     packagingOptions {
     }
+
+    lintOptions{
+        lintConfig file("lint.xml")
+    }
 }
 
 dependencies {

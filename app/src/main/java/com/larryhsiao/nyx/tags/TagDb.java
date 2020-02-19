@@ -35,7 +35,7 @@ public class TagDb implements Source<Connection> {
             );
             return conn;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

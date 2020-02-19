@@ -29,7 +29,7 @@ public class QueriedAttachments implements Source<List<Attachment>> {
             }
             return attachments;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

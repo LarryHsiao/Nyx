@@ -28,7 +28,7 @@ public class QueriedTags implements Source<List<Tag>> {
             }
             return tags;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

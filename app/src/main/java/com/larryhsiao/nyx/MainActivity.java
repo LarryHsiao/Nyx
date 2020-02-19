@@ -13,14 +13,13 @@ import com.silverhetch.aura.AuraActivity;
  * Entry Activity of Nyx.
  */
 public class MainActivity extends AuraActivity {
-    private BottomNavigationView navigation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.page_main);
         setupPageControl(R.id.main_page_container);
-        navigation = findViewById(R.id.main_navigation);
+        BottomNavigationView navigation = findViewById(R.id.main_navigation);
         navigation.setOnNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.menuItem_jots) {
                 rootPage(new JotListFragment());
