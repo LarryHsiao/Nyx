@@ -1,12 +1,12 @@
 package com.larryhsiao.nyx;
 
+import android.Manifest;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.larryhsiao.nyx.android.jot.CalendarFragment;
 import com.larryhsiao.nyx.android.jot.JotListFragment;
 import com.larryhsiao.nyx.android.jot.JotMapFragment;
-import com.larryhsiao.nyx.migration.MigrateFromV1;
 import com.silverhetch.aura.AuraActivity;
 
 /**
@@ -39,7 +39,12 @@ public class MainActivity extends AuraActivity {
             navigation.setSelectedItemId(R.id.menuItem_jots);
             rootPage(new JotListFragment());
         }
+        requestPermissionsByObj(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE});
+    }
 
-        new MigrateFromV1(((JotApplication) getApplication()).db, this).fire();
+    @Override
+    public void onPermissionGranted() {
+        super.onPermissionGranted();
+        new ImportFromBackup(((JotApplication) getApplication()).db).fire();
     }
 }
