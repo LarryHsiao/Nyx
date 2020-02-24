@@ -45,3 +45,5 @@
 # Suppress warnings on sun.misc.Unsafe
 -dontnote sun.misc.Unsafe
 -dontwarn sun.misc.Unsafe
+
+-keep class org.h2.**{*;}

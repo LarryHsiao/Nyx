@@ -21,6 +21,11 @@ public class JotApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        try {
+            Class.forName("org.h2.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         db = new SingleConn(new AttachmentDb(
             new TagDb(
                 new JotsDb(
