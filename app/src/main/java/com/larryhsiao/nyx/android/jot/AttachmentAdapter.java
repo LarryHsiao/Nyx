@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.android.jot;
 
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -49,12 +50,16 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             final ImageView attchmentIcon = holder.getImageView(R.id.itemAttachment_icon);
             final Uri uri = data.get(position);
             final String mimeType = contentResolver.getType(uri);
-            if (mimeType != null && mimeType.startsWith("image/")) {
+            if ((mimeType != null && mimeType.startsWith("image/")) || uri.toString().startsWith("file")) {
                 final Bitmap iconBitmap;
-                if (SDK_INT >= P) {
-                    iconBitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri));
+                if (uri.toString().startsWith("file")) {
+                    iconBitmap = BitmapFactory.decodeFile(uri.toString().replace("file:",""));
                 } else {
-                    iconBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+                    if (SDK_INT >= P) {
+                        iconBitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri));
+                    } else {
+                        iconBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+                    }
                 }
                 attchmentIcon.setImageBitmap(iconBitmap);
                 attchmentIcon.setOnClickListener(v -> {
