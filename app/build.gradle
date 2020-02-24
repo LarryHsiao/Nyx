@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
-def nyxVersionName = "v2.0.0"
-def nyxVersionCode = 20000
+def nyxVersionName = "v2.0.1"
+def nyxVersionCode = 20001
 
 android {
     compileSdkVersion 29
