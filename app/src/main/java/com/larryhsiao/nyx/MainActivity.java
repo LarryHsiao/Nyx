@@ -39,12 +39,5 @@ public class MainActivity extends AuraActivity {
             navigation.setSelectedItemId(R.id.menuItem_jots);
             rootPage(new JotListFragment());
         }
-        requestPermissionsByObj(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE});
-    }
-
-    @Override
-    public void onPermissionGranted() {
-        super.onPermissionGranted();
-        new ImportFromBackup(((JotApplication) getApplication()).db).fire();
     }
 }
