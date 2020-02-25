@@ -1,13 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application >
+    <application>
         <activity android:name="com.larryhsiao.nyx.DebugActivity"
-            android:label="@string/jotted_debug"
-            >
+                  android:label="@string/jotted_debug">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false"/>
+
+        <meta-data android:name="firebase_analytics_collection_deactivated" android:value="true" />
     </application>
 </manifest>
