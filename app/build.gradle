@@ -3,8 +3,8 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 
-def nyxVersionName = "v2.0.3"
-def nyxVersionCode = 20003
+def nyxVersionName = "v2.0.4"
+def nyxVersionCode = 20004
 
 android {
     compileSdkVersion 29
@@ -58,6 +58,7 @@ dependencies {
     implementation 'com.schibstedspain.android:leku:6.4.0'
     implementation "com.silverhetch:aura:1.20.3"
     implementation "com.silverhetch:clotho:1.16.3"
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "androidx.appcompat:appcompat:1.1.0"
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"

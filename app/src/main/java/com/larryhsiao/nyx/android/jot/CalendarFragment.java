@@ -45,7 +45,7 @@ public class CalendarFragment extends JotFragment {
         super.onViewCreated(view, savedInstanceState);
         calendarView = view.findViewById(R.id.calendar_calendarView);
         RecyclerView jotList = view.findViewById(R.id.calendar_list);
-        adapter = new JotListAdapter(item -> {
+        adapter = new JotListAdapter(db, item -> {
             Fragment frag = JotContentFragment.newInstance(item.id());
             frag.setTargetFragment(this, REQUEST_CODE_DIARY_CONTENT);
             nextPage(frag);

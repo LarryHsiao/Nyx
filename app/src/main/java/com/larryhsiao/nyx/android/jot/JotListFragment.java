@@ -68,7 +68,7 @@ public class JotListFragment extends JotFragment {
         super.onViewCreated(view, savedInstanceState);
         final RecyclerView list = view.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        list.setAdapter(adapter = new JotListAdapter(jot -> {
+        list.setAdapter(adapter = new JotListAdapter(db, jot -> {
             Fragment frag = JotContentFragment.newInstance(jot.id());
             frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
             nextPage(frag);

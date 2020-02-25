@@ -1,11 +1,7 @@
 package com.larryhsiao.nyx.android.jot;
 
 import android.content.ContentResolver;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageDecoder;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,18 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.larryhsiao.nyx.R;
 import com.silverhetch.aura.view.ViewHolder;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.P;
+import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 
 /**
  * Adapter for displaying attachments.
@@ -45,58 +40,49 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        try {
-            final ContentResolver contentResolver = holder.itemView.getContext().getContentResolver();
-            final ImageView attchmentIcon = holder.getImageView(R.id.itemAttachment_icon);
-            final Uri uri = data.get(position);
-            final String mimeType = contentResolver.getType(uri);
-            if ((mimeType != null && mimeType.startsWith("image/")) || uri.toString().startsWith("file")) {
-                final Bitmap iconBitmap;
-                if (uri.toString().startsWith("file")) {
-                    iconBitmap = BitmapFactory.decodeFile(uri.toString().replace("file:",""));
-                } else {
-                    if (SDK_INT >= P) {
-                        iconBitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri));
-                    } else {
-                        iconBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
-                    }
+        final ImageView attchmentIcon = holder.getImageView(R.id.itemAttachment_icon);
+        final Uri uri = data.get(position);
+        CircularProgressDrawable progressDrawable = new CircularProgressDrawable(attchmentIcon.getContext());
+        progressDrawable.setStyle(LARGE);
+        Picasso.get().load(uri)
+            .placeholder(progressDrawable)
+            .into(attchmentIcon);
+        attchmentIcon.setOnClickListener(v -> {
+            new StfalconImageViewer.Builder<>(
+                attchmentIcon.getContext(),
+                Collections.singletonList(uri),
+                (imageView, image) -> {
+                    CircularProgressDrawable progressDrawable2 = new CircularProgressDrawable(attchmentIcon.getContext());
+                    progressDrawable2.setStyle(LARGE);
+                    Picasso.get()
+                        .load(image)
+                        .placeholder(progressDrawable2)
+                        .into(imageView);
                 }
-                attchmentIcon.setImageBitmap(iconBitmap);
-                attchmentIcon.setOnClickListener(v -> {
-                    new StfalconImageViewer.Builder<>(
-                        attchmentIcon.getContext(),
-                        Collections.singletonList(uri),
-                        (imageView, image) -> Picasso.get().load(image).into(imageView)).show();
-                });
-                attchmentIcon.setOnLongClickListener(v -> {
-                    final PopupMenu popup = new PopupMenu(attchmentIcon.getContext(), holder.itemView);
-                    popup.getMenu().add(R.string.delete).setOnMenuItemClickListener(item -> {
-                        int index = holder.getAdapterPosition();
-                        data.remove(index);
-                        notifyItemRemoved(index);
-                        return true;
-                    });
-                    popup.getMenu()
-                        .add(attchmentIcon.getContext().getString(R.string.properties))
-                        .setOnMenuItemClickListener(item -> {
-                            final AlertDialog dialog = new AlertDialog.Builder(attchmentIcon.getContext())
-                                .setView(R.layout.dialog_properties)
-                                .show();
-                            ((TextView) dialog.findViewById(R.id.properties_text)).setText(
-                                "Uri: " + uri.toString()
-                            );
-                            return true;
-                        });
-                    popup.show();
+            ).show();
+        });
+        attchmentIcon.setOnLongClickListener(v -> {
+            final PopupMenu popup = new PopupMenu(attchmentIcon.getContext(), holder.itemView);
+            popup.getMenu().add(R.string.delete).setOnMenuItemClickListener(item -> {
+                int index = holder.getAdapterPosition();
+                data.remove(index);
+                notifyItemRemoved(index);
+                return true;
+            });
+            popup.getMenu()
+                .add(attchmentIcon.getContext().getString(R.string.properties))
+                .setOnMenuItemClickListener(item -> {
+                    final AlertDialog dialog = new AlertDialog.Builder(attchmentIcon.getContext())
+                        .setView(R.layout.dialog_properties)
+                        .show();
+                    ((TextView) dialog.findViewById(R.id.properties_text)).setText(
+                        "Uri: " + uri.toString()
+                    );
                     return true;
                 });
-            } else {
-                attchmentIcon.setImageDrawable(null); // clear image
-                attchmentIcon.setOnClickListener(null);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            popup.show();
+            return true;
+        });
     }
 
     @Override
