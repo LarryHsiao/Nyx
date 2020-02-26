@@ -199,7 +199,7 @@ public class JotMapFragment extends JotFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_newJot) {
-            Fragment frag = new NewJotFragment();
+            Fragment frag = new JotContentFragment();
             frag.setTargetFragment(this, REQUEST_CODE_NEW_JOT);
             nextPage(frag);
             return true;

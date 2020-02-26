@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="16dp"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -8,20 +10,32 @@
     <View
         android:layout_width="match_parent"
         android:background="@drawable/bg_edit_field"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
+
+    <TextView android:layout_width="wrap_content"
+              android:padding="16dp"
+              android:id="@+id/jot_date"
+              android:drawablePadding="8dp"
+              style="@style/TextAppearance.AppCompat.Light.SearchResult.Title"
+              app:layout_constraintTop_toTopOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              android:drawableStart="@drawable/ic_calendar"
+              android:layout_height="wrap_content"
+              tools:text="2020/01/01"
+    />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/jot_date"
         android:gravity="top"
         app:layout_constraintBottom_toTopOf="@id/jot_attachment_list"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:background="@null"
         android:id="@+id/jot_content"
-        android:layout_height="0dp" />
+        android:layout_height="0dp"/>
 
     <ImageView
         android:layout_width="48dp"
@@ -30,15 +44,15 @@
         android:id="@+id/jot_tagIcon"
         app:layout_constraintStart_toStartOf="@id/jot_content"
         android:src="@drawable/ic_tag"
-        android:layout_height="48dp" />
+        android:layout_height="48dp"/>
 
     <com.google.android.material.chip.ChipGroup
         android:layout_width="0dp"
         android:id="@+id/jot_tagGroup"
-       app:layout_constraintStart_toEndOf="@id/jot_tagIcon"
+        app:layout_constraintStart_toEndOf="@id/jot_tagIcon"
         app:layout_constraintBottom_toTopOf="@id/jot_attachment_list"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"/>
 
     <ImageView
         android:layout_width="48dp"
@@ -50,7 +64,7 @@
         app:layout_constraintTop_toTopOf="@id/jot_attachment_list"
         app:layout_constraintBottom_toBottomOf="@id/jot_attachment_list"
         android:src="@drawable/ic_attachment"
-        android:layout_height="48dp" />
+        android:layout_height="48dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="0dp"
@@ -60,7 +74,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_height="150dp" />
+        android:layout_height="150dp"/>
 
     <TextView
         android:layout_width="0dp"
@@ -70,5 +84,5 @@
         android:drawableStart="@drawable/ic_location_3"
         app:layout_constraintStart_toStartOf="@id/jot_content"
         app:layout_constraintEnd_toEndOf="@id/jot_content"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

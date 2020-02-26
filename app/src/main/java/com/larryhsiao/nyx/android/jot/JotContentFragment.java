@@ -1,10 +1,13 @@
 package com.larryhsiao.nyx.android.jot;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,11 +29,12 @@ import com.larryhsiao.nyx.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.attachments.NewAttachments;
 import com.larryhsiao.nyx.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.attachments.RemovalAttachmentByJotId;
+import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.JotById;
 import com.larryhsiao.nyx.jots.JotUri;
-import com.larryhsiao.nyx.jots.UpdateJot;
-import com.larryhsiao.nyx.jots.UpdatedJot;
+import com.larryhsiao.nyx.jots.PostedJot;
+import com.larryhsiao.nyx.jots.WrappedJot;
 import com.larryhsiao.nyx.tags.JotTagRemoval;
 import com.larryhsiao.nyx.tags.NewJotTag;
 import com.larryhsiao.nyx.tags.NewTag;
@@ -41,6 +45,9 @@ import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.clotho.source.ConstSource;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -49,6 +56,7 @@ import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LOCATION_ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
+import static java.lang.Double.MIN_VALUE;
 
 /**
  * Fragment that shows the Jot content.
@@ -58,10 +66,8 @@ public class JotContentFragment extends JotFragment {
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final String ARG_JOT_ID = "ARG_JOT_ID";
     private ChipGroup chipGroup;
-    private EditText contentEditText;
     private TextView locationText;
     private AttachmentAdapter attachmentAdapter;
-    private double[] currentLocation = null;
     private Jot jot;
 
     public static Fragment newInstance(long jotId) {
@@ -76,7 +82,16 @@ public class JotContentFragment extends JotFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        jot = new JotById(getArguments().getLong(ARG_JOT_ID), db).value();
+        if (getArguments() != null) {
+            long jotId = getArguments().getLong(ARG_JOT_ID, -1);
+            jot = new JotById(jotId, db).value();
+        } else {
+            jot = new ConstJot(-1,
+                "",
+                new Date().getTime(),
+                new ConstSource<>(new double[]{MIN_VALUE, MIN_VALUE})
+            );
+        }
     }
 
     @Nullable
@@ -88,9 +103,47 @@ public class JotContentFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        TextView date = view.findViewById(R.id.jot_date);
+        date.setOnClickListener(v -> {
+            DatePickerDialog dialog = new DatePickerDialog(view.getContext());
+            dialog.setOnDateSetListener((view1, year, month, dayOfMonth) -> {
+                jot = new WrappedJot(jot) {
+                    @Override
+                    public long createdTime() {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(year, month, dayOfMonth);
+                        return calendar.getTimeInMillis();
+                    }
+                };
+                updateDateIndicator(date);
+            });
+            dialog.show();
+        });
+        updateDateIndicator(date);
         chipGroup = view.findViewById(R.id.jot_tagGroup);
-        contentEditText = view.findViewById(R.id.jot_content);
+        EditText contentEditText = view.findViewById(R.id.jot_content);
         contentEditText.setText(jot.content());
+        contentEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Leave it empty
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Leave it empty
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                jot = new WrappedJot(jot) {
+                    @Override
+                    public String content() {
+                        return s.toString();
+                    }
+                };
+            }
+        });
         ImageView attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
         attachmentIcon.setOnClickListener(v -> {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
@@ -107,10 +160,6 @@ public class JotContentFragment extends JotFragment {
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
         locationText.setText(new LocationAddress(view.getContext(), location).value().getAddressLine(0));
-        currentLocation = new double[]{
-            jot.location()[0],
-            jot.location()[1]
-        };
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
         attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
         attachmentAdapter.loadAttachments(
@@ -165,6 +214,10 @@ public class JotContentFragment extends JotFragment {
         }
     }
 
+    private void updateDateIndicator(TextView date) {
+        date.setText(SimpleDateFormat.getDateInstance().format(new Date(jot.createdTime())));
+    }
+
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -174,11 +227,7 @@ public class JotContentFragment extends JotFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_save) {
-            new UpdateJot(new UpdatedJot(
-                jot,
-                contentEditText.getText().toString(),
-                new ConstSource<>(currentLocation)
-            ), db).fire();
+            jot = new PostedJot(db, jot).value();
             new RemovalAttachmentByJotId(db, jot.id()).fire();
             new NewAttachments(
                 db,
@@ -198,9 +247,7 @@ public class JotContentFragment extends JotFragment {
                 ).fire();
             }
             final Intent intent = new Intent();
-            intent.setData(Uri.parse(new JotUri(
-                jot
-            ).value().toASCIIString()));
+            intent.setData(Uri.parse(new JotUri(jot).value().toASCIIString()));
             sendResult(0, RESULT_OK, intent);
             return true;
         }
@@ -211,9 +258,14 @@ public class JotContentFragment extends JotFragment {
     public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_LOCATION_PICKER && resultCode == RESULT_OK) {
-            currentLocation = new double[]{
-                data.getDoubleExtra(LONGITUDE, 0.0),
-                data.getDoubleExtra(LATITUDE, 0.0)
+            jot = new WrappedJot(jot) {
+                @Override
+                public double[] location() {
+                    return new double[]{
+                        data.getDoubleExtra(LONGITUDE, 0.0),
+                        data.getDoubleExtra(LATITUDE, 0.0)
+                    };
+                }
             };
             locationText.setText(data.getStringExtra(LOCATION_ADDRESS));
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {

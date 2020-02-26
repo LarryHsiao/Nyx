@@ -10,6 +10,8 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 
 /**
  * Action to update given Jot
@@ -29,8 +31,8 @@ public class UpdateJot implements Action {
         try (PreparedStatement stmt = conn.prepareStatement(
             // language=H2
             "UPDATE jots " +
-                "SET content=?1, location=?2 " +
-                "WHERE id=?3;"
+                "SET content=?1, location=?2, CREATEDTIME=?3 " +
+                "WHERE id=?4;"
         )) {
             stmt.setString(1, updated.content());
             stmt.setString(2, new Point(
@@ -43,7 +45,8 @@ public class UpdateJot implements Action {
                     }
                 ), new GeometryFactory()
             ).toText());
-            stmt.setLong(3, updated.id());
+            stmt.setTimestamp(3,new Timestamp(updated.createdTime()), Calendar.getInstance());
+            stmt.setLong(4, updated.id());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
