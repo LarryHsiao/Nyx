@@ -68,7 +68,7 @@ public class JotListFragment extends JotFragment {
         super.onViewCreated(view, savedInstanceState);
         final RecyclerView list = view.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        list.setAdapter(adapter = new JotListAdapter(jot -> {
+        list.setAdapter(adapter = new JotListAdapter(db, jot -> {
             Fragment frag = JotContentFragment.newInstance(jot.id());
             frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
             nextPage(frag);
@@ -137,7 +137,7 @@ public class JotListFragment extends JotFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_newJot) {
-            Fragment frag = new NewJotFragment();
+            Fragment frag = new JotContentFragment();
             frag.setTargetFragment(this, REQUEST_CODE_CREATE_JOT);
             nextPage(frag);
             return true;
