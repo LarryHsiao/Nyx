@@ -47,3 +47,4 @@
 -dontwarn sun.misc.Unsafe
 
 -keep class org.h2.**{*;}
+-keep class com.haibin.calendarview.**{*;}
