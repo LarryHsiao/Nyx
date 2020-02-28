@@ -8,6 +8,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -177,6 +178,9 @@ public class JotContentFragment extends JotFragment {
         ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
         tagIcon.setOnClickListener(v -> {
             final EditText editText = new EditText(v.getContext());
+            editText.setLines(1);
+            editText.setMaxLines(1);
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
             new AlertDialog.Builder(v.getContext())
                 .setTitle(getString(R.string.new_tag))
                 .setMessage(getString(R.string.enter_tag_name))
