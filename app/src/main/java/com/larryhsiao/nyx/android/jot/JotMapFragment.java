@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.android.jot;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +31,7 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.LocationString;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.jots.AllJots;
+import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.JotById;
 import com.larryhsiao.nyx.jots.JotUriId;
@@ -95,22 +98,25 @@ public class JotMapFragment extends JotFragment {
             map,
             clusterManger
         ));
-
         clusterManger.setOnClusterClickListener(cluster -> {
             nextPage(JotListFragment.newInstanceByJotIds(
                 cluster.getItems().stream()
-                    .mapToLong(it -> it.getId())
+                    .mapToLong(it -> it.getJot().id())
                     .toArray()
             ));
             return true;
         });
         clusterManger.setOnClusterItemClickListener(cluster -> {
-            Fragment frag = JotContentFragment.newInstance(cluster.getId());
+            Fragment frag = JotContentFragment.newInstance(new ConstJot(cluster.getJot()));
             frag.setTargetFragment(this, REQUEST_CODE_UPDATE_JOT);
             nextPage(frag);
             return true;
         });
-
+        clusterManger.setOnClusterItemInfoWindowClickListener(jotMapItem -> {
+            Fragment frag = JotContentFragment.newInstance(new ConstJot(jotMapItem.getJot()));
+            frag.setTargetFragment(this, REQUEST_CODE_UPDATE_JOT);
+            nextPage(frag);
+        });
         map.setOnMapClickListener(latLng -> {
             if (selectedMarker != null) {
                 selectedMarker.remove();
@@ -124,6 +130,29 @@ public class JotMapFragment extends JotFragment {
             option.title(new LocationString(address).value());
             selectedMarker = map.addMarker(option);
             selectedMarker.showInfoWindow();
+        });
+
+        map.setOnInfoWindowLongClickListener(marker -> {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+            adapter.add(getString(R.string.new_jot));
+            new AlertDialog.Builder(getContext())
+                .setTitle(marker.getPosition().toString())
+                .setAdapter(adapter, (dialog, which) -> {
+                    if (which == 0) {
+                        Fragment frag = JotContentFragment.newInstance(new ConstJot(
+                            -1,
+                            "",
+                            System.currentTimeMillis(),
+                            new double[]{
+                                marker.getPosition().longitude,
+                                marker.getPosition().latitude
+                            }
+                        ));
+                        frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
+                        nextPage(frag);
+                    }
+                })
+                .show();
         });
     }
 
@@ -246,7 +275,7 @@ public class JotMapFragment extends JotFragment {
             long updatedId = new JotUriId(data.getData().toString()).value();
             JotMapItem updateItem = null;
             for (JotMapItem item : clusterManger.getAlgorithm().getItems()) {
-                if (item.getId() == updatedId) {
+                if (item.getJot().id() == updatedId) {
                     updateItem = item;
                     break;
                 }

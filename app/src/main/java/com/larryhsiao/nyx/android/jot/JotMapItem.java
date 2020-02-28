@@ -5,6 +5,8 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.larryhsiao.nyx.jots.Jot;
 import com.silverhetch.clotho.time.HttpTimeFormat;
 
+import java.text.DateFormat;
+
 /**
  * Item on Cluster grouping map.
  */
@@ -18,8 +20,8 @@ public class JotMapItem implements ClusterItem {
     /**
      * Get id of this jot.
      */
-    public long getId() {
-        return jot.id();
+    public Jot getJot() {
+        return jot;
     }
 
     @Override
@@ -34,6 +36,6 @@ public class JotMapItem implements ClusterItem {
 
     @Override
     public String getSnippet() {
-        return new HttpTimeFormat().value().format(jot.createdTime());
+        return DateFormat.getDateInstance().format(jot.createdTime());
     }
 }

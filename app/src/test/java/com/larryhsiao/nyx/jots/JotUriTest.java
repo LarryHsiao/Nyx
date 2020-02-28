@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.jots;
 
-import com.silverhetch.clotho.source.ConstSource;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +21,7 @@ public class JotUriTest {
                     1,
                     "content",
                     0,
-                    new ConstSource<>(new double[]{})
+                    new double[]{}
                 )
             ).value().toASCIIString()
         );

@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.gson.Gson;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.LocationString;
 import com.larryhsiao.nyx.android.base.JotFragment;
@@ -34,7 +35,6 @@ import com.larryhsiao.nyx.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.attachments.RemovalAttachmentByJotId;
 import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
-import com.larryhsiao.nyx.jots.JotById;
 import com.larryhsiao.nyx.jots.JotUri;
 import com.larryhsiao.nyx.jots.PostedJot;
 import com.larryhsiao.nyx.jots.WrappedJot;
@@ -67,16 +67,16 @@ import static java.lang.Double.MIN_VALUE;
 public class JotContentFragment extends JotFragment {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
-    private static final String ARG_JOT_ID = "ARG_JOT_ID";
+    private static final String ARG_JOT_JSON = "ARG_JOT";
     private ChipGroup chipGroup;
     private TextView locationText;
     private AttachmentAdapter attachmentAdapter;
     private Jot jot;
 
-    public static Fragment newInstance(long jotId) {
+    public static Fragment newInstance(ConstJot jot) {
         final Fragment frag = new JotContentFragment();
         Bundle args = new Bundle();
-        args.putLong(ARG_JOT_ID, jotId);
+        args.putString(ARG_JOT_JSON, new Gson().toJson(jot));
         frag.setArguments(args);
         return frag;
     }
@@ -86,14 +86,16 @@ public class JotContentFragment extends JotFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         if (getArguments() != null) {
-            long jotId = getArguments().getLong(ARG_JOT_ID, -1);
-            jot = new JotById(jotId, db).value();
-        } else {
-            jot = new ConstJot(-1,
-                "",
-                new Date().getTime(),
-                new ConstSource<>(new double[]{MIN_VALUE, MIN_VALUE})
+            jot = new Gson().fromJson(
+                getArguments().getString(ARG_JOT_JSON, "{}"),
+                ConstJot.class
             );
+        } else {
+            jot = new ConstJot(
+                -1,
+                "",
+                System.currentTimeMillis(),
+                new double[]{MIN_VALUE, MIN_VALUE});
         }
     }
 

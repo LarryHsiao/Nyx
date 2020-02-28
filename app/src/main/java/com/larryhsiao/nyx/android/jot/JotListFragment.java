@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.jots.AllJots;
+import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.JotById;
 import com.larryhsiao.nyx.jots.JotUriId;
@@ -69,7 +70,7 @@ public class JotListFragment extends JotFragment {
         final RecyclerView list = view.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(view.getContext()));
         list.setAdapter(adapter = new JotListAdapter(db, jot -> {
-            Fragment frag = JotContentFragment.newInstance(jot.id());
+            Fragment frag = JotContentFragment.newInstance(new ConstJot(jot));
             frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
             nextPage(frag);
             return null;

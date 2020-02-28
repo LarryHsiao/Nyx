@@ -15,6 +15,7 @@ import com.haibin.calendarview.CalendarView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.jots.AllJots;
+import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.JotsByDate;
 import com.larryhsiao.nyx.jots.QueriedJots;
@@ -46,7 +47,7 @@ public class CalendarFragment extends JotFragment {
         calendarView = view.findViewById(R.id.calendar_calendarView);
         RecyclerView jotList = view.findViewById(R.id.calendar_list);
         adapter = new JotListAdapter(db, item -> {
-            Fragment frag = JotContentFragment.newInstance(item.id());
+            Fragment frag = JotContentFragment.newInstance(new ConstJot(item));
             frag.setTargetFragment(this, REQUEST_CODE_DIARY_CONTENT);
             nextPage(frag);
             return null;
