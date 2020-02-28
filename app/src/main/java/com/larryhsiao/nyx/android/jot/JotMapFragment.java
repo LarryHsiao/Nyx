@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.android.LocationString;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.jots.AllJots;
 import com.larryhsiao.nyx.jots.Jot;
@@ -114,19 +115,13 @@ public class JotMapFragment extends JotFragment {
             if (selectedMarker != null) {
                 selectedMarker.remove();
             }
-            Location location = new Location("Const");
+            final Location location = new Location("Const");
             location.setLatitude(latLng.latitude);
             location.setLongitude(latLng.longitude);
-            Address address = new LocationAddress(getContext(), location).value();
-
+            final Address address = new LocationAddress(getContext(), location).value();
             final MarkerOptions option = new MarkerOptions();
             option.position(latLng);
-            option.title(String.format(
-                "%s%s%s",
-                address.getLocality() == null ? "" : address.getLocality(),
-                address.getLocality() == null ? "" : ", ",
-                address.getCountryName() == null ? "" : address.getCountryName()
-            ));
+            option.title(new LocationString(address).value());
             selectedMarker = map.addMarker(option);
             selectedMarker.showInfoWindow();
         });

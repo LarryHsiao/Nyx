@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.android.jot;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.android.LocationString;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.attachments.NewAttachments;
@@ -53,8 +55,8 @@ import java.util.stream.Collectors;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.ACTION_OPEN_DOCUMENT;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
-import static com.schibstedspain.leku.LocationPickerActivityKt.LOCATION_ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
 import static java.lang.Double.MIN_VALUE;
 
@@ -159,7 +161,9 @@ public class JotContentFragment extends JotFragment {
         Location location = new Location("Constant");
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
-        locationText.setText(new LocationAddress(view.getContext(), location).value().getAddressLine(0));
+        locationText.setText(new LocationString(
+            new LocationAddress(view.getContext(), location).value()
+        ).value());
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
         attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
         attachmentAdapter.loadAttachments(
@@ -267,7 +271,8 @@ public class JotContentFragment extends JotFragment {
                     };
                 }
             };
-            locationText.setText(data.getStringExtra(LOCATION_ADDRESS));
+            Address address = data.getParcelableExtra(ADDRESS);
+            locationText.setText(new LocationString(address).value());
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
             attachmentAdapter.appendImage(data.getData());
             getContext().getContentResolver().takePersistableUriPermission(
