@@ -41,7 +41,7 @@ public class QueriedJots implements Source<List<Jot>> {
                     res.getLong(res.findColumn("id")),
                     res.getString(res.findColumn("content")),
                     timestamp.getTime(),
-                    new ConstSource<>(location)
+                    location
                 ));
             }
             return jots;

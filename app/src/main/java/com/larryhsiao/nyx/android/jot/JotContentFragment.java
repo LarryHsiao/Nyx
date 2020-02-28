@@ -3,10 +3,12 @@ package com.larryhsiao.nyx.android.jot;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,7 +25,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.gson.Gson;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.android.LocationString;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.attachments.NewAttachments;
@@ -31,7 +35,6 @@ import com.larryhsiao.nyx.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.attachments.RemovalAttachmentByJotId;
 import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
-import com.larryhsiao.nyx.jots.JotById;
 import com.larryhsiao.nyx.jots.JotUri;
 import com.larryhsiao.nyx.jots.PostedJot;
 import com.larryhsiao.nyx.jots.WrappedJot;
@@ -53,8 +56,8 @@ import java.util.stream.Collectors;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.ACTION_OPEN_DOCUMENT;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
-import static com.schibstedspain.leku.LocationPickerActivityKt.LOCATION_ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
 import static java.lang.Double.MIN_VALUE;
 
@@ -64,16 +67,16 @@ import static java.lang.Double.MIN_VALUE;
 public class JotContentFragment extends JotFragment {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
-    private static final String ARG_JOT_ID = "ARG_JOT_ID";
+    private static final String ARG_JOT_JSON = "ARG_JOT";
     private ChipGroup chipGroup;
     private TextView locationText;
     private AttachmentAdapter attachmentAdapter;
     private Jot jot;
 
-    public static Fragment newInstance(long jotId) {
+    public static Fragment newInstance(ConstJot jot) {
         final Fragment frag = new JotContentFragment();
         Bundle args = new Bundle();
-        args.putLong(ARG_JOT_ID, jotId);
+        args.putString(ARG_JOT_JSON, new Gson().toJson(jot));
         frag.setArguments(args);
         return frag;
     }
@@ -83,14 +86,16 @@ public class JotContentFragment extends JotFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         if (getArguments() != null) {
-            long jotId = getArguments().getLong(ARG_JOT_ID, -1);
-            jot = new JotById(jotId, db).value();
-        } else {
-            jot = new ConstJot(-1,
-                "",
-                new Date().getTime(),
-                new ConstSource<>(new double[]{MIN_VALUE, MIN_VALUE})
+            jot = new Gson().fromJson(
+                getArguments().getString(ARG_JOT_JSON, "{}"),
+                ConstJot.class
             );
+        } else {
+            jot = new ConstJot(
+                -1,
+                "",
+                System.currentTimeMillis(),
+                new double[]{MIN_VALUE, MIN_VALUE});
         }
     }
 
@@ -159,7 +164,9 @@ public class JotContentFragment extends JotFragment {
         Location location = new Location("Constant");
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
-        locationText.setText(new LocationAddress(view.getContext(), location).value().getAddressLine(0));
+        locationText.setText(new LocationString(
+            new LocationAddress(view.getContext(), location).value()
+        ).value());
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
         attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
         attachmentAdapter.loadAttachments(
@@ -173,6 +180,9 @@ public class JotContentFragment extends JotFragment {
         ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
         tagIcon.setOnClickListener(v -> {
             final EditText editText = new EditText(v.getContext());
+            editText.setLines(1);
+            editText.setMaxLines(1);
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
             new AlertDialog.Builder(v.getContext())
                 .setTitle(getString(R.string.new_tag))
                 .setMessage(getString(R.string.enter_tag_name))
@@ -267,7 +277,8 @@ public class JotContentFragment extends JotFragment {
                     };
                 }
             };
-            locationText.setText(data.getStringExtra(LOCATION_ADDRESS));
+            Address address = data.getParcelableExtra(ADDRESS);
+            locationText.setText(new LocationString(address).value());
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
             attachmentAdapter.appendImage(data.getData());
             getContext().getContentResolver().takePersistableUriPermission(

@@ -38,7 +38,7 @@ public class JotById implements Source<Jot> {
                             "createdTime",
                             Calendar.getInstance()
                     ).getTime(),
-                    new PointSource(res.getString("location"))
+                    new PointSource(res.getString("location")).value()
                 );
         } catch (SQLException e) {
             throw new IllegalArgumentException(e);

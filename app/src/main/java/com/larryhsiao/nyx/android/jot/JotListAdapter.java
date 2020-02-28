@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.android.LocationString;
 import com.larryhsiao.nyx.attachments.Attachment;
 import com.larryhsiao.nyx.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.attachments.QueriedAttachments;
@@ -20,6 +21,7 @@ import com.silverhetch.clotho.time.HttpTimeFormat;
 import com.squareup.picasso.Picasso;
 
 import java.sql.Connection;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,7 +57,9 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         List<Attachment> attachments = new QueriedAttachments(new AttachmentsByJotId(db, jot.id())).value();
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
-        String address = new LocationAddress(holder.itemView.getContext(), location).value().getAddressLine(0);
+        String address = new LocationString(
+            new LocationAddress(holder.itemView.getContext(), location).value()
+        ).value();
         if (address != null) {
             address += "\n";
         } else {
@@ -64,7 +68,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         holder.getTextView(R.id.itemJot_content).setText(
             jot.content() + "\n" +
                 address +
-                new HttpTimeFormat().value().format(new Date(jot.createdTime()))
+                DateFormat.getDateInstance().format(new Date(jot.createdTime()))
         );
         final ImageView image = holder.getImageView(R.id.itemJot_image);
         if (attachments.size() > 0) {

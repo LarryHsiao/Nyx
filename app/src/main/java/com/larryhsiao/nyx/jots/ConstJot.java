@@ -11,9 +11,9 @@ public class ConstJot implements Jot {
     private final long id;
     private final String content;
     private final long createdTime;
-    private final Source<double[]> location;
+    private final double[] location;
 
-    public ConstJot(long id, String content, long createdTime, Source<double[]> location) {
+    public ConstJot(long id, String content, long createdTime, double[] location) {
         this.id = id;
         this.content = content;
         this.createdTime = createdTime;
@@ -22,7 +22,7 @@ public class ConstJot implements Jot {
 
     public ConstJot(Jot jot) {
         this.id = jot.id();
-        this.location = new ConstSource<>(jot.location());
+        this.location = jot.location();
         this.createdTime = jot.createdTime();
         this.content = jot.content();
     }
@@ -44,6 +44,6 @@ public class ConstJot implements Jot {
 
     @Override
     public double[] location() {
-        return location.value();
+        return location;
     }
 }

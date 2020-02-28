@@ -1,7 +1,6 @@
 package com.larryhsiao.nyx.jots;
 
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.source.ConstSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -77,7 +76,7 @@ public class NewJot implements Source<Jot> {
                 res.getInt(1),
                 content,
                 calendar.getTimeInMillis(),
-                new ConstSource<>(location));
+                location);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
