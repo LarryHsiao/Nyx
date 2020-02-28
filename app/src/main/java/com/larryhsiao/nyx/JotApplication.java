@@ -16,6 +16,7 @@ import java.sql.Connection;
  * Application of Jot.
  */
 public class JotApplication extends Application {
+    public long lastAuthed = 0L;
     public Source<Connection> db;
 
     @Override

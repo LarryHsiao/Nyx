@@ -5,15 +5,15 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.larryhsiao.nyx.android.base.JotActivity;
 import com.larryhsiao.nyx.android.jot.CalendarFragment;
 import com.larryhsiao.nyx.android.jot.JotListFragment;
 import com.larryhsiao.nyx.android.jot.JotMapFragment;
-import com.silverhetch.aura.AuraActivity;
 
 /**
  * Entry Activity of Nyx.
  */
-public class MainActivity extends AuraActivity {
+public class MainActivity extends JotActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
