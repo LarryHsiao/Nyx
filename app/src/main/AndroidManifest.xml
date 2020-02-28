@@ -48,6 +48,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity android:name=".android.base.AuthActivity"
+                  android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+        />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
