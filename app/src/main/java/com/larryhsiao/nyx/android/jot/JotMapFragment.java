@@ -3,6 +3,8 @@ package com.larryhsiao.nyx.android.jot;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +21,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.R;
@@ -29,6 +33,7 @@ import com.larryhsiao.nyx.jots.JotById;
 import com.larryhsiao.nyx.jots.JotUriId;
 import com.larryhsiao.nyx.jots.JotsByKeyword;
 import com.larryhsiao.nyx.jots.QueriedJots;
+import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.clotho.Source;
 
 import java.sql.ResultSet;
@@ -46,6 +51,7 @@ public class JotMapFragment extends JotFragment {
     private static final int REQUEST_CODE_UPDATE_JOT = 1001;
     private ClusterManager<JotMapItem> clusterManger;
     private GoogleMap map;
+    private Marker selectedMarker = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,6 +108,27 @@ public class JotMapFragment extends JotFragment {
             frag.setTargetFragment(this, REQUEST_CODE_UPDATE_JOT);
             nextPage(frag);
             return true;
+        });
+
+        map.setOnMapClickListener(latLng -> {
+            if (selectedMarker != null) {
+                selectedMarker.remove();
+            }
+            Location location = new Location("Const");
+            location.setLatitude(latLng.latitude);
+            location.setLongitude(latLng.longitude);
+            Address address = new LocationAddress(getContext(), location).value();
+
+            final MarkerOptions option = new MarkerOptions();
+            option.position(latLng);
+            option.title(String.format(
+                "%s%s%s",
+                address.getLocality() == null ? "" : address.getLocality(),
+                address.getLocality() == null ? "" : ", ",
+                address.getCountryName() == null ? "" : address.getCountryName()
+            ));
+            selectedMarker = map.addMarker(option);
+            selectedMarker.showInfoWindow();
         });
     }
 
@@ -167,7 +194,7 @@ public class JotMapFragment extends JotFragment {
             public boolean onQueryTextChange(String newText) {
                 if (map != null) {
                     loadData(new JotsByKeyword(db, newText));
-                }else{
+                } else {
                     searchView.postDelayed(new Runnable() {
                         @Override
                         public void run() {
