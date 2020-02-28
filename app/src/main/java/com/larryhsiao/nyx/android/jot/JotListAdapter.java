@@ -21,6 +21,7 @@ import com.silverhetch.clotho.time.HttpTimeFormat;
 import com.squareup.picasso.Picasso;
 
 import java.sql.Connection;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,7 +68,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         holder.getTextView(R.id.itemJot_content).setText(
             jot.content() + "\n" +
                 address +
-                new HttpTimeFormat().value().format(new Date(jot.createdTime()))
+                DateFormat.getDateInstance().format(new Date(jot.createdTime()))
         );
         final ImageView image = holder.getImageView(R.id.itemJot_image);
         if (attachments.size() > 0) {
