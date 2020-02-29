@@ -31,8 +31,8 @@ public class UpdateJot implements Action {
         try (PreparedStatement stmt = conn.prepareStatement(
             // language=H2
             "UPDATE jots " +
-                "SET content=?1, location=?2, CREATEDTIME=?3 " +
-                "WHERE id=?4;"
+                "SET content=?1, location=?2, CREATEDTIME=?3, MOOD=?4 " +
+                "WHERE id=?5;"
         )) {
             stmt.setString(1, updated.content());
             stmt.setString(2, new Point(
@@ -45,8 +45,9 @@ public class UpdateJot implements Action {
                     }
                 ), new GeometryFactory()
             ).toText());
-            stmt.setTimestamp(3,new Timestamp(updated.createdTime()), Calendar.getInstance());
-            stmt.setLong(4, updated.id());
+            stmt.setTimestamp(3, new Timestamp(updated.createdTime()), Calendar.getInstance());
+            stmt.setString(4, updated.mood());
+            stmt.setLong(5, updated.id());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

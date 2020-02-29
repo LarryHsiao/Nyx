@@ -24,7 +24,8 @@ public class JotsDb implements Source<Connection> {
                             "id integer not null auto_increment," +
                             "content text not null, " +
                             "createdTime timestamp with time zone not null, " +
-                            "location geometry " +
+                            "location geometry, " +
+                            "mood varchar not null default ''" +
                             ");"
             );
             return conn;

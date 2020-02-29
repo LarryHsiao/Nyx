@@ -23,7 +23,7 @@ public class JotsByLocationTest {
     @Test
     public void createdTimeExist() throws Exception {
         Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "content",new double[]{0.0,0.0}).value();
+        new NewJot(db, "content",new double[]{0.0,0.0},' ').value();
         List<Jot> jots = new QueriedJots(
             new JotsByLocation(
                 db, new Polygon(

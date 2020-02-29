@@ -149,7 +149,8 @@ public class JotMapFragment extends JotFragment {
                             new double[]{
                                 marker.getPosition().longitude,
                                 marker.getPosition().latitude
-                            }
+                            },
+                            ""
                         ));
                         frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
                         nextPage(frag);

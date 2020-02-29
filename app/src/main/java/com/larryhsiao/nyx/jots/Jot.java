@@ -25,4 +25,9 @@ public interface Jot {
      * @return length = 2, longitude and latitude.
      */
     double[] location();
+
+    /**
+     * A mood emoji for this jot.
+     */
+    String mood();
 }
