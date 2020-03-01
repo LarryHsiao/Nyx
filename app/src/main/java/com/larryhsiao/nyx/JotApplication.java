@@ -13,6 +13,8 @@ import org.flywaydb.core.api.android.ContextHolder;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 
 /**
  * Application of Jot.
@@ -35,7 +37,19 @@ public class JotApplication extends Application {
                 new JotsDb(
                     new EmbedH2Conn(
                         new ConstSource<>(dbFile))))));
-        db.value();
+        try {
+            Connection conn = db.value();
+            DatabaseMetaData metadata = conn.getMetaData();
+            ResultSet rs = metadata.getColumns(null, null, "jots", "mood");
+            if (!rs.next()) { // mood field not exist
+                conn.createStatement().executeUpdate(
+                    "ALTER TABLE jots\n" +
+                        "ADD COLUMN mood varchar not null default '';"
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         ContextHolder.setContext(this);
         Flyway flyway = Flyway.configure()
