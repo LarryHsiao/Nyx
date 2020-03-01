@@ -26,6 +26,11 @@ public class WrappedJot implements Jot {
     }
 
     @Override
+    public String mood() {
+        return jot.mood();
+    }
+
+    @Override
     public double[] location() {
         return jot.location();
     }

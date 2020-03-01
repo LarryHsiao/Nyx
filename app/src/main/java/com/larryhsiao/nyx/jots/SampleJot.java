@@ -23,4 +23,9 @@ public class SampleJot implements Jot {
     public long createdTime() {
         return System.currentTimeMillis();
     }
+
+    @Override
+    public String mood() {
+        return new String(Character.toChars(0x1F600));
+    }
 }

@@ -16,11 +16,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
@@ -46,6 +50,8 @@ import com.larryhsiao.nyx.tags.Tag;
 import com.larryhsiao.nyx.tags.TagsByJotId;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.location.LocationAddress;
+import com.silverhetch.aura.view.dialog.InputDialog;
+import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.clotho.source.ConstSource;
 
 import java.text.SimpleDateFormat;
@@ -56,6 +62,9 @@ import java.util.stream.Collectors;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.ACTION_OPEN_DOCUMENT;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.util.TypedValue.COMPLEX_UNIT_DIP;
+import static android.view.Gravity.CENTER;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
@@ -67,9 +76,11 @@ import static java.lang.Double.MIN_VALUE;
 public class JotContentFragment extends JotFragment {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
+    private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
     private static final String ARG_JOT_JSON = "ARG_JOT";
     private ChipGroup chipGroup;
     private TextView locationText;
+    private TextView moodText;
     private AttachmentAdapter attachmentAdapter;
     private Jot jot;
 
@@ -95,7 +106,8 @@ public class JotContentFragment extends JotFragment {
                 -1,
                 "",
                 System.currentTimeMillis(),
-                new double[]{MIN_VALUE, MIN_VALUE});
+                new double[]{MIN_VALUE, MIN_VALUE},
+                "");
         }
     }
 
@@ -222,6 +234,108 @@ public class JotContentFragment extends JotFragment {
             });
             chipGroup.addView(chip);
         }
+        moodText = view.findViewById(R.id.jot_mood);
+
+        String mood = String.valueOf(jot.mood());
+        if (mood.isEmpty()) {
+            mood = "+";
+        }
+        moodText.setText(mood);
+        moodText.setOnClickListener(v -> {
+            final GridView gridView = new GridView(v.getContext());
+            gridView.setNumColumns(4);
+            gridView.setAdapter(new ArrayAdapter<String>(
+                v.getContext(),
+                android.R.layout.simple_list_item_1,
+                new String[]{
+                    "x",
+                    new String(Character.toChars(0x1F603)),
+                    new String(Character.toChars(0x1F601)),
+                    new String(Character.toChars(0x1F602)),
+                    new String(Character.toChars(0x1F642)),
+                    new String(Character.toChars(0x1F970)),
+                    new String(Character.toChars(0x1F60D)),
+                    new String(Character.toChars(0x1F60B)),
+                    new String(Character.toChars(0x1F60F)),
+                    new String(Character.toChars(0x1F612)),
+                    new String(Character.toChars(0x1F928)),
+                    new String(Character.toChars(0x1F611)),
+                    new String(Character.toChars(0x1F614)),
+                    new String(Character.toChars(0x1F634)),
+                    new String(Character.toChars(0x1F912)),
+                    new String(Character.toChars(0x1F927)),
+                    new String(Character.toChars(0x1F976)),
+                    new String(Character.toChars(0x1F974)),
+                    new String(Character.toChars(0x1F973)),
+                    "",
+                }
+            ) {
+                @NonNull
+                @Override
+                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                    if (position == getCount() - 1) { // last item for input dialog
+                        final ImageView inputItem = new ImageView(view.getContext());
+                        int padding = ((int) new DP(getContext(), 16).px());
+                        inputItem.setPadding(padding, padding,padding,padding);
+                        inputItem.setLayoutParams(new LayoutParams(
+                            MATCH_PARENT,
+                            parent.getWidth()/4));
+                        inputItem.setImageResource(R.drawable.ic_input);
+                        return inputItem;
+                    }
+
+                    if (position == 0){ // first item to remove mood
+                        final ImageView itemRemove = new ImageView(view.getContext());
+                        int padding = ((int) new DP(getContext(), 16).px());
+                        itemRemove.setPadding(padding, padding,padding,padding);
+                        itemRemove.setLayoutParams(new LayoutParams(
+                            MATCH_PARENT,
+                            parent.getWidth()/4));
+                        itemRemove.setImageResource(R.drawable.ic_cross);
+                        return itemRemove;
+                    }
+                    final AppCompatTextView orgItemView = ((AppCompatTextView) super.getView(position, null, parent));
+                    orgItemView.setGravity(CENTER);
+                    orgItemView.setLayoutParams(new LayoutParams(
+                        MATCH_PARENT,
+                        parent.getWidth()/4));
+                    orgItemView.setTextSize(COMPLEX_UNIT_DIP, 32);
+                    return orgItemView;
+                }
+            });
+            AlertDialog moodDialog = new AlertDialog.Builder(v.getContext())
+                .setTitle(getString(R.string.moods))
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                })
+                .setView(gridView)
+                .show();
+            gridView.setOnItemClickListener((parent, view12, position, id) -> {
+                if (position == gridView.getAdapter().getCount() - 1) { // last custom dialog
+                    moodDialog.dismiss();
+                    InputDialog dialog = InputDialog.Companion.newInstance(
+                        getString(R.string.moods),
+                        REQUEST_CODE_INPUT_CUSTOM_MOOD
+                    );
+                    dialog.setTargetFragment(this, REQUEST_CODE_INPUT_CUSTOM_MOOD);
+                    dialog.show(getFragmentManager(), null);
+                    return;
+                }
+                final String newMood;
+                if (position == 0) {
+                    newMood = "+";
+                } else {
+                    newMood = ((TextView) view12).getText().toString();
+                }
+                jot = new WrappedJot(jot) {
+                    @Override
+                    public String mood() {
+                        return newMood;
+                    }
+                };
+                moodText.setText(newMood);
+                moodDialog.dismiss();
+            });
+        });
     }
 
     private void updateDateIndicator(TextView date) {
@@ -285,6 +399,21 @@ public class JotContentFragment extends JotFragment {
                 data.getData(),
                 FLAG_GRANT_READ_URI_PERMISSION
             );
+        } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK) {
+            final String newMoodRaw = data.getStringExtra("INPUT_FIELD");
+            final String newMood;
+            if (newMoodRaw.length() > 1) {
+                newMood = newMoodRaw.substring(0, 2);
+            } else {
+                newMood = "+";
+            }
+            moodText.setText(newMood);
+            jot = new WrappedJot(jot) {
+                @Override
+                public String mood() {
+                    return newMood;
+                }
+            };
         }
     }
 }

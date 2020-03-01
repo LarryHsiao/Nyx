@@ -1,7 +1,6 @@
 package com.larryhsiao.nyx.jots;
 
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.source.ConstSource;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
 
@@ -41,7 +40,8 @@ public class QueriedJots implements Source<List<Jot>> {
                     res.getLong(res.findColumn("id")),
                     res.getString(res.findColumn("content")),
                     timestamp.getTime(),
-                    location
+                    location,
+                    res.getString("mood")
                 ));
             }
             return jots;

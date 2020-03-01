@@ -66,7 +66,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
             address = "";
         }
         holder.getTextView(R.id.itemJot_content).setText(
-            jot.content() + "\n" +
+            jot.mood()+" "+jot.content() + "\n" +
                 address +
                 DateFormat.getDateInstance().format(new Date(jot.createdTime()))
         );

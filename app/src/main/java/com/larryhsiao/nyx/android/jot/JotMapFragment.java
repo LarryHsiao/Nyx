@@ -133,10 +133,13 @@ public class JotMapFragment extends JotFragment {
         });
 
         map.setOnInfoWindowLongClickListener(marker -> {
+            final Location location = new Location("Address");
+            location.setLongitude(marker.getPosition().longitude);
+            location.setLatitude(marker.getPosition().latitude);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
             adapter.add(getString(R.string.new_jot));
             new AlertDialog.Builder(getContext())
-                .setTitle(marker.getPosition().toString())
+                .setTitle(new LocationString(new LocationAddress(getContext(), location).value()).value())
                 .setAdapter(adapter, (dialog, which) -> {
                     if (which == 0) {
                         Fragment frag = JotContentFragment.newInstance(new ConstJot(
@@ -146,7 +149,8 @@ public class JotMapFragment extends JotFragment {
                             new double[]{
                                 marker.getPosition().longitude,
                                 marker.getPosition().latitude
-                            }
+                            },
+                            ""
                         ));
                         frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
                         nextPage(frag);

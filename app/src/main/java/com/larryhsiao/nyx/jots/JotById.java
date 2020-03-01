@@ -23,23 +23,24 @@ public class JotById implements Source<Jot> {
     @Override
     public Jot value() {
         try (PreparedStatement stmt = db.value().prepareStatement(
-                // language=H2
-                "SELECT * FROM jots WHERE id=?;"
+            // language=H2
+            "SELECT * FROM jots WHERE id=?;"
         )) {
             stmt.setLong(1, id);
             ResultSet res = stmt.executeQuery();
             if (!res.next()) {
-                throw new IllegalArgumentException("Jot not found, id: "+ id);
+                throw new IllegalArgumentException("Jot not found, id: " + id);
             }
             return new ConstJot(
-                    res.getLong("id"),
-                    res.getString("content"),
-                    res.getTimestamp(
-                            "createdTime",
-                            Calendar.getInstance()
-                    ).getTime(),
-                    new PointSource(res.getString("location")).value()
-                );
+                res.getLong("id"),
+                res.getString("content"),
+                res.getTimestamp(
+                    "createdTime",
+                    Calendar.getInstance()
+                ).getTime(),
+                new PointSource(res.getString("location")).value(),
+                res.getString("mood")
+            );
         } catch (SQLException e) {
             throw new IllegalArgumentException(e);
         }
