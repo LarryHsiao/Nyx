@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -236,7 +235,12 @@ public class JotContentFragment extends JotFragment {
             chipGroup.addView(chip);
         }
         moodText = view.findViewById(R.id.jot_mood);
-        moodText.setText(String.valueOf(jot.mood()));
+
+        String mood = String.valueOf(jot.mood());
+        if (mood.isEmpty()) {
+            mood = "+";
+        }
+        moodText.setText(mood);
         moodText.setOnClickListener(v -> {
             final GridView gridView = new GridView(v.getContext());
             gridView.setNumColumns(4);

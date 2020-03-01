@@ -52,9 +52,6 @@ public class ConstJot implements Jot {
 
     @Override
     public String mood() {
-        if (mood.isEmpty()){
-            return "+";
-        }
         return mood;
     }
 }

@@ -64,8 +64,8 @@ public class CalendarFragment extends JotFragment {
             calendar.setYear(jdkCalendar.get(java.util.Calendar.YEAR));
             calendar.setMonth(jdkCalendar.get(java.util.Calendar.MONTH) + 1);
             calendar.setDay(jdkCalendar.get(java.util.Calendar.DAY_OF_MONTH));
-            calendar.setScheme("*");
-            calendar.setSchemeColor(Color.BLACK);
+            calendar.setScheme(jot.mood());
+            calendar.setSchemeColor(Color.TRANSPARENT);
             calendarView.addSchemeDate(calendar);
         }
         calendarView.setOnCalendarSelectListener(new CalendarView.OnCalendarSelectListener() {

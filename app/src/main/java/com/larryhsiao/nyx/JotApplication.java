@@ -9,7 +9,6 @@ import com.silverhetch.clotho.database.SingleConn;
 import com.silverhetch.clotho.database.h2.EmbedH2Conn;
 import com.silverhetch.clotho.source.ConstSource;
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.MigrationVersion;
 import org.flywaydb.core.api.android.ContextHolder;
 
 import java.io.File;

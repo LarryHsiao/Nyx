@@ -46,7 +46,12 @@ public class UpdateJot implements Action {
                 ), new GeometryFactory()
             ).toText());
             stmt.setTimestamp(3, new Timestamp(updated.createdTime()), Calendar.getInstance());
-            stmt.setString(4, updated.mood());
+            String mood = updated.mood();
+            if (mood.length()>1){
+                stmt.setString(4, mood.substring(0,2));
+            }else{
+                stmt.setString(4, "");
+            }
             stmt.setLong(5, updated.id());
             stmt.executeUpdate();
         } catch (SQLException e) {

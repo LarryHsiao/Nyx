@@ -67,7 +67,11 @@ public class NewJot implements Source<Jot> {
                     ), new GeometryFactory()
                 ).toText());
             }
-            stmt.setString(4, mood);
+            if (mood.length()>1){
+                stmt.setString(4, mood.substring(0,2));
+            }else{
+                stmt.setString(4, "");
+            }
             if (stmt.executeUpdate() == 0) {
                 throw new SQLException("Insert failed");
             }
