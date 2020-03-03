@@ -24,7 +24,8 @@ public class JotsByKeyword implements Source<ResultSet> {
             PreparedStatement stmt = dbSource.value().prepareStatement(
                 // language=H2
                 "SELECT * FROM jots " +
-                    "WHERE content like ?;"
+                    "WHERE content like ? " +
+                    "ORDER BY CREATEDTIME DESC;"
             );
             stmt.setString(1, "%"+keyword+"%");
             return stmt.executeQuery();

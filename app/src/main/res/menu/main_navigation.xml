@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:title="@string/calendar"
         app:showAsAction="ifRoom"
         android:id="@+id/menuItem_calendar"
         app:iconTint="@color/colorPrimaryDark"
-        android:icon="@drawable/ic_calendar" />
+        android:icon="@drawable/ic_calendar"/>
 
     <item
         android:title="@string/jots"
         android:id="@+id/menuItem_jots"
         android:icon="@drawable/ic_agenda"
         app:iconTint="@color/colorPrimaryDark"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"/>
 
     <item
         android:title="@string/map"
         android:icon="@drawable/ic_map"
         android:id="@+id/menuItem_map"
         app:iconTint="@color/colorPrimaryDark"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:title="@string/tags"
+        app:showAsAction="ifRoom"
+        android:id="@+id/menuItem_tag"
+        app:iconTint="@color/colorPrimaryDark"
+        android:icon="@drawable/ic_tag"/>
 
 </menu>
