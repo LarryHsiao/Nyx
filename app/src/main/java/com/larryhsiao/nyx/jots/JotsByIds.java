@@ -32,7 +32,8 @@ public class JotsByIds implements Source<ResultSet> {
             return stmt.executeQuery(
                 // language=H2
                 "SELECT * FROM jots " +
-                    "WHERE ID IN (" + idStr.toString() + ")"
+                    "WHERE ID IN (" + idStr.toString() + ") " +
+                    "ORDER BY CREATEDTIME DESC;"
             );
         } catch (Exception e) {
             throw new IllegalArgumentException(e);

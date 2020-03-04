@@ -9,6 +9,7 @@ import com.larryhsiao.nyx.android.base.JotActivity;
 import com.larryhsiao.nyx.android.jot.CalendarFragment;
 import com.larryhsiao.nyx.android.jot.JotListFragment;
 import com.larryhsiao.nyx.android.jot.JotMapFragment;
+import com.larryhsiao.nyx.android.tag.TagListFragment;
 
 /**
  * Entry Activity of Nyx.
@@ -34,6 +35,9 @@ public class MainActivity extends JotActivity {
             } else if (item.getItemId() == R.id.menuItem_calendar) {
                 rootPage(new CalendarFragment());
                 return true;
+            } else if (item.getItemId() == R.id.menuItem_tag) {
+                rootPage(new TagListFragment());
+                return true;
             } else {
                 return false;
             }
@@ -47,7 +51,7 @@ public class MainActivity extends JotActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
         }

@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.android.jot;
+package com.larryhsiao.nyx.android.tag;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -10,53 +10,45 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
-import com.larryhsiao.nyx.jots.AllJots;
-import com.larryhsiao.nyx.jots.ConstJot;
+import com.larryhsiao.nyx.android.jot.JotListFragment;
 import com.larryhsiao.nyx.jots.Jot;
-import com.larryhsiao.nyx.jots.JotById;
-import com.larryhsiao.nyx.jots.JotUriId;
-import com.larryhsiao.nyx.jots.JotsByIds;
-import com.larryhsiao.nyx.jots.JotsByKeyword;
 import com.larryhsiao.nyx.jots.QueriedJots;
+import com.larryhsiao.nyx.tags.AllTags;
+import com.larryhsiao.nyx.tags.JotsByTagId;
+import com.larryhsiao.nyx.tags.NewTag;
+import com.larryhsiao.nyx.tags.QueriedTags;
+import com.larryhsiao.nyx.tags.Tag;
+import com.larryhsiao.nyx.tags.TagRemoval;
+import com.larryhsiao.nyx.tags.TagsByKeyword;
+import com.silverhetch.aura.view.dialog.InputDialog;
+import com.silverhetch.clotho.source.ConstSource;
+import com.silverhetch.clotho.utility.comparator.StringComparator;
 
-import java.util.List;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
 
 /**
- * Fragment for showing Jot list.
+ * Fragment to showing/manage tags.
  */
-public class JotListFragment extends JotFragment {
-    private static final String ARG_JOT_IDS = "ARG_JOT_IDS";
-    private static final int REQUEST_CODE_CREATE_JOT = 1000;
-    private static final int REQUEST_CODE_JOT_CONTENT = 1001;
-    private JotListAdapter adapter;
-
-    /**
-     * Show by jot ids.
-     */
-    public static Fragment newInstanceByJotIds(long[] jotIds) {
-        Fragment frag = new JotListFragment();
-        Bundle args = new Bundle();
-        args.putLongArray(ARG_JOT_IDS, jotIds);
-        frag.setArguments(args);
-        return frag;
-    }
+public class TagListFragment extends JotFragment {
+    private static final int REQUEST_CODE_NEW_TAG = 1000;
+    private TagListAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final Bundle args = getArguments();
-        setHasOptionsMenu(args == null || args.getLongArray(ARG_JOT_IDS) == null);
-        setTitle(getString(R.string.jots));
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -68,28 +60,45 @@ public class JotListFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        adapter = new TagListAdapter(tag -> {
+            nextPage(
+                JotListFragment.newInstanceByJotIds(
+                    new QueriedJots(new JotsByTagId(db, new ConstSource<>(tag.id())))
+                        .value().stream().mapToLong(Jot::id).toArray()
+                )
+            );
+            return new Object();
+        }, tag -> {
+            final ArrayAdapter<String> tagOptions = new ArrayAdapter<>(
+                view.getContext(),
+                android.R.layout.simple_list_item_1,
+                new String[]{getString(R.string.delete)}
+            );
+            new AlertDialog.Builder(view.getContext())
+                .setTitle(tag.title())
+                .setAdapter(tagOptions, (dialog, which) -> {
+                    if (which == 0) {
+                        new TagRemoval(db, tag.id()).fire();
+                        adapter.removeTag(tag);
+                    }
+                }).show();
+            return new Object();
+        });
         final RecyclerView list = view.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        list.setAdapter(adapter = new JotListAdapter(db, jot -> {
-            Fragment frag = JotContentFragment.newInstance(new ConstJot(jot));
-            frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
-            nextPage(frag);
-            return null;
-        }));
-        adapter.loadJots(loadJotsByArg());
-    }
+        list.setAdapter(adapter);
+        adapter.loadTags(
+            new QueriedTags(
+                new AllTags(db)
+            ).value().stream().sorted(new Comparator<Tag>() {
+                final StringComparator comparator = new StringComparator();
 
-    private List<Jot> loadJotsByArg() {
-        final Bundle args = getArguments();
-        long[] jotIds = new long[0];
-        if (args != null && args.getLongArray(ARG_JOT_IDS) != null) {
-            jotIds = args.getLongArray(ARG_JOT_IDS);
-        }
-        if (args != null && args.getLongArray(ARG_JOT_IDS) != null) {
-            return new QueriedJots(new JotsByIds(db, jotIds)).value();
-        } else {
-            return new QueriedJots(new AllJots(db)).value();
-        }
+                @Override
+                public int compare(Tag o1, Tag o2) {
+                    return comparator.compare(o2.title(), o1.title());
+                }
+            }).collect(Collectors.toList())
+        );
     }
 
     @Override
@@ -113,7 +122,15 @@ public class JotListFragment extends JotFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.loadJots(new QueriedJots(new JotsByKeyword(db, newText)).value());
+                StringComparator comparator = new StringComparator();
+                adapter.loadTags(
+                    new QueriedTags(new TagsByKeyword(db, newText))
+                        .value()
+                        .stream()
+                        .sorted((o1, o2) ->
+                            comparator.compare(o2.title(), o1.title())
+                        ).collect(Collectors.toList())
+                );
                 return true;
             }
         });
@@ -138,10 +155,12 @@ public class JotListFragment extends JotFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_newJot) {
-            Fragment frag = new JotContentFragment();
-            frag.setTargetFragment(this, REQUEST_CODE_CREATE_JOT);
-            nextPage(frag);
-            return true;
+            final InputDialog frag = InputDialog.Companion.newInstance(
+                getString(R.string.new_tag),
+                REQUEST_CODE_NEW_TAG
+            );
+            frag.setTargetFragment(this, REQUEST_CODE_NEW_TAG);
+            frag.show(getFragmentManager(), null);
         }
         return false;
     }
@@ -149,12 +168,9 @@ public class JotListFragment extends JotFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CREATE_JOT && resultCode == RESULT_OK) {
-            adapter.insertJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
-            getFragmentManager().popBackStack();
-        } else if (requestCode == REQUEST_CODE_JOT_CONTENT && resultCode == RESULT_OK) {
-            adapter.updateJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
-            getFragmentManager().popBackStack();
+        if (REQUEST_CODE_NEW_TAG == requestCode && RESULT_OK == resultCode) {
+            final String newTagName = data.getStringExtra("INPUT_FIELD");
+            adapter.appendTag(new NewTag(db, newTagName).value());
         }
     }
 }
