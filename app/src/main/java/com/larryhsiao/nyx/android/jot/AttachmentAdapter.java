@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.android.jot;
 
-import android.content.ContentResolver;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;

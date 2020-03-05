@@ -39,6 +39,7 @@ import com.larryhsiao.nyx.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.attachments.RemovalAttachmentByJotId;
 import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
+import com.larryhsiao.nyx.jots.JotRemoval;
 import com.larryhsiao.nyx.jots.JotUri;
 import com.larryhsiao.nyx.jots.PostedJot;
 import com.larryhsiao.nyx.jots.WrappedJot;
@@ -49,6 +50,7 @@ import com.larryhsiao.nyx.tags.QueriedTags;
 import com.larryhsiao.nyx.tags.Tag;
 import com.larryhsiao.nyx.tags.TagsByJotId;
 import com.schibstedspain.leku.LocationPickerActivity;
+import com.silverhetch.aura.BackControl;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.measures.DP;
@@ -73,7 +75,7 @@ import static java.lang.Double.MIN_VALUE;
 /**
  * Fragment that shows the Jot content.
  */
-public class JotContentFragment extends JotFragment {
+public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
@@ -276,21 +278,21 @@ public class JotContentFragment extends JotFragment {
                     if (position == getCount() - 1) { // last item for input dialog
                         final ImageView inputItem = new ImageView(view.getContext());
                         int padding = ((int) new DP(getContext(), 16).px());
-                        inputItem.setPadding(padding, padding,padding,padding);
+                        inputItem.setPadding(padding, padding, padding, padding);
                         inputItem.setLayoutParams(new LayoutParams(
                             MATCH_PARENT,
-                            parent.getWidth()/4));
+                            parent.getWidth() / 4));
                         inputItem.setImageResource(R.drawable.ic_input);
                         return inputItem;
                     }
 
-                    if (position == 0){ // first item to remove mood
+                    if (position == 0) { // first item to remove mood
                         final ImageView itemRemove = new ImageView(view.getContext());
                         int padding = ((int) new DP(getContext(), 16).px());
-                        itemRemove.setPadding(padding, padding,padding,padding);
+                        itemRemove.setPadding(padding, padding, padding, padding);
                         itemRemove.setLayoutParams(new LayoutParams(
                             MATCH_PARENT,
-                            parent.getWidth()/4));
+                            parent.getWidth() / 4));
                         itemRemove.setImageResource(R.drawable.ic_cross);
                         return itemRemove;
                     }
@@ -298,7 +300,7 @@ public class JotContentFragment extends JotFragment {
                     orgItemView.setGravity(CENTER);
                     orgItemView.setLayoutParams(new LayoutParams(
                         MATCH_PARENT,
-                        parent.getWidth()/4));
+                        parent.getWidth() / 4));
                     orgItemView.setTextSize(COMPLEX_UNIT_DIP, 32);
                     return orgItemView;
                 }
@@ -375,7 +377,35 @@ public class JotContentFragment extends JotFragment {
             sendResult(0, RESULT_OK, intent);
             return true;
         }
+        if (item.getItemId() == R.id.menuItem_delete) {
+            preferDelete();
+        }
         return false;
+    }
+
+    private void deleteFlow() {
+        new AlertDialog.Builder(getContext())
+            .setTitle(R.string.delete)
+            .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                new JotRemoval(db, jot.id()).fire();
+                getFragmentManager().popBackStack();
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
+    }
+
+    private void discardFlow() {
+        if (jot instanceof WrappedJot) { // modified
+            new AlertDialog.Builder(getContext())
+                .setTitle(R.string.discard)
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    getFragmentManager().popBackStack();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+        } else {
+            getFragmentManager().popBackStack();
+        }
     }
 
     @Override
@@ -414,6 +444,24 @@ public class JotContentFragment extends JotFragment {
                     return newMood;
                 }
             };
+        }
+    }
+
+    @Override
+    public boolean onBackPress() {
+        if (jot instanceof WrappedJot) {
+            preferDelete();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void preferDelete() {
+        if (jot.id() < 0) {
+            discardFlow();
+        } else {
+            deleteFlow();
         }
     }
 }

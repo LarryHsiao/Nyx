@@ -17,7 +17,6 @@ import com.larryhsiao.nyx.jots.Jot;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.aura.view.ViewHolder;
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.time.HttpTimeFormat;
 import com.squareup.picasso.Picasso;
 
 import java.sql.Connection;
@@ -66,7 +65,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
             address = "";
         }
         holder.getTextView(R.id.itemJot_content).setText(
-            jot.mood()+" "+jot.content() + "\n" +
+            jot.mood() + " " + jot.content() + "\n" +
                 address +
                 DateFormat.getDateInstance().format(new Date(jot.createdTime()))
         );
@@ -104,8 +103,13 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
      * Append a Jot to list
      */
     public void insertJot(Jot jot) {
+        boolean emptyFirst = data.size() == 0;
         data.add(0, jot);
-        notifyItemInserted(data.size() - 1);
+        if (emptyFirst) {
+            notifyDataSetChanged();
+        } else {
+            notifyItemInserted(data.size() - 1);
+        }
     }
 
     /**

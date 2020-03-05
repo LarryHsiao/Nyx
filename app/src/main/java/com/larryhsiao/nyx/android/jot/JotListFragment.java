@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
+import com.larryhsiao.nyx.android.util.EmptyView;
 import com.larryhsiao.nyx.jots.AllJots;
 import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
@@ -26,6 +27,7 @@ import com.larryhsiao.nyx.jots.JotUriId;
 import com.larryhsiao.nyx.jots.JotsByIds;
 import com.larryhsiao.nyx.jots.JotsByKeyword;
 import com.larryhsiao.nyx.jots.QueriedJots;
+import com.silverhetch.aura.view.EmptyListAdapter;
 
 import java.util.List;
 
@@ -68,14 +70,15 @@ public class JotListFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final RecyclerView list = view.findViewById(R.id.list);
-        list.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        list.setAdapter(adapter = new JotListAdapter(db, jot -> {
+        adapter = new JotListAdapter(db, jot -> {
             Fragment frag = JotContentFragment.newInstance(new ConstJot(jot));
             frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
             nextPage(frag);
             return null;
-        }));
+        });
+        final RecyclerView list = view.findViewById(R.id.list);
+        list.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        list.setAdapter(new EmptyListAdapter(adapter, new EmptyView(view.getContext())));
         adapter.loadJots(loadJotsByArg());
     }
 
