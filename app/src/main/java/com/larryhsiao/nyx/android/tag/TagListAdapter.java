@@ -66,8 +66,13 @@ public class TagListAdapter extends RecyclerView.Adapter<ViewHolder> {
      * Append New Tag to list.
      */
     public void appendTag(Tag newTag) {
+        boolean emptyFirst = data.size() == 0;
         data.add(newTag);
-        notifyItemInserted(data.size() - 1);
+        if (emptyFirst) {
+            notifyDataSetChanged();
+        } else {
+            notifyItemInserted(data.size() - 1);
+        }
     }
 
     /**

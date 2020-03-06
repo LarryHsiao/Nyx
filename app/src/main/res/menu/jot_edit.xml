@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:icon="@drawable/trash_can"
+          android:id="@+id/menuItem_delete"
+          app:showAsAction="ifRoom"
+          app:iconTint="#fff"
+          android:title="@string/delete"
+    />
+
     <item
         android:icon="@drawable/ic_save"
         android:id="@+id/menuItem_save"
         app:showAsAction="always"
-        android:title="@string/save" />
+        android:title="@string/save"/>
 </menu>

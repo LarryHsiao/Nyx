@@ -48,4 +48,6 @@
     <string name="properties">Properties</string>
     <string name="enter_tag_name">New Tag name</string>
     <string name="moods">Moods</string>
+    <string name="empty">Empty</string>
+    <string name="discard">Discard</string>
 </resources>

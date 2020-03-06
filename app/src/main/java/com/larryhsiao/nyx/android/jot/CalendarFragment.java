@@ -14,11 +14,13 @@ import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
+import com.larryhsiao.nyx.android.util.EmptyView;
 import com.larryhsiao.nyx.jots.AllJots;
 import com.larryhsiao.nyx.jots.ConstJot;
 import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.JotsByDate;
 import com.larryhsiao.nyx.jots.QueriedJots;
+import com.silverhetch.aura.view.EmptyListAdapter;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -52,7 +54,7 @@ public class CalendarFragment extends JotFragment {
             nextPage(frag);
             return null;
         });
-        jotList.setAdapter(adapter);
+        jotList.setAdapter(new EmptyListAdapter(adapter, new EmptyView(view.getContext())));
         loadJotsByDate(java.util.Calendar.getInstance());
         setTitle(dateString());
         List<Jot> jots = new QueriedJots(new AllJots(db)).value();

@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.android.base.JotFragment;
 import com.larryhsiao.nyx.android.jot.JotListFragment;
+import com.larryhsiao.nyx.android.util.EmptyView;
 import com.larryhsiao.nyx.jots.Jot;
 import com.larryhsiao.nyx.jots.QueriedJots;
 import com.larryhsiao.nyx.tags.AllTags;
@@ -29,6 +30,7 @@ import com.larryhsiao.nyx.tags.QueriedTags;
 import com.larryhsiao.nyx.tags.Tag;
 import com.larryhsiao.nyx.tags.TagRemoval;
 import com.larryhsiao.nyx.tags.TagsByKeyword;
+import com.silverhetch.aura.view.EmptyListAdapter;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.clotho.source.ConstSource;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
@@ -86,7 +88,7 @@ public class TagListFragment extends JotFragment {
         });
         final RecyclerView list = view.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        list.setAdapter(adapter);
+        list.setAdapter(new EmptyListAdapter(adapter, new EmptyView(view.getContext())));
         adapter.loadTags(
             new QueriedTags(
                 new AllTags(db)
