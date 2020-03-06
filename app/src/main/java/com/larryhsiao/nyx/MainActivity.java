@@ -5,11 +5,11 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.larryhsiao.nyx.android.base.JotActivity;
-import com.larryhsiao.nyx.android.jot.CalendarFragment;
-import com.larryhsiao.nyx.android.jot.JotListFragment;
-import com.larryhsiao.nyx.android.jot.JotMapFragment;
-import com.larryhsiao.nyx.android.tag.TagListFragment;
+import com.larryhsiao.nyx.base.JotActivity;
+import com.larryhsiao.nyx.jot.CalendarFragment;
+import com.larryhsiao.nyx.jot.JotListFragment;
+import com.larryhsiao.nyx.jot.JotMapFragment;
+import com.larryhsiao.nyx.tag.TagListFragment;
 
 /**
  * Entry Activity of Nyx.
