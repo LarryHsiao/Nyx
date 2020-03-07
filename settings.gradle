@@ -1,1 +1,4 @@
 include ':app'
+include 'core'
+findProject(':core')?.name = 'nyx-core'
+

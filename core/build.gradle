@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+    id 'java-library'
+}
+
+group 'com.larryhsiao'
+version '1.0.0'
+
+sourceCompatibility = 1.8
+
+test {
+    useJUnitPlatform {
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api 'com.silverhetch:clotho:1.17.0'
+    implementation 'com.h2database:h2:1.4.197'
+    api "org.flywaydb:flyway-core:6.2.4"
+    implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+}

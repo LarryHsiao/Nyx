@@ -48,7 +48,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".android.base.AuthActivity"
+        <activity android:name=".base.AuthActivity"
                   android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
         />
 
