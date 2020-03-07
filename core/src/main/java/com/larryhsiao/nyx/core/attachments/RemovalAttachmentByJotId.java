@@ -22,8 +22,9 @@ public class RemovalAttachmentByJotId implements Action {
     public void fire() {
         try (PreparedStatement stmt = dbConn.value().prepareStatement(
             // language=H2
-            "DELETE FROM attachments " +
-                "WHERE JOT_ID=?;"
+            "UPDATE attachments " +
+                "SET DELETE = 1 , VERSION = VERSION + 1 " +
+                "WHERE JOT_ID=?1;"
         )) {
             stmt.setLong(1, jotId);
             stmt.executeUpdate();

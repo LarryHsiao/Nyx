@@ -142,16 +142,18 @@ public class JotMapFragment extends JotFragment {
                 .setTitle(new LocationString(new LocationAddress(getContext(), location).value()).value())
                 .setAdapter(adapter, (dialog, which) -> {
                     if (which == 0) {
-                        Fragment frag = JotContentFragment.newInstance(new ConstJot(
-                            -1,
-                            "",
-                            System.currentTimeMillis(),
-                            new double[]{
-                                marker.getPosition().longitude,
-                                marker.getPosition().latitude
-                            },
-                            ""
-                        ));
+                        Fragment frag = JotContentFragment.newInstance(
+                            new ConstJot(
+                                -1,
+                                "",
+                                System.currentTimeMillis(),
+                                new double[]{
+                                    marker.getPosition().longitude,
+                                    marker.getPosition().latitude
+                                },
+                                "",
+                                1,
+                                false));
                         frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
                         nextPage(frag);
                     }

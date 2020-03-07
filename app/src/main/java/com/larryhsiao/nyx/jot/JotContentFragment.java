@@ -110,7 +110,10 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 "",
                 System.currentTimeMillis(),
                 new double[]{MIN_VALUE, MIN_VALUE},
-                "");
+                "",
+                1,
+                false
+            );
         }
     }
 
@@ -396,6 +399,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void discardFlow() {
+        try {
+            new JotRemoval(db, jot.id()).fire();
+        } catch (Exception e) {
+            // make sure not have actually inserted into db
+            e.printStackTrace();
+        }
         if (jot instanceof WrappedJot) { // modified
             new AlertDialog.Builder(getContext())
                 .setTitle(R.string.discard)

@@ -23,7 +23,9 @@ public class AttachmentDb implements Source<Connection> {
                 "CREATE TABLE IF NOT EXISTS attachments(" +
                     "id integer not null auto_increment, " +
                     "uri text not null, " +
-                    "jot_id integer not null " +
+                    "jot_id integer not null ," +
+                    "version integer not null default 1, " +
+                    "delete integer not null default 0" +
                     ");"
             );
             return conn;

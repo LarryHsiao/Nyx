@@ -50,4 +50,7 @@
     <string name="moods">Moods</string>
     <string name="empty">Empty</string>
     <string name="discard">Discard</string>
+    <string name="account">Account</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
 </resources>

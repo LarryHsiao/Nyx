@@ -22,7 +22,9 @@ public class JotTagRemoval implements Action {
     public void fire() {
         try (PreparedStatement stmt = conn.value().prepareStatement(
             // language=H2
-            "DELETE FROM tag_jot WHERE jot_id=?"
+            "UPDATE tag_jot " +
+                "SET DELETE = 1,  VERSION = VERSION + 1" +
+                " WHERE jot_id=?"
         )) {
             stmt.setLong(1, jotId);
             stmt.executeUpdate();

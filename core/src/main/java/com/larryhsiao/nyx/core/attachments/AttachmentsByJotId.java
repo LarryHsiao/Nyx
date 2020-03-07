@@ -24,7 +24,8 @@ public class AttachmentsByJotId implements Source<ResultSet> {
             PreparedStatement stmt = dbSource.value().prepareStatement(
                 // language=H2
                 "SELECT * FROM attachments " +
-                    "WHERE jot_id=?;"
+                    "WHERE jot_id = ? " +
+                    "AND DELETE = 0;"
             );
             stmt.setLong(1, jotId);
             return stmt.executeQuery();

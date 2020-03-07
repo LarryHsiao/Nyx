@@ -31,6 +31,11 @@ public class JotWeekView extends WeekView {
         mPadding = dipToPx(context, 4);
     }
 
+    private static int dipToPx(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
     /**
      * 如果需要点击Scheme没有效果，则return true
      *
@@ -46,7 +51,6 @@ public class JotWeekView extends WeekView {
         canvas.drawRect(x + mPadding, mPadding, x + mItemWidth - mPadding, mItemHeight - mPadding, mSelectedPaint);
         return true;
     }
-
 
     @Override
     protected void onDrawScheme(Canvas canvas, Calendar calendar, int x) {
@@ -75,10 +79,5 @@ public class JotWeekView extends WeekView {
                 calendar.isCurrentDay() ? mCurDayTextPaint :
                     calendar.isCurrentMonth() ? mCurMonthTextPaint : mOtherMonthTextPaint);
         }
-    }
-
-    private static int dipToPx(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
     }
 }

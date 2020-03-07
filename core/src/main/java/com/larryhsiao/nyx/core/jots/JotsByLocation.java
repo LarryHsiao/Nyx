@@ -26,7 +26,8 @@ public class JotsByLocation implements Source<ResultSet> {
             PreparedStatement stmt = conn.value().prepareStatement(
                 // language=H2
                 "SELECT * FROM jots " +
-                    "WHERE location && ?" +
+                    "WHERE location && ? " +
+                    "AND DELETE = 0 " +
                     "ORDER BY CREATEDTIME DESC;"
             );
             stmt.setString(1, geometry.toText());

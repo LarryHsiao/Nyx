@@ -23,8 +23,8 @@ public class QueriedTags implements Source<List<Tag>> {
             while (res.next()) {
                 tags.add(new ConstTag(
                     res.getLong("id"),
-                    res.getString("title")
-                ));
+                    res.getString("title"),
+                    res.getInt("version")));
             }
             return tags;
         } catch (Exception e) {

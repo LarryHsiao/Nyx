@@ -34,5 +34,15 @@ public class WrappedJot implements Jot {
     public double[] location() {
         return jot.location();
     }
+
+    @Override
+    public int version() {
+        return jot.version();
+    }
+
+    @Override
+    public boolean deleted() {
+        return jot.deleted();
+    }
 }
 

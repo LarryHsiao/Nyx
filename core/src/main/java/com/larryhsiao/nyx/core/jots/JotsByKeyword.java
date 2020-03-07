@@ -25,9 +25,10 @@ public class JotsByKeyword implements Source<ResultSet> {
                 // language=H2
                 "SELECT * FROM jots " +
                     "WHERE content like ? " +
+                    "AND DELETE = 0 " +
                     "ORDER BY CREATEDTIME DESC;"
             );
-            stmt.setString(1, "%"+keyword+"%");
+            stmt.setString(1, "%" + keyword + "%");
             return stmt.executeQuery();
         } catch (Exception e) {
             throw new IllegalArgumentException(e);

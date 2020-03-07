@@ -41,7 +41,9 @@ public class QueriedJots implements Source<List<Jot>> {
                     res.getString(res.findColumn("content")),
                     timestamp.getTime(),
                     location,
-                    res.getString("mood")
+                    res.getString("mood"),
+                    res.getInt("version"),
+                    res.getInt("delete") == 1
                 ));
             }
             return jots;

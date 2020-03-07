@@ -6,10 +6,12 @@ package com.larryhsiao.nyx.core.tags;
 public class ConstTag implements Tag {
     private final long id;
     private final String title;
+    private final int version;
 
-    public ConstTag(long id, String title) {
+    public ConstTag(long id, String title, int version) {
         this.id = id;
         this.title = title;
+        this.version = version;
     }
 
     @Override
@@ -20,5 +22,10 @@ public class ConstTag implements Tag {
     @Override
     public long id() {
         return id;
+    }
+
+    @Override
+    public int version() {
+        return version;
     }
 }

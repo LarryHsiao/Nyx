@@ -32,6 +32,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/calendar_list"
+        android:background="#fff"
         tools:listitem="@layout/item_jot"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

@@ -23,7 +23,8 @@ public class JotRemoval implements Action {
         try {
             final PreparedStatement removeTag = db.value().prepareStatement(
                 // language=H2
-                "DELETE FROM TAG_JOT " +
+                "UPDATE TAG_JOT " +
+                    "SET DELETE=1 , VERSION = VERSION + 1 " +
                     "WHERE JOT_ID=?"
             );
             removeTag.setLong(1, id);
@@ -32,7 +33,8 @@ public class JotRemoval implements Action {
 
             final PreparedStatement removeJot = db.value().prepareStatement(
                 // language=H2
-                "DELETE FROM JOTS " +
+                "UPDATE JOTS " +
+                    "SET DELETE=1, VERSION = VERSION + 1 " +
                     "WHERE ID=?"
             );
             removeJot.setLong(1, id);

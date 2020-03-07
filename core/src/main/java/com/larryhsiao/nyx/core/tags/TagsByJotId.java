@@ -25,7 +25,7 @@ public class TagsByJotId implements Source<ResultSet> {
                 //language=H2
                 "SELECT  * FROM TAGS " +
                     "INNER JOIN TAG_JOT TJ on TAGS.ID = TJ.TAG_ID " +
-                    "WHERE TJ.JOT_ID=?;"
+                    "WHERE TJ.JOT_ID=? AND TAGS.DELETE = 0;"
             );
             stmt.setLong(1, jotId);
             return stmt.executeQuery();

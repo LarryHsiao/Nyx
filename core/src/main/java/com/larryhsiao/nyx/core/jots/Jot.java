@@ -30,4 +30,14 @@ public interface Jot {
      * A mood emoji for this jot.
      */
     String mood();
+
+    /**
+     * Version of this Jot. For syncing to replace from.
+     */
+    int version();
+
+    /**
+     * Determine this Jot is deleted.
+     */
+    boolean deleted();
 }

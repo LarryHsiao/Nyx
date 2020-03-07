@@ -12,10 +12,16 @@ import java.util.Date;
 public class PostedJot implements Source<Jot> {
     private final Source<Connection> db;
     private final Jot jot;
+    private final boolean updateVer;
 
-    public PostedJot(Source<Connection> db, Jot jot) {
+    public PostedJot(Source<Connection> db, Jot jot, boolean updateVer) {
         this.db = db;
         this.jot = jot;
+        this.updateVer = updateVer;
+    }
+
+    public PostedJot(Source<Connection> db, Jot jot) {
+        this(db, jot, true);
     }
 
     @Override
@@ -25,7 +31,7 @@ public class PostedJot implements Source<Jot> {
             calendar.setTime(new Date(jot.createdTime()));
             return new NewJot(db, jot.content(), jot.location(), calendar, jot.mood()).value();
         } else {
-            new UpdateJot(jot, db).fire();
+            new UpdateJot(jot, db, updateVer).fire();
             return jot;
         }
     }

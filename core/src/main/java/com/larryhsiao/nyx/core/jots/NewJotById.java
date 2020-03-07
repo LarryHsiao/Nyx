@@ -8,39 +8,18 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
-import static java.lang.Double.MIN_VALUE;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-
 /**
- * Source to build a Jot which just created by user.
+ * Source to build a Jot which just created with specific Id.
  */
-public class NewJot implements Source<Jot> {
+public class NewJotById implements Source<Jot> {
     private final Source<Connection> db;
     private final Jot jot;
 
-    public NewJot(Source<Connection> db, String content) {
-        this(db, content, new double[]{MIN_VALUE, MIN_VALUE}, Calendar.getInstance(), " ");
-    }
-
-    public NewJot(Source<Connection> db, String content, Calendar calendar, String mood) {
-        this(db, content, new double[]{MIN_VALUE, MIN_VALUE}, calendar, mood);
-    }
-
-    public NewJot(Source<Connection> db, String content, double[] location, String mood) {
-        this(db, content, location, Calendar.getInstance(), mood);
-    }
-
-    public NewJot(Source<Connection> db, String content, double[] location, Calendar calendar, String mood) {
-        this.db = db;
-        this.jot = new ConstJot(-1L, content, calendar.getTimeInMillis(), location, mood, 1, false);
-    }
-
-    public NewJot(Source<Connection> db, Jot jot) {
+    public NewJotById(Source<Connection> db, Jot jot) {
         this.db = db;
         this.jot = jot;
     }
@@ -49,9 +28,8 @@ public class NewJot implements Source<Jot> {
     public Jot value() {
         try (PreparedStatement stmt = db.value().prepareStatement(
             // language=H2
-            "INSERT INTO jots(content, createdTime, location, mood, VERSION) " +
-                "VALUES (?, ?, ?, ?, ?)",
-            RETURN_GENERATED_KEYS
+            "INSERT INTO jots(content, createdTime, location, mood, VERSION, ID, DELETE) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)"
         )) {
             stmt.setString(1, jot.content());
             stmt.setTimestamp(2, new Timestamp(jot.createdTime()), Calendar.getInstance());
@@ -73,20 +51,12 @@ public class NewJot implements Source<Jot> {
                 stmt.setString(4, "");
             }
             stmt.setInt(5, jot.version());
+            stmt.setLong(6, jot.id());
+            stmt.setInt(7, jot.deleted() ? 1 : 0);
             if (stmt.executeUpdate() == 0) {
                 throw new SQLException("Insert failed");
             }
-            final ResultSet res = stmt.getGeneratedKeys();
-            if (!res.next()) {
-                throw new IllegalArgumentException("Create jot failed: " + jot.content());
-            }
-            long newId = res.getLong(1);
-            return new WrappedJot(jot) {
-                @Override
-                public long id() {
-                    return newId;
-                }
-            };
+            return jot;
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

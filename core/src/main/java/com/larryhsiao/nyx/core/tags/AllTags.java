@@ -21,7 +21,7 @@ public class AllTags implements Source<ResultSet> {
         try {
             return conn.value().createStatement().executeQuery(
                 // language=H2
-                "SELECT * FROM TAGS;"
+                "SELECT * FROM TAGS WHERE DELETE = 0;"
             );
         } catch (SQLException e) {
             throw new IllegalArgumentException(e);

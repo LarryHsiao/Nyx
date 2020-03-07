@@ -39,7 +39,9 @@ public class JotById implements Source<Jot> {
                     Calendar.getInstance()
                 ).getTime(),
                 new PointSource(res.getString("location")).value(),
-                res.getString("mood")
+                res.getString("mood"),
+                res.getInt("version"),
+                res.getInt("delete") == 1
             );
         } catch (SQLException e) {
             throw new IllegalArgumentException(e);
