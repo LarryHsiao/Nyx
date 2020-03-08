@@ -56,7 +56,8 @@ public class AccountFragment extends JotFragment {
                 FirebaseAuth.getInstance().signOut();
                 updateView(view);
             });
-            new SyncFromFirebase(user.getUid(), db).fire();
+//            new SyncJots(user.getUid(), db).fire();
+            new SyncTags(user.getUid(), db).fire();
         } else {
             info.setText("");
             loginLogoutBtn.setText(R.string.login);

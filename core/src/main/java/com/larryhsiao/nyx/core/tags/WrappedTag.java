@@ -24,4 +24,9 @@ public class WrappedTag implements Tag {
     public int version() {
         return origin.version();
     }
+
+    @Override
+    public boolean deleted() {
+        return origin.deleted();
+    }
 }

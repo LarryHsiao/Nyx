@@ -18,4 +18,9 @@ public interface Tag {
      * The version of this tag
      */
     int version();
+
+    /**
+     * This tag is marked as deleted
+     */
+    boolean deleted();
 }

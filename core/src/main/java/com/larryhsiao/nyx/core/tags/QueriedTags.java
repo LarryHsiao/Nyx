@@ -24,7 +24,9 @@ public class QueriedTags implements Source<List<Tag>> {
                 tags.add(new ConstTag(
                     res.getLong("id"),
                     res.getString("title"),
-                    res.getInt("version")));
+                    res.getInt("version"),
+                    res.getInt("delete") == 1)
+                );
             }
             return tags;
         } catch (Exception e) {

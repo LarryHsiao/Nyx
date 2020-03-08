@@ -23,11 +23,11 @@ import java.util.Map;
 /**
  * Action to sync firebase
  */
-public class SyncFromFirebase implements Action {
+public class SyncJots implements Action {
     private final String userId;
     private final Source<Connection> db;
 
-    public SyncFromFirebase(String userId, Source<Connection> db) {
+    public SyncJots(String userId, Source<Connection> db) {
         this.userId = userId;
         this.db = db;
     }

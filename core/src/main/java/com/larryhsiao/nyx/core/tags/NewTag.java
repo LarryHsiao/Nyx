@@ -16,7 +16,7 @@ public class NewTag implements Source<Tag> {
     private final Tag tag;
 
     public NewTag(Source<Connection> connSource, String title) {
-        this(connSource, new ConstTag(-1L, title, 1));
+        this(connSource, new ConstTag(-1L, title, 1, false));
     }
 
     public NewTag(Source<Connection> db, Tag tag) {
