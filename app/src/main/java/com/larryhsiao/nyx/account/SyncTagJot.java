@@ -80,7 +80,6 @@ public class SyncTagJot implements Action {
     private void newLocalTag(QueryDocumentSnapshot remoteTag) {
         new NewJotTagById(
             db,
-            Long.parseLong(remoteTag.getId()),
             remoteTag.getLong("jot_id"),
             remoteTag.getLong("tag_id"),
             remoteTag.getLong("version").intValue(),

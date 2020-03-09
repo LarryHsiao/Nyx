@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
  */
 public class NewJotTagById implements Action {
     private final Source<Connection> conSource;
-    private final long id;
     private final long jotId;
     private final long tagId;
     private final int version;
@@ -19,13 +18,12 @@ public class NewJotTagById implements Action {
 
     public NewJotTagById(
         Source<Connection> conSource,
-        long id, long jotId,
+        long jotId,
         long tagId,
         int version,
         int delete
     ) {
         this.conSource = conSource;
-        this.id = id;
         this.jotId = jotId;
         this.tagId = tagId;
         this.version = version;

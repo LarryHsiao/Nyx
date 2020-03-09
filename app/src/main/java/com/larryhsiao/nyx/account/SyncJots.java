@@ -75,7 +75,7 @@ public class SyncJots implements Action {
                 Long.parseLong(remoteJot.getId()),
                 remoteJot.getString("content"),
                 calendar.getTimeInMillis(),
-                new double[]{geo.getLatitude(), geo.getLongitude()},
+                new double[]{geo.getLongitude(), geo.getLatitude()},
                 remoteJot.getString("mood"),
                 remoteJot.getLong("version").intValue(),
                 remoteJot.getLong("delete").intValue() == 1
@@ -93,7 +93,7 @@ public class SyncJots implements Action {
                 Long.parseLong(remoteJot.getId()),
                 remoteJot.getString("content"),
                 calendar.getTimeInMillis(),
-                new double[]{geo.getLatitude(), geo.getLongitude()},
+                new double[]{geo.getLongitude(), geo.getLatitude()},
                 remoteJot.getString("mood"),
                 remoteJot.getLong("version").intValue(),
                 remoteJot.getLong("delete").intValue() == 1
@@ -106,7 +106,7 @@ public class SyncJots implements Action {
         data.put("content", jot.content());
         data.put("mood", jot.mood());
         data.put("createdTime", jot.createdTime());
-        data.put("location", new GeoPoint(jot.location()[0], jot.location()[1]));
+        data.put("location", new GeoPoint(jot.location()[1], jot.location()[0]));
         data.put("version", jot.version());
         data.put("delete", jot.deleted() ? 1 : 0);
         jotsRef.document(jot.id() + "").set(data);
