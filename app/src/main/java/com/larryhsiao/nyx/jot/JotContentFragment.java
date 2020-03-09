@@ -50,6 +50,7 @@ import com.larryhsiao.nyx.core.tags.NewTag;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagsByJotId;
+import com.larryhsiao.nyx.core.tags.TagsByKeyword;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.BackControl;
 import com.silverhetch.aura.location.LocationAddress;
@@ -60,6 +61,7 @@ import com.silverhetch.clotho.source.ConstSource;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -81,7 +83,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
     private static final String ARG_JOT_JSON = "ARG_JOT";
-    private ChipGroup chipGroup;
+    private ChipGroup viewGroup;
     private TextView locationText;
     private TextView moodText;
     private AttachmentAdapter attachmentAdapter;
@@ -143,7 +145,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             dialog.show();
         });
         updateDateIndicator(date);
-        chipGroup = view.findViewById(R.id.jot_tagGroup);
+        viewGroup = view.findViewById(R.id.jot_tagGroup);
         EditText contentEditText = view.findViewById(R.id.jot_content);
         contentEditText.setText(jot.content());
         contentEditText.addTextChangedListener(new TextWatcher() {
@@ -206,7 +208,17 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 .setMessage(getString(R.string.enter_tag_name))
                 .setView(editText)
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                    final Tag tag = new NewTag(db, editText.getText().toString()).value();
+                    final String preferTagName = editText.getText().toString();
+                    Tag tag = null;
+                    for (Tag searched : new QueriedTags(new TagsByKeyword(db, preferTagName)).value()) {
+                        if (searched.title().equals(preferTagName)) {
+                            tag = searched;
+                            break;
+                        }
+                    }
+                    if (tag == null) {
+                        tag = new NewTag(db, editText.getText().toString()).value();
+                    }
                     final Chip tagChip = new Chip(v.getContext());
                     tagChip.setText(tag.title());
                     tagChip.setLines(1);
@@ -215,10 +227,10 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     tagChip.setOnClickListener(v1 -> new AlertDialog.Builder(v1.getContext())
                         .setTitle(tagChip.getText().toString())
                         .setMessage(getString(R.string.delete))
-                        .setPositiveButton(R.string.confirm, (dialog1, which1) -> chipGroup.removeView(v1))
+                        .setPositiveButton(R.string.confirm, (dialog1, which1) -> viewGroup.removeView(v1))
                         .setNegativeButton(R.string.cancel, null)
                         .show());
-                    chipGroup.addView(tagChip);
+                    viewGroup.addView(tagChip);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .create().show();
@@ -233,12 +245,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     .setTitle(tag.title())
                     .setMessage(R.string.delete)
                     .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                        chipGroup.removeView(v);
+                        viewGroup.removeView(v);
                     })
                     .setNegativeButton(R.string.cancel, null)
                     .show();
             });
-            chipGroup.addView(chip);
+            viewGroup.addView(chip);
         }
         moodText = view.findViewById(R.id.jot_mood);
 
@@ -368,14 +380,24 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     .collect(Collectors.toList())
                     .toArray(new String[0])
             ).value();
-            new JotTagRemoval(db, jot.id()).fire();
-            for (int i = 0; i < chipGroup.getChildCount(); i++) {
-                new NewJotTag(
-                    db,
-                    new ConstSource<>(jot.id()),
-                    new ConstSource<>(((Tag) chipGroup.getChildAt(i).getTag()).id())
-                ).fire();
+            final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
+                .value()
+                .stream()
+                .collect(Collectors.toMap(Tag::id, tag -> tag));
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                Tag tagOnView = ((Tag) viewGroup.getChildAt(i).getTag());
+                if (!dbTags.containsKey(tagOnView.id())) {
+                    // update JOT TAG
+                    new NewJotTag(
+                        db,
+                        new ConstSource<>(jot.id()),
+                        new ConstSource<>(tagOnView.id())
+                    ).fire();
+                } else {
+                    dbTags.remove(tagOnView.id());
+                }
             }
+            dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
             final Intent intent = new Intent();
             intent.setData(Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString()));
             sendResult(0, RESULT_OK, intent);

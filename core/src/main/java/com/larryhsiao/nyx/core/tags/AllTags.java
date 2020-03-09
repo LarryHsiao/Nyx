@@ -25,12 +25,12 @@ public class AllTags implements Source<ResultSet> {
     @Override
     public ResultSet value() {
         try {
-            if (icnludeDeleted){
+            if (icnludeDeleted) {
                 return conn.value().createStatement().executeQuery(
                     // language=H2
                     "SELECT * FROM TAGS;"
                 );
-            }else {
+            } else {
                 return conn.value().createStatement().executeQuery(
                     // language=H2
                     "SELECT * FROM TAGS WHERE DELETE = 0;"
