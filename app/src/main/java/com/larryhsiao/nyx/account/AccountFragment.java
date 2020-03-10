@@ -14,6 +14,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
 
@@ -59,6 +60,7 @@ public class AccountFragment extends JotFragment {
             new SyncJots(user.getUid(), db).fire();
             new SyncTags(user.getUid(), db).fire();
             new SyncTagJot(user.getUid(), db).fire();
+            new SyncAttachments(user.getUid(), db).fire();
         } else {
             info.setText("");
             loginLogoutBtn.setText(R.string.login);

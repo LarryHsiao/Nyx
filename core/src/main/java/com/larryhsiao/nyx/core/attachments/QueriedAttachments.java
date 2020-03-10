@@ -24,8 +24,9 @@ public class QueriedAttachments implements Source<List<Attachment>> {
                 attachments.add(new ConstAttachment(
                     res.getLong("id"),
                     res.getLong("jot_id"),
-                    res.getString("uri")
-                ));
+                    res.getString("uri"),
+                    res.getInt("version"),
+                    res.getInt("delete")));
             }
             return attachments;
         } catch (Exception e) {

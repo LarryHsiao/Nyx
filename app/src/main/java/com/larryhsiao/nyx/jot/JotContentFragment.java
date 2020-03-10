@@ -34,10 +34,14 @@ import com.larryhsiao.nyx.BuildConfig;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
+import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
+import com.larryhsiao.nyx.core.attachments.NewAttachment;
 import com.larryhsiao.nyx.core.attachments.NewAttachments;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
-import com.larryhsiao.nyx.core.attachments.RemovalAttachmentByJotId;
+import com.larryhsiao.nyx.core.attachments.RemovalAttachment;
+import com.larryhsiao.nyx.core.attachments.UpdateAttachment;
+import com.larryhsiao.nyx.core.attachments.WrappedAttachment;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotRemoval;
@@ -61,6 +65,7 @@ import com.silverhetch.clotho.source.ConstSource;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -370,16 +375,33 @@ public class JotContentFragment extends JotFragment implements BackControl {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_save) {
             jot = new PostedJot(db, jot).value();
-            new RemovalAttachmentByJotId(db, jot.id()).fire();
-            new NewAttachments(
-                db,
-                jot.id(),
-                attachmentAdapter.exportUri()
-                    .stream()
-                    .map(it -> it.toString())
-                    .collect(Collectors.toList())
-                    .toArray(new String[0])
+            final List<Attachment> attachments = new QueriedAttachments(
+                new AttachmentsByJotId(db, jot.id(), true)
             ).value();
+            attachmentAdapter.exportUri().forEach(uri -> {
+                boolean hasItem = false;
+                for (Attachment attachment : attachments) {
+                    if (attachment.uri().equals(uri.toString())) {
+                        hasItem = true;
+                        if (attachment.deleted()) {
+                            new UpdateAttachment(
+                                db,
+                                new WrappedAttachment(attachment) {
+                                    @Override
+                                    public boolean deleted() {
+                                        return false;
+                                    }
+                                }
+                            ).fire();
+                        }
+                        attachments.remove(uri.toString());
+                    }
+                }
+                if (!hasItem) {
+                    new NewAttachment(db, uri.toString(), jot.id()).value();
+                }
+            });
+            attachments.forEach((attachment) -> new RemovalAttachment(db, attachment.id()).fire());
             final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
                 .value()
                 .stream()

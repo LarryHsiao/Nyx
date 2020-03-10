@@ -18,4 +18,14 @@ public interface Attachment {
      * Uri of this attachment
      */
     String uri();
+
+    /**
+     * Version of this attachment item.
+     */
+    int version();
+
+    /**
+     * Indicates if this attachment is deleted or not.
+     */
+    boolean deleted();
 }
