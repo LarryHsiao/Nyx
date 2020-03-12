@@ -56,6 +56,12 @@ public class JotListFragment extends JotFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        adapter = new JotListAdapter(db, jot -> {
+            Fragment frag = JotContentFragment.newInstance(new ConstJot(jot));
+            frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
+            nextPage(frag);
+            return null;
+        });
         final Bundle args = getArguments();
         setHasOptionsMenu(args == null || args.getLongArray(ARG_JOT_IDS) == null);
         setTitle(getString(R.string.jots));
@@ -70,12 +76,7 @@ public class JotListFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        adapter = new JotListAdapter(db, jot -> {
-            Fragment frag = JotContentFragment.newInstance(new ConstJot(jot));
-            frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
-            nextPage(frag);
-            return null;
-        });
+
         final RecyclerView list = view.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(view.getContext()));
         list.setAdapter(new EmptyListAdapter(adapter, new EmptyView(view.getContext())));
