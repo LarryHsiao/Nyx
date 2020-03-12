@@ -32,7 +32,8 @@
 
     <item
         android:title="@string/account"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
+        android:visible="false"
         android:id="@+id/menuItem_account"
         app:iconTint="@color/colorPrimaryDark"
         android:icon="@drawable/ic_account"
