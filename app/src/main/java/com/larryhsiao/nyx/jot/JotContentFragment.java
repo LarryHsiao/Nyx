@@ -451,7 +451,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     @Override
     public boolean onBackPress() {
         if (jot instanceof WrappedJot) {
-            preferDelete();
+            discardFlow();
             return true;
         } else {
             return false;
