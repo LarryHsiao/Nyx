@@ -25,7 +25,8 @@ public class JotsByDate implements Source<ResultSet> {
             PreparedStatement stmt = db.value().prepareStatement(
                 // language=H2
                 "SELECT * FROM jots " +
-                    "WHERE CAST(CREATEDTIME AS DATE) = ?;"
+                    "WHERE CAST(CREATEDTIME AS DATE) = ? " +
+                    "AND DELETE = 0;"
             );
             stmt.setDate(1, date);
             return stmt.executeQuery();

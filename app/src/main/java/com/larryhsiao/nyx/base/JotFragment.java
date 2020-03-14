@@ -13,6 +13,7 @@ import java.sql.Connection;
  */
 public class JotFragment extends AuraFragment {
     protected Source<Connection> db;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -25,8 +25,9 @@ public class JotUriTest {
                     "content",
                     0,
                     new double[]{},
-                    ""
-                )
+                    "",
+                    1,
+                    false)
             ).value().toASCIIString()
         );
     }

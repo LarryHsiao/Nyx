@@ -20,7 +20,7 @@ public class JotsByIds implements Source<ResultSet> {
 
     @Override
     public ResultSet value() {
-        try  {
+        try {
             Statement stmt = dbSource.value().createStatement();
             final StringBuilder idStr = new StringBuilder();
             for (int i = 0; i < ids.length; i++) {
@@ -33,6 +33,7 @@ public class JotsByIds implements Source<ResultSet> {
                 // language=H2
                 "SELECT * FROM jots " +
                     "WHERE ID IN (" + idStr.toString() + ") " +
+                    "AND DELETE = 0 " +
                     "ORDER BY CREATEDTIME DESC;"
             );
         } catch (Exception e) {

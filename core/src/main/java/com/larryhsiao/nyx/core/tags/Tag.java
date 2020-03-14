@@ -4,7 +4,6 @@ package com.larryhsiao.nyx.core.tags;
  * Tag of Jot
  */
 public interface Tag {
-
     /**
      * The title of this tag
      */
@@ -14,4 +13,14 @@ public interface Tag {
      * The id of this Tag
      */
     long id();
+
+    /**
+     * The version of this tag
+     */
+    int version();
+
+    /**
+     * This tag is marked as deleted
+     */
+    boolean deleted();
 }

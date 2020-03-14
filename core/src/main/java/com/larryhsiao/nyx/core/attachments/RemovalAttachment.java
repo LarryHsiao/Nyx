@@ -9,13 +9,13 @@ import java.sql.PreparedStatement;
 /**
  * Remove Attachments by given Jot id.
  */
-public class RemovalAttachmentByJotId implements Action {
+public class RemovalAttachment implements Action {
     private final Source<Connection> dbConn;
-    private final long jotId;
+    private final long id;
 
-    public RemovalAttachmentByJotId(Source<Connection> dbConn, long jotId) {
+    public RemovalAttachment(Source<Connection> dbConn, long id) {
         this.dbConn = dbConn;
-        this.jotId = jotId;
+        this.id = id;
     }
 
     @Override
@@ -24,9 +24,9 @@ public class RemovalAttachmentByJotId implements Action {
             // language=H2
             "UPDATE attachments " +
                 "SET DELETE = 1 , VERSION = VERSION + 1 " +
-                "WHERE JOT_ID=?1;"
+                "WHERE ID=?1;"
         )) {
-            stmt.setLong(1, jotId);
+            stmt.setLong(1, id);
             stmt.executeUpdate();
         } catch (Exception e) {
             throw new IllegalArgumentException(e);

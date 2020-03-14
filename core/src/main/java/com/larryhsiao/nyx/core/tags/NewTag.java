@@ -13,11 +13,15 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
  */
 public class NewTag implements Source<Tag> {
     private final Source<Connection> connSource;
-    private final String title;
+    private final Tag tag;
 
     public NewTag(Source<Connection> connSource, String title) {
-        this.connSource = connSource;
-        this.title = title;
+        this(connSource, new ConstTag(-1L, title, 1, false));
+    }
+
+    public NewTag(Source<Connection> db, Tag tag) {
+        this.connSource = db;
+        this.tag = tag;
     }
 
     @Override
@@ -27,13 +31,19 @@ public class NewTag implements Source<Tag> {
             "INSERT INTO TAGS (TITLE)VALUES ( ? );"
             , RETURN_GENERATED_KEYS
         )) {
-            stmt.setString(1, title);
+            stmt.setString(1, tag.title());
             stmt.executeUpdate();
             ResultSet res = stmt.getGeneratedKeys();
             if (!res.next()) {
-                throw new IllegalArgumentException("Creating tag failed, title: "+ title);
+                throw new IllegalArgumentException("Creating tag failed, title: " + tag.title());
             }
-            return new ConstTag(res.getLong(1), title);
+            long newId = res.getLong(1);
+            return new WrappedTag(tag) {
+                @Override
+                public long id() {
+                    return newId;
+                }
+            };
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

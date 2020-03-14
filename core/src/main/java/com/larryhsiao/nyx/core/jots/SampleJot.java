@@ -28,4 +28,14 @@ public class SampleJot implements Jot {
     public String mood() {
         return new String(Character.toChars(0x1F600));
     }
+
+    @Override
+    public int version() {
+        return 1;
+    }
+
+    @Override
+    public boolean deleted() {
+        return false;
+    }
 }

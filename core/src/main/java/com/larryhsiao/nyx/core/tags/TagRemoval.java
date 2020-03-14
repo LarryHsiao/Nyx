@@ -23,7 +23,8 @@ public class TagRemoval implements Action {
         try {
             final PreparedStatement linkRemoval = db.value().prepareStatement(
                 // language=H2
-                "DELETE FROM TAG_JOT " +
+                "UPDATE TAG_JOT " +
+                    "SET DELETE = 1, VERSION = VERSION + 1 " +
                     "WHERE TAG_ID=?;"
             );
             linkRemoval.setLong(1, id);
@@ -31,7 +32,8 @@ public class TagRemoval implements Action {
             linkRemoval.close();
             final PreparedStatement tagRemoval = db.value().prepareStatement(
                 // language=H2
-                "DELETE FROM tags " +
+                "UPDATE tags " +
+                    "SET DELETE = 1, VERSION = VERSION + 1 " +
                     "WHERE id=?;"
             );
             tagRemoval.setLong(1, id);

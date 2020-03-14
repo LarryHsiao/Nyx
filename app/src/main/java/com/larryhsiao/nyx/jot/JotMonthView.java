@@ -31,6 +31,11 @@ public class JotMonthView extends MonthView {
         mPadding = dipToPx(context, 4);
     }
 
+    private static int dipToPx(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
     @Override
     protected boolean onDrawSelected(Canvas canvas, Calendar calendar, int x, int y, boolean hasScheme) {
         mSelectedPaint.setStyle(Paint.Style.FILL);
@@ -43,7 +48,7 @@ public class JotMonthView extends MonthView {
         mSchemeBasicPaint.setColor(calendar.getSchemeColor());
 
         canvas.drawText(calendar.getScheme(),
-            x + (mItemWidth / 2f) - (mRadio/2) - (mSchemeBasicPaint.measureText(calendar.getScheme()) / 2),
+            x + (mItemWidth / 2f) - (mRadio / 2) - (mSchemeBasicPaint.measureText(calendar.getScheme()) / 2),
             y + (mItemHeight / 2f) + mPadding + mRadio,
             mTextPaint);
     }
@@ -65,10 +70,5 @@ public class JotMonthView extends MonthView {
                 calendar.isCurrentDay() ? mCurDayTextPaint :
                     calendar.isCurrentMonth() ? mCurMonthTextPaint : mOtherMonthTextPaint);
         }
-    }
-
-    private static int dipToPx(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
     }
 }

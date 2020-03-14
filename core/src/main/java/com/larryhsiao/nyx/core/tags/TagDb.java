@@ -22,14 +22,18 @@ public class TagDb implements Source<Connection> {
                 // language=H2
                 "CREATE TABLE IF NOT EXISTS tags(" +
                     "id integer not null auto_increment, " +
-                    "title text not null" +
+                    "title text not null, " +
+                    "version integer not null default 1, " +
+                    "delete integer not null default 0" +
                     ");"
             );
             conn.createStatement().executeUpdate(
                 // language=H2
                 "CREATE TABLE IF NOT EXISTS tag_jot(" +
                     "jot_id integer not null, " +
-                    "tag_id integer not null," +
+                    "tag_id integer not null, " +
+                    "version integer not null default 1, " +
+                    "delete integer not null default 0, " +
                     "unique (jot_id, tag_id)" +
                     ");"
             );
