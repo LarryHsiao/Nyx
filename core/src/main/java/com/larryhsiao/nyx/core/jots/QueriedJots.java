@@ -27,28 +27,32 @@ public class QueriedJots implements Source<List<Jot>> {
         try (ResultSet res = query.value()) {
             List<Jot> jots = new ArrayList<>();
             while (res.next()) {
-                Timestamp timestamp = res.getTimestamp(
-                    res.findColumn("createdTime"),
-                    Calendar.getInstance());
-                String locationStr = res.getString("location");
-                double[] location = new double[]{MIN_VALUE, MIN_VALUE};
-                if (locationStr != null) {
-                    final Point locationGeo = new WKTReader().read(locationStr).getCentroid();
-                    location = new double[]{locationGeo.getX(), locationGeo.getY()};
-                }
-                jots.add(new ConstJot(
-                    res.getLong(res.findColumn("id")),
-                    res.getString(res.findColumn("content")),
-                    timestamp.getTime(),
-                    location,
-                    res.getString("mood"),
-                    res.getInt("version"),
-                    res.getInt("delete") == 1
-                ));
+                toJot(res, jots);
             }
             return jots;
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    private void toJot(ResultSet res, List<Jot> jots) throws Exception {
+        Timestamp timestamp = res.getTimestamp(
+            res.findColumn("createdTime"),
+            Calendar.getInstance());
+        String locationStr = res.getString("location");
+        double[] location = new double[]{MIN_VALUE, MIN_VALUE};
+        if (locationStr != null) {
+            final Point locationGeo = new WKTReader().read(locationStr).getCentroid();
+            location = new double[]{locationGeo.getX(), locationGeo.getY()};
+        }
+        jots.add(new ConstJot(
+            res.getLong(res.findColumn("id")),
+            res.getString(res.findColumn("content")),
+            timestamp.getTime(),
+            location,
+            res.getString("mood"),
+            res.getInt("version"),
+            res.getInt("delete") == 1
+        ));
     }
 }

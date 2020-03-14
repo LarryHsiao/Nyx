@@ -45,20 +45,24 @@ public class SyncAttachments implements Action {
             new AllAttachments(db, true)
         ).value().stream().collect(Collectors.toMap(Attachment::id, attachment -> attachment));
         for (QueryDocumentSnapshot remoteItem : result) {
-            final Attachment dbItem = dbItems.get(Long.valueOf(remoteItem.getId()));
-            if (dbItem == null) {
-                newLocalItem(remoteItem);
-            } else {
-                long remoteVersion = remoteItem.getLong("version");
-                if (dbItem.version() > remoteVersion) {
-                    updateRemoteItem(remoteDb, dbItem);
-                } else if (dbItem.version() < remoteVersion) {
-                    updateLocalItem(remoteItem);
-                }
-                dbItems.remove(dbItem.id() + "");
-            }
+            syncItem(dbItems, remoteItem, remoteDb);
         }
         dbItems.forEach(((s, attachment) -> updateRemoteItem(remoteDb, attachment)));
+    }
+
+    private void syncItem(Map<Long, Attachment> dbItems, QueryDocumentSnapshot remoteItem, CollectionReference remoteDb){
+        final Attachment dbItem = dbItems.get(Long.valueOf(remoteItem.getId()));
+        if (dbItem == null) {
+            newLocalItem(remoteItem);
+        } else {
+            long remoteVersion = remoteItem.getLong("version");
+            if (dbItem.version() > remoteVersion) {
+                updateRemoteItem(remoteDb, dbItem);
+            } else if (dbItem.version() < remoteVersion) {
+                updateLocalItem(remoteItem);
+            }
+            dbItems.remove(dbItem.id() + "");
+        }
     }
 
     private void updateLocalItem(QueryDocumentSnapshot remoteItem) {

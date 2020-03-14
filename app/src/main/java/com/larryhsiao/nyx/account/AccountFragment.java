@@ -14,7 +14,6 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
 
@@ -46,33 +45,43 @@ public class AccountFragment extends JotFragment {
     }
 
     private void updateView(View view) {
-        TextView info = view.findViewById(R.id.account_info);
-        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         boolean isLoggedIn = user != null;
         if (isLoggedIn) {
-            info.setText(user.getEmail() + " " + user.getUid());
-            loginLogoutBtn.setText(R.string.logout);
-            loginLogoutBtn.setOnClickListener(v -> {
-                FirebaseAuth.getInstance().signOut();
-                updateView(view);
-            });
-            new SyncJots(user.getUid(), db).fire();
-            new SyncTags(user.getUid(), db).fire();
-            new SyncTagJot(user.getUid(), db).fire();
-            new SyncAttachments(user.getUid(), db).fire();
+            updateViewLoggedIn(view, user);
         } else {
-            info.setText("");
-            loginLogoutBtn.setText(R.string.login);
-            loginLogoutBtn.setOnClickListener(v -> {
-                startActivityForResult(AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(Arrays.asList(
-                        new AuthUI.IdpConfig.GoogleBuilder().build()
-                    )).build(), REQUEST_CODE_LOG_IN
-                );
-            });
+            updateViewLoggedOut(view);
         }
+    }
+
+    private void updateViewLoggedOut(View view) {
+        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
+        TextView info = view.findViewById(R.id.account_info);
+        info.setText("");
+        loginLogoutBtn.setText(R.string.login);
+        loginLogoutBtn.setOnClickListener(v -> {
+            startActivityForResult(AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(Arrays.asList(
+                    new AuthUI.IdpConfig.GoogleBuilder().build()
+                )).build(), REQUEST_CODE_LOG_IN
+            );
+        });
+    }
+
+    private void updateViewLoggedIn(View view, FirebaseUser user) {
+        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
+        TextView info = view.findViewById(R.id.account_info);
+        info.setText(user.getEmail() + " " + user.getUid());
+        loginLogoutBtn.setText(R.string.logout);
+        loginLogoutBtn.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            updateView(view);
+        });
+        new SyncJots(user.getUid(), db).fire();
+        new SyncTags(user.getUid(), db).fire();
+        new SyncTagJot(user.getUid(), db).fire();
+        new SyncAttachments(user.getUid(), db).fire();
     }
 
     @Override

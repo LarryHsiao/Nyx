@@ -45,22 +45,26 @@ public class SyncTags implements Action {
             dbTags.put(tag.id() + "", tag);
         }
         for (QueryDocumentSnapshot remoteTag : result) {
-            final Tag dbTag = dbTags.get(remoteTag.getId());
-            if (dbTag == null) {
-                newLocalTag(remoteTag);
-            } else {
-                long remoteVersion = remoteTag.getLong("version");
-                if (dbTag.version() > remoteVersion) {
-                    updateRemoteTag(remote, dbTag);
-                } else if (dbTag.version() < remoteVersion) {
-                    updateLocalTag(remoteTag);
-                }
-                dbTags.remove(dbTag.id() + "");
-            }
+            syncTag(dbTags, remoteTag, remote);
         }
         dbTags.forEach((s, tag) -> {
             updateRemoteTag(remote, tag);
         });
+    }
+
+    private void syncTag(Map<String, Tag> dbTags, QueryDocumentSnapshot remoteTag, CollectionReference remote) {
+        final Tag dbTag = dbTags.get(remoteTag.getId());
+        if (dbTag == null) {
+            newLocalTag(remoteTag);
+        } else {
+            long remoteVersion = remoteTag.getLong("version");
+            if (dbTag.version() > remoteVersion) {
+                updateRemoteTag(remote, dbTag);
+            } else if (dbTag.version() < remoteVersion) {
+                updateLocalTag(remoteTag);
+            }
+            dbTags.remove(dbTag.id() + "");
+        }
     }
 
     private void updateLocalTag(QueryDocumentSnapshot remoteTag) {

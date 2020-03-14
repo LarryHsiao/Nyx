@@ -48,22 +48,26 @@ public class SyncJots implements Action {
             dbJots.put(jot.id() + "", jot);
         }
         for (QueryDocumentSnapshot remoteJot : result) {
-            final Jot dbJot = dbJots.get(remoteJot.getId());
-            if (dbJot == null) {
-                newLocalJot(remoteJot);
-            } else {
-                long remoteVersion = remoteJot.getLong("version");
-                if (dbJot.version() > remoteVersion) {
-                    updateRemoteJot(remoteJots, dbJot);
-                } else if (dbJot.version() < remoteVersion) {
-                    updateLocalJot(remoteJot);
-                }
-                dbJots.remove(dbJot.id() + "");
-            }
+            syncJot(dbJots, remoteJot, remoteJots);
         }
         dbJots.forEach((s, jot) -> {
             updateRemoteJot(remoteJots, jot);
         });
+    }
+
+    private void syncJot(Map<String, Jot> dbJots, QueryDocumentSnapshot remoteJot, CollectionReference remoteJots){
+        final Jot dbJot = dbJots.get(remoteJot.getId());
+        if (dbJot == null) {
+            newLocalJot(remoteJot);
+        } else {
+            long remoteVersion = remoteJot.getLong("version");
+            if (dbJot.version() > remoteVersion) {
+                updateRemoteJot(remoteJots, dbJot);
+            } else if (dbJot.version() < remoteVersion) {
+                updateLocalJot(remoteJot);
+            }
+            dbJots.remove(dbJot.id() + "");
+        }
     }
 
     private void updateLocalJot(QueryDocumentSnapshot remoteJot) {

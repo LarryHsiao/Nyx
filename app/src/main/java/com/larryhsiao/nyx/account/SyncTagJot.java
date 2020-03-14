@@ -40,22 +40,26 @@ public class SyncTagJot implements Action {
     private void sync(CollectionReference remote, QuerySnapshot result) {
         Map<String, Map<String, Object>> dbTags = allDbTagJots();
         for (QueryDocumentSnapshot remoteTag : result) {
-            final String id = remoteTag.getId();
-            final Map<String, Object> dbTag = dbTags.get(id);
-            if (dbTag == null) {
-                newLocalTag(remoteTag);
-            } else {
-                int dbVer = (int) dbTag.get("version");
-                long remoteVersion = remoteTag.getLong("version");
-                if (dbVer > remoteVersion) {
-                    updateRemoteTag(remote, id, dbTag);
-                } else if (dbVer < remoteVersion) {
-                    updateLocalTag(remoteTag);
-                }
-                dbTags.remove(id);
-            }
+            syncTagJot(remoteTag, dbTags, remote);
         }
         dbTags.forEach((id, tag) -> updateRemoteTag(remote, id, tag));
+    }
+
+    private void syncTagJot(QueryDocumentSnapshot remoteTag, Map<String, Map<String, Object>> dbTags, CollectionReference remote){
+        final String id = remoteTag.getId();
+        final Map<String, Object> dbTag = dbTags.get(id);
+        if (dbTag == null) {
+            newLocalTag(remoteTag);
+        } else {
+            int dbVer = (int) dbTag.get("version");
+            long remoteVersion = remoteTag.getLong("version");
+            if (dbVer > remoteVersion) {
+                updateRemoteTag(remote, id, dbTag);
+            } else if (dbVer < remoteVersion) {
+                updateLocalTag(remoteTag);
+            }
+            dbTags.remove(id);
+        }
     }
 
     private void updateLocalTag(QueryDocumentSnapshot remoteTag) {
