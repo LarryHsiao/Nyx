@@ -16,6 +16,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
+import com.larryhsiao.nyx.core.jots.AllJots;
+import com.larryhsiao.nyx.core.jots.QueriedJots;
+import com.larryhsiao.nyx.core.tags.AllTags;
+import com.larryhsiao.nyx.core.tags.QueriedTags;
 
 import java.util.Arrays;
 
@@ -52,6 +56,11 @@ public class AccountFragment extends JotFragment {
         } else {
             updateViewLoggedOut(view);
         }
+        TextView staticsText = view.findViewById(R.id.account_jot_statics);
+        staticsText.append(getString(R.string.jots_title, "" + new QueriedJots(new AllJots(db)).value().size()));
+        staticsText.append("\n");
+        staticsText.append(getString(R.string.tags_title, "" + new QueriedTags(new AllTags(db)).value().size()));
+        staticsText.append("\n");
     }
 
     private void updateViewLoggedOut(View view) {

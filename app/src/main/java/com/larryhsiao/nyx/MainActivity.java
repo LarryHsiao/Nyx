@@ -40,8 +40,8 @@ public class MainActivity extends JotActivity {
             } else if (item.getItemId() == R.id.menuItem_tag) {
                 rootPage(new TagListFragment());
                 return true;
-            } else if (item.getItemId() == R.id.menuItem_analytics) {
-                rootPage(new AnalyticsFragment());
+            } else if (item.getItemId() == R.id.menuItem_account) {
+                rootPage(new AccountFragment());
                 return true;
             } else {
                 return false;

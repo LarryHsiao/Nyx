@@ -55,4 +55,6 @@
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="analytics">Analytics</string>
+    <string name="jots_title">Jots: %s</string>
+    <string name="tags_title">Tags: %s</string>
 </resources>
