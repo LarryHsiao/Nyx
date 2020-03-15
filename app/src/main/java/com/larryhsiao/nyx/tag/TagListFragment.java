@@ -51,6 +51,7 @@ public class TagListFragment extends JotFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setTitle(getString(R.string.tags));
     }
 
     @Nullable
@@ -65,6 +66,7 @@ public class TagListFragment extends JotFragment {
         adapter = new TagListAdapter(tag -> {
             nextPage(
                 JotListFragment.newInstanceByJotIds(
+                    getString(R.string.tag_title, tag.title()),
                     new QueriedJots(new JotsByTagId(db, new ConstSource<>(tag.id())))
                         .value().stream().mapToLong(Jot::id).toArray()
                 )

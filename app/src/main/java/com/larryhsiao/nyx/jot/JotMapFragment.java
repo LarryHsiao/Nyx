@@ -99,7 +99,11 @@ public class JotMapFragment extends JotFragment {
             clusterManger
         ));
         clusterManger.setOnClusterClickListener(cluster -> {
+            final Location location = new Location("const");
+            location.setLatitude(cluster.getPosition().latitude);
+            location.setLongitude(cluster.getPosition().longitude);
             nextPage(JotListFragment.newInstanceByJotIds(
+                new LocationString(new LocationAddress(getContext(), location).value()).value(),
                 cluster.getItems().stream()
                     .mapToLong(it -> it.getJot().id())
                     .toArray()
