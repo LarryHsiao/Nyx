@@ -59,7 +59,7 @@ public class CalendarFragment extends JotFragment {
         setTitle(dateString());
         List<Jot> jots = new QueriedJots(new AllJots(db)).value();
         for (Jot jot : jots) {
-            final java.util.Calendar jdkCalendar = java.util.Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            final java.util.Calendar jdkCalendar = java.util.Calendar.getInstance();
             jdkCalendar.setTime(new Date(jot.createdTime()));
 
             final Calendar calendar = new Calendar();
