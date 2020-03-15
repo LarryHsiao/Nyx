@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.larryhsiao.nyx.account.AccountFragment;
+import com.larryhsiao.nyx.analytics.AnalyticsFragment;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.jot.CalendarFragment;
 import com.larryhsiao.nyx.jot.JotListFragment;
@@ -39,8 +40,8 @@ public class MainActivity extends JotActivity {
             } else if (item.getItemId() == R.id.menuItem_tag) {
                 rootPage(new TagListFragment());
                 return true;
-            } else if (item.getItemId() == R.id.menuItem_account) {
-                rootPage(new AccountFragment());
+            } else if (item.getItemId() == R.id.menuItem_analytics) {
+                rootPage(new AnalyticsFragment());
                 return true;
             } else {
                 return false;

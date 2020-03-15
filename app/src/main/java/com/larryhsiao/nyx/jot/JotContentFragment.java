@@ -37,7 +37,6 @@ import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.NewAttachment;
-import com.larryhsiao.nyx.core.attachments.NewAttachments;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.core.attachments.RemovalAttachment;
 import com.larryhsiao.nyx.core.attachments.UpdateAttachment;
@@ -47,8 +46,11 @@ import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotRemoval;
 import com.larryhsiao.nyx.core.jots.JotUri;
 import com.larryhsiao.nyx.core.jots.PostedJot;
+import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.jots.WrappedJot;
+import com.larryhsiao.nyx.core.tags.CreatedTagByName;
 import com.larryhsiao.nyx.core.tags.JotTagRemoval;
+import com.larryhsiao.nyx.core.tags.JotsByTagId;
 import com.larryhsiao.nyx.core.tags.NewJotTag;
 import com.larryhsiao.nyx.core.tags.NewTag;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
@@ -67,6 +69,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -88,7 +91,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
     private static final String ARG_JOT_JSON = "ARG_JOT";
-    private ChipGroup viewGroup;
+    private ChipGroup chipGroup;
     private TextView locationText;
     private TextView moodText;
     private AttachmentAdapter attachmentAdapter;
@@ -150,7 +153,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             dialog.show();
         });
         updateDateIndicator(date);
-        viewGroup = view.findViewById(R.id.jot_tagGroup);
+        chipGroup = view.findViewById(R.id.jot_tagGroup);
         EditText contentEditText = view.findViewById(R.id.jot_content);
         contentEditText.setText(jot.content());
         contentEditText.addTextChangedListener(new TextWatcher() {
@@ -229,13 +232,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     tagChip.setLines(1);
                     tagChip.setMaxLines(1);
                     tagChip.setTag(tag);
-                    tagChip.setOnClickListener(v1 -> new AlertDialog.Builder(v1.getContext())
-                        .setTitle(tagChip.getText().toString())
-                        .setMessage(getString(R.string.delete))
-                        .setPositiveButton(R.string.confirm, (dialog1, which1) -> viewGroup.removeView(v1))
-                        .setNegativeButton(R.string.cancel, null)
-                        .show());
-                    viewGroup.addView(tagChip);
+                    tagChip.setOnClickListener(v1 -> tagChipClicked(tagChip));
+                    chipGroup.addView(tagChip);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .create().show();
@@ -250,12 +248,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     .setTitle(tag.title())
                     .setMessage(R.string.delete)
                     .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                        viewGroup.removeView(v);
+                        chipGroup.removeView(v);
                     })
                     .setNegativeButton(R.string.cancel, null)
                     .show();
             });
-            viewGroup.addView(chip);
+            chipGroup.addView(chip);
         }
         moodText = view.findViewById(R.id.jot_mood);
 
@@ -361,6 +359,46 @@ public class JotContentFragment extends JotFragment implements BackControl {
         });
     }
 
+    private void tagChipClicked(Chip tagChip) {
+        new AlertDialog.Builder(getContext())
+            .setTitle(tagChip.getText().toString())
+            .setAdapter(new ArrayAdapter<>(
+                getContext(),
+                android.R.layout.simple_list_item_1,
+                new String[]{
+                    getString(R.string.jots),
+                    getString(R.string.delete)
+                }
+            ), (dialog1, which1) -> onTagOptionClicked(tagChip, which1))
+            .show();
+    }
+
+    private void onTagOptionClicked(Chip tagChip, int which1) {
+        switch (which1) {
+            case 0:
+                // @todo: confirm for dicard changes
+                nextPage(JotListFragment.newInstanceByJotIds(
+                    getString(R.string.tag_title, tagChip.getText().toString()),
+                    new QueriedJots(new JotsByTagId(db,
+                        new ConstSource<>(
+                            new CreatedTagByName(db, tagChip.getText().toString()).value().id()
+                        ))
+                    ).value().stream().mapToLong(value -> value.id()).toArray()));
+                break;
+            case 1:
+                new AlertDialog.Builder(getContext())
+                    .setTitle(tagChip.getText().toString())
+                    .setMessage(getString(R.string.delete))
+                    .setPositiveButton(R.string.confirm, (dialog2, which2) ->
+                        chipGroup.removeView(tagChip)
+                    ).setNegativeButton(R.string.cancel, null)
+                    .show();
+                break;
+            default:
+                break;
+        }
+    }
+
     private void updateDateIndicator(TextView date) {
         date.setText(SimpleDateFormat.getDateInstance().format(new Date(jot.createdTime())));
     }
@@ -406,8 +444,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 .value()
                 .stream()
                 .collect(Collectors.toMap(Tag::id, tag -> tag));
-            for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                Tag tagOnView = ((Tag) viewGroup.getChildAt(i).getTag());
+            for (int i = 0; i < chipGroup.getChildCount(); i++) {
+                Tag tagOnView = ((Tag) chipGroup.getChildAt(i).getTag());
                 if (!dbTags.containsKey(tagOnView.id())) {
                     // update JOT TAG
                     new NewJotTag(

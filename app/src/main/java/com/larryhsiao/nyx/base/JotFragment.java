@@ -11,7 +11,7 @@ import java.sql.Connection;
 /**
  * Base fragment for Jot
  */
-public class JotFragment extends AuraFragment {
+public abstract class JotFragment extends AuraFragment {
     protected Source<Connection> db;
 
     @Override

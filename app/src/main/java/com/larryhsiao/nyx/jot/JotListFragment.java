@@ -38,16 +38,22 @@ import static android.app.Activity.RESULT_OK;
  */
 public class JotListFragment extends JotFragment {
     private static final String ARG_JOT_IDS = "ARG_JOT_IDS";
+    private static final String ARG_TITLE = "ARG_TITLE";
     private static final int REQUEST_CODE_CREATE_JOT = 1000;
     private static final int REQUEST_CODE_JOT_CONTENT = 1001;
     private JotListAdapter adapter;
 
+    public JotListFragment() {
+        setArguments(new Bundle());
+    }
+
     /**
      * Show by jot ids.
      */
-    public static Fragment newInstanceByJotIds(long[] jotIds) {
+    public static Fragment newInstanceByJotIds(String title, long[] jotIds) {
         Fragment frag = new JotListFragment();
         Bundle args = new Bundle();
+        args.putString(ARG_TITLE, title);
         args.putLongArray(ARG_JOT_IDS, jotIds);
         frag.setArguments(args);
         return frag;
@@ -64,7 +70,7 @@ public class JotListFragment extends JotFragment {
         });
         final Bundle args = getArguments();
         setHasOptionsMenu(args == null || args.getLongArray(ARG_JOT_IDS) == null);
-        setTitle(getString(R.string.jots));
+        setTitle(getArguments().getString(ARG_TITLE, getString(R.string.jots)));
     }
 
     @Nullable
