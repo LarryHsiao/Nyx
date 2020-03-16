@@ -153,6 +153,11 @@ public class JotListFragment extends JotFragment {
             nextPage(frag);
             return true;
         }
+
+        if (item.getItemId() == R.id.menuItem_viewMode) {
+            rootPage(new JotMapFragment());
+            return true;
+        }
         return false;
     }
 

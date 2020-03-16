@@ -57,4 +57,5 @@
     <string name="analytics">Analytics</string>
     <string name="jots_title">Jots: %s</string>
     <string name="tags_title">Tags: %s</string>
+    <string name="view_mode">View Mode</string>
 </resources>

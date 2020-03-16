@@ -208,6 +208,7 @@ public class JotMapFragment extends JotFragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.jot_list, menu);
+        menu.findItem(R.id.menuItem_viewMode).setIcon(R.drawable.ic_agenda);
 
         SearchManager searchManager = ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));
         MenuItem searchMenuItem = menu.findItem(R.id.menuItem_search);
@@ -264,6 +265,10 @@ public class JotMapFragment extends JotFragment {
             frag.setTargetFragment(this, REQUEST_CODE_NEW_JOT);
             nextPage(frag);
             return true;
+        }
+
+        if (item.getItemId() == R.id.menuItem_viewMode){
+            rootPage(new JotListFragment());
         }
         return false;
     }

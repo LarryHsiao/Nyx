@@ -31,9 +31,6 @@ public class MainActivity extends JotActivity {
             if (item.getItemId() == R.id.menuItem_jots) {
                 rootPage(new JotListFragment());
                 return true;
-            } else if (item.getItemId() == R.id.menuItem_map) {
-                rootPage(new JotMapFragment());
-                return true;
             } else if (item.getItemId() == R.id.menuItem_calendar) {
                 rootPage(new CalendarFragment());
                 return true;
