@@ -58,4 +58,6 @@
     <string name="jots_title">Jots: %s</string>
     <string name="tags_title">Tags: %s</string>
     <string name="view_mode">View Mode</string>
+    <string name="email_title">Email: %s</string>
+    <string name="name_title">Name: %s</string>
 </resources>

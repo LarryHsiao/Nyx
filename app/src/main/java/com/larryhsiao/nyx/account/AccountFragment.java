@@ -1,15 +1,21 @@
 package com.larryhsiao.nyx.account;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,10 +26,16 @@ import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.tags.AllTags;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
+import com.silverhetch.aura.view.bitmap.CircledDrawable;
+import com.silverhetch.clotho.source.ConstSource;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
+import static androidx.core.graphics.drawable.RoundedBitmapDrawableFactory.create;
+import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 
 /**
  * Account page
@@ -57,16 +69,59 @@ public class AccountFragment extends JotFragment {
             updateViewLoggedOut(view);
         }
         TextView staticsText = view.findViewById(R.id.account_jot_statics);
-        staticsText.append(getString(R.string.jots_title, "" + new QueriedJots(new AllJots(db)).value().size()));
+        staticsText.setText("");
+        staticsText.append(
+            getString(R.string.jots_title,
+                "" + new QueriedJots(new AllJots(db)).value().size()));
         staticsText.append("\n");
-        staticsText.append(getString(R.string.tags_title, "" + new QueriedTags(new AllTags(db)).value().size()));
+        staticsText.append(
+            getString(R.string.tags_title,
+                "" + new QueriedTags(new AllTags(db)).value().size()));
         staticsText.append("\n");
     }
 
+    private void loadUserIcon(View view, FirebaseUser user) {
+        final CircularProgressDrawable placeholder
+            = new CircularProgressDrawable(view.getContext());
+        placeholder.setStyle(LARGE);
+        final ImageView icon = view.findViewById(R.id.account_icon);
+        Picasso.get().load(user.getPhotoUrl())
+            .placeholder(placeholder)
+            .into(icon, new Callback() {
+                @Override
+                public void onSuccess() {
+                    setUpRoundedIcon(icon);
+                }
+
+                @Override
+                public void onError(Exception ex) {
+                    // leave it empty
+                }
+            });
+    }
+
+    private void setUpRoundedIcon(ImageView icon) {
+        Bitmap bitmap = ((BitmapDrawable) icon.getDrawable()).getBitmap();
+        RoundedBitmapDrawable drawable = create(getContext().getResources(), bitmap);
+        drawable.setCircular(true);
+        drawable.setCornerRadius(Math.max(
+            bitmap.getWidth() / 2.0f,
+            bitmap.getHeight() / 2.0f
+        ));
+        icon.setImageDrawable(drawable);
+    }
+
     private void updateViewLoggedOut(View view) {
-        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.eraseColor(Color.GRAY);
+        ImageView icon = view.findViewById(R.id.account_icon);
+        icon.setImageDrawable(new CircledDrawable(
+            getResources(),
+            new ConstSource<>(bitmap)
+        ).value());
         TextView info = view.findViewById(R.id.account_info);
         info.setText("");
+        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
         loginLogoutBtn.setText(R.string.login);
         loginLogoutBtn.setOnClickListener(v -> {
             startActivityForResult(AuthUI.getInstance()
@@ -79,14 +134,18 @@ public class AccountFragment extends JotFragment {
     }
 
     private void updateViewLoggedIn(View view, FirebaseUser user) {
-        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
         TextView info = view.findViewById(R.id.account_info);
-        info.setText(user.getEmail() + " " + user.getUid());
+        info.append(getString(R.string.name_title, user.getDisplayName()));
+        info.append("\n");
+        info.append(getString(R.string.email_title, user.getEmail()));
+        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
         loginLogoutBtn.setText(R.string.logout);
         loginLogoutBtn.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             updateView(view);
         });
+        loadUserIcon(view, user);
+
         new SyncJots(user.getUid(), db).fire();
         new SyncTags(user.getUid(), db).fire();
         new SyncTagJot(user.getUid(), db).fire();
@@ -100,10 +159,6 @@ public class AccountFragment extends JotFragment {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                ((TextView) getView().findViewById(R.id.account_info)).setText(
-                    user.getEmail() + " " + user.getUid()
-                );
                 updateView(getView());
             } else {
                 Toast.makeText(getContext(),
