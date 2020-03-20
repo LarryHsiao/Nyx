@@ -9,6 +9,13 @@
         android:icon="@drawable/ic_search"
         app:actionViewClass="android.widget.SearchView" />
     <item
+        android:title="@string/view_mode"
+        android:id="@+id/menuItem_viewMode"
+        app:iconTint="#fff"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_map"
+        />
+    <item
         android:id="@+id/menuItem_newJot"
         app:showAsAction="always"
         android:icon="@drawable/ic_plus_2"

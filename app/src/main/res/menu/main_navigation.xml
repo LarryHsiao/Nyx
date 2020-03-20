@@ -17,24 +17,9 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:title="@string/analytics"
-        app:showAsAction="ifRoom"
-        android:id="@+id/menuItem_analytics"
-        android:icon="@drawable/ic_analyze"
-    />
-
-    <item
-        android:title="@string/map"
-        android:icon="@drawable/ic_map"
-        android:id="@+id/menuItem_map"
-        app:iconTint="@color/colorPrimaryDark"
-        app:showAsAction="ifRoom"/>
-
-    <item
         android:title="@string/tags"
         app:showAsAction="ifRoom"
         android:id="@+id/menuItem_tag"
         app:iconTint="@color/colorPrimaryDark"
         android:icon="@drawable/ic_tag"/>
-
 </menu>

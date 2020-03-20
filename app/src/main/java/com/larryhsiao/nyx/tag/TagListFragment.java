@@ -109,6 +109,7 @@ public class TagListFragment extends JotFragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.jot_list, menu);
+        menu.findItem(R.id.menuItem_viewMode).setVisible(false);
 
         SearchManager searchManager = ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));
         MenuItem searchMenuItem = menu.findItem(R.id.menuItem_search);
