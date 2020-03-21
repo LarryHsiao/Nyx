@@ -432,7 +432,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                                 }
                             ).fire();
                         }
-                        attachments.remove(uri.toString());
+                        attachments.remove(attachment);
                     }
                 }
                 if (!hasItem) {
