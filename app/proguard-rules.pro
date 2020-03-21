@@ -48,3 +48,6 @@
 
 -keep class org.h2.**{*;}
 -keep class com.haibin.calendarview.**{*;}
+
+-keep class com.larryhsiao.nyx.jot.JotMonthView { *; }
+-keep class com.larryhsiao.nyx.jot.JotWeekView { *; }
