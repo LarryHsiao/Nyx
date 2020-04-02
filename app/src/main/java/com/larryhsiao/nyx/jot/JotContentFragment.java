@@ -65,6 +65,7 @@ import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.clotho.source.ConstSource;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -418,6 +419,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             ).value();
             attachmentAdapter.exportUri().forEach(uri -> {
                 boolean hasItem = false;
+                List<Attachment> exist = new ArrayList<>();
                 for (Attachment attachment : attachments) {
                     if (attachment.uri().equals(uri.toString())) {
                         hasItem = true;
@@ -432,9 +434,10 @@ public class JotContentFragment extends JotFragment implements BackControl {
                                 }
                             ).fire();
                         }
-                        attachments.remove(attachment);
+                        exist.add(attachment);
                     }
                 }
+                attachments.removeAll(exist);
                 if (!hasItem) {
                     new NewAttachment(db, uri.toString(), jot.id()).value();
                 }
