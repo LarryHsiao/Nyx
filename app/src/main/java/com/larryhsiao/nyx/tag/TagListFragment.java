@@ -51,7 +51,6 @@ public class TagListFragment extends JotFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setTitle(getString(R.string.tags));
     }
 
     @Nullable
@@ -103,6 +102,12 @@ public class TagListFragment extends JotFragment {
                 }
             }).collect(Collectors.toList())
         );
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setTitle(getString(R.string.tags));
     }
 
     @Override

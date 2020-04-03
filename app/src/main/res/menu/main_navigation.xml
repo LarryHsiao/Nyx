@@ -22,4 +22,10 @@
         android:id="@+id/menuItem_tag"
         app:iconTint="@color/colorPrimaryDark"
         android:icon="@drawable/ic_tag"/>
+
+<!--    <item-->
+<!--        android:title="@string/account"-->
+<!--        app:showAsAction="ifRoom"-->
+<!--        android:id="@+id/menuItem_account"-->
+<!--        android:icon="@drawable/ic_account"/>-->
 </menu>
