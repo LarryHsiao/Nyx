@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -58,6 +59,7 @@ import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagsByJotId;
 import com.larryhsiao.nyx.core.tags.TagsByKeyword;
+import com.larryhsiao.nyx.util.EmbedMapFragment;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.BackControl;
 import com.silverhetch.aura.location.LocationAddress;
@@ -186,23 +188,14 @@ public class JotContentFragment extends JotFragment implements BackControl {
             startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
         });
         locationText = view.findViewById(R.id.jot_location);
-        locationText.setOnClickListener(v -> {
-            LocationPickerActivity.Builder build = new LocationPickerActivity.Builder();
-            if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-                && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
-                build.withLocation(jot.location()[1], jot.location()[0]);
-            }
-            startActivityForResult(
-                build.build(view.getContext()),
-                REQUEST_CODE_LOCATION_PICKER
-            );
-        });
+        locationText.setOnClickListener(v -> pickLocation());
         Location location = new Location("Constant");
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
         locationText.setText(new LocationString(
             new LocationAddress(view.getContext(), location).value()
         ).value());
+        loadEmbedMapByJot();
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
         attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
         attachmentAdapter.loadAttachments(
@@ -367,6 +360,18 @@ public class JotContentFragment extends JotFragment implements BackControl {
         });
     }
 
+    private void pickLocation() {
+        LocationPickerActivity.Builder build = new LocationPickerActivity.Builder();
+        if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+            && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
+            build.withLocation(jot.location()[1], jot.location()[0]);
+        }
+        startActivityForResult(
+            build.build(getContext()),
+            REQUEST_CODE_LOCATION_PICKER
+        );
+    }
+
     private void tagChipClicked(Chip tagChip) {
         new AlertDialog.Builder(getContext())
             .setTitle(tagChip.getText().toString())
@@ -527,6 +532,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             };
             Address address = data.getParcelableExtra(ADDRESS);
             locationText.setText(new LocationString(address).value());
+            loadEmbedMapByJot();
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
             attachmentAdapter.appendImage(data.getData());
             getContext().getContentResolver().takePersistableUriPermission(
@@ -562,6 +568,9 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 getContext().getContentResolver().openInputStream(data)
             );
             final double[] latLong = exif.getLatLong();
+            if (latLong == null) {
+                return;
+            }
             jot = new WrappedJot(jot) {
                 @Override
                 public double[] location() {
@@ -573,8 +582,30 @@ public class JotContentFragment extends JotFragment implements BackControl {
             location.setLongitude(latLong[1]);
             Address address = new LocationAddress(getContext(), location).value();
             locationText.setText(new LocationString(address).value());
+            loadEmbedMapByJot();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void loadEmbedMapByJot() {
+        FragmentManager mgr = getChildFragmentManager();
+        if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+            && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
+            mgr.beginTransaction().replace(
+                R.id.jot_embedMapContainer,
+                EmbedMapFragment.newInstance(
+                    jot.location()[0],
+                    jot.location()[1]
+                )
+            ).commit();
+            getView().findViewById(R.id.jot_embedMapContainer).setVisibility(View.VISIBLE);
+        } else {
+            Fragment map = mgr.findFragmentById(R.id.jot_embedMapContainer);
+            if (map != null) {
+                mgr.beginTransaction().remove(map).commit();
+            }
+            getView().findViewById(R.id.jot_embedMapContainer).setVisibility(View.GONE);
         }
     }
 

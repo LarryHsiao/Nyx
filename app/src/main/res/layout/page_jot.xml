@@ -88,21 +88,33 @@
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="0dp"
             app:layout_constraintStart_toEndOf="@id/jot_attachment_icon"
-            app:layout_constraintBottom_toTopOf="@id/jot_location"
+            app:layout_constraintBottom_toTopOf="@id/jot_locationContainer"
             android:id="@+id/jot_attachment_list"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_height="150dp"/>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/jot_location"
-            android:gravity="center_vertical"
-            android:drawableStart="@drawable/ic_location_3"
-            app:layout_constraintStart_toStartOf="@id/jot_content"
-            app:layout_constraintEnd_toEndOf="@id/jot_content"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/jot_locationContainer"
+                      android:orientation="vertical"
+                      app:layout_constraintStart_toStartOf="@id/jot_content"
+                      app:layout_constraintEnd_toEndOf="@id/jot_content"
+                      app:layout_constraintBottom_toBottomOf="parent"
+        >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/jot_location"
+                android:gravity="center_vertical"
+                android:drawableStart="@drawable/ic_location_3"/>
+            <FrameLayout android:layout_width="match_parent"
+                         android:id="@+id/jot_embedMapContainer"
+                         android:visibility="gone"
+                         tools:background="#000"
+                         tools:visibility="visible"
+                         android:layout_height="150dp"/>
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
