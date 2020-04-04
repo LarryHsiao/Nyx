@@ -22,6 +22,7 @@ import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.tags.AllTags;
+import com.larryhsiao.nyx.core.tags.CombineTags;
 import com.larryhsiao.nyx.core.tags.JotsByTagId;
 import com.larryhsiao.nyx.core.tags.NewTag;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
@@ -35,7 +36,9 @@ import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.clotho.source.ConstSource;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -72,17 +75,25 @@ public class TagListFragment extends JotFragment {
             );
             return new Object();
         }, tag -> {
-            final ArrayAdapter<String> tagOptions = new ArrayAdapter<>(
-                view.getContext(),
-                android.R.layout.simple_list_item_1,
-                new String[]{getString(R.string.delete)}
-            );
+            final boolean canCombine = adapter.tags().size() > 1;
+            final ArrayList<String> options = new ArrayList<>();
+            if (canCombine) {
+                options.add(getString(R.string.combine));
+            }
+            options.add(getString(R.string.delete));
+
             new AlertDialog.Builder(view.getContext())
                 .setTitle(tag.title())
-                .setAdapter(tagOptions, (dialog, which) -> {
-                    if (which == 0) {
+                .setAdapter(new ArrayAdapter<>(
+                    view.getContext(),
+                    android.R.layout.simple_list_item_1,
+                    options
+                ), (dialog, which) -> {
+                    if (which == (canCombine ? 1 : 0)) {
                         new TagRemoval(db, tag.id()).fire();
                         adapter.removeTag(tag);
+                    } else if (canCombine && which == 0) {
+                        combine(tag);
                     }
                 }).show();
             return new Object();
@@ -102,6 +113,29 @@ public class TagListFragment extends JotFragment {
                 }
             }).collect(Collectors.toList())
         );
+    }
+
+    private void combine(Tag targetTag) {
+        final List<Tag> otherTags = adapter.tags()
+            .stream()
+            .filter(filterTag -> targetTag.id() != filterTag.id())
+            .collect(Collectors.toList());
+        new AlertDialog.Builder(getContext())
+            .setTitle(getString(R.string.combine_, targetTag.title()))
+            .setAdapter(new ArrayAdapter<>(
+                    getContext(),
+                    android.R.layout.simple_list_item_1,
+                    otherTags.stream()
+                        .map(mapTag -> mapTag.title())
+                        .collect(Collectors.toList())
+                ), (dialog, which) -> {
+                    new CombineTags(
+                        db,
+                        targetTag.id(),
+                        otherTags.get(which).id()).fire();
+                    adapter.removeTag(otherTags.get(which));
+                }
+            ).show();
     }
 
     @Override

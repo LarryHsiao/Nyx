@@ -7,5 +7,11 @@
       <jdbc-driver>org.h2.Driver</jdbc-driver>
       <jdbc-url>jdbc:h2:mem:default</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="h2DBTemp" uuid="7c741a7b-06a4-41e2-8102-bfba9c26bb1d">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:file:$USER_HOME$/h2DBTemp</jdbc-url>
+    </data-source>
   </component>
 </project>

@@ -60,4 +60,6 @@
     <string name="view_mode">View Mode</string>
     <string name="email_title">Email: %s</string>
     <string name="name_title">Name: %s</string>
+    <string name="combine">Combine</string>
+    <string name="combine_">Combine: %s</string>
 </resources>

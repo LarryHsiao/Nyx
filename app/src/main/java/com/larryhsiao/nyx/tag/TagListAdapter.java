@@ -53,6 +53,10 @@ public class TagListAdapter extends RecyclerView.Adapter<ViewHolder> {
         return data.size();
     }
 
+    public List<Tag> tags() {
+        return data;
+    }
+
     /**
      * Load entire list.
      */
