@@ -25,6 +25,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
@@ -66,11 +67,11 @@ import com.silverhetch.clotho.source.ConstSource;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -185,11 +186,17 @@ public class JotContentFragment extends JotFragment implements BackControl {
             startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
         });
         locationText = view.findViewById(R.id.jot_location);
-        locationText.setOnClickListener(v -> startActivityForResult(
-            new LocationPickerActivity.Builder()
-                .build(view.getContext()),
-            REQUEST_CODE_LOCATION_PICKER
-        ));
+        locationText.setOnClickListener(v -> {
+            LocationPickerActivity.Builder build = new LocationPickerActivity.Builder();
+            if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+                && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
+                build.withLocation(jot.location()[1], jot.location()[0]);
+            }
+            startActivityForResult(
+                build.build(view.getContext()),
+                REQUEST_CODE_LOCATION_PICKER
+            );
+        });
         Location location = new Location("Constant");
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
@@ -526,6 +533,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 data.getData(),
                 FLAG_GRANT_READ_URI_PERMISSION
             );
+            if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+                || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
+            ) {
+                loadLocationByExif(data.getData());
+            }
         } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK) {
             final String newMoodRaw = data.getStringExtra("INPUT_FIELD");
             final String newMood;
@@ -541,6 +553,28 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     return newMood;
                 }
             };
+        }
+    }
+
+    private void loadLocationByExif(Uri data) {
+        try {
+            final ExifInterface exif = new ExifInterface(
+                getContext().getContentResolver().openInputStream(data)
+            );
+            final double[] latLong = exif.getLatLong();
+            jot = new WrappedJot(jot) {
+                @Override
+                public double[] location() {
+                    return new double[]{latLong[1], latLong[0]};
+                }
+            };
+            Location location = new Location("constant");
+            location.setLatitude(latLong[0]);
+            location.setLongitude(latLong[1]);
+            Address address = new LocationAddress(getContext(), location).value();
+            locationText.setText(new LocationString(address).value());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
