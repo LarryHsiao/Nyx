@@ -562,6 +562,9 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 getContext().getContentResolver().openInputStream(data)
             );
             final double[] latLong = exif.getLatLong();
+            if (latLong==null){
+                return;
+            }
             jot = new WrappedJot(jot) {
                 @Override
                 public double[] location() {
