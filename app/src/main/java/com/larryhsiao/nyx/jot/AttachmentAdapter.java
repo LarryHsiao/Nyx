@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static android.content.Intent.ACTION_VIEW;
 import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 
 /**
@@ -31,6 +32,7 @@ import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static final int ITEM_TYPE_IMAGE = 1;
     private static final int ITEM_TYPE_VIDEO = 2;
+    private static final int ITEM_TYPE_AUDIO = 3;
 
     private final Context context;
     private final List<Uri> data = new ArrayList<>();
@@ -43,6 +45,12 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
+            case ITEM_TYPE_AUDIO:
+                return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.item_attachment_audio,
+                    parent,
+                    false
+                ));
             case ITEM_TYPE_VIDEO:
                 return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
                     R.layout.item_attachment_video,
@@ -70,7 +78,25 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             case ITEM_TYPE_VIDEO:
                 onBindVideo(uri, holder);
                 break;
+            case ITEM_TYPE_AUDIO:
+                onBindAudio(uri, holder);
+                break;
         }
+    }
+
+    private void onBindAudio(Uri uri, ViewHolder holder){
+        ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentAudio_icon);
+        imageView.setOnClickListener(v -> {
+            final Intent intent = new Intent(ACTION_VIEW);
+            intent.setDataAndType(uri, "audio/*");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            context.startActivity(intent);
+        });
+        imageView.setOnLongClickListener(v -> {
+            showProperties(holder, uri);
+            return true;
+        });
     }
 
     private void onBindVideo(Uri uri, ViewHolder holder) {
@@ -79,7 +105,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentVideo_icon);
             imageView.setImageBitmap(mmr.getFrameAtTime());
             imageView.setOnClickListener(v -> {
-                final Intent intent = new Intent(Intent.ACTION_VIEW);
+                final Intent intent = new Intent(ACTION_VIEW);
                 intent.setDataAndType(uri, "video/*");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -148,6 +174,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
         ).value();
         if (mimeType.startsWith("video")) {
             return ITEM_TYPE_VIDEO;
+        } else if (mimeType.startsWith("audio")) {
+            return ITEM_TYPE_AUDIO;
         } else {
             return ITEM_TYPE_IMAGE;
         }

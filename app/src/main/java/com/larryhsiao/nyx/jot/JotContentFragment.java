@@ -189,7 +189,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         attachmentIcon.setOnClickListener(v -> {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
             startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
         });
         locationText = view.findViewById(R.id.jot_location);
@@ -552,6 +552,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 }
                 attachmentAdapter.append(data.getData());
             } else if (mimeType.startsWith("video")) {
+                attachmentAdapter.append(data.getData());
+            } else if (mimeType.startsWith("audio")) {
                 attachmentAdapter.append(data.getData());
             } else {
                 Alert.Companion.newInstance(
