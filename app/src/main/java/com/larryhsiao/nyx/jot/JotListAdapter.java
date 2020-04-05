@@ -15,6 +15,7 @@ import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.silverhetch.aura.location.LocationAddress;
+import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.ViewHolder;
 import com.silverhetch.clotho.Source;
 import com.squareup.picasso.Picasso;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 
@@ -53,7 +55,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Location location = new Location("Constant");
         final Jot jot = data.get(position);
-        List<Attachment> attachments = new QueriedAttachments(new AttachmentsByJotId(db, jot.id())).value();
+
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
         String address = new LocationString(
@@ -69,12 +71,20 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
                 address +
                 DateFormat.getDateInstance().format(new Date(jot.createdTime()))
         );
-        final ImageView image = holder.getImageView(R.id.itemJot_image);
+        List<Attachment> attachments = new QueriedAttachments(
+            new AttachmentsByJotId(db, jot.id())
+        ).value().stream().filter(attachment -> new UriMimeType(
+                holder.itemView.getContext(),
+                attachment.uri()
+            ).value().startsWith("image")
+        ).limit(4).collect(Collectors.toList());
+        final ImageView image = holder.itemView.findViewById(R.id.itemJot_image);
         if (attachments.size() > 0) {
             image.setVisibility(View.VISIBLE);
             CircularProgressDrawable progress = new CircularProgressDrawable(image.getContext());
             progress.setStyle(LARGE);
-            Picasso.get().load(attachments.get(0).uri())
+            Picasso.get()
+                .load(attachments.get(0).uri())
                 .placeholder(progress)
                 .into(image);
         } else {

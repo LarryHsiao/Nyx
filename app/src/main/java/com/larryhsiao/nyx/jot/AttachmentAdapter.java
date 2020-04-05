@@ -119,25 +119,27 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private void onBindImage(Uri uri, ViewHolder holder) {
-        final ImageView attachmentIcon = holder.getImageView(R.id.itemAttachmentImage_icon);
-        CircularProgressDrawable progressDrawable = new CircularProgressDrawable(attachmentIcon.getContext());
-        progressDrawable.setStyle(LARGE);
-        Picasso.get().load(uri).placeholder(progressDrawable).into(attachmentIcon);
-        attachmentIcon.setOnClickListener(v -> {
+        final ImageView icon = holder.getImageView(R.id.itemAttachmentImage_icon);
+        CircularProgressDrawable progress = new CircularProgressDrawable(icon.getContext());
+        progress.setStyle(LARGE);
+        Picasso.get().load(uri).placeholder(progress).into(icon);
+        icon.setOnClickListener(v -> {
             new StfalconImageViewer.Builder<>(
-                attachmentIcon.getContext(),
+                icon.getContext(),
                 Collections.singletonList(uri),
                 (imageView, image) -> {
-                    CircularProgressDrawable progressDrawable2 = new CircularProgressDrawable(attachmentIcon.getContext());
-                    progressDrawable2.setStyle(LARGE);
+                    CircularProgressDrawable progress2 = new CircularProgressDrawable(
+                        icon.getContext()
+                    );
+                    progress2.setStyle(LARGE);
                     Picasso.get()
                         .load(image)
-                        .placeholder(progressDrawable2)
+                        .placeholder(progress2)
                         .into(imageView);
                 }
             ).show();
         });
-        attachmentIcon.setOnLongClickListener(v -> {
+        icon.setOnLongClickListener(v -> {
             showProperties(holder, uri);
             return true;
         });
