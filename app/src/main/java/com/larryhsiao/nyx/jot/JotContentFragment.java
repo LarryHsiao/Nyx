@@ -16,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -24,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -63,8 +61,9 @@ import com.larryhsiao.nyx.util.EmbedMapFragment;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.BackControl;
 import com.silverhetch.aura.location.LocationAddress;
+import com.silverhetch.aura.uri.UriMimeType;
+import com.silverhetch.aura.view.alert.Alert;
 import com.silverhetch.aura.view.dialog.InputDialog;
-import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.clotho.source.ConstSource;
 
 import java.text.SimpleDateFormat;
@@ -79,9 +78,6 @@ import java.util.stream.Collectors;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.ACTION_OPEN_DOCUMENT;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
-import static android.util.TypedValue.COMPLEX_UNIT_DIP;
-import static android.view.Gravity.CENTER;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
@@ -94,6 +90,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
+    private static final int REQUEST_CODE_ALERT = 1003;
+
     private static final String ARG_JOT_JSON = "ARG_JOT";
     private ChipGroup chipGroup;
     private TextView locationText;
@@ -185,6 +183,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         attachmentIcon.setOnClickListener(v -> {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
             startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
         });
         locationText = view.findViewById(R.id.jot_location);
@@ -197,7 +196,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         ).value());
         loadEmbedMapByJot();
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
-        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
+        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter(view.getContext()));
         attachmentAdapter.loadAttachments(
             new QueriedAttachments(new AttachmentsByJotId(db, jot.id()))
                 .value()
@@ -266,65 +265,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         moodText.setOnClickListener(v -> {
             final GridView gridView = new GridView(v.getContext());
             gridView.setNumColumns(4);
-            gridView.setAdapter(new ArrayAdapter<String>(
-                v.getContext(),
-                android.R.layout.simple_list_item_1,
-                new String[]{
-                    "x",
-                    new String(Character.toChars(0x1F603)),
-                    new String(Character.toChars(0x1F601)),
-                    new String(Character.toChars(0x1F602)),
-                    new String(Character.toChars(0x1F642)),
-                    new String(Character.toChars(0x1F970)),
-                    new String(Character.toChars(0x1F60D)),
-                    new String(Character.toChars(0x1F60B)),
-                    new String(Character.toChars(0x1F60F)),
-                    new String(Character.toChars(0x1F612)),
-                    new String(Character.toChars(0x1F928)),
-                    new String(Character.toChars(0x1F611)),
-                    new String(Character.toChars(0x1F614)),
-                    new String(Character.toChars(0x1F634)),
-                    new String(Character.toChars(0x1F912)),
-                    new String(Character.toChars(0x1F927)),
-                    new String(Character.toChars(0x1F976)),
-                    new String(Character.toChars(0x1F974)),
-                    new String(Character.toChars(0x1F973)),
-                    "",
-                }
-            ) {
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    if (position == getCount() - 1) { // last item for input dialog
-                        final ImageView inputItem = new ImageView(view.getContext());
-                        int padding = ((int) new DP(getContext(), 16).px());
-                        inputItem.setPadding(padding, padding, padding, padding);
-                        inputItem.setLayoutParams(new LayoutParams(
-                            MATCH_PARENT,
-                            parent.getWidth() / 4));
-                        inputItem.setImageResource(R.drawable.ic_input);
-                        return inputItem;
-                    }
-
-                    if (position == 0) { // first item to remove mood
-                        final ImageView itemRemove = new ImageView(view.getContext());
-                        int padding = ((int) new DP(getContext(), 16).px());
-                        itemRemove.setPadding(padding, padding, padding, padding);
-                        itemRemove.setLayoutParams(new LayoutParams(
-                            MATCH_PARENT,
-                            parent.getWidth() / 4));
-                        itemRemove.setImageResource(R.drawable.ic_cross);
-                        return itemRemove;
-                    }
-                    final AppCompatTextView orgItemView = ((AppCompatTextView) super.getView(position, null, parent));
-                    orgItemView.setGravity(CENTER);
-                    orgItemView.setLayoutParams(new LayoutParams(
-                        MATCH_PARENT,
-                        parent.getWidth() / 4));
-                    orgItemView.setTextSize(COMPLEX_UNIT_DIP, 32);
-                    return orgItemView;
-                }
-            });
+            gridView.setAdapter(new MoodAdapter(v.getContext()));
             AlertDialog moodDialog = new AlertDialog.Builder(v.getContext())
                 .setTitle(getString(R.string.moods))
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
@@ -454,7 +395,9 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     new NewAttachment(db, uri.toString(), jot.id()).value();
                 }
             });
-            attachments.forEach((attachment) -> new RemovalAttachment(db, attachment.id()).fire());
+            attachments.forEach((attachment) ->
+                new RemovalAttachment(db, attachment.id()).fire()
+            );
             final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
                 .value()
                 .stream()
@@ -474,7 +417,9 @@ public class JotContentFragment extends JotFragment implements BackControl {
             }
             dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
             final Intent intent = new Intent();
-            intent.setData(Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString()));
+            intent.setData(
+                Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
+            );
             sendResult(0, RESULT_OK, intent);
             return true;
         }
@@ -518,7 +463,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_LOCATION_PICKER && resultCode == RESULT_OK) {
             jot = new WrappedJot(jot) {
@@ -534,15 +479,30 @@ public class JotContentFragment extends JotFragment implements BackControl {
             locationText.setText(new LocationString(address).value());
             loadEmbedMapByJot();
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
-            attachmentAdapter.appendImage(data.getData());
             getContext().getContentResolver().takePersistableUriPermission(
                 data.getData(),
                 FLAG_GRANT_READ_URI_PERMISSION
             );
-            if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-                || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
-            ) {
-                loadLocationByExif(data.getData());
+            final String mimeType = new UriMimeType(
+                getContext(),
+                data.getData().toString()
+            ).value();
+            if (mimeType.startsWith("image")) {
+                if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+                    || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
+                ) {
+                    loadLocationByExif(data.getData());
+                }
+                attachmentAdapter.append(data.getData());
+            } else if (mimeType.startsWith("video")) {
+                attachmentAdapter.append(data.getData());
+            } else if (mimeType.startsWith("audio")) {
+                attachmentAdapter.append(data.getData());
+            } else {
+                Alert.Companion.newInstance(
+                    REQUEST_CODE_ALERT,
+                    getString(R.string.not_supported_file)
+                ).show(getChildFragmentManager(), null);
             }
         } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK) {
             final String newMoodRaw = data.getStringExtra("INPUT_FIELD");

@@ -30,7 +30,7 @@ public class CombineTags implements Action {
             // language=H2
             "UPDATE tag_jot "
                 + "SET TAG_ID=?1, VERSION=VERSION+1 "
-                + "WHERE TAG_ID=?2 AND JOT_ID NOT IN ("+ targetJotIds()+");"
+                + "WHERE TAG_ID=?2 AND JOT_ID NOT IN (" + targetJotIds() + ");"
         )) {
             stmt.setLong(1, targetId);
             stmt.setLong(2, combinedId);

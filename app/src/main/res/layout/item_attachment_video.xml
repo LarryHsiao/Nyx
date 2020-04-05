@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="150dp"
+             android:layout_height="150dp">
+    <ImageView
+        android:layout_width="match_parent"
+        android:id="@+id/itemAttachmentVideo_icon"
+        tools:background="@drawable/bg_button"
+        android:layout_height="match_parent"/>
+
+    <ImageView android:layout_width="72dp"
+               android:padding="16dp"
+               android:src="@drawable/ic_playback"
+               android:layout_gravity="center"
+               android:layout_height="72dp"/>
+</FrameLayout>

@@ -67,7 +67,7 @@ public class EmbedMapFragment extends Fragment {
             settings.setMapToolbarEnabled(false);
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(new LatLng(
                 location[1], location[0]
-            ), 10);
+            ), 15);
             googleMap.moveCamera(update);
             MarkerOptions marker = new MarkerOptions();
             marker.position(new LatLng(location[1],location[0]));
