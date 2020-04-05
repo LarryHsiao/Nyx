@@ -63,6 +63,8 @@ import com.larryhsiao.nyx.util.EmbedMapFragment;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.BackControl;
 import com.silverhetch.aura.location.LocationAddress;
+import com.silverhetch.aura.uri.UriMimeType;
+import com.silverhetch.aura.view.alert.Alert;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.clotho.source.ConstSource;
@@ -94,6 +96,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
+    private static final int REQUEST_CODE_ALERT = 1003;
+
     private static final String ARG_JOT_JSON = "ARG_JOT";
     private ChipGroup chipGroup;
     private TextView locationText;
@@ -185,6 +189,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         attachmentIcon.setOnClickListener(v -> {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
             startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
         });
         locationText = view.findViewById(R.id.jot_location);
@@ -197,7 +202,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         ).value());
         loadEmbedMapByJot();
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
-        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter());
+        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter(view.getContext()));
         attachmentAdapter.loadAttachments(
             new QueriedAttachments(new AttachmentsByJotId(db, jot.id()))
                 .value()
@@ -534,15 +539,25 @@ public class JotContentFragment extends JotFragment implements BackControl {
             locationText.setText(new LocationString(address).value());
             loadEmbedMapByJot();
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
-            attachmentAdapter.appendImage(data.getData());
             getContext().getContentResolver().takePersistableUriPermission(
                 data.getData(),
                 FLAG_GRANT_READ_URI_PERMISSION
             );
-            if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-                || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
-            ) {
-                loadLocationByExif(data.getData());
+            final String mimeType = new UriMimeType(getContext(), data.getData().toString()).value();
+            if (mimeType.startsWith("image")) {
+                if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+                    || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
+                ) {
+                    loadLocationByExif(data.getData());
+                }
+                attachmentAdapter.append(data.getData());
+            } else if (mimeType.startsWith("video")) {
+                attachmentAdapter.append(data.getData());
+            } else {
+                Alert.Companion.newInstance(
+                    REQUEST_CODE_ALERT,
+                    getString(R.string.not_supported_file)
+                ).show(getChildFragmentManager(), null);
             }
         } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK) {
             final String newMoodRaw = data.getStringExtra("INPUT_FIELD");

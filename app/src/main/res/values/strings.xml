@@ -62,4 +62,5 @@
     <string name="name_title">Name: %s</string>
     <string name="combine">Combine</string>
     <string name="combine_">Combine: %s</string>
+    <string name="not_supported_file">Not supported file</string>
 </resources>
