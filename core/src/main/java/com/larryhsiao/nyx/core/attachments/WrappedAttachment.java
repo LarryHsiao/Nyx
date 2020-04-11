@@ -32,6 +32,6 @@ public class WrappedAttachment implements Attachment {
 
     @Override
     public boolean deleted() {
-        return false;
+        return origin.deleted();
     }
 }

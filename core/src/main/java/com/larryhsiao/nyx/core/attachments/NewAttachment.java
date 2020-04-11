@@ -37,7 +37,12 @@ public class NewAttachment implements Source<Attachment> {
             if (!res.next()) {
                 throw new IllegalArgumentException("Creating Attachment failed, jotId: " + jotId + ", Uri: " + uri);
             }
-            return new ConstAttachment(res.getLong(1), jotId, uri, 1, 0);
+            return new ConstAttachment(res.getLong(1),
+                jotId,
+                uri,
+                1,
+                0
+            );
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    api 'com.silverhetch:clotho:1.17.0'
+    api 'com.silverhetch:clotho:1.17.2'
     implementation 'com.h2database:h2:1.4.197'
     api "org.flywaydb:flyway-core:6.2.4"
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'

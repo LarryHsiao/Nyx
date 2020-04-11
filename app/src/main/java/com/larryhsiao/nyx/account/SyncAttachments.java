@@ -50,7 +50,7 @@ public class SyncAttachments implements Action {
         dbItems.forEach(((s, attachment) -> updateRemoteItem(remoteDb, attachment)));
     }
 
-    private void syncItem(Map<Long, Attachment> dbItems, QueryDocumentSnapshot remoteItem, CollectionReference remoteDb){
+    private void syncItem(Map<Long, Attachment> dbItems, QueryDocumentSnapshot remoteItem, CollectionReference remoteDb) {
         final Attachment dbItem = dbItems.get(Long.valueOf(remoteItem.getId()));
         if (dbItem == null) {
             newLocalItem(remoteItem);

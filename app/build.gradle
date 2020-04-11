@@ -25,7 +25,7 @@ android {
 
     defaultConfig {
         applicationId "com.larryhsiao.nyx"
-        minSdkVersion 25
+        minSdkVersion 26
         targetSdkVersion 29
         versionCode nyxVersionCode
         versionName nyxVersionName
@@ -66,6 +66,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project (':nyx-core')
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'

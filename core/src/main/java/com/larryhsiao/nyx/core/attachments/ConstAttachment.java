@@ -10,7 +10,13 @@ public class ConstAttachment implements Attachment {
     private final int version;
     private final int delete;
 
-    public ConstAttachment(long id, long jotId, String uri, int version, int delete) {
+    public ConstAttachment(
+        long id,
+        long jotId,
+        String uri,
+        int version,
+        int delete
+    ) {
         this.id = id;
         this.jotId = jotId;
         this.uri = uri;

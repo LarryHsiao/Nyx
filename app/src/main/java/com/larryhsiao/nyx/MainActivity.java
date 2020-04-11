@@ -2,6 +2,7 @@ package com.larryhsiao.nyx;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.webkit.MimeTypeMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;

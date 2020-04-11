@@ -139,6 +139,7 @@ public class AccountFragment extends JotFragment {
         new SyncTags(user.getUid(), db).fire();
         new SyncTagJot(user.getUid(), db).fire();
         new SyncAttachments(user.getUid(), db).fire();
+        new SyncFiles(getContext(), db, user.getUid()).fire();
     }
 
     @Override

@@ -84,7 +84,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private void onBindAudio(Uri uri, ViewHolder holder){
+    private void onBindAudio(Uri uri, ViewHolder holder) {
         ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentAudio_icon);
         imageView.setOnClickListener(v -> {
             final Intent intent = new Intent(ACTION_VIEW);
@@ -100,22 +100,22 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private void onBindVideo(Uri uri, ViewHolder holder) {
-        try (MediaMetadataRetriever mmr = new MediaMetadataRetriever()) {
-            mmr.setDataSource(context, uri);
-            ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentVideo_icon);
-            imageView.setImageBitmap(mmr.getFrameAtTime());
-            imageView.setOnClickListener(v -> {
-                final Intent intent = new Intent(ACTION_VIEW);
-                intent.setDataAndType(uri, "video/*");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                context.startActivity(intent);
-            });
-            imageView.setOnLongClickListener(v -> {
-                showProperties(holder, uri);
-                return true;
-            });
-        }
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(context, uri);
+        ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentVideo_icon);
+        imageView.setImageBitmap(mmr.getFrameAtTime());
+        imageView.setOnClickListener(v -> {
+            final Intent intent = new Intent(ACTION_VIEW);
+            intent.setDataAndType(uri, "video/*");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            context.startActivity(intent);
+        });
+        imageView.setOnLongClickListener(v -> {
+            showProperties(holder, uri);
+            return true;
+        });
+        mmr.release();
     }
 
     private void onBindImage(Uri uri, ViewHolder holder) {
