@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.jot;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ClipData;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
@@ -184,6 +185,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
             intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
         });
         locationText = view.findViewById(R.id.jot_location);
@@ -479,30 +481,13 @@ public class JotContentFragment extends JotFragment implements BackControl {
             locationText.setText(new LocationString(address).value());
             loadEmbedMapByJot();
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
-            getContext().getContentResolver().takePersistableUriPermission(
-                data.getData(),
-                FLAG_GRANT_READ_URI_PERMISSION
-            );
-            final String mimeType = new UriMimeType(
-                getContext(),
-                data.getData().toString()
-            ).value();
-            if (mimeType.startsWith("image")) {
-                if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-                    || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
-                ) {
-                    loadLocationByExif(data.getData());
-                }
-                attachmentAdapter.append(data.getData());
-            } else if (mimeType.startsWith("video")) {
-                attachmentAdapter.append(data.getData());
-            } else if (mimeType.startsWith("audio")) {
-                attachmentAdapter.append(data.getData());
+            if (data.getData() != null) {
+                addAttachment(data.getData());
             } else {
-                Alert.Companion.newInstance(
-                    REQUEST_CODE_ALERT,
-                    getString(R.string.not_supported_file)
-                ).show(getChildFragmentManager(), null);
+                ClipData clip = data.getClipData();
+                for (int i = 0; i < clip.getItemCount(); i++) {
+                    addAttachment(clip.getItemAt(i).getUri());
+                }
             }
         } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK) {
             final String newMoodRaw = data.getStringExtra("INPUT_FIELD");
@@ -519,6 +504,34 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     return newMood;
                 }
             };
+        }
+    }
+
+    private void addAttachment(Uri uri) {
+        getContext().getContentResolver().takePersistableUriPermission(
+            uri,
+            FLAG_GRANT_READ_URI_PERMISSION
+        );
+        final String mimeType = new UriMimeType(
+            getContext(),
+            uri.toString()
+        ).value();
+        if (mimeType.startsWith("image")) {
+            if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+                || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
+            ) {
+                loadLocationByExif(uri);
+            }
+            attachmentAdapter.append(uri);
+        } else if (mimeType.startsWith("video")) {
+            attachmentAdapter.append(uri);
+        } else if (mimeType.startsWith("audio")) {
+            attachmentAdapter.append(uri);
+        } else {
+            Alert.Companion.newInstance(
+                REQUEST_CODE_ALERT,
+                getString(R.string.not_supported_file)
+            ).show(getChildFragmentManager(), null);
         }
     }
 

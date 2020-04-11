@@ -13,10 +13,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import com.bumptech.glide.Glide;
 import com.larryhsiao.nyx.R;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.ViewHolder;
-import com.squareup.picasso.Picasso;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 
 import java.util.ArrayList;
@@ -122,7 +122,9 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
         final ImageView icon = holder.getImageView(R.id.itemAttachmentImage_icon);
         CircularProgressDrawable progress = new CircularProgressDrawable(icon.getContext());
         progress.setStyle(LARGE);
-        Picasso.get().load(uri).placeholder(progress).into(icon);
+        Glide.with(context)
+            .load(uri)
+            .into(icon);
         icon.setOnClickListener(v -> {
             new StfalconImageViewer.Builder<>(
                 icon.getContext(),
@@ -132,7 +134,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
                         icon.getContext()
                     );
                     progress2.setStyle(LARGE);
-                    Picasso.get()
+                    Glide.with(context)
                         .load(image)
                         .placeholder(progress2)
                         .into(imageView);
