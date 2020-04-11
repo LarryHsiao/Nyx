@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import com.bumptech.glide.Glide;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.core.attachments.Attachment;
@@ -18,7 +19,6 @@ import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.ViewHolder;
 import com.silverhetch.clotho.Source;
-import com.squareup.picasso.Picasso;
 
 import java.sql.Connection;
 import java.text.DateFormat;
@@ -83,7 +83,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
             image.setVisibility(View.VISIBLE);
             CircularProgressDrawable progress = new CircularProgressDrawable(image.getContext());
             progress.setStyle(LARGE);
-            Picasso.get()
+            Glide.with(image.getContext())
                 .load(attachments.get(0).uri())
                 .placeholder(progress)
                 .into(image);

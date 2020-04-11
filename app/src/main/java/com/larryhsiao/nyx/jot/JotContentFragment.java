@@ -507,7 +507,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         }
     }
 
-    private void addAttachment(Uri uri){
+    private void addAttachment(Uri uri) {
         getContext().getContentResolver().takePersistableUriPermission(
             uri,
             FLAG_GRANT_READ_URI_PERMISSION
