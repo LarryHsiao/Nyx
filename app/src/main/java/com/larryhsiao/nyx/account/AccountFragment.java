@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.account;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -19,8 +20,11 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -35,6 +39,7 @@ import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.silverhetch.aura.view.bitmap.CircledDrawable;
 import com.silverhetch.clotho.source.ConstSource;
 
+import java.security.MessageDigest;
 import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
@@ -91,37 +96,8 @@ public class AccountFragment extends JotFragment {
         final ImageView icon = view.findViewById(R.id.account_icon);
         Glide.with(this).load(user.getPhotoUrl())
             .placeholder(placeholder)
-            .addListener(new RequestListener<Drawable>() {
-                @Override
-                public boolean onLoadFailed(@Nullable GlideException exception,
-                                            Object model,
-                                            Target<Drawable> target,
-                                            boolean isFirstResource) {
-                    return false;
-                }
-
-                @Override
-                public boolean onResourceReady(Drawable resource,
-                                               Object model,
-                                               Target<Drawable> target,
-                                               DataSource dataSource,
-                                               boolean isFirstResource) {
-                    setUpRoundedIcon(icon);
-                    return false;
-                }
-            })
+            .apply(RequestOptions.circleCropTransform())
             .into(icon);
-    }
-
-    private void setUpRoundedIcon(ImageView icon) {
-        Bitmap bitmap = ((BitmapDrawable) icon.getDrawable()).getBitmap();
-        RoundedBitmapDrawable drawable = create(getContext().getResources(), bitmap);
-        drawable.setCircular(true);
-        drawable.setCornerRadius(Math.max(
-            bitmap.getWidth() / 2.0f,
-            bitmap.getHeight() / 2.0f
-        ));
-        icon.setImageDrawable(drawable);
     }
 
     private void updateViewLoggedOut(View view) {
