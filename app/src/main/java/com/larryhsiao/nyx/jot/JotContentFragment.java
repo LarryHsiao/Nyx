@@ -8,6 +8,8 @@ import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -96,6 +98,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_ALERT = 1003;
 
     private static final String ARG_JOT_JSON = "ARG_JOT";
+    private HandlerThread backgroundThread;
+    private Handler backgroundHandler;
     private ChipGroup chipGroup;
     private TextView locationText;
     private TextView moodText;
@@ -111,8 +115,18 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        backgroundThread.quitSafely();
+        backgroundThread.interrupt();
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        backgroundThread = new HandlerThread("ContentBackground");
+        backgroundThread.start();
+        backgroundHandler = new Handler(backgroundThread.getLooper());
         setHasOptionsMenu(true);
         if (getArguments() != null) {
             jot = new Gson().fromJson(
@@ -195,9 +209,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         Location location = new Location("Constant");
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
-        locationText.setText(new LocationString(
-            new LocationAddress(view.getContext(), location).value()
-        ).value());
+        updateAddress(location);
         loadEmbedMapByJot();
         final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
         attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter(view.getContext()));
@@ -310,6 +322,15 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 moodText.setText(newMood);
                 moodDialog.dismiss();
             });
+        });
+    }
+
+    private void updateAddress(Location location){
+        backgroundHandler.post(() -> {
+            final String value = new LocationString(
+                new LocationAddress(locationText.getContext(), location).value()
+            ).value();
+            locationText.post(()-> locationText.setText(value));
         });
     }
 
@@ -488,7 +509,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 }
             };
             Address address = data.getParcelableExtra(ADDRESS);
-            locationText.setText(new LocationString(address).value());
+            locationText.setText(address == null ? "" : new LocationString(address).value());
             loadEmbedMapByJot();
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
             if (data.getData() != null) {
@@ -563,8 +584,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             Location location = new Location("constant");
             location.setLatitude(latLong[0]);
             location.setLongitude(latLong[1]);
-            Address address = new LocationAddress(getContext(), location).value();
-            locationText.setText(new LocationString(address).value());
+            updateAddress(location);
             loadEmbedMapByJot();
         } catch (Exception e) {
             e.printStackTrace();

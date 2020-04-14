@@ -63,4 +63,5 @@
     <string name="combine">Combine</string>
     <string name="combine_">Combine: %s</string>
     <string name="not_supported_file">Not supported file</string>
+    <string name="location_lat_lon">Location: %s, %s</string>
 </resources>
