@@ -18,7 +18,9 @@ repositories {
 }
 
 dependencies {
-    api 'com.silverhetch:clotho:1.17.0'
+    implementation group: 'org.takes', name: 'takes', version: '1.11.3'
+    api 'com.google.code.gson:gson:2.8.6'
+    api 'com.silverhetch:clotho:1.17.1'
     implementation 'com.h2database:h2:1.4.197'
     api "org.flywaydb:flyway-core:6.2.4"
     implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'

@@ -1,0 +1,50 @@
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="lib/spectre.css">
+    <link rel="stylesheet" href="lib/spectre-exp.css">
+    <link rel="stylesheet" href="lib/spectre-icons.css">
+    <title>Nyx Web Access</title>
+</head>
+<header class="navbar">
+
+    <section class="navbar-section">
+        <a href="/" class="navbar-brand mr-2">Jots</a>
+        <a href="/map.html" class="navbar-brand mr-20">Map</a>
+    </section>
+</header>
+<div class="container">
+    <div class="columns">
+        <div id="jots"></div>
+    </div>
+</div>
+<script>
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            let obj = JSON.parse(this.responseText);
+            console.debug(obj);
+            document.getElementById('jots').appendChild(makeUL(obj));
+        }
+    };
+    xmlhttp.open("GET", "http://localhost:8080/api/jots", true);
+    xmlhttp.send();
+
+    function makeUL(json) {
+        var list = document.createElement('ul');
+        for (var i = 0; i < Object.keys(json).length; i++) {
+            var item = document.createElement('li');
+            item.appendChild(
+                document.createTextNode(
+                    JSON.stringify(
+                        Object.values(json)[i]
+                    )
+                )
+            );
+            list.appendChild(item);
+        }
+        return list;
+    }
+
+</script>
+</html>
