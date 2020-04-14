@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -49,6 +50,7 @@ import com.larryhsiao.nyx.core.jots.JotUri;
 import com.larryhsiao.nyx.core.jots.PostedJot;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.jots.WrappedJot;
+import com.larryhsiao.nyx.core.tags.AllTags;
 import com.larryhsiao.nyx.core.tags.CreatedTagByName;
 import com.larryhsiao.nyx.core.tags.JotTagRemoval;
 import com.larryhsiao.nyx.core.tags.JotsByTagId;
@@ -209,10 +211,18 @@ public class JotContentFragment extends JotFragment implements BackControl {
 
         ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
         tagIcon.setOnClickListener(v -> {
-            final EditText editText = new EditText(v.getContext());
+            final AutoCompleteTextView editText = new AutoCompleteTextView(v.getContext());
             editText.setLines(1);
             editText.setMaxLines(1);
             editText.setInputType(InputType.TYPE_CLASS_TEXT);
+            editText.setAdapter(new ArrayAdapter<>(
+                    v.getContext(),
+                    android.R.layout.simple_dropdown_item_1line,
+                    new QueriedTags(
+                        new AllTags(db)
+                    ).value().stream().map(Tag::title).collect(Collectors.toList())
+                )
+            );
             new AlertDialog.Builder(v.getContext())
                 .setTitle(getString(R.string.new_tag))
                 .setMessage(getString(R.string.enter_tag_name))
