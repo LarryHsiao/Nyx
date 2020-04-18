@@ -69,6 +69,7 @@ public class CalendarFragment extends JotFragment {
             calendar.setScheme(jot.mood());
             calendar.setSchemeColor(Color.CYAN);
             calendarView.addSchemeDate(calendar);
+            calendarView.addSchemeDate(calendar);
         }
         calendarView.setOnCalendarSelectListener(new CalendarView.OnCalendarSelectListener() {
             @Override

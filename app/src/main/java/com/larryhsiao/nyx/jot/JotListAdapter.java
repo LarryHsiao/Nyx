@@ -58,17 +58,8 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
-        String address = new LocationString(
-            new LocationAddress(holder.itemView.getContext(), location).value()
-        ).value();
-        if (address != null) {
-            address += "\n";
-        } else {
-            address = "";
-        }
         holder.getTextView(R.id.itemJot_content).setText(
             jot.mood() + " " + jot.content() + "\n" +
-                address +
                 DateFormat.getDateInstance().format(new Date(jot.createdTime()))
         );
         List<Attachment> attachments = new QueriedAttachments(

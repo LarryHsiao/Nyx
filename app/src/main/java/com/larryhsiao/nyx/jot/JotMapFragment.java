@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,7 +26,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.jots.AllJots;
@@ -37,7 +35,6 @@ import com.larryhsiao.nyx.core.jots.JotById;
 import com.larryhsiao.nyx.core.jots.JotUriId;
 import com.larryhsiao.nyx.core.jots.JotsByKeyword;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
-import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.clotho.Source;
 
 import java.sql.ResultSet;
@@ -99,11 +96,8 @@ public class JotMapFragment extends JotFragment {
             clusterManger
         ));
         clusterManger.setOnClusterClickListener(cluster -> {
-            final Location location = new Location("const");
-            location.setLatitude(cluster.getPosition().latitude);
-            location.setLongitude(cluster.getPosition().longitude);
             nextPage(JotListFragment.newInstanceByJotIds(
-                new LocationString(new LocationAddress(getContext(), location).value()).value(),
+                cluster.getPosition().latitude + ", " + cluster.getPosition().longitude + "",
                 cluster.getItems().stream()
                     .mapToLong(it -> it.getJot().id())
                     .toArray()
@@ -125,13 +119,9 @@ public class JotMapFragment extends JotFragment {
             if (selectedMarker != null) {
                 selectedMarker.remove();
             }
-            final Location location = new Location("Const");
-            location.setLatitude(latLng.latitude);
-            location.setLongitude(latLng.longitude);
-            final Address address = new LocationAddress(getContext(), location).value();
             final MarkerOptions option = new MarkerOptions();
             option.position(latLng);
-            option.title(new LocationString(address).value());
+            option.title(latLng.latitude + ", " + latLng.longitude + "");
             selectedMarker = map.addMarker(option);
             selectedMarker.showInfoWindow();
         });
@@ -143,25 +133,26 @@ public class JotMapFragment extends JotFragment {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
             adapter.add(getString(R.string.new_jot));
             new AlertDialog.Builder(getContext())
-                .setTitle(new LocationString(new LocationAddress(getContext(), location).value()).value())
-                .setAdapter(adapter, (dialog, which) -> {
-                    if (which == 0) {
-                        Fragment frag = JotContentFragment.newInstance(
-                            new ConstJot(
-                                -1,
-                                "",
-                                System.currentTimeMillis(),
-                                new double[]{
-                                    marker.getPosition().longitude,
-                                    marker.getPosition().latitude
-                                },
-                                "",
-                                1,
-                                false));
-                        frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
-                        nextPage(frag);
-                    }
-                })
+                .setTitle(
+                    marker.getPosition().latitude + ", " + marker.getPosition().longitude
+                ).setAdapter(adapter, (dialog, which) -> {
+                if (which == 0) {
+                    Fragment frag = JotContentFragment.newInstance(
+                        new ConstJot(
+                            -1,
+                            "",
+                            System.currentTimeMillis(),
+                            new double[]{
+                                marker.getPosition().longitude,
+                                marker.getPosition().latitude
+                            },
+                            "",
+                            1,
+                            false));
+                    frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
+                    nextPage(frag);
+                }
+            })
                 .show();
         });
     }
@@ -267,7 +258,7 @@ public class JotMapFragment extends JotFragment {
             return true;
         }
 
-        if (item.getItemId() == R.id.menuItem_viewMode){
+        if (item.getItemId() == R.id.menuItem_viewMode) {
             rootPage(new JotListFragment());
         }
         return false;
