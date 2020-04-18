@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 /**
- * New Attachment of a Jot
+ * New Attachment of a Jot, update by an object.
  */
 public class NewAttachmentById implements Action {
     private final Source<Connection> source;

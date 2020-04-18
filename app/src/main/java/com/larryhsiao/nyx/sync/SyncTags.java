@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.account;
+package com.larryhsiao.nyx.sync;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Action to sync firebase
+ * Action to sync to firebase.
  */
 public class SyncTags implements Action {
     private final String userId;
@@ -31,7 +31,9 @@ public class SyncTags implements Action {
 
     @Override
     public void fire() {
-        CollectionReference remote = FirebaseFirestore.getInstance().collection(userId + "/data/tags");
+        CollectionReference remote = FirebaseFirestore.getInstance().collection(
+            userId + "/data/tags"
+        );
         remote.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 sync(remote, task.getResult());
@@ -52,7 +54,11 @@ public class SyncTags implements Action {
         });
     }
 
-    private void syncTag(Map<String, Tag> dbTags, QueryDocumentSnapshot remoteTag, CollectionReference remote) {
+    private void syncTag(
+        Map<String, Tag> dbTags,
+        QueryDocumentSnapshot remoteTag,
+        CollectionReference remote
+    ) {
         final Tag dbTag = dbTags.get(remoteTag.getId());
         if (dbTag == null) {
             newLocalTag(remoteTag);

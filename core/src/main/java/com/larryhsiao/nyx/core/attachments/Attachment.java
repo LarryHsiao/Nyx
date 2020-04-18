@@ -15,7 +15,7 @@ public interface Attachment {
     long jotId();
 
     /**
-     * Uri of this attachment
+     * Uri of this attachment.
      */
     String uri();
 

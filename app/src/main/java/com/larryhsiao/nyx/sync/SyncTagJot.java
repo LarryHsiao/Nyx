@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.account;
+package com.larryhsiao.nyx.sync;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Action to sync firebase
+ * Action to sync to firebase.
  */
 public class SyncTagJot implements Action {
     private final String userId;
@@ -29,7 +29,8 @@ public class SyncTagJot implements Action {
 
     @Override
     public void fire() {
-        CollectionReference remote = FirebaseFirestore.getInstance().collection(userId + "/data/tag_jot");
+        CollectionReference remote = FirebaseFirestore.getInstance()
+            .collection(userId + "/data/tag_jot");
         remote.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 sync(remote, task.getResult());
@@ -45,7 +46,11 @@ public class SyncTagJot implements Action {
         dbTags.forEach((id, tag) -> updateRemoteTag(remote, id, tag));
     }
 
-    private void syncTagJot(QueryDocumentSnapshot remoteTag, Map<String, Map<String, Object>> dbTags, CollectionReference remote){
+    private void syncTagJot(
+        QueryDocumentSnapshot remoteTag,
+        Map<String, Map<String, Object>> dbTags,
+        CollectionReference remote
+    ) {
         final String id = remoteTag.getId();
         final Map<String, Object> dbTag = dbTags.get(id);
         if (dbTag == null) {
@@ -65,9 +70,9 @@ public class SyncTagJot implements Action {
     private void updateLocalTag(QueryDocumentSnapshot remoteTag) {
         try (PreparedStatement stmt = db.value().prepareStatement(
             // language=H2
-            "UPDATE TAG_JOT " +
-                "SET VERSION = ?3, DELETE =?4 " +
-                "WHERE JOT_ID=?1 AND TAG_ID=?2"
+            "UPDATE TAG_JOT "
+                + "SET VERSION = ?3, DELETE =?4 "
+                + "WHERE JOT_ID=?1 AND TAG_ID=?2"
         )) {
             final long jotId = remoteTag.getLong("jot_id");
             final long tagId = remoteTag.getLong("tag_id");
@@ -91,7 +96,11 @@ public class SyncTagJot implements Action {
         ).fire();
     }
 
-    private void updateRemoteTag(CollectionReference tagRef, String id, Map<String, Object> tagJot) {
+    private void updateRemoteTag(
+        CollectionReference tagRef,
+        String id,
+        Map<String, Object> tagJot
+    ) {
         tagRef.document(id).set(tagJot);
     }
 

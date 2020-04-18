@@ -26,7 +26,8 @@ public class QueriedAttachments implements Source<List<Attachment>> {
                     res.getLong("jot_id"),
                     res.getString("uri"),
                     res.getInt("version"),
-                    res.getInt("delete")));
+                    res.getInt("delete")
+                ));
             }
             return attachments;
         } catch (Exception e) {

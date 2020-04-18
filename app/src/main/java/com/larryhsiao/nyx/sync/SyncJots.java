@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.account;
+package com.larryhsiao.nyx.sync;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Action to sync firebase
+ * Action to sync to firebase.
  */
 public class SyncJots implements Action {
     private final String userId;
@@ -34,7 +34,8 @@ public class SyncJots implements Action {
 
     @Override
     public void fire() {
-        CollectionReference remoteJots = FirebaseFirestore.getInstance().collection(userId + "/data/jots");
+        CollectionReference remoteJots = FirebaseFirestore.getInstance()
+            .collection(userId + "/data/jots");
         remoteJots.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 sync(remoteJots, task.getResult());
@@ -55,7 +56,11 @@ public class SyncJots implements Action {
         });
     }
 
-    private void syncJot(Map<String, Jot> dbJots, QueryDocumentSnapshot remoteJot, CollectionReference remoteJots){
+    private void syncJot(
+        Map<String, Jot> dbJots,
+        QueryDocumentSnapshot remoteJot,
+        CollectionReference remoteJots
+    ) {
         final Jot dbJot = dbJots.get(remoteJot.getId());
         if (dbJot == null) {
             newLocalJot(remoteJot);

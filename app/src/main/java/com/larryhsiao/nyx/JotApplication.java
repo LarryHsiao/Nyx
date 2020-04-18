@@ -8,11 +8,25 @@ import org.flywaydb.core.api.android.ContextHolder;
 
 import java.io.File;
 import java.sql.Connection;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Application of Jot.
  */
 public class JotApplication extends Application {
+    public final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    public final ExecutorService executor = new ThreadPoolExecutor(
+        Runtime.getRuntime().availableProcessors(),
+        Runtime.getRuntime().availableProcessors() * 2,
+        1,
+        TimeUnit.SECONDS,
+        queue,
+        new JotThreadFactory()
+    );
     public long lastAuthed = 0L;
     public Source<Connection> db;
 
