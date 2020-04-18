@@ -23,8 +23,8 @@ public class ByUrl implements Source<ResultSet> {
         try {
             PreparedStatement stmt = dbSource.value().prepareStatement(
                 // language=H2
-                "SELECT * FROM attachments " +
-                    "WHERE URI=?"
+                "SELECT * FROM attachments "
+                    + "WHERE URI=?"
             );
             stmt.setString(1, uri);
             return stmt.executeQuery();

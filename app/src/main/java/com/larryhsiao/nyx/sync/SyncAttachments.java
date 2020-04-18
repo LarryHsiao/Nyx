@@ -1,5 +1,6 @@
-package com.larryhsiao.nyx.account;
+package com.larryhsiao.nyx.sync;
 
+import android.content.Context;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -22,20 +23,24 @@ import java.util.stream.Collectors;
  * Action to sync attachments.
  */
 public class SyncAttachments implements Action {
+    private final Context context;
     private final String uid;
     private final Source<Connection> db;
 
-    public SyncAttachments(String uid, Source<Connection> db) {
+    public SyncAttachments(Context context, String uid, Source<Connection> db) {
+        this.context = context;
         this.uid = uid;
         this.db = db;
     }
 
     @Override
     public void fire() {
-        CollectionReference remoteDb = FirebaseFirestore.getInstance().collection(uid + "/data/attachments");
+        CollectionReference remoteDb = FirebaseFirestore.getInstance()
+            .collection(uid + "/data/attachments");
         remoteDb.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 sync(remoteDb, task.getResult());
+                new SyncFiles(context, db, uid).fire();
             }
         });
     }
@@ -50,7 +55,11 @@ public class SyncAttachments implements Action {
         dbItems.forEach(((s, attachment) -> updateRemoteItem(remoteDb, attachment)));
     }
 
-    private void syncItem(Map<Long, Attachment> dbItems, QueryDocumentSnapshot remoteItem, CollectionReference remoteDb) {
+    private void syncItem(
+        Map<Long, Attachment> dbItems,
+                          QueryDocumentSnapshot remoteItem,
+                          CollectionReference remoteDb
+    ) {
         final Attachment dbItem = dbItems.get(Long.valueOf(remoteItem.getId()));
         if (dbItem == null) {
             newLocalItem(remoteItem);

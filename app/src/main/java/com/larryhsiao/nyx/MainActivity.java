@@ -2,16 +2,14 @@ package com.larryhsiao.nyx;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.webkit.MimeTypeMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.larryhsiao.nyx.account.AccountFragment;
-import com.larryhsiao.nyx.analytics.AnalyticsFragment;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.jot.CalendarFragment;
 import com.larryhsiao.nyx.jot.JotListFragment;
-import com.larryhsiao.nyx.jot.JotMapFragment;
+import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.tag.TagListFragment;
 
 /**
@@ -49,6 +47,7 @@ public class MainActivity extends JotActivity {
         if (savedInstanceState == null) {
             navigation.setSelectedItemId(R.id.menuItem_jots);
             rootPage(new JotListFragment());
+            SyncService.enqueue(this);
         }
     }
 

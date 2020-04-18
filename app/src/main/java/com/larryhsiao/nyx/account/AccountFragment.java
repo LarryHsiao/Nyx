@@ -1,11 +1,8 @@
 package com.larryhsiao.nyx.account;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,16 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.Transformation;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.load.engine.Resource;
-import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,10 +26,15 @@ import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.tags.AllTags;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
+import com.larryhsiao.nyx.sync.SyncAttachments;
+import com.larryhsiao.nyx.sync.SyncFiles;
+import com.larryhsiao.nyx.sync.SyncJots;
+import com.larryhsiao.nyx.sync.SyncService;
+import com.larryhsiao.nyx.sync.SyncTagJot;
+import com.larryhsiao.nyx.sync.SyncTags;
 import com.silverhetch.aura.view.bitmap.CircledDrawable;
 import com.silverhetch.clotho.source.ConstSource;
 
-import java.security.MessageDigest;
 import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
@@ -134,12 +129,6 @@ public class AccountFragment extends JotFragment {
             updateView(view);
         });
         loadUserIcon(view, user);
-
-        new SyncJots(user.getUid(), db).fire();
-        new SyncTags(user.getUid(), db).fire();
-        new SyncTagJot(user.getUid(), db).fire();
-        new SyncAttachments(user.getUid(), db).fire();
-        new SyncFiles(getContext(), db, user.getUid()).fire();
     }
 
     @Override
@@ -150,6 +139,7 @@ public class AccountFragment extends JotFragment {
 
             if (resultCode == RESULT_OK) {
                 updateView(getView());
+                SyncService.enqueue(getContext());
             } else {
                 Toast.makeText(getContext(),
                     "error " + response,

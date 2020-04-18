@@ -66,5 +66,8 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key"/>
+        <service android:name=".sync.SyncService"
+                 android:permission="android.permission.BIND_JOB_SERVICE"
+        />
     </application>
 </manifest>
