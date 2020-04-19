@@ -37,6 +37,7 @@ import com.google.gson.Gson;
 import com.larryhsiao.nyx.BuildConfig;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.attachments.AttachmentsFragment;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
@@ -69,6 +70,7 @@ import com.silverhetch.aura.BackControl;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.alert.Alert;
+import com.silverhetch.aura.view.dialog.FullScreenDialogFragment;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.source.ConstSource;
@@ -98,6 +100,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
     private static final int REQUEST_CODE_ALERT = 1003;
+    private static final int REQUEST_CODE_ATTACHMENT_DIALOG = 1004;
 
     private static final String ARG_JOT_JSON = "ARG_JOT";
     private HandlerThread backgroundThread;
@@ -198,13 +201,18 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 };
             }
         });
-        ImageView attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
-        attachmentIcon.setOnClickListener(v -> {
+        view.findViewById(R.id.jot_newAttachment).setOnClickListener(it -> {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
             intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
+        });
+        ImageView attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
+        attachmentIcon.setOnClickListener(v -> {
+            FullScreenDialogFragment dialog = AttachmentsFragment.newInstance(attachmentAdapter.exportUri());
+            dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
+            dialog.show(getParentFragmentManager(), null);
         });
         locationText = view.findViewById(R.id.jot_location);
         locationText.setOnClickListener(v -> pickLocation());
@@ -349,12 +357,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
         detachFab();
     }
 
-    private void updateAddress(Location location){
+    private void updateAddress(Location location) {
         backgroundHandler.post(() -> {
             final String value = new LocationString(
                 new LocationAddress(locationText.getContext(), location).value()
             ).value();
-            locationText.post(()-> locationText.setText(value));
+            locationText.post(() -> locationText.setText(value));
         });
     }
 
@@ -428,7 +436,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         return false;
     }
 
-    private void save(){
+    private void save() {
         jot = new PostedJot(db, jot).value();
         final List<Attachment> attachments = new QueriedAttachments(
             new AttachmentsByJotId(db, jot.id(), true)
@@ -560,6 +568,9 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     return newMood;
                 }
             };
+        } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG){
+            ArrayList<Uri> uris = data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
+            attachmentAdapter.loadAttachments(uris);
         }
     }
 
