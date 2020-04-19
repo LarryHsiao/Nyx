@@ -33,6 +33,7 @@ import com.larryhsiao.nyx.jot.JotListFragment;
 import com.larryhsiao.nyx.util.EmptyView;
 import com.silverhetch.aura.view.EmptyListAdapter;
 import com.silverhetch.aura.view.dialog.InputDialog;
+import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.source.ConstSource;
 import com.silverhetch.clotho.utility.comparator.StringComparator;
 
@@ -142,6 +143,28 @@ public class TagListFragment extends JotFragment {
     public void onResume() {
         super.onResume();
         setTitle(getString(R.string.tags));
+        attachFab(new FabBehavior() {
+            @Override
+            public int icon() {
+                return R.drawable.ic_plus;
+            }
+
+            @Override
+            public void onClick() {
+                final InputDialog frag = InputDialog.Companion.newInstance(
+                    getString(R.string.new_tag),
+                    REQUEST_CODE_NEW_TAG
+                );
+                frag.setTargetFragment(TagListFragment.this, REQUEST_CODE_NEW_TAG);
+                frag.show(getFragmentManager(), null);
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        detachFab();
     }
 
     @Override
@@ -196,18 +219,6 @@ public class TagListFragment extends JotFragment {
         });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menuItem_newJot) {
-            final InputDialog frag = InputDialog.Companion.newInstance(
-                getString(R.string.new_tag),
-                REQUEST_CODE_NEW_TAG
-            );
-            frag.setTargetFragment(this, REQUEST_CODE_NEW_TAG);
-            frag.show(getFragmentManager(), null);
-        }
-        return false;
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {

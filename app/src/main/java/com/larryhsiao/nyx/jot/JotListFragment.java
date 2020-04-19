@@ -28,6 +28,7 @@ import com.larryhsiao.nyx.core.jots.JotsByKeyword;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.util.EmptyView;
 import com.silverhetch.aura.view.EmptyListAdapter;
+import com.silverhetch.aura.view.fab.FabBehavior;
 
 import java.util.List;
 
@@ -147,18 +148,35 @@ public class JotListFragment extends JotFragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menuItem_newJot) {
-            Fragment frag = new JotContentFragment();
-            frag.setTargetFragment(this, REQUEST_CODE_CREATE_JOT);
-            nextPage(frag);
-            return true;
-        }
-
         if (item.getItemId() == R.id.menuItem_viewMode) {
             rootPage(new JotMapFragment());
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        attachFab(new FabBehavior() {
+            @Override
+            public int icon() {
+                return R.drawable.ic_plus;
+            }
+
+            @Override
+            public void onClick() {
+                Fragment frag = new JotContentFragment();
+                frag.setTargetFragment(JotListFragment.this, REQUEST_CODE_CREATE_JOT);
+                nextPage(frag);
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        detachFab();
     }
 
     @Override

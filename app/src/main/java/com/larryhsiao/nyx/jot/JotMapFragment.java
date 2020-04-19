@@ -35,6 +35,7 @@ import com.larryhsiao.nyx.core.jots.JotById;
 import com.larryhsiao.nyx.core.jots.JotUriId;
 import com.larryhsiao.nyx.core.jots.JotsByKeyword;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
+import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.Source;
 
 import java.sql.ResultSet;
@@ -74,6 +75,19 @@ public class JotMapFragment extends JotFragment {
     @Override
     public void onResume() {
         super.onResume();
+        attachFab(new FabBehavior() {
+            @Override
+            public int icon() {
+                return R.drawable.ic_plus;
+            }
+
+            @Override
+            public void onClick() {
+                Fragment frag = new JotContentFragment();
+                frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
+                nextPage(frag);
+            }
+        });
         SupportMapFragment mapFrag = SupportMapFragment.newInstance();
         mapFrag.getMapAsync(googleMap -> {
             map = googleMap;
@@ -187,6 +201,7 @@ public class JotMapFragment extends JotFragment {
     @Override
     public void onPause() {
         super.onPause();
+        detachFab();
         final Fragment mapFrag = getChildFragmentManager().findFragmentById(R.id.map_container);
         if (mapFrag != null) {
             getChildFragmentManager().beginTransaction()
@@ -251,13 +266,6 @@ public class JotMapFragment extends JotFragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menuItem_newJot) {
-            Fragment frag = new JotContentFragment();
-            frag.setTargetFragment(this, REQUEST_CODE_NEW_JOT);
-            nextPage(frag);
-            return true;
-        }
-
         if (item.getItemId() == R.id.menuItem_viewMode) {
             rootPage(new JotListFragment());
         }

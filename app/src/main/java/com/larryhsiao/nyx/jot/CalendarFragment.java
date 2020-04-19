@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.jot;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.haibin.calendarview.Calendar;
+import com.haibin.calendarview.CalendarLayout;
 import com.haibin.calendarview.CalendarView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
@@ -21,21 +23,25 @@ import com.larryhsiao.nyx.core.jots.JotsByDate;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.util.EmptyView;
 import com.silverhetch.aura.view.EmptyListAdapter;
+import com.silverhetch.aura.view.fab.FabBehavior;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import static android.app.Activity.RESULT_OK;
+import static java.lang.Double.MIN_VALUE;
 
 /**
- * Calendar for viewing Jots
+ * Calendar for viewing Jots.
  */
 public class CalendarFragment extends JotFragment {
     private static final int REQUEST_CODE_DIARY_CONTENT = 1000;
+    private static final int REQUEST_CODE_NEW_JOT = 1001;
     private CalendarView calendarView;
+    private RecyclerView jotList;
     private JotListAdapter adapter;
+    private CalendarLayout root;
 
     @Nullable
     @Override
@@ -46,8 +52,9 @@ public class CalendarFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        root = getView().findViewById(R.id.calendar_layout);
         calendarView = view.findViewById(R.id.calendar_calendarView);
-        RecyclerView jotList = view.findViewById(R.id.calendar_list);
+        jotList = view.findViewById(R.id.calendar_list);
         adapter = new JotListAdapter(db, item -> {
             Fragment frag = JotContentFragment.newInstance(new ConstJot(item));
             frag.setTargetFragment(this, REQUEST_CODE_DIARY_CONTENT);
@@ -55,7 +62,6 @@ public class CalendarFragment extends JotFragment {
             return null;
         });
         jotList.setAdapter(new EmptyListAdapter(adapter, new EmptyView(view.getContext())));
-        loadJotsByDate(java.util.Calendar.getInstance());
         setTitle(dateString());
         List<Jot> jots = new QueriedJots(new AllJots(db)).value();
         for (Jot jot : jots) {
@@ -79,19 +85,47 @@ public class CalendarFragment extends JotFragment {
 
             @Override
             public void onCalendarSelect(Calendar calendar, boolean isClick) {
-                setTitle(dateString());
-                java.util.Calendar jdkCalendar = java.util.Calendar.getInstance();
-                jdkCalendar.set(
-                    calendar.getYear(),
-                    calendar.getMonth() - 1,
-                    calendar.getDay()
-                );
-                loadJotsByDate(jdkCalendar);
+                java.util.Calendar date = selectedDate();
+                setTitle(dateString(date));
+                loadJotsByDate(date);
+            }
+        });
+        loadJotsByDate();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        attachFab(new FabBehavior() {
+            @Override
+            public int icon() {
+                return R.drawable.ic_plus;
+            }
+
+            @Override
+            public void onClick() {
+                Fragment frag = JotContentFragment.newInstance(new ConstJot(
+                    -1,
+                    "",
+                    selectedDate().getTimeInMillis(),
+                    new double[]{MIN_VALUE, MIN_VALUE},
+                    "",
+                    1,
+                    false
+                ));
+                frag.setTargetFragment(CalendarFragment.this, REQUEST_CODE_NEW_JOT);
+                nextPage(frag);
             }
         });
     }
 
-    private String dateString() {
+    @Override
+    public void onPause() {
+        super.onPause();
+        detachFab();
+    }
+
+    private java.util.Calendar selectedDate() {
         Calendar selected = calendarView.getSelectedCalendar();
         java.util.Calendar date = java.util.Calendar.getInstance();
         date.set(
@@ -99,7 +133,19 @@ public class CalendarFragment extends JotFragment {
             selected.getMonth() - 1,
             selected.getDay()
         );
+        return date;
+    }
+
+    private String dateString() {
+        return dateString(selectedDate());
+    }
+
+    private String dateString(java.util.Calendar date) {
         return DateFormat.getDateInstance().format(date.getTime());
+    }
+
+    private void loadJotsByDate() {
+        loadJotsByDate(selectedDate());
     }
 
     private void loadJotsByDate(java.util.Calendar jdkCalendar) {
@@ -109,10 +155,18 @@ public class CalendarFragment extends JotFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_DIARY_CONTENT && resultCode == RESULT_OK) {
             getFragmentManager().popBackStack();
+        }
+        if (requestCode == REQUEST_CODE_NEW_JOT && resultCode == RESULT_OK) {
+            loadJotsByDate();
+            getFragmentManager().popBackStack();
+            new Handler().postDelayed(() -> {
+                root.shrink();
+                jotList.smoothScrollToPosition(adapter.getItemCount() - 1);
+            }, 100);
         }
     }
 }

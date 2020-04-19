@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     app:default_status="expand"
+    android:id="@+id/calendar_layout"
     app:calendar_show_mode="both_month_week_view"
     app:calendar_content_view_id="@+id/calendar_list"
     xmlns:app="http://schemas.android.com/apk/res-auto"

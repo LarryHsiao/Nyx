@@ -15,9 +15,4 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_map"
         />
-    <item
-        android:id="@+id/menuItem_newJot"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_plus_2"
-        android:title="@string/new_jot" />
 </menu>

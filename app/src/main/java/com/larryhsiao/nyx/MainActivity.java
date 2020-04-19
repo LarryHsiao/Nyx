@@ -16,27 +16,37 @@ import com.larryhsiao.nyx.tag.TagListFragment;
  * Entry Activity of Nyx.
  */
 public class MainActivity extends JotActivity {
+    private int currentPage = R.id.menuItem_jots;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.page_main);
         setupPageControl(R.id.main_page_container);
+        setupFabControl(findViewById(R.id.main_fab));
         getSupportFragmentManager().addOnBackStackChangedListener(() ->
             getSupportActionBar().setDisplayHomeAsUpEnabled(getSupportFragmentManager().getBackStackEntryCount() > 0)
         );
 
         BottomNavigationView navigation = findViewById(R.id.main_navigation);
         navigation.setOnNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == currentPage) {
+                return false;
+            }
             if (item.getItemId() == R.id.menuItem_jots) {
+                currentPage = R.id.menuItem_jots;
                 rootPage(new JotListFragment());
                 return true;
             } else if (item.getItemId() == R.id.menuItem_calendar) {
+                currentPage = R.id.menuItem_calendar;
                 rootPage(new CalendarFragment());
                 return true;
             } else if (item.getItemId() == R.id.menuItem_tag) {
+                currentPage = R.id.menuItem_tag;
                 rootPage(new TagListFragment());
                 return true;
             } else if (item.getItemId() == R.id.menuItem_account) {
+                currentPage = R.id.menuItem_account;
                 rootPage(new AccountFragment());
                 return true;
             } else {
