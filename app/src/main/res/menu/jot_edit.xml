@@ -8,10 +8,4 @@
           app:iconTint="#fff"
           android:title="@string/delete"
     />
-
-    <item
-        android:icon="@drawable/ic_save"
-        android:id="@+id/menuItem_save"
-        app:showAsAction="always"
-        android:title="@string/save"/>
 </menu>

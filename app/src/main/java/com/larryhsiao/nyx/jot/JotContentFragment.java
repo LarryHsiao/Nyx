@@ -70,6 +70,7 @@ import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.alert.Alert;
 import com.silverhetch.aura.view.dialog.InputDialog;
+import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.source.ConstSource;
 
 import java.text.SimpleDateFormat;
@@ -326,6 +327,28 @@ public class JotContentFragment extends JotFragment implements BackControl {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        attachFab(new FabBehavior() {
+            @Override
+            public int icon() {
+                return R.drawable.ic_save;
+            }
+
+            @Override
+            public void onClick() {
+                save();
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        detachFab();
+    }
+
     private void updateAddress(Location location){
         backgroundHandler.post(() -> {
             final String value = new LocationString(
@@ -399,69 +422,69 @@ public class JotContentFragment extends JotFragment implements BackControl {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menuItem_save) {
-            jot = new PostedJot(db, jot).value();
-            final List<Attachment> attachments = new QueriedAttachments(
-                new AttachmentsByJotId(db, jot.id(), true)
-            ).value();
-            attachmentAdapter.exportUri().forEach(uri -> {
-                boolean hasItem = false;
-                List<Attachment> exist = new ArrayList<>();
-                for (Attachment attachment : attachments) {
-                    if (attachment.uri().equals(uri.toString())) {
-                        hasItem = true;
-                        if (attachment.deleted()) {
-                            new UpdateAttachment(
-                                db,
-                                new WrappedAttachment(attachment) {
-                                    @Override
-                                    public boolean deleted() {
-                                        return false;
-                                    }
-                                }
-                            ).fire();
-                        }
-                        exist.add(attachment);
-                    }
-                }
-                attachments.removeAll(exist);
-                if (!hasItem) {
-                    new NewAttachment(db, uri.toString(), jot.id()).value();
-                }
-            });
-            attachments.forEach((attachment) ->
-                new RemovalAttachment(db, attachment.id()).fire()
-            );
-            final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
-                .value()
-                .stream()
-                .collect(Collectors.toMap(Tag::id, tag -> tag));
-            for (int i = 0; i < chipGroup.getChildCount(); i++) {
-                Tag tagOnView = ((Tag) chipGroup.getChildAt(i).getTag());
-                if (!dbTags.containsKey(tagOnView.id())) {
-                    // update JOT TAG
-                    new NewJotTag(
-                        db,
-                        new ConstSource<>(jot.id()),
-                        new ConstSource<>(tagOnView.id())
-                    ).fire();
-                } else {
-                    dbTags.remove(tagOnView.id());
-                }
-            }
-            dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
-            SyncService.enqueue(getContext());
-            final Intent intent = new Intent();
-            intent.setData(
-                Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
-            );
-            sendResult(0, RESULT_OK, intent);
-            return true;
-        }
         if (item.getItemId() == R.id.menuItem_delete) {
             preferDelete();
         }
         return false;
+    }
+
+    private void save(){
+        jot = new PostedJot(db, jot).value();
+        final List<Attachment> attachments = new QueriedAttachments(
+            new AttachmentsByJotId(db, jot.id(), true)
+        ).value();
+        attachmentAdapter.exportUri().forEach(uri -> {
+            boolean hasItem = false;
+            List<Attachment> exist = new ArrayList<>();
+            for (Attachment attachment : attachments) {
+                if (attachment.uri().equals(uri.toString())) {
+                    hasItem = true;
+                    if (attachment.deleted()) {
+                        new UpdateAttachment(
+                            db,
+                            new WrappedAttachment(attachment) {
+                                @Override
+                                public boolean deleted() {
+                                    return false;
+                                }
+                            }
+                        ).fire();
+                    }
+                    exist.add(attachment);
+                }
+            }
+            attachments.removeAll(exist);
+            if (!hasItem) {
+                new NewAttachment(db, uri.toString(), jot.id()).value();
+            }
+        });
+        attachments.forEach((attachment) ->
+            new RemovalAttachment(db, attachment.id()).fire()
+        );
+        final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
+            .value()
+            .stream()
+            .collect(Collectors.toMap(Tag::id, tag -> tag));
+        for (int i = 0; i < chipGroup.getChildCount(); i++) {
+            Tag tagOnView = ((Tag) chipGroup.getChildAt(i).getTag());
+            if (!dbTags.containsKey(tagOnView.id())) {
+                // update JOT TAG
+                new NewJotTag(
+                    db,
+                    new ConstSource<>(jot.id()),
+                    new ConstSource<>(tagOnView.id())
+                ).fire();
+            } else {
+                dbTags.remove(tagOnView.id());
+            }
+        }
+        dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
+        SyncService.enqueue(getContext());
+        final Intent intent = new Intent();
+        intent.setData(
+            Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
+        );
+        sendResult(0, RESULT_OK, intent);
     }
 
     private void deleteFlow() {
