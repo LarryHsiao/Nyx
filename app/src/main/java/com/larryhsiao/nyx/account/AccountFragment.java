@@ -26,19 +26,14 @@ import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.tags.AllTags;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
-import com.larryhsiao.nyx.sync.SyncAttachments;
-import com.larryhsiao.nyx.sync.SyncFiles;
-import com.larryhsiao.nyx.sync.SyncJots;
 import com.larryhsiao.nyx.sync.SyncService;
-import com.larryhsiao.nyx.sync.SyncTagJot;
-import com.larryhsiao.nyx.sync.SyncTags;
 import com.silverhetch.aura.view.bitmap.CircledDrawable;
 import com.silverhetch.clotho.source.ConstSource;
 
 import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
-import static androidx.core.graphics.drawable.RoundedBitmapDrawableFactory.create;
+import static android.graphics.Bitmap.Config.ARGB_8888;
 import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 
 /**
@@ -90,13 +85,14 @@ public class AccountFragment extends JotFragment {
         placeholder.setStyle(LARGE);
         final ImageView icon = view.findViewById(R.id.account_icon);
         Glide.with(this).load(user.getPhotoUrl())
+            .error(getResources().getDrawable(R.drawable.ic_user, null))
             .placeholder(placeholder)
             .apply(RequestOptions.circleCropTransform())
             .into(icon);
     }
 
     private void updateViewLoggedOut(View view) {
-        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, ARGB_8888);
         bitmap.eraseColor(Color.GRAY);
         ImageView icon = view.findViewById(R.id.account_icon);
         icon.setImageDrawable(new CircledDrawable(
@@ -111,6 +107,7 @@ public class AccountFragment extends JotFragment {
             startActivityForResult(AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(Arrays.asList(
+                    new AuthUI.IdpConfig.EmailBuilder().build(),
                     new AuthUI.IdpConfig.GoogleBuilder().build()
                 )).build(), REQUEST_CODE_LOG_IN
             );
@@ -146,7 +143,6 @@ public class AccountFragment extends JotFragment {
                     Toast.LENGTH_SHORT).show();
             }
         }
-
     }
 
     @Override
