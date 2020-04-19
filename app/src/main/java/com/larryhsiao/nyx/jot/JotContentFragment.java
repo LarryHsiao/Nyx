@@ -62,6 +62,7 @@ import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagsByJotId;
 import com.larryhsiao.nyx.core.tags.TagsByKeyword;
+import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.util.EmbedMapFragment;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.BackControl;
@@ -449,6 +450,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 }
             }
             dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
+            SyncService.enqueue(getContext());
             final Intent intent = new Intent();
             intent.setData(
                 Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
