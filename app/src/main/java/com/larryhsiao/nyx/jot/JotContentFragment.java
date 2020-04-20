@@ -3,9 +3,11 @@ package com.larryhsiao.nyx.jot;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,15 +24,18 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
@@ -74,11 +79,13 @@ import com.silverhetch.aura.view.dialog.FullScreenDialogFragment;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.source.ConstSource;
+import com.stfalcon.imageviewer.StfalconImageViewer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +93,10 @@ import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.ACTION_OPEN_DOCUMENT;
+import static android.content.Intent.ACTION_VIEW;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static androidx.appcompat.app.AlertDialog.Builder;
+import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
@@ -103,12 +113,13 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_ATTACHMENT_DIALOG = 1004;
 
     private static final String ARG_JOT_JSON = "ARG_JOT";
+    private Handler mainHandler = new Handler();
+    private List<Uri> attachmentOnView = new ArrayList<>();
     private HandlerThread backgroundThread;
     private Handler backgroundHandler;
     private ChipGroup chipGroup;
     private TextView locationText;
     private TextView moodText;
-    private AttachmentAdapter attachmentAdapter;
     private Jot jot;
 
     public static Fragment newInstance(ConstJot jot) {
@@ -201,18 +212,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 };
             }
         });
-        view.findViewById(R.id.jot_newAttachment).setOnClickListener(it -> {
+        view.findViewById(R.id.jot_attachment_icon).setOnClickListener(it -> {
             final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
             intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
-        });
-        ImageView attachmentIcon = view.findViewById(R.id.jot_attachment_icon);
-        attachmentIcon.setOnClickListener(v -> {
-            FullScreenDialogFragment dialog = AttachmentsFragment.newInstance(attachmentAdapter.exportUri());
-            dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
-            dialog.show(getParentFragmentManager(), null);
         });
         locationText = view.findViewById(R.id.jot_location);
         locationText.setOnClickListener(v -> pickLocation());
@@ -221,15 +226,15 @@ public class JotContentFragment extends JotFragment implements BackControl {
         location.setLatitude(jot.location()[1]);
         updateAddress(location);
         loadEmbedMapByJot();
-        final RecyclerView attachmentList = view.findViewById(R.id.jot_attachment_list);
-        attachmentList.setAdapter(attachmentAdapter = new AttachmentAdapter(view.getContext()));
-        attachmentAdapter.loadAttachments(
+        attachmentOnView.clear();
+        attachmentOnView.addAll(
             new QueriedAttachments(new AttachmentsByJotId(db, jot.id()))
                 .value()
                 .stream()
                 .map(it -> Uri.parse(it.uri()))
                 .collect(Collectors.toList())
         );
+        updateAttachmentView();
 
         ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
         tagIcon.setOnClickListener(v -> {
@@ -297,6 +302,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         }
         moodText.setText(mood);
         moodText.setOnClickListener(v -> {
+            // @todo #1 Used Mood history ranking
             final GridView gridView = new GridView(v.getContext());
             gridView.setNumColumns(4);
             gridView.setAdapter(new MoodAdapter(v.getContext()));
@@ -395,7 +401,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private void onTagOptionClicked(Chip tagChip, int which1) {
         switch (which1) {
             case 0:
-                // @todo: confirm for dicard changes
+                // @todo #1 confirm for dicard changes
                 nextPage(JotListFragment.newInstanceByJotIds(
                     getString(R.string.tag_title, tagChip.getText().toString()),
                     new QueriedJots(new JotsByTagId(db,
@@ -438,19 +444,19 @@ public class JotContentFragment extends JotFragment implements BackControl {
 
     private void save() {
         jot = new PostedJot(db, jot).value();
-        final List<Attachment> attachments = new QueriedAttachments(
+        final List<Attachment> dbAttachments = new QueriedAttachments(
             new AttachmentsByJotId(db, jot.id(), true)
         ).value();
-        attachmentAdapter.exportUri().forEach(uri -> {
+        attachmentOnView.forEach(uri -> {
             boolean hasItem = false;
-            List<Attachment> exist = new ArrayList<>();
-            for (Attachment attachment : attachments) {
-                if (attachment.uri().equals(uri.toString())) {
+            List<Attachment> existOnView = new ArrayList<>();
+            for (Attachment dbAttachment : dbAttachments) {
+                if (dbAttachment.uri().equals(uri.toString())) {
                     hasItem = true;
-                    if (attachment.deleted()) {
+                    if (dbAttachment.deleted()) {
                         new UpdateAttachment(
                             db,
-                            new WrappedAttachment(attachment) {
+                            new WrappedAttachment(dbAttachment) {
                                 @Override
                                 public boolean deleted() {
                                     return false;
@@ -458,15 +464,15 @@ public class JotContentFragment extends JotFragment implements BackControl {
                             }
                         ).fire();
                     }
-                    exist.add(attachment);
+                    existOnView.add(dbAttachment);
                 }
             }
-            attachments.removeAll(exist);
+            dbAttachments.removeAll(existOnView);
             if (!hasItem) {
                 new NewAttachment(db, uri.toString(), jot.id()).value();
             }
         });
-        attachments.forEach((attachment) ->
+        dbAttachments.forEach((attachment) ->
             new RemovalAttachment(db, attachment.id()).fire()
         );
         final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
@@ -568,10 +574,140 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     return newMood;
                 }
             };
-        } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG){
-            ArrayList<Uri> uris = data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
-            attachmentAdapter.loadAttachments(uris);
+        } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG) {
+            attachmentOnView.clear();
+            attachmentOnView.addAll(data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI"));
+            updateAttachmentView();
         }
+    }
+
+    private void updateAttachmentView() {
+        final FrameLayout root = getView().findViewById(R.id.jot_attachment_container);
+        root.removeAllViews();
+        if (attachmentOnView.size() == 0) {
+            return;
+        }
+        final Uri attachmentUri = attachmentOnView.get(0);
+        final String mimeType = new UriMimeType(
+            root.getContext(), attachmentUri.toString()
+        ).value();
+        if (mimeType.startsWith("video/")) {
+            updateVideo(root, attachmentUri);
+        } else if (mimeType.startsWith("audio/")) {
+            updateAudio(root, attachmentUri);
+        } else {
+            updateImage(root, attachmentUri);
+        }
+    }
+
+    private void updateVideo(FrameLayout root, Uri uri) {
+        LayoutInflater.from(getContext())
+            .inflate(R.layout.item_attachment_video, root, true);
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(root.getContext(), uri);
+        ImageView imageView = root.findViewById(R.id.itemAttachmentVideo_icon);
+        imageView.setImageBitmap(mmr.getFrameAtTime());
+        imageView.setOnClickListener(v -> {
+            if (attachmentOnView.size() > 1) {
+                browseAttachments();
+            } else {
+                final Intent intent = new Intent(ACTION_VIEW);
+                intent.setDataAndType(uri, "video/*");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(intent);
+            }
+        });
+        imageView.setOnLongClickListener(v -> {
+            showProperties(v, uri);
+            return true;
+        });
+        mmr.release();
+    }
+
+    private void updateAudio(FrameLayout root, Uri uri) {
+        LayoutInflater.from(getContext())
+            .inflate(R.layout.item_attachment_audio, root, true);
+        ImageView imageView = root.findViewById(R.id.itemAttachmentAudio_icon);
+        imageView.setOnClickListener(v -> {
+            if (attachmentOnView.size() > 1) {
+                browseAttachments();
+            } else {
+                final Intent intent = new Intent(ACTION_VIEW);
+                intent.setDataAndType(uri, "audio/*");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(intent);
+            }
+        });
+        imageView.setOnLongClickListener(v -> {
+            showProperties(v, uri);
+            return true;
+        });
+    }
+
+    private void updateImage(FrameLayout root, Uri uri) {
+        LayoutInflater.from(getContext())
+            .inflate(R.layout.item_attachment_image, root, true);
+        final ImageView icon = root.findViewById(R.id.itemAttachmentImage_icon);
+        CircularProgressDrawable progress = new CircularProgressDrawable(icon.getContext());
+        progress.setStyle(LARGE);
+        Glide.with(root.getContext()).load(uri).into(icon);
+        icon.setOnClickListener(v -> {
+            if (attachmentOnView.size() > 1) {
+                browseAttachments();
+            } else {
+                showImage(v.getContext(), uri);
+            }
+        });
+        icon.setOnLongClickListener(v -> {
+            showProperties(v, uri);
+            return true;
+        });
+    }
+
+    private void browseAttachments() {
+        FullScreenDialogFragment dialog = AttachmentsFragment.newInstance(attachmentOnView);
+        dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
+        dialog.show(getParentFragmentManager(), null);
+    }
+
+    private void showImage(Context context, Uri uri) {
+        new StfalconImageViewer.Builder<>(
+            context,
+            Collections.singletonList(uri),
+            (imageView, image) -> {
+                CircularProgressDrawable progress2 = new CircularProgressDrawable(
+                    context
+                );
+                progress2.setStyle(LARGE);
+                Glide.with(imageView.getContext())
+                    .load(image)
+                    .placeholder(progress2)
+                    .into(imageView);
+            }
+        ).show();
+    }
+
+    private void showProperties(View view, Uri uri) {
+        final PopupMenu popup = new PopupMenu(view.getContext(), view);
+        popup.getMenu().add(R.string.delete).setOnMenuItemClickListener(item -> {
+            attachmentOnView.remove(uri);
+            updateAttachmentView();
+            return true;
+        });
+        popup.getMenu()
+            .add(view.getContext().getString(R.string.properties))
+            .setOnMenuItemClickListener(item -> {
+                final androidx.appcompat.app.AlertDialog dialog = new Builder(view.getContext())
+                    .setView(R.layout.dialog_properties)
+                    .show();
+                ((TextView) dialog.findViewById(R.id.properties_text)).setText(
+                    "Uri: " + uri.toString()
+                );
+                return true;
+            });
+        popup.show();
     }
 
     private void addAttachment(Uri uri) {
@@ -589,11 +725,14 @@ public class JotContentFragment extends JotFragment implements BackControl {
             ) {
                 loadLocationByExif(uri);
             }
-            attachmentAdapter.append(uri);
+            attachmentOnView.add(uri);
+            updateAttachmentView();
         } else if (mimeType.startsWith("video")) {
-            attachmentAdapter.append(uri);
+            attachmentOnView.add(uri);
+            updateAttachmentView();
         } else if (mimeType.startsWith("audio")) {
-            attachmentAdapter.append(uri);
+            attachmentOnView.add(uri);
+            updateAttachmentView();
         } else {
             Alert.Companion.newInstance(
                 REQUEST_CODE_ALERT,

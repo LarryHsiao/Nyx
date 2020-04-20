@@ -49,7 +49,7 @@
             android:layout_marginStart="16dp"
             app:layout_constraintTop_toBottomOf="@id/jot_date"
             android:gravity="top"
-            app:layout_constraintBottom_toTopOf="@id/jot_attachment_list"
+            app:layout_constraintBottom_toTopOf="@id/jot_attachment_container"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
             android:background="@null"
@@ -70,7 +70,7 @@
             android:id="@+id/jot_tagGroup"
             tools:background="#ff0000"
             app:layout_constraintStart_toEndOf="@id/jot_tagIcon"
-            app:layout_constraintBottom_toTopOf="@id/jot_attachment_list"
+            app:layout_constraintBottom_toTopOf="@id/jot_attachment_container"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_height="50dp"/>
 
@@ -81,30 +81,19 @@
             android:id="@+id/jot_attachment_icon"
             android:layout_marginEnd="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/jot_attachment_list"
-            app:layout_constraintBottom_toBottomOf="@id/jot_attachment_list"
+            app:layout_constraintTop_toTopOf="@id/jot_attachment_container"
+            app:layout_constraintBottom_toBottomOf="@id/jot_attachment_container"
             android:src="@drawable/ic_attachment"
             android:layout_height="48dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <FrameLayout
             android:layout_width="0dp"
             app:layout_constraintStart_toEndOf="@id/jot_attachment_icon"
             app:layout_constraintBottom_toTopOf="@id/jot_locationContainer"
-            android:id="@+id/jot_attachment_list"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:id="@+id/jot_attachment_container"
             android:orientation="horizontal"
-            app:layout_constraintEnd_toStartOf="@id/jot_newAttachment"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_height="150dp"/>
-
-        <ImageView
-            android:layout_width="54dp"
-            android:layout_height="54dp"
-            android:src="@drawable/ic_plus"
-            android:padding="8dp"
-            android:id="@+id/jot_newAttachment"
-            app:layout_constraintTop_toTopOf="@id/jot_attachment_list"
-            app:layout_constraintBottom_toBottomOf="@id/jot_attachment_list"
-            app:layout_constraintEnd_toEndOf="parent"/>
 
         <LinearLayout android:layout_width="0dp"
                       android:layout_height="wrap_content"
