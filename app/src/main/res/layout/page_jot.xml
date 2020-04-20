@@ -74,21 +74,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_height="50dp"/>
 
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginStart="16dp"
-            android:id="@+id/jot_attachment_icon"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/jot_attachment_container"
-            app:layout_constraintBottom_toBottomOf="@id/jot_attachment_container"
-            android:src="@drawable/ic_attachment"
-            android:layout_height="48dp"/>
-
         <FrameLayout
             android:layout_width="0dp"
-            app:layout_constraintStart_toEndOf="@id/jot_attachment_icon"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/jot_locationContainer"
             android:id="@+id/jot_attachment_container"
             android:orientation="horizontal"
@@ -101,12 +89,12 @@
                       android:orientation="vertical"
                       app:layout_constraintStart_toStartOf="@id/jot_content"
                       app:layout_constraintEnd_toEndOf="@id/jot_content"
-                      app:layout_constraintBottom_toBottomOf="parent"
-        >
+                      app:layout_constraintBottom_toBottomOf="parent">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/jot_location"
+                android:text="@string/no_location"
                 android:gravity="center_vertical"
                 android:drawableStart="@drawable/ic_location_3"/>
             <FrameLayout android:layout_width="match_parent"
@@ -116,5 +104,39 @@
                          tools:visibility="visible"
                          android:layout_height="150dp"/>
         </LinearLayout>
+
+        <TextView android:layout_width="24dp"
+                  android:backgroundTint="@color/colorPrimary"
+                  tools:text="99"
+                  android:autoSizeTextType="uniform"
+                  android:autoSizeMinTextSize="1sp"
+                  android:textColor="#ffffff"
+                  android:ems="2"
+                  android:visibility="gone"
+                  android:id="@+id/jot_attachment_count"
+                  tools:visibility="visible"
+                  app:layout_constraintEnd_toEndOf="@id/jot_attachment_new"
+                  app:layout_constraintTop_toTopOf="@id/jot_attachment_new"
+                  android:gravity="center"
+                  android:background="@drawable/ic_dot"
+                  android:layout_height="24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="@id/jot_attachment_container"
+            app:layout_constraintEnd_toEndOf="@id/jot_attachment_container"
+            app:layout_constraintBottom_toBottomOf="@id/jot_attachment_container"
+            android:layout_height="wrap_content"
+            android:autoSizeMinTextSize="1sp"
+            android:id="@+id/jot_attachment_new"
+            android:drawableTop="@drawable/ic_image_plus"
+            android:text="@string/new_"
+            android:padding="16dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:backgroundTint="@color/colorPrimary"
+        />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

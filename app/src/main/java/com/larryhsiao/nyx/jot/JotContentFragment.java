@@ -42,6 +42,7 @@ import com.google.gson.Gson;
 import com.larryhsiao.nyx.BuildConfig;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.attachments.AttachmentPickerIntent;
 import com.larryhsiao.nyx.attachments.AttachmentsFragment;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.attachments.Attachment;
@@ -92,9 +93,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Intent.ACTION_OPEN_DOCUMENT;
 import static android.content.Intent.ACTION_VIEW;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static androidx.appcompat.app.AlertDialog.Builder;
 import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
@@ -211,13 +213,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     }
                 };
             }
-        });
-        view.findViewById(R.id.jot_attachment_icon).setOnClickListener(it -> {
-            final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
         });
         locationText = view.findViewById(R.id.jot_location);
         locationText.setOnClickListener(v -> pickLocation());
@@ -444,6 +439,38 @@ public class JotContentFragment extends JotFragment implements BackControl {
 
     private void save() {
         jot = new PostedJot(db, jot).value();
+        saveAttachment();
+        saveTag();
+        SyncService.enqueue(getContext());
+        final Intent intent = new Intent();
+        intent.setData(
+            Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
+        );
+        sendResult(0, RESULT_OK, intent);
+    }
+
+    private void saveTag() {
+        final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
+            .value()
+            .stream()
+            .collect(Collectors.toMap(Tag::id, tag -> tag));
+        for (int i = 0; i < chipGroup.getChildCount(); i++) {
+            Tag tagOnView = ((Tag) chipGroup.getChildAt(i).getTag());
+            if (!dbTags.containsKey(tagOnView.id())) {
+                // update JOT TAG
+                new NewJotTag(
+                    db,
+                    new ConstSource<>(jot.id()),
+                    new ConstSource<>(tagOnView.id())
+                ).fire();
+            } else {
+                dbTags.remove(tagOnView.id());
+            }
+        }
+        dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
+    }
+
+    private void saveAttachment() {
         final List<Attachment> dbAttachments = new QueriedAttachments(
             new AttachmentsByJotId(db, jot.id(), true)
         ).value();
@@ -475,30 +502,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
         dbAttachments.forEach((attachment) ->
             new RemovalAttachment(db, attachment.id()).fire()
         );
-        final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
-            .value()
-            .stream()
-            .collect(Collectors.toMap(Tag::id, tag -> tag));
-        for (int i = 0; i < chipGroup.getChildCount(); i++) {
-            Tag tagOnView = ((Tag) chipGroup.getChildAt(i).getTag());
-            if (!dbTags.containsKey(tagOnView.id())) {
-                // update JOT TAG
-                new NewJotTag(
-                    db,
-                    new ConstSource<>(jot.id()),
-                    new ConstSource<>(tagOnView.id())
-                ).fire();
-            } else {
-                dbTags.remove(tagOnView.id());
-            }
-        }
-        dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
-        SyncService.enqueue(getContext());
-        final Intent intent = new Intent();
-        intent.setData(
-            Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
-        );
-        sendResult(0, RESULT_OK, intent);
     }
 
     private void deleteFlow() {
@@ -506,7 +509,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             .setTitle(R.string.delete)
             .setPositiveButton(R.string.confirm, (dialog, which) -> {
                 new JotRemoval(db, jot.id()).fire();
-                getFragmentManager().popBackStack();
+                getParentFragmentManager().popBackStack();
             })
             .setNegativeButton(R.string.cancel, null)
             .show();
@@ -525,12 +528,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
             new AlertDialog.Builder(getContext())
                 .setTitle(R.string.discard)
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                    getFragmentManager().popBackStack();
+                    getParentFragmentManager().popBackStack();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
         } else {
-            getFragmentManager().popBackStack();
+            getParentFragmentManager().popBackStack();
         }
     }
 
@@ -559,6 +562,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     addAttachment(clip.getItemAt(i).getUri());
                 }
             }
+            updateAttachmentView();
         } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK) {
             final String newMoodRaw = data.getStringExtra("INPUT_FIELD");
             final String newMood;
@@ -575,8 +579,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 }
             };
         } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG) {
+            List<Uri> uris = data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
             attachmentOnView.clear();
-            attachmentOnView.addAll(data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI"));
+            for (Uri uri : uris) {
+                addAttachment(uri, false);
+            }
             updateAttachmentView();
         }
     }
@@ -585,6 +592,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         final FrameLayout root = getView().findViewById(R.id.jot_attachment_container);
         root.removeAllViews();
         if (attachmentOnView.size() == 0) {
+            updateEmptyAttachment(root);
             return;
         }
         final Uri attachmentUri = attachmentOnView.get(0);
@@ -598,6 +606,31 @@ public class JotContentFragment extends JotFragment implements BackControl {
         } else {
             updateImage(root, attachmentUri);
         }
+        final TextView newAttachment = getView().findViewById(R.id.jot_attachment_new);
+        newAttachment.setVisibility(VISIBLE);
+        newAttachment.setOnClickListener(v -> startPicker());
+
+        final TextView countText = getView().findViewById(R.id.jot_attachment_count);
+        countText.setVisibility(VISIBLE);
+        countText.setText(attachmentOnView.size() + "");
+    }
+
+    private void updateEmptyAttachment(FrameLayout root) {
+        final TextView countText = getView().findViewById(R.id.jot_attachment_count);
+        countText.setVisibility(GONE);
+        final TextView attachmentCount = getView().findViewById(R.id.jot_attachment_new);
+        attachmentCount.setVisibility(GONE);
+        LayoutInflater.from(root.getContext()).inflate(
+            R.layout.item_add_attachment,
+            root
+        ).setOnClickListener(it -> startPicker());
+    }
+
+    private void startPicker() {
+        startActivityForResult(
+            new AttachmentPickerIntent().value(),
+            REQUEST_CODE_PICK_FILE
+        );
     }
 
     private void updateVideo(FrameLayout root, Uri uri) {
@@ -711,14 +744,17 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void addAttachment(Uri uri) {
-        getContext().getContentResolver().takePersistableUriPermission(
-            uri,
-            FLAG_GRANT_READ_URI_PERMISSION
-        );
-        final String mimeType = new UriMimeType(
-            getContext(),
-            uri.toString()
-        ).value();
+        addAttachment(uri, true);
+    }
+
+    private void addAttachment(Uri uri, boolean grantPermission) {
+        if (grantPermission) {
+            getContext().getContentResolver().takePersistableUriPermission(
+                uri,
+                FLAG_GRANT_READ_URI_PERMISSION
+            );
+        }
+        final String mimeType = new UriMimeType(getContext(), uri.toString()).value();
         if (mimeType.startsWith("image")) {
             if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
                 || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
@@ -726,13 +762,10 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 loadLocationByExif(uri);
             }
             attachmentOnView.add(uri);
-            updateAttachmentView();
         } else if (mimeType.startsWith("video")) {
             attachmentOnView.add(uri);
-            updateAttachmentView();
         } else if (mimeType.startsWith("audio")) {
             attachmentOnView.add(uri);
-            updateAttachmentView();
         } else {
             Alert.Companion.newInstance(
                 REQUEST_CODE_ALERT,
@@ -777,13 +810,13 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     jot.location()[1]
                 )
             ).commit();
-            getView().findViewById(R.id.jot_embedMapContainer).setVisibility(View.VISIBLE);
+            getView().findViewById(R.id.jot_embedMapContainer).setVisibility(VISIBLE);
         } else {
             Fragment map = mgr.findFragmentById(R.id.jot_embedMapContainer);
             if (map != null) {
                 mgr.beginTransaction().remove(map).commit();
             }
-            getView().findViewById(R.id.jot_embedMapContainer).setVisibility(View.GONE);
+            getView().findViewById(R.id.jot_embedMapContainer).setVisibility(GONE);
         }
     }
 

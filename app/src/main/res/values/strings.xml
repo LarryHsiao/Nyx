@@ -64,4 +64,7 @@
     <string name="combine_">Combine: %s</string>
     <string name="not_supported_file">Not supported file</string>
     <string name="location_lat_lon">Location: %s, %s</string>
+    <string name="new_attachment">New attachment</string>
+    <string name="new_">New</string>
+    <string name="no_location">No location</string>
 </resources>

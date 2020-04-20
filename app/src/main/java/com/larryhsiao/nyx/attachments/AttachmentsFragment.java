@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.attachments;
 
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,16 +15,23 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.jot.AttachmentAdapter;
+import com.silverhetch.aura.uri.UriMimeType;
+import com.silverhetch.aura.view.alert.Alert;
 import com.silverhetch.aura.view.dialog.FullScreenDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.app.Activity.RESULT_OK;
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+
 /**
  * Fragment that shows the attachments.
  */
 public class AttachmentsFragment extends FullScreenDialogFragment {
-    private final static String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
+    private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
+    private static final int REQUEST_CODE_PICK_FILE = 1000;
+    private static final int REQUEST_CODE_ALERT = 1001;
 
     private List<Uri> uris;
     private AttachmentAdapter adapter;
@@ -46,8 +52,12 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.list, container, false);
+    public View onCreateView(
+        @NonNull LayoutInflater inflater,
+        @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState
+    ) {
+        return inflater.inflate(R.layout.page_attachments, container, false);
     }
 
     @Override
@@ -60,7 +70,7 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
         );
         getTargetFragment().onActivityResult(
             getTargetRequestCode(),
-            Activity.RESULT_OK,
+            RESULT_OK,
             intent
         );
     }
@@ -68,10 +78,56 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RecyclerView listView = ((RecyclerView) view);
+        RecyclerView listView = view.findViewById(R.id.list);
         listView.setBackgroundColor(Color.BLACK);
         listView.setAdapter(adapter = new AttachmentAdapter(view.getContext()));
         listView.setLayoutManager(new GridLayoutManager(view.getContext(), 2));
         adapter.loadAttachments(uris);
+
+        view.findViewById(R.id.attachments_plus).setOnClickListener(v -> {
+            startActivityForResult(
+                new AttachmentPickerIntent().value(),
+                REQUEST_CODE_PICK_FILE
+            );
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
+            if (data.getData() != null) {
+                addAttachment(data.getData());
+            } else {
+                ClipData clip = data.getClipData();
+                for (int i = 0; i < clip.getItemCount(); i++) {
+                    addAttachment(clip.getItemAt(i).getUri());
+                }
+            }
+        }
+    }
+
+    private void addAttachment(Uri uri) {
+        getContext().getContentResolver().takePersistableUriPermission(
+            uri,
+            FLAG_GRANT_READ_URI_PERMISSION
+        );
+        final String mimeType = new UriMimeType(
+            getContext(),
+            uri.toString()
+        ).value();
+        if (mimeType.startsWith("image")) {
+            adapter.append(uri);
+        } else if (mimeType.startsWith("video")) {
+            adapter.append(uri);
+        } else if (mimeType.startsWith("audio")) {
+            adapter.append(uri);
+        } else {
+            Alert.Companion.newInstance(
+                REQUEST_CODE_ALERT,
+                getString(R.string.not_supported_file)
+            ).show(getChildFragmentManager(), null);
+        }
     }
 }
