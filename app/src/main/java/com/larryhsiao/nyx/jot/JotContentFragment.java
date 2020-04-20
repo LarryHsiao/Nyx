@@ -42,6 +42,7 @@ import com.google.gson.Gson;
 import com.larryhsiao.nyx.BuildConfig;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.attachments.AttachmentPickerIntent;
 import com.larryhsiao.nyx.attachments.AttachmentsFragment;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.attachments.Attachment;
@@ -92,7 +93,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Intent.ACTION_OPEN_DOCUMENT;
 import static android.content.Intent.ACTION_VIEW;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static androidx.appcompat.app.AlertDialog.Builder;
@@ -213,11 +213,10 @@ public class JotContentFragment extends JotFragment implements BackControl {
             }
         });
         view.findViewById(R.id.jot_attachment_icon).setOnClickListener(it -> {
-            final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
-            intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
+            startActivityForResult(
+                new AttachmentPickerIntent().value(),
+                REQUEST_CODE_PICK_FILE
+            );
         });
         locationText = view.findViewById(R.id.jot_location);
         locationText.setOnClickListener(v -> pickLocation());
@@ -506,7 +505,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             .setTitle(R.string.delete)
             .setPositiveButton(R.string.confirm, (dialog, which) -> {
                 new JotRemoval(db, jot.id()).fire();
-                getFragmentManager().popBackStack();
+                getParentFragmentManager().popBackStack();
             })
             .setNegativeButton(R.string.cancel, null)
             .show();
@@ -525,12 +524,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
             new AlertDialog.Builder(getContext())
                 .setTitle(R.string.discard)
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                    getFragmentManager().popBackStack();
+                    getParentFragmentManager().popBackStack();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
         } else {
-            getFragmentManager().popBackStack();
+            getParentFragmentManager().popBackStack();
         }
     }
 
@@ -559,6 +558,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     addAttachment(clip.getItemAt(i).getUri());
                 }
             }
+            updateAttachmentView();
         } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK) {
             final String newMoodRaw = data.getStringExtra("INPUT_FIELD");
             final String newMood;
@@ -575,8 +575,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 }
             };
         } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG) {
+            List<Uri> uris = data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
             attachmentOnView.clear();
-            attachmentOnView.addAll(data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI"));
+            for (Uri uri : uris) {
+                addAttachment(uri, false);
+            }
             updateAttachmentView();
         }
     }
@@ -711,14 +714,17 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void addAttachment(Uri uri) {
-        getContext().getContentResolver().takePersistableUriPermission(
-            uri,
-            FLAG_GRANT_READ_URI_PERMISSION
-        );
-        final String mimeType = new UriMimeType(
-            getContext(),
-            uri.toString()
-        ).value();
+        addAttachment(uri, true);
+    }
+
+    private void addAttachment(Uri uri, boolean grantPermission) {
+        if (grantPermission) {
+            getContext().getContentResolver().takePersistableUriPermission(
+                uri,
+                FLAG_GRANT_READ_URI_PERMISSION
+            );
+        }
+        final String mimeType = new UriMimeType(getContext(), uri.toString()).value();
         if (mimeType.startsWith("image")) {
             if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
                 || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
@@ -726,13 +732,10 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 loadLocationByExif(uri);
             }
             attachmentOnView.add(uri);
-            updateAttachmentView();
         } else if (mimeType.startsWith("video")) {
             attachmentOnView.add(uri);
-            updateAttachmentView();
         } else if (mimeType.startsWith("audio")) {
             attachmentOnView.add(uri);
-            updateAttachmentView();
         } else {
             Alert.Companion.newInstance(
                 REQUEST_CODE_ALERT,
