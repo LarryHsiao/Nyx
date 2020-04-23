@@ -26,11 +26,18 @@ public class SyncAttachments implements Action {
     private final Context context;
     private final String uid;
     private final Source<Connection> db;
+    private final boolean uploadFile;
 
-    public SyncAttachments(Context context, String uid, Source<Connection> db) {
+    public SyncAttachments(
+        Context context,
+        String uid,
+        Source<Connection> db,
+        boolean uploadFile
+    ) {
         this.context = context;
         this.uid = uid;
         this.db = db;
+        this.uploadFile = uploadFile;
     }
 
     @Override
@@ -40,7 +47,9 @@ public class SyncAttachments implements Action {
         remoteDb.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 sync(remoteDb, task.getResult());
-                new SyncFiles(context, db, uid).fire();
+                if (uploadFile) {
+                    new SyncFiles(context, db, uid).fire();
+                }
             }
         });
     }
@@ -57,8 +66,8 @@ public class SyncAttachments implements Action {
 
     private void syncItem(
         Map<Long, Attachment> dbItems,
-                          QueryDocumentSnapshot remoteItem,
-                          CollectionReference remoteDb
+        QueryDocumentSnapshot remoteItem,
+        CollectionReference remoteDb
     ) {
         final Attachment dbItem = dbItems.get(Long.valueOf(remoteItem.getId()));
         if (dbItem == null) {

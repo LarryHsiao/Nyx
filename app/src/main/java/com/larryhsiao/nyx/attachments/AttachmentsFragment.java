@@ -100,11 +100,15 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
             if (data.getData() != null) {
                 addAttachment(data.getData());
             } else {
-                ClipData clip = data.getClipData();
-                for (int i = 0; i < clip.getItemCount(); i++) {
-                    addAttachment(clip.getItemAt(i).getUri());
-                }
+                addMultiple(data);
             }
+        }
+    }
+
+    private void addMultiple(Intent data) {
+        ClipData clip = data.getClipData();
+        for (int i = 0; i < clip.getItemCount(); i++) {
+            addAttachment(clip.getItemAt(i).getUri());
         }
     }
 

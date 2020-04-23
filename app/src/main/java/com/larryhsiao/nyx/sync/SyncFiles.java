@@ -24,6 +24,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.file.Files;
 import java.sql.Connection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -41,7 +42,7 @@ import static androidx.core.content.FileProvider.getUriForFile;
  */
 public class SyncFiles implements Action {
     private static final String URI_PATH = "content://com.larryhsiao.nyx.fileprovider/attachments";
-    private final MimeTypeMap map = MimeTypeMap.getSingleton();
+    private final MimeTypeMap mimeType = MimeTypeMap.getSingleton();
     private final Context context;
     private final Source<Connection> db;
     private final String uid;
@@ -61,15 +62,27 @@ public class SyncFiles implements Action {
             Function.identity(),
             (attachment, attachment2) -> attachment
         ));
-        StorageReference remoteStorage = FirebaseStorage.getInstance().getReference(uid);
-        for (final Attachment attachment : attachmentMap.values()) {
-            syncAttachment(attachment, remoteStorage);
+        syncAttachment(
+            FirebaseStorage.getInstance().getReference(uid),
+            attachmentMap.values().iterator()
+        );
+    }
+
+    private void syncAttachment(StorageReference remoteRoot, Iterator<Attachment> attachments) {
+        if (attachments.hasNext()) {
+            syncAttachment(remoteRoot, attachments.next(), attachments);
+        } else {
+            new SyncAttachments(context, uid, db, false).fire();
         }
     }
 
-    private void syncAttachment(Attachment attachment, StorageReference remoteStorage) {
+    private void syncAttachment(
+        StorageReference remoteRoot,
+        Attachment attachment,
+        Iterator<Attachment> iterator
+    ) {
         if (!attachment.uri().startsWith(URI_PATH)) {
-            checkRemoteExist(map, attachment, remoteStorage);
+            checkRemoteExist(mimeType, attachment, remoteRoot, iterator);
         } else {
             final String fileName = attachment.uri().replace(URI_PATH, "");
             final File localFile = new File(new File(
@@ -78,68 +91,96 @@ public class SyncFiles implements Action {
             ), fileName);
             localFile.getParentFile().mkdirs();
             if (!localFile.exists()) {
-                remoteStorage.child(fileName.replace(uid + "/", ""))
+                remoteRoot.child(fileName.replace(uid + "/", ""))
                     .getFile(localFile)
                     .addOnSuccessListener(taskSnapshot -> {
-                        System.out.println("Download success");
+                        syncAttachment(remoteRoot, iterator);
                     }).addOnFailureListener(e -> {
-                    System.out.println("Download Failed " + e);
+                    syncAttachment(remoteRoot, iterator);
                 });
+            } else {
+                syncAttachment(remoteRoot, iterator);
             }
         }
     }
 
-    private void checkRemoteExist(MimeTypeMap map, Attachment attachment, StorageReference ref) {
+    private void checkRemoteExist(
+        MimeTypeMap map,
+        Attachment attachment,
+        StorageReference remoteRoot,
+        Iterator<Attachment> localAttachments
+    ) {
         final String ext = map.getExtensionFromMimeType(
             new UriMimeType(context, attachment.uri()).value()
         );
-        Uri localUri = Uri.parse(attachment.uri());
-        StorageReference remote = ref.child(
+        StorageReference remoteAttachment = remoteRoot.child(
             UUID.randomUUID().toString() + "." + (ext == null ? "" : ext)
         );
-        remote.getMetadata().addOnSuccessListener(meta -> {
+        remoteAttachment.getMetadata().addOnSuccessListener(meta -> {
             // @todo #1 Handle if file changed, deleted.
-            System.out.println(meta.getName() + " " + meta.getContentType());
-        }).addOnFailureListener(e -> {
-            try {
-                upload(remote, localUri, ext, attachment);
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        });
+            syncAttachment(remoteRoot, localAttachments); // remote exist, iterate next
+        }).addOnFailureListener(e ->
+            uploadToRemote(
+                remoteRoot,
+                remoteAttachment,
+                attachment,
+                ext,
+                localAttachments
+            )
+        );
     }
 
-    private void upload(
-        StorageReference remote,
-        Uri localUri, String ext,
-        Attachment attachment
-    ) throws IOException {
-        remote.putStream(uploadStream(localUri, ext)).addOnSuccessListener(it -> {
-            try {
-                final File file = new File(
-                    new File(context.getFilesDir(), "attachments"),
-                    remote.getPath()
-                );
-                file.getParentFile().mkdirs();
-                Files.copy(
-                    context.getContentResolver().openInputStream(localUri),
-                    file.toPath()
-                );
-                updateAttachmentUrl(remote, attachment, file);
-            } catch (Exception ioException) {
-                ioException.printStackTrace();
-            }
-        });
+    private void uploadToRemote(
+        StorageReference remoteRoot,
+        StorageReference remoteAttachment,
+        Attachment attachment,
+        String ext,
+        Iterator<Attachment> localIterator
+    ) {
+        try {
+            Uri localUri = Uri.parse(attachment.uri());
+            remoteAttachment.putStream(uploadStream(
+                context.getContentResolver().openInputStream(localUri),
+                localUri,
+                ext
+            )).addOnSuccessListener(it ->
+                ((JotApplication) context.getApplicationContext()).executor.execute(() -> {
+                        saveToInternal(remoteAttachment, localUri, attachment);
+                        syncAttachment(remoteRoot, localIterator);
+                    }
+                )
+            );
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            syncAttachment(remoteRoot, localIterator);
+        }
     }
 
-    private InputStream uploadStream(Uri localUri, String ext) throws IOException {
+    private void saveToInternal(StorageReference remote, Uri localUri, Attachment attachment) {
+        try {
+            final File file = new File(
+                new File(context.getFilesDir(), "attachments"),
+                remote.getPath()
+            );
+            file.getParentFile().mkdirs();
+            Files.copy(
+                context.getContentResolver().openInputStream(localUri),
+                file.toPath()
+            );
+            updateAttachmentUrl(remote, attachment, file);
+        } catch (Exception ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    private InputStream uploadStream(InputStream fileInputStream, Uri localUri, String ext) throws IOException {
         if ("jpg".equals(ext) || "jpeg".equals(ext)) {
             final PipedInputStream inputStream = new PipedInputStream();
             final PipedOutputStream outputStream = new PipedOutputStream(inputStream);
             ((JotApplication) context.getApplicationContext()).executor.execute(() -> {
                 try {
                     BitmapFactory.decodeStream(
-                        context.getContentResolver().openInputStream(localUri)
+                        fileInputStream
                     ).compress(JPEG, 80, outputStream);
                     outputStream.close();
                 } catch (Exception ep) {
@@ -154,9 +195,7 @@ public class SyncFiles implements Action {
 
     private void updateAttachmentUrl(StorageReference ref, Attachment attachment, File localFile) {
         ref.getDownloadUrl().addOnSuccessListener(uri ->
-            new QueriedAttachments(
-                new ByUrl(db, attachment.uri())
-            ).value().forEach(res ->
+            new QueriedAttachments(new ByUrl(db, attachment.uri())).value().forEach(res ->
                 new UpdateAttachment(db, new WrappedAttachment(res) {
                     @Override
                     public String uri() {
