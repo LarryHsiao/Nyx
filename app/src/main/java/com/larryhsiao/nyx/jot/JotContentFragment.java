@@ -752,10 +752,14 @@ public class JotContentFragment extends JotFragment implements BackControl {
 
     private void addAttachment(Uri uri, boolean grantPermission) {
         if (grantPermission) {
-            getContext().getContentResolver().takePersistableUriPermission(
-                uri,
-                FLAG_GRANT_READ_URI_PERMISSION
-            );
+            try {
+                getContext().getContentResolver().takePersistableUriPermission(
+                    uri,
+                    FLAG_GRANT_READ_URI_PERMISSION
+                );
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         final String mimeType = new UriMimeType(getContext(), uri.toString()).value();
         if (mimeType.startsWith("image")) {
