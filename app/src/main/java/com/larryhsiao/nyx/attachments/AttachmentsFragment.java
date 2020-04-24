@@ -113,10 +113,14 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
     }
 
     private void addAttachment(Uri uri) {
-        getContext().getContentResolver().takePersistableUriPermission(
-            uri,
-            FLAG_GRANT_READ_URI_PERMISSION
-        );
+        try {
+            getContext().getContentResolver().takePersistableUriPermission(
+                uri,
+                FLAG_GRANT_READ_URI_PERMISSION
+            );
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         final String mimeType = new UriMimeType(
             getContext(),
             uri.toString()
