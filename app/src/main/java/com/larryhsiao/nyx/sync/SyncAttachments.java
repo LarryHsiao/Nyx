@@ -48,7 +48,7 @@ public class SyncAttachments implements Action {
             if (task.isSuccessful()) {
                 sync(remoteDb, task.getResult());
                 if (uploadFile) {
-                    new SyncFiles(context, db, uid).fire();
+//                    new SyncFiles(context, db, uid).fire();
                 }
             }
         });

@@ -21,6 +21,7 @@ import com.silverhetch.clotho.file.ToFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.util.Iterator;
@@ -80,7 +81,7 @@ public class SyncFiles implements Action {
         Iterator<Attachment> iterator
     ) {
         if (!attachment.uri().startsWith(URI_PATH)) {
-            checkRemoteExist(mimeType, attachment, remoteRoot, iterator);
+            uploadToRemote(mimeType, attachment, remoteRoot, iterator);
         } else {
             final String fileName = attachment.uri().replace(URI_PATH, "");
             final File localFile = new File(new File(
@@ -102,7 +103,7 @@ public class SyncFiles implements Action {
         }
     }
 
-    private void checkRemoteExist(
+    private void uploadToRemote(
         MimeTypeMap map,
         Attachment attachment,
         StorageReference remoteRoot,
@@ -115,8 +116,7 @@ public class SyncFiles implements Action {
             UUID.randomUUID().toString() + "." + (ext == null ? "" : ext)
         );
         remoteAttachment.getMetadata().addOnSuccessListener(meta -> {
-            // @todo #1 Handle if file changed, deleted.
-            syncAttachment(remoteRoot, localAttachments); // remote exist, iterate next
+            uploadToRemote(map, attachment, remoteRoot, localAttachments); // remote exist, retry
         }).addOnFailureListener(e ->
             uploadToRemote(
                 remoteRoot,
@@ -154,7 +154,7 @@ public class SyncFiles implements Action {
                 File origin = Files.createTempFile("ori", ".jpg").toFile();
                 File compressedFile = Files.createTempFile("dist", ".jpg").toFile();
                 new ToFile(
-                    context.getContentResolver().openInputStream(localUri),
+                    streamFromUri(localUri),
                     origin,
                     integer -> null
                 ).fire();
@@ -172,7 +172,7 @@ public class SyncFiles implements Action {
                 ).addOnFailureListener(it ->
                     syncAttachment(remoteRoot, localIterator)
                 ).addOnCompleteListener(it -> compressedFile.delete());
-            } catch (IOException e) {
+            } catch (IOException|SecurityException e) {
                 e.printStackTrace();
                 syncAttachment(remoteRoot, localIterator);
             }
@@ -189,7 +189,7 @@ public class SyncFiles implements Action {
         try {
             Uri localUri = Uri.parse(attachment.uri());
             remoteAttachment.putStream(
-                context.getContentResolver().openInputStream(localUri)
+                streamFromUri(localUri)
             ).addOnSuccessListener(it ->
                 ((JotApplication) context.getApplicationContext()).executor.execute(() -> {
                         saveToInternal(remoteAttachment, localUri, attachment);
@@ -211,7 +211,7 @@ public class SyncFiles implements Action {
             );
             file.getParentFile().mkdirs();
             Files.copy(
-                context.getContentResolver().openInputStream(localUri),
+                streamFromUri(localUri),
                 file.toPath()
             );
             updateAttachmentUrl(remote, attachment, file);
@@ -235,5 +235,13 @@ public class SyncFiles implements Action {
                 }).fire()
             )
         );
+    }
+
+    private InputStream streamFromUri(Uri uri) throws IOException, SecurityException{
+        if (uri.toString().startsWith("file:")){
+            return new FileInputStream(new File(uri.toString().replaceFirst("file:","")));
+        }else{
+            return context.getContentResolver().openInputStream(uri);
+        }
     }
 }

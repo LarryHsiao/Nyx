@@ -10,11 +10,13 @@ import com.larryhsiao.nyx.JotApplication;
 import com.silverhetch.clotho.Source;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Service to sync data to server.
  *
  * @todo #1 Inform user to resolve conflict if the local data will be override.
+ * @todo #2 Duplicate files when sync files.
  */
 public class SyncService extends JobIntentService {
     private static final int JOB_ID = 1000;

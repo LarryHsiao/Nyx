@@ -85,6 +85,7 @@ import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.source.ConstSource;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
