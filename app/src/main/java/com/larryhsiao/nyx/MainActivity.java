@@ -16,7 +16,7 @@ import com.larryhsiao.nyx.tag.TagListFragment;
  * Entry Activity of Nyx.
  */
 public class MainActivity extends JotActivity {
-    private int currentPage = R.id.menuItem_jots;
+    private int currentPage = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
