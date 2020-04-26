@@ -7,10 +7,10 @@ import androidx.core.app.JobIntentService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.attachments.CopyToInternal;
 import com.silverhetch.clotho.Source;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Service to sync data to server.
@@ -28,6 +28,8 @@ public class SyncService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         final Source<Connection> db = ((JotApplication) getApplication()).db;
+        new CopyToInternal(this, db, integer -> null).fire();
+
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             return;

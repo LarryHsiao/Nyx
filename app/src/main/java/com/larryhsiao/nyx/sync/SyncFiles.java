@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static androidx.core.content.FileProvider.getUriForFile;
+import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
 
 /**
  * Action to sync files to Firebase storage.
@@ -40,7 +41,6 @@ import static androidx.core.content.FileProvider.getUriForFile;
  * @todo #4 Image compression.
  */
 public class SyncFiles implements Action {
-    private static final String URI_PATH = "content://com.larryhsiao.nyx.fileprovider/attachments";
     private final MimeTypeMap mimeType = MimeTypeMap.getSingleton();
     private final Context context;
     private final Source<Connection> db;
@@ -80,10 +80,10 @@ public class SyncFiles implements Action {
         Attachment attachment,
         Iterator<Attachment> iterator
     ) {
-        if (!attachment.uri().startsWith(URI_PATH)) {
+        if (!attachment.uri().startsWith(URI_FILE_PROVIDER)) {
             uploadToRemote(mimeType, attachment, remoteRoot, iterator);
         } else {
-            final String fileName = attachment.uri().replace(URI_PATH, "");
+            final String fileName = attachment.uri().replace(URI_FILE_PROVIDER, "");
             final File localFile = new File(new File(
                 context.getFilesDir(),
                 "attachments"
@@ -109,7 +109,7 @@ public class SyncFiles implements Action {
         StorageReference remoteRoot,
         Iterator<Attachment> localAttachments
     ) {
-        final String ext = map.getExtensionFromMimeType(
+        final String ext = MimeTypeMap.getFileExtensionFromUrl(
             new UriMimeType(context, attachment.uri()).value()
         );
         StorageReference remoteAttachment = remoteRoot.child(
