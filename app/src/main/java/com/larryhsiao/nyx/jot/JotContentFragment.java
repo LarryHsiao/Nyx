@@ -5,15 +5,11 @@ import android.app.DatePickerDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BlurMaskFilter;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.location.Address;
 import android.location.Location;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.Editable;
@@ -86,7 +82,6 @@ import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.source.ConstSource;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,6 +106,9 @@ import static java.lang.Double.MIN_VALUE;
 
 /**
  * Fragment that shows the Jot content.
+ *
+ * @todo #0 One click create template jot with geometry, and some pictures.
+ * @todo #0 Survey capture image, video and audio in app or use third-party apps.
  */
 public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
@@ -759,7 +757,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                     uri,
                     FLAG_GRANT_READ_URI_PERMISSION
                 );
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

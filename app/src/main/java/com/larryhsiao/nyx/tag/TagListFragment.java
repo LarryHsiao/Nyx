@@ -46,6 +46,8 @@ import static android.app.Activity.RESULT_OK;
 
 /**
  * Fragment to showing/manage tags.
+ *
+ * @todo #0 remove this page, and add mutation function for each page have tag list.
  */
 public class TagListFragment extends JotFragment {
     private static final int REQUEST_CODE_NEW_TAG = 1000;

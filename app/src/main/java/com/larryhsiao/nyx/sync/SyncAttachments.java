@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.sync;
 
-import android.content.Context;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -23,21 +22,12 @@ import java.util.stream.Collectors;
  * Action to sync attachments.
  */
 public class SyncAttachments implements Action {
-    private final Context context;
     private final String uid;
     private final Source<Connection> db;
-    private final boolean uploadFile;
 
-    public SyncAttachments(
-        Context context,
-        String uid,
-        Source<Connection> db,
-        boolean uploadFile
-    ) {
-        this.context = context;
+    public SyncAttachments(String uid, Source<Connection> db) {
         this.uid = uid;
         this.db = db;
-        this.uploadFile = uploadFile;
     }
 
     @Override
@@ -47,9 +37,6 @@ public class SyncAttachments implements Action {
         remoteDb.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 sync(remoteDb, task.getResult());
-                if (uploadFile) {
-//                    new SyncFiles(context, db, uid).fire();
-                }
             }
         });
     }

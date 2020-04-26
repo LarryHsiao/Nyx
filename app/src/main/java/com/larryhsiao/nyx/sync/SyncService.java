@@ -37,6 +37,7 @@ public class SyncService extends JobIntentService {
         new SyncJots(user.getUid(), db).fire();
         new SyncTags(user.getUid(), db).fire();
         new SyncTagJot(user.getUid(), db).fire();
-        new SyncAttachments(this, user.getUid(), db, true).fire();
+        new SyncAttachments(user.getUid(), db).fire();
+        new SyncFiles(this, db, user.getUid()).fire();
     }
 }

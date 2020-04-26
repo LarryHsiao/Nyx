@@ -26,6 +26,7 @@ import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
  * Action to copy the attachment files to internal to prevent permission losing.
  * <p>
  * The attachment files will be stored in attachment directory at app internal file root.
+ * @todo #4 Image compression.
  */
 public class CopyToInternal implements Action {
     private final MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();

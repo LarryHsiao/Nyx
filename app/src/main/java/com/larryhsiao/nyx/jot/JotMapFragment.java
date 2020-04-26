@@ -47,6 +47,9 @@ import static java.lang.Double.MIN_VALUE;
 
 /**
  * Fragment that shows jots by map.
+ * @todo #0 Filter by date.
+ * @todo #0 Preview image on a marker.
+ * @todo #0 Filter by tag.
  */
 public class JotMapFragment extends JotFragment {
     private static final int REQUEST_CODE_NEW_JOT = 1000;

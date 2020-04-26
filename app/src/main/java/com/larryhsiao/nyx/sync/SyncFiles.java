@@ -1,36 +1,23 @@
 package com.larryhsiao.nyx.sync;
 
 import android.content.Context;
-import android.net.Uri;
-import android.webkit.MimeTypeMap;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.core.attachments.AllAttachments;
 import com.larryhsiao.nyx.core.attachments.Attachment;
-import com.larryhsiao.nyx.core.attachments.ByUrl;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
-import com.larryhsiao.nyx.core.attachments.UpdateAttachment;
-import com.larryhsiao.nyx.core.attachments.WrappedAttachment;
-import com.silverhetch.aura.images.JpegCompress;
-import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.file.ToFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static androidx.core.content.FileProvider.getUriForFile;
 import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
 
 /**
@@ -38,10 +25,8 @@ import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
  *
  * @todo #2 syncing progress indicator.
  * @todo #3 File size limitation
- * @todo #4 Image compression.
  */
 public class SyncFiles implements Action {
-    private final MimeTypeMap mimeType = MimeTypeMap.getSingleton();
     private final Context context;
     private final Source<Connection> db;
     private final String uid;
@@ -67,181 +52,71 @@ public class SyncFiles implements Action {
         );
     }
 
-    private void syncAttachment(StorageReference remoteRoot, Iterator<Attachment> attachments) {
-        if (attachments.hasNext()) {
-            syncAttachment(remoteRoot, attachments.next(), attachments);
-        } else {
-            new SyncAttachments(context, uid, db, false).fire();
-        }
-    }
-
     private void syncAttachment(
         StorageReference remoteRoot,
-        Attachment attachment,
         Iterator<Attachment> iterator
     ) {
+        if (!iterator.hasNext()) {
+            return;
+        }
+        final Attachment attachment = iterator.next();
         if (!attachment.uri().startsWith(URI_FILE_PROVIDER)) {
-            uploadToRemote(mimeType, attachment, remoteRoot, iterator);
-        } else {
-            final String fileName = attachment.uri().replace(URI_FILE_PROVIDER, "");
-            final File localFile = new File(new File(
-                context.getFilesDir(),
-                "attachments"
-            ), fileName);
-            localFile.getParentFile().mkdirs();
-            if (!localFile.exists()) {
-                remoteRoot.child(fileName.replace(uid + "/", ""))
-                    .getFile(localFile)
-                    .addOnSuccessListener(taskSnapshot ->
-                        syncAttachment(remoteRoot, iterator)
-                    ).addOnFailureListener(e ->
-                    syncAttachment(remoteRoot, iterator)
-                );
+            syncAttachment(remoteRoot, iterator);
+            return;
+        }
+        final File localFile = new File(new File(
+            context.getFilesDir(),
+            "attachments"
+        ), attachment.uri().replace(URI_FILE_PROVIDER, ""));
+        remoteRoot.child(localFile.getName()).getMetadata().addOnSuccessListener(it -> {
+            if (localFile.exists()) {
+                syncAttachment(remoteRoot, iterator); // exist
             } else {
-                syncAttachment(remoteRoot, iterator);
+                localFile.getParentFile().mkdirs();
+                download(remoteRoot, localFile, iterator);
             }
-        }
-    }
-
-    private void uploadToRemote(
-        MimeTypeMap map,
-        Attachment attachment,
-        StorageReference remoteRoot,
-        Iterator<Attachment> localAttachments
-    ) {
-        final String ext = MimeTypeMap.getFileExtensionFromUrl(
-            new UriMimeType(context, attachment.uri()).value()
-        );
-        StorageReference remoteAttachment = remoteRoot.child(
-            UUID.randomUUID().toString() + "." + (ext == null ? "" : ext)
-        );
-        remoteAttachment.getMetadata().addOnSuccessListener(meta -> {
-            uploadToRemote(map, attachment, remoteRoot, localAttachments); // remote exist, retry
-        }).addOnFailureListener(e ->
-            uploadToRemote(
-                remoteRoot,
-                remoteAttachment,
-                attachment,
-                ext,
-                localAttachments
-            )
-        );
-    }
-
-    private void uploadToRemote(
-        StorageReference remoteRoot,
-        StorageReference remoteAttachment,
-        Attachment attachment,
-        String ext,
-        Iterator<Attachment> localIterator
-    ) {
-        if ("jpg".equals(ext) || "jpeg".equals(ext)) {
-            uploadJpg(remoteRoot, remoteAttachment, attachment, localIterator);
-        } else {
-            upload(remoteRoot, remoteAttachment, attachment, localIterator);
-        }
-    }
-
-    private void uploadJpg(
-        StorageReference remoteRoot,
-        StorageReference remoteAttachment,
-        Attachment attachment,
-        Iterator<Attachment> localIterator
-    ) {
-        Uri localUri = Uri.parse(attachment.uri());
-        ((JotApplication) context.getApplicationContext()).executor.execute(() -> {
-            try {
-                File origin = Files.createTempFile("ori", ".jpg").toFile();
-                File compressedFile = Files.createTempFile("dist", ".jpg").toFile();
-                new ToFile(
-                    streamFromUri(localUri),
-                    origin,
-                    integer -> null
-                ).fire();
-                new JpegCompress(origin, compressedFile).fire();
-                origin.delete();
-                remoteAttachment.putStream(
-                    new FileInputStream(compressedFile)
-                ).addOnSuccessListener(it ->
-                    ((JotApplication) context.getApplicationContext())
-                        .executor.execute(() -> {
-                            saveToInternal(remoteAttachment, localUri, attachment);
-                            syncAttachment(remoteRoot, localIterator);
-                        }
-                    )
-                ).addOnFailureListener(it ->
-                    syncAttachment(remoteRoot, localIterator)
-                ).addOnCompleteListener(it -> compressedFile.delete());
-            } catch (IOException|SecurityException e) {
-                e.printStackTrace();
-                syncAttachment(remoteRoot, localIterator);
+        }).addOnFailureListener(it -> {
+            if (localFile.exists()) {
+                upload(remoteRoot, localFile, iterator);
+            } else {
+                // @todo #0 Handle missing file.
             }
         });
     }
 
     private void upload(
         StorageReference remoteRoot,
-        StorageReference remoteAttachment,
-        Attachment attachment,
-        Iterator<Attachment> localIterator
-
+        File localFile,
+        Iterator<Attachment> iterator
     ) {
         try {
-            Uri localUri = Uri.parse(attachment.uri());
-            remoteAttachment.putStream(
-                streamFromUri(localUri)
-            ).addOnSuccessListener(it ->
-                ((JotApplication) context.getApplicationContext()).executor.execute(() -> {
-                        saveToInternal(remoteAttachment, localUri, attachment);
-                        syncAttachment(remoteRoot, localIterator);
-                    }
-                )
-            );
-        } catch (Exception e2) {
-            e2.printStackTrace();
-            syncAttachment(remoteRoot, localIterator);
+            remoteRoot.child(localFile.getName()).putStream(
+                new FileInputStream(localFile)
+            ).addOnSuccessListener(it -> {
+                syncAttachment(remoteRoot, iterator);
+            }).addOnFailureListener(it -> {
+                // @todo #0 Handle upload failed.
+                syncAttachment(remoteRoot, iterator);
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            // @todo #0 Handle open file stream failed.
+            syncAttachment(remoteRoot, iterator);
         }
     }
 
-    private void saveToInternal(StorageReference remote, Uri localUri, Attachment attachment) {
-        try {
-            final File file = new File(
-                new File(context.getFilesDir(), "attachments"),
-                remote.getPath()
-            );
-            file.getParentFile().mkdirs();
-            Files.copy(
-                streamFromUri(localUri),
-                file.toPath()
-            );
-            updateAttachmentUrl(remote, attachment, file);
-        } catch (Exception ioException) {
-            ioException.printStackTrace();
-        }
-    }
-
-    private void updateAttachmentUrl(StorageReference ref, Attachment attachment, File localFile) {
-        ref.getDownloadUrl().addOnSuccessListener(uri ->
-            new QueriedAttachments(new ByUrl(db, attachment.uri())).value().forEach(res ->
-                new UpdateAttachment(db, new WrappedAttachment(res) {
-                    @Override
-                    public String uri() {
-                        return getUriForFile(
-                            context,
-                            "com.larryhsiao.nyx.fileprovider",
-                            localFile
-                        ).toString();
-                    }
-                }).fire()
-            )
+    private void download(
+        StorageReference remoteRoot,
+        File dist,
+        Iterator<Attachment> iterator
+    ) {
+        remoteRoot.child(dist.getName())
+            .getFile(dist)
+            .addOnSuccessListener(taskSnapshot ->
+                syncAttachment(remoteRoot, iterator)
+            ).addOnFailureListener(e ->
+            // @todo #0 handle download faild or survey if there are any side effect if we ignore it.
+            syncAttachment(remoteRoot, iterator)
         );
-    }
-
-    private InputStream streamFromUri(Uri uri) throws IOException, SecurityException{
-        if (uri.toString().startsWith("file:")){
-            return new FileInputStream(new File(uri.toString().replaceFirst("file:","")));
-        }else{
-            return context.getContentResolver().openInputStream(uri);
-        }
     }
 }
