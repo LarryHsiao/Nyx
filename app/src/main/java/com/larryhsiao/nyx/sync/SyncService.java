@@ -7,6 +7,7 @@ import androidx.core.app.JobIntentService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.attachments.CopyToInternal;
 import com.silverhetch.clotho.Source;
 
 import java.sql.Connection;
@@ -15,6 +16,7 @@ import java.sql.Connection;
  * Service to sync data to server.
  *
  * @todo #1 Inform user to resolve conflict if the local data will be override.
+ * @todo #2 Duplicate files when sync files.
  */
 public class SyncService extends JobIntentService {
     private static final int JOB_ID = 1000;
@@ -26,6 +28,8 @@ public class SyncService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         final Source<Connection> db = ((JotApplication) getApplication()).db;
+        new CopyToInternal(this, db, integer -> null).fire();
+
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             return;
@@ -33,6 +37,7 @@ public class SyncService extends JobIntentService {
         new SyncJots(user.getUid(), db).fire();
         new SyncTags(user.getUid(), db).fire();
         new SyncTagJot(user.getUid(), db).fire();
-        new SyncAttachments(this, user.getUid(), db, true).fire();
+        new SyncAttachments(user.getUid(), db).fire();
+        new SyncFiles(this, db, user.getUid()).fire();
     }
 }

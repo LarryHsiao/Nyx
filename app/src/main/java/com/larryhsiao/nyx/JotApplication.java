@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
  * Application of Jot.
  */
 public class JotApplication extends Application {
+    public static final String URI_FILE_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments/";
     public final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     public final ExecutorService executor = new ThreadPoolExecutor(
         Runtime.getRuntime().availableProcessors(),

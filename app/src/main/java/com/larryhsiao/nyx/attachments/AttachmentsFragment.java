@@ -27,6 +27,9 @@ import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 
 /**
  * Fragment that shows the attachments.
+ *
+ * @todo #0 Attachment sorting by created time.
+ * @todo #0 Attachment comment in page.
  */
 public class AttachmentsFragment extends FullScreenDialogFragment {
     private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
@@ -118,7 +121,7 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
                 uri,
                 FLAG_GRANT_READ_URI_PERMISSION
             );
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         final String mimeType = new UriMimeType(
