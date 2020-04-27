@@ -476,7 +476,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
 
     private void saveAttachment() {
         final List<Attachment> dbAttachments = new QueriedAttachments(
-            new AttachmentsByJotId(db, jot.id(), true)
+            new AttachmentsByJotId(db, jot.id())
         ).value();
         attachmentOnView.forEach(uri -> {
             boolean hasItem = false;
@@ -484,18 +484,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
             for (Attachment dbAttachment : dbAttachments) {
                 if (dbAttachment.uri().equals(uri.toString())) {
                     hasItem = true;
-                    if (dbAttachment.deleted()) {
-                        /* In this case, the uri will be the exposed file uri from third-party.*/
-                        new UpdateAttachment(
-                            db,
-                            new WrappedAttachment(dbAttachment) {
-                                @Override
-                                public boolean deleted() {
-                                    return false;
-                                }
-                            }
-                        ).fire();
-                    }
                     existOnView.add(dbAttachment);
                 }
             }
