@@ -25,14 +25,14 @@ import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
  *
  * @todo #2 syncing progress indicator.
  * @todo #3 File size limitation.
- * @todo #0 Handle the deleted files. Not just delete it, same attachment may link to same file.(Same name). Figure out to use duplicate file or same file?
+ * @todo #4 Query multiple remote files a time.
  */
-public class SyncFiles implements Action {
+public class RemoteFileSync implements Action {
     private final Context context;
     private final Source<Connection> db;
     private final String uid;
 
-    public SyncFiles(Context context, Source<Connection> db, String uid) {
+    public RemoteFileSync(Context context, Source<Connection> db, String uid) {
         this.context = context;
         this.db = db;
         this.uid = uid;
@@ -41,7 +41,7 @@ public class SyncFiles implements Action {
     @Override
     public void fire() {
         Map<String, Attachment> attachmentMap = new QueriedAttachments(
-            new AllAttachments(db)
+            new AllAttachments(db, true)
         ).value().stream().collect(Collectors.toMap(
             Attachment::uri,
             Function.identity(),
@@ -63,23 +63,39 @@ public class SyncFiles implements Action {
         final Attachment attachment = iterator.next();
         if (!attachment.uri().startsWith(URI_FILE_PROVIDER)) {
             syncAttachment(remoteRoot, iterator);
-            return;
+        } else {
+            syncFile(remoteRoot, attachment, iterator);
         }
+    }
+
+    private void syncFile(
+        StorageReference remoteRoot,
+        Attachment attachment,
+        Iterator<Attachment> iterator
+    ) {
         final File localFile = new File(new File(
             context.getFilesDir(),
             "attachments"
         ), attachment.uri().replace(URI_FILE_PROVIDER, ""));
-        remoteRoot.child(localFile.getName()).getMetadata().addOnSuccessListener(it -> {
-            if (localFile.exists()) {
-                syncAttachment(remoteRoot, iterator); // exist
+        final StorageReference ref = remoteRoot.child(localFile.getName());
+        ref.getMetadata().addOnSuccessListener(it -> {
+            if (attachment.deleted()) {
+                ref.delete().addOnCompleteListener(it2->{
+                   syncAttachment(remoteRoot, iterator);
+                });
             } else {
-                localFile.getParentFile().mkdirs();
-                download(remoteRoot, localFile, iterator);
+                if (localFile.exists()) {
+                    syncAttachment(remoteRoot, iterator); // exist
+                } else {
+                    localFile.getParentFile().mkdirs();
+                    download(remoteRoot, localFile, iterator);
+                }
             }
         }).addOnFailureListener(it -> {
-            if (localFile.exists()) {
+            if (localFile.exists()&& !attachment.deleted()) {
                 upload(remoteRoot, localFile, iterator);
             } else {
+                syncAttachment(remoteRoot, iterator);
                 // @todo #0 Handle missing file.
             }
         });

@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.sync;
 
+import android.content.Context;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -15,6 +16,7 @@ import com.silverhetch.clotho.Source;
 
 import java.sql.Connection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -22,10 +24,12 @@ import java.util.stream.Collectors;
  * Action to sync attachments.
  */
 public class SyncAttachments implements Action {
+    private final Context context;
     private final String uid;
     private final Source<Connection> db;
 
-    public SyncAttachments(String uid, Source<Connection> db) {
+    public SyncAttachments(Context context, String uid, Source<Connection> db) {
+        this.context = context;
         this.uid = uid;
         this.db = db;
     }
@@ -46,28 +50,19 @@ public class SyncAttachments implements Action {
             new AllAttachments(db, true)
         ).value().stream().collect(Collectors.toMap(Attachment::id, attachment -> attachment));
         for (QueryDocumentSnapshot remoteItem : result) {
-            syncItem(dbItems, remoteItem, remoteDb);
-        }
-        dbItems.forEach(((s, attachment) -> updateRemoteItem(remoteDb, attachment)));
-    }
-
-    private void syncItem(
-        Map<Long, Attachment> dbItems,
-        QueryDocumentSnapshot remoteItem,
-        CollectionReference remoteDb
-    ) {
-        final Attachment dbItem = dbItems.get(Long.valueOf(remoteItem.getId()));
-        if (dbItem == null) {
-            newLocalItem(remoteItem);
-        } else {
-            long remoteVersion = remoteItem.getLong("version");
-            if (dbItem.version() > remoteVersion) {
-                updateRemoteItem(remoteDb, dbItem);
-            } else if (dbItem.version() < remoteVersion) {
-                updateLocalItem(remoteItem);
+            final Attachment dbItem = dbItems.get(Long.valueOf(remoteItem.getId()));
+            if (dbItem == null) {
+                newLocalItem(remoteItem);
+            } else {
+                long remoteVersion = remoteItem.getLong("version");
+                if (dbItem.version() < remoteVersion) {
+                    updateLocalItem(remoteItem);
+                }
+                dbItems.remove(dbItem.id() + "");
             }
-            dbItems.remove(dbItem.id() + "");
         }
+        // new Items or remote version is newer
+        updateRemoteItem(remoteDb, dbItems.values().iterator());
     }
 
     private void updateLocalItem(QueryDocumentSnapshot remoteItem) {
@@ -96,12 +91,22 @@ public class SyncAttachments implements Action {
         ).fire();
     }
 
-    private void updateRemoteItem(CollectionReference remoteDb, Attachment attachment) {
+    private void updateRemoteItem(CollectionReference remoteDb, Iterator<Attachment> iterator) {
+        if (!iterator.hasNext()) {
+            new RemoteFileSync(context, db, uid).fire();
+            return;
+        }
+        Attachment attachment = iterator.next();
         Map<String, Object> data = new HashMap<>();
         data.put("delete", attachment.deleted() ? 1 : 0);
         data.put("version", attachment.version());
         data.put("jot_id", attachment.jotId());
         data.put("uri", attachment.uri());
-        remoteDb.document(attachment.id() + "").set(data);
+        remoteDb.document(attachment.id() + "")
+            .set(data)
+            .addOnCompleteListener(it -> {
+                updateRemoteItem(remoteDb, iterator);
+                new LocalFileSync(context, db, integer -> null).fire(); // for deleted items
+            });
     }
 }
