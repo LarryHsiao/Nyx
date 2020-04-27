@@ -27,6 +27,7 @@ import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
  * <p>
  * The attachment files will be stored in attachment directory at app internal file root.
  * @todo #4 Image compression.
+ * @todo #0 Handle deleted attachment in internal storage.
  */
 public class CopyToInternal implements Action {
     private final MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();

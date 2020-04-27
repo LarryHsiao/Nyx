@@ -24,7 +24,8 @@ import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
  * Action to sync files to Firebase storage.
  *
  * @todo #2 syncing progress indicator.
- * @todo #3 File size limitation
+ * @todo #3 File size limitation.
+ * @todo #0 Handle the deleted files. Not just delete it, same attachment may link to same file.(Same name). Figure out to use duplicate file or same file?
  */
 public class SyncFiles implements Action {
     private final Context context;
