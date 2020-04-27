@@ -57,11 +57,13 @@ public class SyncAttachments implements Action {
                 long remoteVersion = remoteItem.getLong("version");
                 if (dbItem.version() < remoteVersion) {
                     updateLocalItem(remoteItem);
+                    dbItems.remove(dbItem.id());
+                } else if (dbItem.version() == remoteVersion) {
+                    dbItems.remove(dbItem.id());
                 }
-                dbItems.remove(dbItem.id() + "");
             }
         }
-        // new Items or remote version is newer
+        // new Items or local version is newer
         updateRemoteItem(remoteDb, dbItems.values().iterator());
     }
 
@@ -93,6 +95,7 @@ public class SyncAttachments implements Action {
 
     private void updateRemoteItem(CollectionReference remoteDb, Iterator<Attachment> iterator) {
         if (!iterator.hasNext()) {
+            new LocalFileSync(context, db, integer -> null).fire(); // for deleted items
             new RemoteFileSync(context, db, uid).fire();
             return;
         }
@@ -106,7 +109,6 @@ public class SyncAttachments implements Action {
             .set(data)
             .addOnCompleteListener(it -> {
                 updateRemoteItem(remoteDb, iterator);
-                new LocalFileSync(context, db, integer -> null).fire(); // for deleted items
             });
     }
 }
