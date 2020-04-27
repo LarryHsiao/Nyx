@@ -109,6 +109,7 @@ import static java.lang.Double.MIN_VALUE;
  *
  * @todo #0 One click create template jot with geometry, and some pictures.
  * @todo #0 Survey capture image, video and audio in app or use third-party apps.
+ * @todo #0 Do not update deleted attachment rows which is already deleted.
  */
 public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
@@ -484,6 +485,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 if (dbAttachment.uri().equals(uri.toString())) {
                     hasItem = true;
                     if (dbAttachment.deleted()) {
+                        /* In this case, the uri will be the exposed file uri from third-party.*/
                         new UpdateAttachment(
                             db,
                             new WrappedAttachment(dbAttachment) {

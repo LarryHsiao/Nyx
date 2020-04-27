@@ -7,7 +7,6 @@ import androidx.core.app.JobIntentService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.JotApplication;
-import com.larryhsiao.nyx.attachments.CopyToInternal;
 import com.silverhetch.clotho.Source;
 
 import java.sql.Connection;
@@ -28,7 +27,7 @@ public class SyncService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         final Source<Connection> db = ((JotApplication) getApplication()).db;
-        new CopyToInternal(this, db, integer -> null).fire();
+        new LocalFileSync(this, db, integer -> null).fire();
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
@@ -37,7 +36,6 @@ public class SyncService extends JobIntentService {
         new SyncJots(user.getUid(), db).fire();
         new SyncTags(user.getUid(), db).fire();
         new SyncTagJot(user.getUid(), db).fire();
-        new SyncAttachments(user.getUid(), db).fire();
-        new SyncFiles(this, db, user.getUid()).fire();
+        new SyncAttachments(this, user.getUid(), db).fire();
     }
 }
