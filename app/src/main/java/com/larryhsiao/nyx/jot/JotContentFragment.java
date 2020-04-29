@@ -119,6 +119,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_ATTACHMENT_DIALOG = 1004;
 
     private static final String ARG_JOT_JSON = "ARG_JOT";
+    private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
+    private static final String ARG_REQUEST_CODE = "ARG_REQUEST_CODE";
     private Handler mainHandler = new Handler();
     private List<Uri> attachmentOnView = new ArrayList<>();
     private HandlerThread backgroundThread;
@@ -129,10 +131,20 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private TextView moodText;
     private Jot jot;
 
-    public static Fragment newInstance(ConstJot jot) {
+    public static Fragment newInstance(Jot jot) {
+        return newInstance(jot, new ArrayList<>(), 0);
+    }
+
+    public static Fragment newInstance(Jot jot, int requestCode) {
+        return newInstance(jot, new ArrayList<>(), requestCode);
+    }
+
+    public static Fragment newInstance(Jot jot, ArrayList<String> uris, int requestCode) {
         final Fragment frag = new JotContentFragment();
         Bundle args = new Bundle();
         args.putString(ARG_JOT_JSON, new Gson().toJson(jot));
+        args.putStringArrayList(ARG_ATTACHMENT_URI, uris);
+        args.putInt(ARG_REQUEST_CODE, requestCode);
         frag.setArguments(args);
         return frag;
     }
@@ -234,6 +246,9 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 .map(it -> Uri.parse(it.uri()))
                 .collect(Collectors.toList())
         );
+        for (String uri : getArguments().getStringArrayList(ARG_ATTACHMENT_URI)) {
+            addAttachment(Uri.parse(uri));
+        }
         updateAttachmentView();
 
         ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
@@ -451,7 +466,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
         intent.setData(
             Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
         );
-        sendResult(0, RESULT_OK, intent);
+        sendResult(
+            getArguments().getInt(ARG_REQUEST_CODE, 0),
+            RESULT_OK,
+            intent
+        );
     }
 
     private void saveTag() {

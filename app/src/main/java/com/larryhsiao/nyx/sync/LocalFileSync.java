@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -54,40 +53,50 @@ public class LocalFileSync implements Action {
     public void fire() {
         final File internalRoot = new File(context.getFilesDir(), "attachments");
         internalRoot.mkdir();
-        final List<Attachment> copyRequired = new ArrayList<>();
-        for (Attachment attachment : new QueriedAttachments(
+        final List<Attachment> dbAttachments = new QueriedAttachments(
             new AllAttachments(db, true)
         ).value()
             .stream()
             .filter(it -> !it.uri().isEmpty())
-            .collect(Collectors.toList())
-        ) {
-            if (!attachment.uri().startsWith(URI_FILE_PROVIDER)) {
-                copyRequired.add(attachment);
-            } else {
-                if (attachment.deleted()) {
-                    File internalFile = new File(
-                        internalRoot,
-                        attachment.uri().replaceFirst(URI_FILE_PROVIDER, "")
-                    );
-                    if (internalFile.exists()) {
-                        internalFile.delete();
-                    }
-                }
+            .collect(Collectors.toList());
+        for (Attachment attachment : dbAttachments) {
+            if (attachment.uri().startsWith("content:")) {
+                check(internalRoot, attachment);
             }
         }
-        for (Attachment attachment : copyRequired) {
-            try {
-                final String ext = mimeTypeMap.getExtensionFromMimeType(
-                    new UriMimeType(context, attachment.uri()).value()
-                );
-                if ("jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext)) {
-                    compressToInternal(internalRoot, attachment);
-                } else {
-                    copyToInternal(ext, internalRoot, attachment);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+    }
+
+    private void check(File internalRoot, Attachment attachment) {
+        if (attachment.uri().startsWith(URI_FILE_PROVIDER)) {
+            checkDeleted(internalRoot, attachment);
+        } else {
+            copyToInternal(internalRoot, attachment);
+        }
+    }
+
+    private void copyToInternal(File internalRoot, Attachment attachment) {
+        try {
+            final String ext = mimeTypeMap.getExtensionFromMimeType(
+                new UriMimeType(context, attachment.uri()).value()
+            );
+            if ("jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext)) {
+                compressToInternal(internalRoot, attachment);
+            } else {
+                copyToInternal(ext, internalRoot, attachment);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void checkDeleted(File internalRoot, Attachment attachment) {
+        if (attachment.deleted()) {
+            File internalFile = new File(
+                internalRoot,
+                attachment.uri().replaceFirst(URI_FILE_PROVIDER, "")
+            );
+            if (internalFile.exists()) {
+                internalFile.delete();
             }
         }
     }

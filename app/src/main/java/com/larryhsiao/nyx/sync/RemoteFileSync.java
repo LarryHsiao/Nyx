@@ -62,7 +62,7 @@ public class RemoteFileSync implements Action {
         }
         final Attachment attachment = iterator.next();
         if (!attachment.uri().startsWith(URI_FILE_PROVIDER)) {
-            syncAttachment(remoteRoot, iterator);
+            syncAttachment(remoteRoot, iterator); // Next
         } else {
             syncFile(remoteRoot, attachment, iterator);
         }
