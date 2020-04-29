@@ -50,8 +50,6 @@ import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.NewAttachment;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.core.attachments.RemovalAttachment;
-import com.larryhsiao.nyx.core.attachments.UpdateAttachment;
-import com.larryhsiao.nyx.core.attachments.WrappedAttachment;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotRemoval;
@@ -73,6 +71,8 @@ import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.util.EmbedMapFragment;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.BackControl;
+import com.silverhetch.aura.images.exif.ExifAttribute;
+import com.silverhetch.aura.images.exif.ExifUnixTimeStamp;
 import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.alert.Alert;
@@ -98,6 +98,7 @@ import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static androidx.appcompat.app.AlertDialog.Builder;
+import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
 import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
@@ -109,7 +110,6 @@ import static java.lang.Double.MIN_VALUE;
  *
  * @todo #0 One click create template jot with geometry, and some pictures.
  * @todo #0 Survey capture image, video and audio in app or use third-party apps.
- * @todo #0 Do not update deleted attachment rows which is already deleted.
  */
 public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
@@ -124,6 +124,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private HandlerThread backgroundThread;
     private Handler backgroundHandler;
     private ChipGroup chipGroup;
+    private TextView dateText;
     private TextView locationText;
     private TextView moodText;
     private Jot jot;
@@ -177,8 +178,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        TextView date = view.findViewById(R.id.jot_date);
-        date.setOnClickListener(v -> {
+        dateText = view.findViewById(R.id.jot_date);
+        dateText.setOnClickListener(v -> {
             DatePickerDialog dialog = new DatePickerDialog(view.getContext());
             dialog.setOnDateSetListener((view1, year, month, dayOfMonth) -> {
                 jot = new WrappedJot(jot) {
@@ -189,11 +190,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
                         return calendar.getTimeInMillis();
                     }
                 };
-                updateDateIndicator(date);
+                updateDateIndicator();
             });
             dialog.show();
         });
-        updateDateIndicator(date);
+        updateDateIndicator();
         chipGroup = view.findViewById(R.id.jot_tagGroup);
         EditText contentEditText = view.findViewById(R.id.jot_content);
         contentEditText.setText(jot.content());
@@ -423,8 +424,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
         }
     }
 
-    private void updateDateIndicator(TextView date) {
-        date.setText(SimpleDateFormat.getDateInstance().format(new Date(jot.createdTime())));
+    private void updateDateIndicator() {
+        dateText.setText(SimpleDateFormat.getDateInstance().format(new Date(jot.createdTime())));
     }
 
     @Override
@@ -753,11 +754,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         }
         final String mimeType = new UriMimeType(getContext(), uri.toString()).value();
         if (mimeType.startsWith("image")) {
-            if (Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-                || Arrays.equals(jot.location(), new double[]{0.0, 0.0})
-            ) {
-                loadLocationByExif(uri);
-            }
+            updateJotWithExif(uri);
             attachmentOnView.add(uri);
         } else if (mimeType.startsWith("video")) {
             attachmentOnView.add(uri);
@@ -771,29 +768,57 @@ public class JotContentFragment extends JotFragment implements BackControl {
         }
     }
 
-    private void loadLocationByExif(Uri data) {
+    private void updateJotWithExif(Uri data) {
         try {
             final ExifInterface exif = new ExifInterface(
                 getContext().getContentResolver().openInputStream(data)
             );
-            final double[] latLong = exif.getLatLong();
-            if (latLong == null) {
-                return;
-            }
-            jot = new WrappedJot(jot) {
-                @Override
-                public double[] location() {
-                    return new double[]{latLong[1], latLong[0]};
-                }
-            };
-            Location location = new Location("constant");
-            location.setLatitude(latLong[0]);
-            location.setLongitude(latLong[1]);
-            updateAddress(location);
-            loadEmbedMapByJot();
+            updateJotLocationByExif(exif);
+            updateJotDateByExif(exif);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateJotDateByExif(ExifInterface exif) {
+        final Long time = new ExifUnixTimeStamp(
+            new ExifAttribute(
+                new ConstSource<>(exif),
+                TAG_DATETIME_ORIGINAL
+            )
+        ).value();
+        // invalid time or is a created jot or there are already have attachment there,
+        // remains unchanged.
+        if (time == -1L || jot.id() != -1L || attachmentOnView.size() > 0) {
+            return;
+        }
+        jot = new WrappedJot(jot) {
+            @Override
+            public long createdTime() {
+                return time;
+            }
+        };
+        updateDateIndicator();
+    }
+
+    private void updateJotLocationByExif(ExifInterface exif) {
+        final double[] latLong = exif.getLatLong();
+        if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+            && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})
+            || latLong == null) {
+            return;
+        }
+        jot = new WrappedJot(jot) {
+            @Override
+            public double[] location() {
+                return new double[]{latLong[1], latLong[0]};
+            }
+        };
+        Location location = new Location("constant");
+        location.setLatitude(latLong[0]);
+        location.setLongitude(latLong[1]);
+        updateAddress(location);
+        loadEmbedMapByJot();
     }
 
     private void loadEmbedMapByJot() {

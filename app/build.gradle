@@ -71,7 +71,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
     implementation "androidx.biometric:biometric:1.0.1"
-    implementation 'com.silverhetch:aura:1.22.0'
+    implementation 'com.silverhetch:aura:1.22.2'
     implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.google.firebase:firebase-crashlytics:17.0.0-beta01'
     implementation 'com.haibin:calendarview:3.6.7'
