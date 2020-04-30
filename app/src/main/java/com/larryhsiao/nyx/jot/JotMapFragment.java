@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -47,6 +48,7 @@ import static java.lang.Double.MIN_VALUE;
 
 /**
  * Fragment that shows jots by map.
+ *
  * @todo #0 Filter by date.
  * @todo #0 Preview image on a marker.
  * @todo #0 Filter by tag.
@@ -56,6 +58,7 @@ public class JotMapFragment extends JotFragment {
     private static final int REQUEST_CODE_UPDATE_JOT = 1001;
     private ClusterManager<JotMapItem> clusterManger;
     private GoogleMap map;
+    private CameraPosition cameraPos;
     private Marker selectedMarker = null;
 
     @Override
@@ -186,18 +189,25 @@ public class JotMapFragment extends JotFragment {
             map,
             clusterManger
         ));
+
         if (jots.size() > 0) {
             LatLngBounds.Builder bounds = LatLngBounds.builder();
             for (Jot jot : jots) {
                 clusterManger.addItem(new JotMapItem(jot));
                 bounds.include(new LatLng(jot.location()[1], jot.location()[0]));
             }
-            map.moveCamera(
-                CameraUpdateFactory.newLatLngBounds(
-                    bounds.build(),
-                    200
-                )
-            );
+            if (cameraPos == null) {
+                map.moveCamera(
+                    CameraUpdateFactory.newLatLngBounds(
+                        bounds.build(),
+                        200
+                    )
+                );
+            } else {
+                map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+            }
+        } else {
+            map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
         }
     }
 
@@ -207,6 +217,7 @@ public class JotMapFragment extends JotFragment {
         detachFab();
         final Fragment mapFrag = getChildFragmentManager().findFragmentById(R.id.map_container);
         if (mapFrag != null) {
+            cameraPos = map.getCameraPosition();
             getChildFragmentManager().beginTransaction()
                 .remove(mapFrag)
                 .commit();
