@@ -67,7 +67,18 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key"/>
         <service android:name=".sync.SyncService"
-                 android:permission="android.permission.BIND_JOB_SERVICE"
-        />
+                 android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <activity android:name=".SharedActivity"
+                  android:label="@string/new_jot">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.SEND_MULTIPLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+                <data android:mimeType="image/*"/>
+                <data android:mimeType="video/*"/>
+                <data android:mimeType="audio/*"/>
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

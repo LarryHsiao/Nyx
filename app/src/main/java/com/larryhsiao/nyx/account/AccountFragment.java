@@ -28,8 +28,11 @@ import com.larryhsiao.nyx.core.tags.AllTags;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.larryhsiao.nyx.sync.SyncService;
 import com.silverhetch.aura.view.bitmap.CircledDrawable;
+import com.silverhetch.clotho.file.FileSize;
+import com.silverhetch.clotho.file.SizeText;
 import com.silverhetch.clotho.source.ConstSource;
 
+import java.io.File;
 import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
@@ -76,6 +79,19 @@ public class AccountFragment extends JotFragment {
         staticsText.append(
             getString(R.string.tags_title,
                 "" + new QueriedTags(new AllTags(db)).value().size()));
+        staticsText.append("\n");
+        staticsText.append(getString(
+            R.string.Storage_usage_,
+            new SizeText(
+                new FileSize(
+                    new File(
+                        getContext().getFilesDir(),
+                        "attachments"
+                    ).toPath()
+                )
+            ).value()
+            )
+        );
         staticsText.append("\n");
     }
 

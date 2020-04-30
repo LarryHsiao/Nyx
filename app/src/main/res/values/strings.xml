@@ -67,4 +67,6 @@
     <string name="new_attachment">New attachment</string>
     <string name="new_">New</string>
     <string name="no_location">No location</string>
+    <string name="used_">Used: %s</string>
+    <string name="Storage_usage_">Storage usage: %s</string>
 </resources>

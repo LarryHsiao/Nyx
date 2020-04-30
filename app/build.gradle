@@ -17,8 +17,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
-def nyxVersionName = "v3.1.6"
-def nyxVersionCode = 30106
+def nyxVersionName = "v3.2.0"
+def nyxVersionCode = 30200
 
 android {
     compileSdkVersion 29
@@ -35,7 +35,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -71,7 +71,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
     implementation "androidx.biometric:biometric:1.0.1"
-    implementation 'com.silverhetch:aura:1.22.0'
+    implementation 'com.silverhetch:aura:1.22.2'
     implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.google.firebase:firebase-crashlytics:17.0.0-beta01'
     implementation 'com.haibin:calendarview:3.6.7'
