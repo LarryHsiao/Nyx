@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.core.jots.ConstJot;
@@ -17,7 +18,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.UUID;
 
+import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
 import static java.lang.Double.MIN_VALUE;
 
 /**
@@ -25,6 +29,7 @@ import static java.lang.Double.MIN_VALUE;
  */
 public class SharedActivity extends JotActivity {
     private static final int REQUEST_CODE_NEW_JOT = 1000;
+    private final MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,10 +52,9 @@ public class SharedActivity extends JotActivity {
             if (uri == null) {
                 continue;
             }
-            final String contentType = new UriMimeType(
-                this,
-                uri.toString()
-            ).value();
+            final String contentType = new UriMimeType(this, uri.toString()).value();
+            final File tempDir = new File(getFilesDir(), "attachments_temp");
+            tempDir.mkdirs();
             if ("text/plain".equals(contentType)) {
                 // @todo #0 Read file off main thread
                 content = readText(item.getUri());
@@ -59,7 +63,18 @@ public class SharedActivity extends JotActivity {
                     contentType.startsWith("video/") ||
                     contentType.startsWith("audio/")
             ) {
-                list.add(item.getUri().toString());
+                try {
+                    final String ext = mimeTypeMap.getExtensionFromMimeType(contentType);
+                    final String fileName = UUID.randomUUID().toString() + "." + ext;
+                    new ToFile(
+                        getContentResolver().openInputStream(item.getUri()),
+                        new File(tempDir, fileName),
+                        integer -> null
+                    ).fire();
+                    list.add(URI_FILE_TEMP_PROVIDER  + fileName);
+                } catch (Exception ignore) {
+                    ignore.printStackTrace();
+                }
             }
         }
         nextPage(

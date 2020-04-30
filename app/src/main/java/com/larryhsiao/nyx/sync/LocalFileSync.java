@@ -26,6 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
 
 /**
  * Action to sync the attachment files to internal to prevent permission losing.
@@ -104,11 +105,18 @@ public class LocalFileSync implements Action {
     private void compressToInternal(File internalRoot, Attachment attachment) throws IOException {
         final File temp = Files.createTempFile("temp", "").toFile();
         final File compressTemp = Files.createTempFile("compressedTemp", "").toFile();
-        new ToFile(
-            context.getContentResolver().openInputStream(Uri.parse(attachment.uri())),
-            temp,
-            it -> null
-        ).fire();
+        if (attachment.uri().startsWith(URI_FILE_TEMP_PROVIDER)) {
+            new File(
+                new File(context.getFilesDir(), "attachments_temp"),
+                attachment.uri().replace(URI_FILE_TEMP_PROVIDER, "")
+            ).renameTo(temp);
+        }else {
+            new ToFile(
+                context.getContentResolver().openInputStream(Uri.parse(attachment.uri())),
+                temp,
+                it -> null
+            ).fire();
+        }
         new JpegCompress(temp, compressTemp).fire();
         final String fileName = generateFileName(
             "jpg",
@@ -133,11 +141,18 @@ public class LocalFileSync implements Action {
             ext,
             new MD5(context.getContentResolver().openInputStream(uri)).value()
         );
-        new ToFile(
-            context.getContentResolver().openInputStream(uri),
-            new File(internalRoot, fileName),
-            integer -> null
-        ).fire();
+        if (uri.toString().startsWith(URI_FILE_TEMP_PROVIDER)) {
+            new File(
+                new File(context.getFilesDir(), "attachments_temp"),
+                uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
+            ).renameTo(new File(internalRoot, fileName));
+        }else {
+            new ToFile(
+                context.getContentResolver().openInputStream(uri),
+                new File(internalRoot, fileName),
+                integer -> null
+            ).fire();
+        }
         new UpdateAttachment(db, new WrappedAttachment(attachment) {
             @Override
             public String uri() {
