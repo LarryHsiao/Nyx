@@ -19,15 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class JotApplication extends Application {
     public static final String URI_FILE_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments/";
-    public final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-    public final ExecutorService executor = new ThreadPoolExecutor(
-        Runtime.getRuntime().availableProcessors(),
-        Runtime.getRuntime().availableProcessors() * 2,
-        1,
-        TimeUnit.SECONDS,
-        queue,
-        new JotThreadFactory()
-    );
+    public static final String URI_FILE_TEMP_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments_temp/";
     public long lastAuthed = 0L;
     public Source<Connection> db;
 

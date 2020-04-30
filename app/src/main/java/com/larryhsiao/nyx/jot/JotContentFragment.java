@@ -246,10 +246,16 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 .map(it -> Uri.parse(it.uri()))
                 .collect(Collectors.toList())
         );
-        for (String uri : getArguments().getStringArrayList(ARG_ATTACHMENT_URI)) {
-            addAttachment(Uri.parse(uri));
+
+        if (getArguments()!=null) {
+            final List<String> attachments = getArguments().getStringArrayList(ARG_ATTACHMENT_URI);
+            if (attachments != null) {
+                for (String uri : attachments) {
+                    addAttachment(Uri.parse(uri));
+                }
+                updateAttachmentView();
+            }
         }
-        updateAttachmentView();
 
         ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
         tagIcon.setOnClickListener(v -> {
