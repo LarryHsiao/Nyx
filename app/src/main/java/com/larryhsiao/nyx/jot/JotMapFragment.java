@@ -89,7 +89,7 @@ public class JotMapFragment extends JotFragment {
 
             @Override
             public void onClick() {
-                Fragment frag = new JotContentFragment();
+                Fragment frag = JotContentFragment.newInstance();
                 frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
                 nextPage(frag);
             }
