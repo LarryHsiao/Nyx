@@ -55,16 +55,13 @@ import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotRemoval;
 import com.larryhsiao.nyx.core.jots.JotUri;
 import com.larryhsiao.nyx.core.jots.PostedJot;
-import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.jots.WrappedJot;
 import com.larryhsiao.nyx.core.jots.moods.DefaultMoods;
 import com.larryhsiao.nyx.core.jots.moods.MergedMoods;
 import com.larryhsiao.nyx.core.jots.moods.RankedMood;
 import com.larryhsiao.nyx.core.jots.moods.RankedMoods;
 import com.larryhsiao.nyx.core.tags.AllTags;
-import com.larryhsiao.nyx.core.tags.CreatedTagByName;
 import com.larryhsiao.nyx.core.tags.JotTagRemoval;
-import com.larryhsiao.nyx.core.tags.JotsByTagId;
 import com.larryhsiao.nyx.core.tags.NewJotTag;
 import com.larryhsiao.nyx.core.tags.NewTag;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
@@ -94,6 +91,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -830,6 +828,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 TAG_DATETIME_ORIGINAL
             )
         ).value();
+
         // invalid time or is a created jot or there are already have attachment there,
         // remains unchanged.
         if (time == -1L || jot.id() != -1L || attachmentOnView.size() > 0) {
@@ -838,7 +837,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
         jot = new WrappedJot(jot) {
             @Override
             public long createdTime() {
-                return time;
+                // @todo #0 Find out better solution for determining the time zone of the exif timestamp.
+                //          For now this solution is base on the picture is on the same time zone when saving this jot.
+                //          So the date time should be correct if user creating new jot from at same time zone as the picture took.
+                TimeZone tz = TimeZone.getDefault();
+                return time - tz.getOffset(Calendar.ZONE_OFFSET);
             }
         };
         updateDateIndicator();
