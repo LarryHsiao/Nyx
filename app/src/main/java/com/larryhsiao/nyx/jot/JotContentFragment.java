@@ -125,7 +125,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final String ARG_JOT_JSON = "ARG_JOT";
     private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
     private static final String ARG_REQUEST_CODE = "ARG_REQUEST_CODE";
-    private Handler mainHandler = new Handler();
     private List<Uri> attachmentOnView = new ArrayList<>();
     private HandlerThread backgroundThread;
     private Handler backgroundHandler;
@@ -341,7 +340,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
         }
         moodText.setText(mood);
         moodText.setOnClickListener(v -> {
-            // @todo #1 Used Mood history ranking
             final GridView gridView = new GridView(v.getContext());
             gridView.setNumColumns(4);
             gridView.setAdapter(
@@ -443,7 +441,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 getContext(),
                 android.R.layout.simple_list_item_1,
                 new String[]{
-                    getString(R.string.jots),
                     getString(R.string.delete)
                 }
             ), (dialog1, which1) -> onTagOptionClicked(tagChip, which1))
@@ -453,16 +450,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private void onTagOptionClicked(Chip tagChip, int which1) {
         switch (which1) {
             case 0:
-                // @todo #1 confirm for dicard changes
-                nextPage(JotListFragment.newInstanceByJotIds(
-                    getString(R.string.tag_title, tagChip.getText().toString()),
-                    new QueriedJots(new JotsByTagId(db,
-                        new ConstSource<>(
-                            new CreatedTagByName(db, tagChip.getText().toString()).value().id()
-                        ))
-                    ).value().stream().mapToLong(value -> value.id()).toArray()));
-                break;
-            case 1:
                 new AlertDialog.Builder(getContext())
                     .setTitle(tagChip.getText().toString())
                     .setMessage(getString(R.string.delete))

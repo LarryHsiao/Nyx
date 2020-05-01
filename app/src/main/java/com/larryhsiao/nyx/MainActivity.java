@@ -10,7 +10,6 @@ import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.jot.CalendarFragment;
 import com.larryhsiao.nyx.jot.JotListFragment;
 import com.larryhsiao.nyx.sync.SyncService;
-import com.larryhsiao.nyx.tag.TagListFragment;
 
 /**
  * Entry Activity of Nyx.
@@ -40,10 +39,6 @@ public class MainActivity extends JotActivity {
             } else if (item.getItemId() == R.id.menuItem_calendar) {
                 currentPage = R.id.menuItem_calendar;
                 rootPage(new CalendarFragment());
-                return true;
-            } else if (item.getItemId() == R.id.menuItem_tag) {
-                currentPage = R.id.menuItem_tag;
-                rootPage(new TagListFragment());
                 return true;
             } else if (item.getItemId() == R.id.menuItem_account) {
                 currentPage = R.id.menuItem_account;
