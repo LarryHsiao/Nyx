@@ -166,7 +166,7 @@ public class JotListFragment extends JotFragment {
 
             @Override
             public void onClick() {
-                Fragment frag = new JotContentFragment();
+                Fragment frag = JotContentFragment.newInstance();
                 frag.setTargetFragment(JotListFragment.this, REQUEST_CODE_CREATE_JOT);
                 nextPage(frag);
             }

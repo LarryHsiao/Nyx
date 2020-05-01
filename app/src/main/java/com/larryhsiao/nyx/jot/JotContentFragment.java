@@ -57,6 +57,10 @@ import com.larryhsiao.nyx.core.jots.JotUri;
 import com.larryhsiao.nyx.core.jots.PostedJot;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.jots.WrappedJot;
+import com.larryhsiao.nyx.core.jots.moods.DefaultMoods;
+import com.larryhsiao.nyx.core.jots.moods.MergedMoods;
+import com.larryhsiao.nyx.core.jots.moods.RankedMood;
+import com.larryhsiao.nyx.core.jots.moods.RankedMoods;
 import com.larryhsiao.nyx.core.tags.AllTags;
 import com.larryhsiao.nyx.core.tags.CreatedTagByName;
 import com.larryhsiao.nyx.core.tags.JotTagRemoval;
@@ -130,6 +134,22 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private TextView locationText;
     private TextView moodText;
     private Jot jot;
+
+    public static Fragment newInstance() {
+        return newInstance(
+            new ConstJot(
+                -1,
+                "",
+                System.currentTimeMillis(),
+                new double[]{MIN_VALUE, MIN_VALUE},
+                "",
+                1,
+                false
+            ),
+            new ArrayList<>(),
+            0
+        );
+    }
 
     public static Fragment newInstance(Jot jot) {
         return newInstance(jot, new ArrayList<>(), 0);
@@ -247,7 +267,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 .collect(Collectors.toList())
         );
 
-        if (getArguments()!=null) {
+        if (getArguments() != null) {
             final List<String> attachments = getArguments().getStringArrayList(ARG_ATTACHMENT_URI);
             if (attachments != null) {
                 for (String uri : attachments) {
@@ -303,16 +323,14 @@ public class JotContentFragment extends JotFragment implements BackControl {
             Chip chip = new Chip(view.getContext());
             chip.setTag(tag);
             chip.setText(tag.title());
-            chip.setOnClickListener(v -> {
-                new AlertDialog.Builder(v.getContext())
-                    .setTitle(tag.title())
-                    .setMessage(R.string.delete)
-                    .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                        chipGroup.removeView(v);
-                    })
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
-            });
+            chip.setOnClickListener(v -> new AlertDialog.Builder(v.getContext())
+                .setTitle(tag.title())
+                .setMessage(R.string.delete)
+                .setPositiveButton(R.string.confirm, (dialog, which) ->
+                    chipGroup.removeView(v)
+                )
+                .setNegativeButton(R.string.cancel, null)
+                .show());
             chipGroup.addView(chip);
         }
         moodText = view.findViewById(R.id.jot_mood);
@@ -326,7 +344,20 @@ public class JotContentFragment extends JotFragment implements BackControl {
             // @todo #1 Used Mood history ranking
             final GridView gridView = new GridView(v.getContext());
             gridView.setNumColumns(4);
-            gridView.setAdapter(new MoodAdapter(v.getContext()));
+            gridView.setAdapter(
+                new MoodAdapter(
+                    v.getContext(),
+                    new MergedMoods(
+                        new ConstSource<>(
+                            new RankedMoods(db).value()
+                                .stream()
+                                .map(RankedMood::mood)
+                                .collect(Collectors.toList())
+                        ),
+                        new DefaultMoods()
+                    ).value()
+                )
+            );
             AlertDialog moodDialog = new AlertDialog.Builder(v.getContext())
                 .setTitle(getString(R.string.moods))
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {

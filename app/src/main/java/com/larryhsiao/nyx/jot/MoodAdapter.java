@@ -11,37 +11,18 @@ import androidx.appcompat.widget.AppCompatTextView;
 import com.larryhsiao.nyx.R;
 import com.silverhetch.aura.view.measures.DP;
 
+import java.util.List;
+
 import static android.util.TypedValue.COMPLEX_UNIT_DIP;
 import static android.view.Gravity.CENTER;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 public class MoodAdapter extends ArrayAdapter<String> {
 
-    public MoodAdapter(@NonNull Context context) {
+    public  MoodAdapter(@NonNull Context context, List<String> moods) {
         super(context,
             android.R.layout.simple_list_item_1,
-            new String[]{
-                "x",
-                new String(Character.toChars(0x1F603)),
-                new String(Character.toChars(0x1F601)),
-                new String(Character.toChars(0x1F602)),
-                new String(Character.toChars(0x1F642)),
-                new String(Character.toChars(0x1F970)),
-                new String(Character.toChars(0x1F60D)),
-                new String(Character.toChars(0x1F60B)),
-                new String(Character.toChars(0x1F60F)),
-                new String(Character.toChars(0x1F612)),
-                new String(Character.toChars(0x1F928)),
-                new String(Character.toChars(0x1F611)),
-                new String(Character.toChars(0x1F614)),
-                new String(Character.toChars(0x1F634)),
-                new String(Character.toChars(0x1F912)),
-                new String(Character.toChars(0x1F927)),
-                new String(Character.toChars(0x1F976)),
-                new String(Character.toChars(0x1F974)),
-                new String(Character.toChars(0x1F973)),
-                "",
-            }
+            moods
         );
     }
 
@@ -71,6 +52,12 @@ public class MoodAdapter extends ArrayAdapter<String> {
         return orgItemView;
     }
 
+    @Nullable
+    @Override
+    public String getItem(int position) {
+        return super.getItem(position-1);
+    }
+
     private View inputItem(ViewGroup parent) {
         final ImageView inputItem = new ImageView(parent.getContext());
         int padding = ((int) new DP(getContext(), 16).px());
@@ -91,5 +78,10 @@ public class MoodAdapter extends ArrayAdapter<String> {
             parent.getWidth() / 4));
         itemRemove.setImageResource(R.drawable.ic_cross);
         return itemRemove;
+    }
+
+    @Override
+    public int getCount() {
+        return super.getCount() + 2;
     }
 }
