@@ -90,12 +90,12 @@ public class CalendarFragment extends JotFragment {
                 loadJotsByDate(date);
             }
         });
-        loadJotsByDate();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        loadJotsByDate();
         attachFab(new FabBehavior() {
             @Override
             public int icon() {

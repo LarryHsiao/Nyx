@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.bumptech.glide.Glide;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.core.youtube.IsYoutubeUrl;
+import com.larryhsiao.nyx.core.youtube.UrlVideoId;
+import com.larryhsiao.nyx.core.youtube.YoutubePreviewUrl;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.ViewHolder;
 import com.stfalcon.imageviewer.StfalconImageViewer;
@@ -73,7 +76,18 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
         switch (getItemViewType(position)) {
             default:
             case ITEM_TYPE_IMAGE:
-                onBindImage(uri, holder);
+                if (new IsYoutubeUrl(uri.toString()).value()) {
+                    onBindImage(
+                        Uri.parse(new YoutubePreviewUrl(new UrlVideoId(uri.toString())).value()),
+                        holder,
+                        () -> {
+                            Intent intent = new Intent(ACTION_VIEW);
+                            intent.setData(uri);
+                            context.startActivity(intent);
+                        });
+                } else {
+                    onBindImage(uri, holder, () -> showFullScreenImage(context, uri));
+                }
                 break;
             case ITEM_TYPE_VIDEO:
                 onBindVideo(uri, holder);
@@ -82,6 +96,23 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
                 onBindAudio(uri, holder);
                 break;
         }
+    }
+
+    private void showFullScreenImage(Context context, Uri uri) {
+        new StfalconImageViewer.Builder<>(
+            context,
+            Collections.singletonList(uri),
+            (imageView, image) -> {
+                CircularProgressDrawable progress2 = new CircularProgressDrawable(
+                    context
+                );
+                progress2.setStyle(LARGE);
+                Glide.with(context)
+                    .load(image)
+                    .placeholder(progress2)
+                    .into(imageView);
+            }
+        ).show();
     }
 
     private void onBindAudio(Uri uri, ViewHolder holder) {
@@ -118,7 +149,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
         mmr.release();
     }
 
-    private void onBindImage(Uri uri, ViewHolder holder) {
+    private void onBindImage(Uri uri, ViewHolder holder, Runnable onClick) {
         final ImageView icon = holder.getImageView(R.id.itemAttachmentImage_icon);
         CircularProgressDrawable progress = new CircularProgressDrawable(icon.getContext());
         progress.setStyle(LARGE);
@@ -126,20 +157,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             .load(uri)
             .into(icon);
         icon.setOnClickListener(v -> {
-            new StfalconImageViewer.Builder<>(
-                icon.getContext(),
-                Collections.singletonList(uri),
-                (imageView, image) -> {
-                    CircularProgressDrawable progress2 = new CircularProgressDrawable(
-                        icon.getContext()
-                    );
-                    progress2.setStyle(LARGE);
-                    Glide.with(context)
-                        .load(image)
-                        .placeholder(progress2)
-                        .into(imageView);
-                }
-            ).show();
+            onClick.run();
         });
         icon.setOnLongClickListener(v -> {
             showProperties(holder, uri);

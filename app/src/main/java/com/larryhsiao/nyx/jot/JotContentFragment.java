@@ -55,24 +55,26 @@ import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotRemoval;
 import com.larryhsiao.nyx.core.jots.JotUri;
 import com.larryhsiao.nyx.core.jots.PostedJot;
-import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.jots.WrappedJot;
 import com.larryhsiao.nyx.core.jots.moods.DefaultMoods;
 import com.larryhsiao.nyx.core.jots.moods.MergedMoods;
 import com.larryhsiao.nyx.core.jots.moods.RankedMood;
 import com.larryhsiao.nyx.core.jots.moods.RankedMoods;
 import com.larryhsiao.nyx.core.tags.AllTags;
-import com.larryhsiao.nyx.core.tags.CreatedTagByName;
 import com.larryhsiao.nyx.core.tags.JotTagRemoval;
-import com.larryhsiao.nyx.core.tags.JotsByTagId;
 import com.larryhsiao.nyx.core.tags.NewJotTag;
 import com.larryhsiao.nyx.core.tags.NewTag;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagsByJotId;
 import com.larryhsiao.nyx.core.tags.TagsByKeyword;
+import com.larryhsiao.nyx.core.youtube.IsYoutubeUrl;
+import com.larryhsiao.nyx.core.youtube.UrlVideoId;
+import com.larryhsiao.nyx.core.youtube.YoutubePreviewUrl;
 import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.util.EmbedMapFragment;
+import com.linkedin.urls.Url;
+import com.linkedin.urls.detection.UrlDetector;
 import com.schibstedspain.leku.LocationPickerActivity;
 import com.silverhetch.aura.BackControl;
 import com.silverhetch.aura.images.exif.ExifAttribute;
@@ -94,6 +96,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
@@ -104,6 +107,7 @@ import static android.view.View.VISIBLE;
 import static androidx.appcompat.app.AlertDialog.Builder;
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
 import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
+import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
@@ -125,8 +129,8 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final String ARG_JOT_JSON = "ARG_JOT";
     private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
     private static final String ARG_REQUEST_CODE = "ARG_REQUEST_CODE";
-    private Handler mainHandler = new Handler();
     private List<Uri> attachmentOnView = new ArrayList<>();
+    private Handler mainHandler = new Handler();
     private HandlerThread backgroundThread;
     private Handler backgroundHandler;
     private ChipGroup chipGroup;
@@ -249,7 +253,26 @@ public class JotContentFragment extends JotFragment implements BackControl {
                         return s.toString();
                     }
                 };
+                mainHandler.removeCallbacks(handler);
+                if (contentEditText.getText().toString().endsWith("\n")) {
+                    mainHandler.postDelayed(handler, 1000);
+                }
             }
+
+            private final Runnable handler = () -> {
+                List<Url> detect = new UrlDetector(
+                    contentEditText.getText().toString(),
+                    Default
+                ).detect();
+                if (detect.size() > 0) {
+                    addAttachment(
+                        Uri.parse(detect.get(detect.size() - 1).toString()),
+                        () -> {
+                        }
+                    );
+                    updateAttachmentView();
+                }
+            };
         });
         locationText = view.findViewById(R.id.jot_location);
         locationText.setOnClickListener(v -> pickLocation());
@@ -271,7 +294,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             final List<String> attachments = getArguments().getStringArrayList(ARG_ATTACHMENT_URI);
             if (attachments != null) {
                 for (String uri : attachments) {
-                    addAttachment(Uri.parse(uri));
+                    addAttachmentGrantPermission(Uri.parse(uri));
                 }
                 updateAttachmentView();
             }
@@ -341,7 +364,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
         }
         moodText.setText(mood);
         moodText.setOnClickListener(v -> {
-            // @todo #1 Used Mood history ranking
             final GridView gridView = new GridView(v.getContext());
             gridView.setNumColumns(4);
             gridView.setAdapter(
@@ -443,7 +465,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 getContext(),
                 android.R.layout.simple_list_item_1,
                 new String[]{
-                    getString(R.string.jots),
                     getString(R.string.delete)
                 }
             ), (dialog1, which1) -> onTagOptionClicked(tagChip, which1))
@@ -453,16 +474,6 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private void onTagOptionClicked(Chip tagChip, int which1) {
         switch (which1) {
             case 0:
-                // @todo #1 confirm for dicard changes
-                nextPage(JotListFragment.newInstanceByJotIds(
-                    getString(R.string.tag_title, tagChip.getText().toString()),
-                    new QueriedJots(new JotsByTagId(db,
-                        new ConstSource<>(
-                            new CreatedTagByName(db, tagChip.getText().toString()).value().id()
-                        ))
-                    ).value().stream().mapToLong(value -> value.id()).toArray()));
-                break;
-            case 1:
                 new AlertDialog.Builder(getContext())
                     .setTitle(tagChip.getText().toString())
                     .setMessage(getString(R.string.delete))
@@ -605,11 +616,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
             loadEmbedMapByJot();
         } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
             if (data.getData() != null) {
-                addAttachment(data.getData());
+                addAttachmentGrantPermission(data.getData());
             } else {
                 ClipData clip = data.getClipData();
                 for (int i = 0; i < clip.getItemCount(); i++) {
-                    addAttachment(clip.getItemAt(i).getUri());
+                    addAttachmentGrantPermission(clip.getItemAt(i).getUri());
                 }
             }
             updateAttachmentView();
@@ -632,7 +643,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             List<Uri> uris = data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
             attachmentOnView.clear();
             for (Uri uri : uris) {
-                addAttachment(uri, false);
+                addAttachment(uri, this::unsupportedDialog);
             }
             updateAttachmentView();
         }
@@ -640,11 +651,23 @@ public class JotContentFragment extends JotFragment implements BackControl {
 
     private void updateAttachmentView() {
         final FrameLayout root = getView().findViewById(R.id.jot_attachment_container);
+        final TextView newAttachment = getView().findViewById(R.id.jot_attachment_new);
+        newAttachment.setVisibility(VISIBLE);
+        newAttachment.setOnClickListener(v -> startPicker());
+
+        final TextView countText = getView().findViewById(R.id.jot_attachment_count);
+        countText.setVisibility(VISIBLE);
+        countText.setText(attachmentOnView.size() + "");
         root.removeAllViews();
+
         if (attachmentOnView.size() == 0) {
             updateEmptyAttachment(root);
             return;
         }
+        updateAttachmentViewByMimeType(root);
+    }
+
+    private void updateAttachmentViewByMimeType(FrameLayout root) {
         final Uri attachmentUri = attachmentOnView.get(0);
         final String mimeType = new UriMimeType(
             root.getContext(), attachmentUri.toString()
@@ -654,15 +677,38 @@ public class JotContentFragment extends JotFragment implements BackControl {
         } else if (mimeType.startsWith("audio/")) {
             updateAudio(root, attachmentUri);
         } else {
-            updateImage(root, attachmentUri);
+            if (new IsYoutubeUrl(attachmentUri.toString()).value()) {
+                updateYoutube(root, attachmentUri);
+            } else {
+                updateImage(root, attachmentUri);
+            }
         }
-        final TextView newAttachment = getView().findViewById(R.id.jot_attachment_new);
-        newAttachment.setVisibility(VISIBLE);
-        newAttachment.setOnClickListener(v -> startPicker());
+    }
 
-        final TextView countText = getView().findViewById(R.id.jot_attachment_count);
-        countText.setVisibility(VISIBLE);
-        countText.setText(attachmentOnView.size() + "");
+    private void updateYoutube(FrameLayout root, Uri uri) {
+        LayoutInflater.from(getContext())
+            .inflate(R.layout.item_attachment_image, root, true);
+        final ImageView icon = root.findViewById(R.id.itemAttachmentImage_icon);
+        CircularProgressDrawable progress = new CircularProgressDrawable(icon.getContext());
+        progress.setStyle(LARGE);
+        Glide.with(root.getContext())
+            .load(new YoutubePreviewUrl(
+                new UrlVideoId(uri.toString())
+            ).value())
+            .into(icon);
+        icon.setOnClickListener(v -> {
+            if (attachmentOnView.size() > 1) {
+                browseAttachments();
+            } else {
+                final Intent intent = new Intent(ACTION_VIEW);
+                intent.setData(uri);
+                root.getContext().startActivity(intent);
+            }
+        });
+        icon.setOnLongClickListener(v -> {
+            showProperties(v, uri);
+            return true;
+        });
     }
 
     private void updateEmptyAttachment(FrameLayout root) {
@@ -740,7 +786,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             if (attachmentOnView.size() > 1) {
                 browseAttachments();
             } else {
-                showImage(v.getContext(), uri);
+                showImage(root.getContext(), uri);
             }
         });
         icon.setOnLongClickListener(v -> {
@@ -793,20 +839,28 @@ public class JotContentFragment extends JotFragment implements BackControl {
         popup.show();
     }
 
-    private void addAttachment(Uri uri) {
-        addAttachment(uri, true);
+    private void addAttachmentGrantPermission(Uri uri) {
+        try {
+            getContext().getContentResolver().takePersistableUriPermission(
+                uri,
+                FLAG_GRANT_READ_URI_PERMISSION
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        addAttachment(uri, this::unsupportedDialog);
     }
 
-    private void addAttachment(Uri uri, boolean grantPermission) {
-        if (grantPermission) {
-            try {
-                getContext().getContentResolver().takePersistableUriPermission(
-                    uri,
-                    FLAG_GRANT_READ_URI_PERMISSION
-                );
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    private void unsupportedDialog() {
+        Alert.Companion.newInstance(
+            REQUEST_CODE_ALERT,
+            getString(R.string.not_supported_file)
+        ).show(getChildFragmentManager(), null);
+    }
+
+    private void addAttachment(Uri uri, Runnable unsupportedCallback) {
+        if (attachmentOnView.contains(uri)) {
+            return;
         }
         final String mimeType = new UriMimeType(getContext(), uri.toString()).value();
         if (mimeType.startsWith("image")) {
@@ -817,10 +871,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
         } else if (mimeType.startsWith("audio")) {
             attachmentOnView.add(uri);
         } else {
-            Alert.Companion.newInstance(
-                REQUEST_CODE_ALERT,
-                getString(R.string.not_supported_file)
-            ).show(getChildFragmentManager(), null);
+            if (new IsYoutubeUrl(uri.toString()).value()) {
+                attachmentOnView.add(uri);
+            } else {
+                unsupportedCallback.run();
+            }
         }
     }
 
@@ -843,6 +898,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 TAG_DATETIME_ORIGINAL
             )
         ).value();
+
         // invalid time or is a created jot or there are already have attachment there,
         // remains unchanged.
         if (time == -1L || jot.id() != -1L || attachmentOnView.size() > 0) {
@@ -851,7 +907,11 @@ public class JotContentFragment extends JotFragment implements BackControl {
         jot = new WrappedJot(jot) {
             @Override
             public long createdTime() {
-                return time;
+                // @todo #0 Find out better solution for determining the time zone of the exif timestamp.
+                //          For now this solution is base on the picture is on the same time zone when saving this jot.
+                //          So the date time should be correct if user creating new jot from at same time zone as the picture took.
+                TimeZone tz = TimeZone.getDefault();
+                return time - tz.getOffset(Calendar.ZONE_OFFSET);
             }
         };
         updateDateIndicator();
