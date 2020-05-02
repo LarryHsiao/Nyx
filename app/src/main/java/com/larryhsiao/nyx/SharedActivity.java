@@ -10,6 +10,8 @@ import androidx.annotation.Nullable;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.jot.JotContentFragment;
+import com.linkedin.urls.Url;
+import com.linkedin.urls.detection.UrlDetector;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.clotho.file.FileText;
 import com.silverhetch.clotho.file.ToFile;
@@ -19,9 +21,10 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
 import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
+import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
 import static java.lang.Double.MIN_VALUE;
 
 /**
@@ -43,9 +46,12 @@ public class SharedActivity extends JotActivity {
         final Intent intent = getIntent();
         final String extraText = intent.getStringExtra(Intent.EXTRA_TEXT);
         String content = extraText == null ? "" : extraText;
-
+        ArrayList<String> attachmentList = new UrlDetector(content, Default)
+            .detect()
+            .stream()
+            .map(Url::toString)
+            .collect(Collectors.toCollection(ArrayList::new));
         final ClipData clipData = intent.getClipData();
-        ArrayList<String> list = new ArrayList<>();
         for (int i = 0; i < clipData.getItemCount(); i++) {
             final ClipData.Item item = clipData.getItemAt(i);
             final Uri uri = item.getUri();
@@ -71,7 +77,7 @@ public class SharedActivity extends JotActivity {
                         new File(tempDir, fileName),
                         integer -> null
                     ).fire();
-                    list.add(URI_FILE_TEMP_PROVIDER  + fileName);
+                    attachmentList.add(URI_FILE_TEMP_PROVIDER + fileName);
                 } catch (Exception ignore) {
                     ignore.printStackTrace();
                 }
@@ -88,7 +94,7 @@ public class SharedActivity extends JotActivity {
                     1,
                     false
                 ),
-                new ArrayList<>(list),
+                new ArrayList<>(attachmentList),
                 REQUEST_CODE_NEW_JOT
             )
         );

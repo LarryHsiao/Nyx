@@ -4,5 +4,6 @@
         <!-- Can not control apache library includes javax-->
         <ignore path="*/h2-*.jar" />
         <ignore path="*/jts-*.jar" />
+        <ignore path="*/bsh-*.jar" />
     </issue>
 </lint>
