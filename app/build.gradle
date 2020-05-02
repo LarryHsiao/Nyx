@@ -34,6 +34,10 @@ android {
         buildConfigField("String", "URI_HOST", "\"https://larryhsiao.com\"")
     }
     buildTypes {
+        debug{
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -70,6 +74,8 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project (':nyx-core')
     implementation group: 'com.linkedin.urls', name: 'url-detector', version: '0.1.17'
+    implementation 'io.github.ponnamkarthik:richlinkpreview:1.0.9'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
     implementation 'com.google.firebase:firebase-storage:19.1.1'

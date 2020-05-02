@@ -84,7 +84,18 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
         RecyclerView listView = view.findViewById(R.id.list);
         listView.setBackgroundColor(Color.BLACK);
         listView.setAdapter(adapter = new AttachmentAdapter(view.getContext()));
-        listView.setLayoutManager(new GridLayoutManager(view.getContext(), 2));
+        final GridLayoutManager manager = new GridLayoutManager(view.getContext(), 2);
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (adapter.isFullSpan(position)) {
+                    return manager.getSpanCount();
+                } else {
+                    return 1;
+                }
+            }
+        });
+        listView.setLayoutManager(manager);
         adapter.loadAttachments(uris);
 
         view.findViewById(R.id.attachments_plus).setOnClickListener(v -> {
