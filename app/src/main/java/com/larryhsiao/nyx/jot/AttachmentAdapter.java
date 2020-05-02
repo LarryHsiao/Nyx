@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,12 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.bumptech.glide.Glide;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.core.youtube.IsYoutubeUrl;
-import com.larryhsiao.nyx.core.youtube.UrlVideoId;
-import com.larryhsiao.nyx.core.youtube.YoutubePreviewUrl;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.ViewHolder;
 import com.stfalcon.imageviewer.StfalconImageViewer;
+import io.github.ponnamkarthik.richlinkpreview.MetaData;
+import io.github.ponnamkarthik.richlinkpreview.ResponseListener;
+import io.github.ponnamkarthik.richlinkpreview.RichPreview;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +37,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static final int ITEM_TYPE_IMAGE = 1;
     private static final int ITEM_TYPE_VIDEO = 2;
     private static final int ITEM_TYPE_AUDIO = 3;
+    private static final int ITEM_TYPE_PREVIEW_URL = 4;
 
     private final Context context;
     private final List<Uri> data = new ArrayList<>();
@@ -60,6 +62,12 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
                     parent,
                     false
                 ));
+            case ITEM_TYPE_PREVIEW_URL:
+                return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.item_attachment_link_preview,
+                    parent,
+                    false
+                ));
             default:
             case ITEM_TYPE_IMAGE:
                 return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
@@ -76,18 +84,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
         switch (getItemViewType(position)) {
             default:
             case ITEM_TYPE_IMAGE:
-                if (new IsYoutubeUrl(uri.toString()).value()) {
-                    onBindImage(
-                        Uri.parse(new YoutubePreviewUrl(new UrlVideoId(uri.toString())).value()),
-                        holder,
-                        () -> {
-                            Intent intent = new Intent(ACTION_VIEW);
-                            intent.setData(uri);
-                            context.startActivity(intent);
-                        });
-                } else {
-                    onBindImage(uri, holder, () -> showFullScreenImage(context, uri));
-                }
+                onBindImage(uri, holder, () -> showFullScreenImage(context, uri));
                 break;
             case ITEM_TYPE_VIDEO:
                 onBindVideo(uri, holder);
@@ -95,7 +92,40 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             case ITEM_TYPE_AUDIO:
                 onBindAudio(uri, holder);
                 break;
+            case ITEM_TYPE_PREVIEW_URL:
+                onBindPreview(uri, holder);
+                break;
         }
+    }
+
+    private void onBindPreview(Uri uri, ViewHolder holder) {
+        RichPreview preview = new RichPreview(new ResponseListener() {
+            @Override
+            public void onData(MetaData metaData) {
+                final View root = holder.getRootView();
+                ImageView icon = root.findViewById(R.id.itemAttachmentUrlPreview_icon);
+                Glide.with(icon.getContext())
+                    .load(metaData.getImageurl())
+                    .into(icon);
+                TextView urlText = root.findViewById(R.id.itemAttachmentUrlPreview_urlText);
+                urlText.setText(metaData.getUrl());
+                TextView title = root.findViewById(R.id.itemAttachmentUrlPreview_title);
+                title.setText(metaData.getTitle());
+                root.setOnClickListener(it ->
+                    it.getContext().startActivity(new Intent(ACTION_VIEW, uri))
+                );
+                root.setOnLongClickListener(it -> {
+                    showProperties(holder, uri);
+                    return true;
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+        preview.getPreview(uri.toString());
     }
 
     private void showFullScreenImage(Context context, Uri uri) {
@@ -198,9 +228,21 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             return ITEM_TYPE_VIDEO;
         } else if (mimeType.startsWith("audio")) {
             return ITEM_TYPE_AUDIO;
+        } else if (mimeType.startsWith("image")) {
+            return ITEM_TYPE_IMAGE;
         } else {
+            if (uri.toString().startsWith("http")) {
+                return ITEM_TYPE_PREVIEW_URL;
+            }
             return ITEM_TYPE_IMAGE;
         }
+    }
+
+    /**
+     * Determine if the given position should have full span.
+     */
+    public boolean isFullSpan(int position) {
+        return getItemViewType(position) == ITEM_TYPE_PREVIEW_URL;
     }
 
     @Override

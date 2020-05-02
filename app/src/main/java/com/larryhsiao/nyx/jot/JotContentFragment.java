@@ -68,9 +68,6 @@ import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagsByJotId;
 import com.larryhsiao.nyx.core.tags.TagsByKeyword;
-import com.larryhsiao.nyx.core.youtube.IsYoutubeUrl;
-import com.larryhsiao.nyx.core.youtube.UrlVideoId;
-import com.larryhsiao.nyx.core.youtube.YoutubePreviewUrl;
 import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.util.EmbedMapFragment;
 import com.linkedin.urls.Url;
@@ -87,6 +84,9 @@ import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.source.ConstSource;
 import com.stfalcon.imageviewer.StfalconImageViewer;
+import io.github.ponnamkarthik.richlinkpreview.MetaData;
+import io.github.ponnamkarthik.richlinkpreview.ResponseListener;
+import io.github.ponnamkarthik.richlinkpreview.RichPreview;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -676,39 +676,55 @@ public class JotContentFragment extends JotFragment implements BackControl {
             updateVideo(root, attachmentUri);
         } else if (mimeType.startsWith("audio/")) {
             updateAudio(root, attachmentUri);
+        } else if (mimeType.startsWith("image/")) {
+            updateImage(root, attachmentUri);
         } else {
-            if (new IsYoutubeUrl(attachmentUri.toString()).value()) {
-                updateYoutube(root, attachmentUri);
+            if (attachmentUri.toString().startsWith("http")) {
+                updatePreview(root, attachmentUri);
             } else {
                 updateImage(root, attachmentUri);
             }
         }
     }
 
-    private void updateYoutube(FrameLayout root, Uri uri) {
-        LayoutInflater.from(getContext())
-            .inflate(R.layout.item_attachment_image, root, true);
-        final ImageView icon = root.findViewById(R.id.itemAttachmentImage_icon);
-        CircularProgressDrawable progress = new CircularProgressDrawable(icon.getContext());
-        progress.setStyle(LARGE);
-        Glide.with(root.getContext())
-            .load(new YoutubePreviewUrl(
-                new UrlVideoId(uri.toString())
-            ).value())
-            .into(icon);
-        icon.setOnClickListener(v -> {
-            if (attachmentOnView.size() > 1) {
-                browseAttachments();
-            } else {
-                final Intent intent = new Intent(ACTION_VIEW);
-                intent.setData(uri);
-                root.getContext().startActivity(intent);
+    private void updatePreview(FrameLayout root, Uri attachmentUri) {
+        LayoutInflater.from(getContext()).inflate(
+            R.layout.item_attachment_link_preview,
+            root,
+            true
+        );
+        root.setOnClickListener(v -> {
+                if (attachmentOnView.size() > 1) {
+                    browseAttachments();
+                } else {
+                    root.getContext().startActivity(new Intent(ACTION_VIEW, attachmentUri));
+                }
+            }
+        );
+        root.setOnLongClickListener(v -> {
+                showProperties(root, attachmentUri);
+                return true;
+            }
+        );
+        RichPreview preview = new RichPreview(new ResponseListener() {
+            @Override
+            public void onData(MetaData metaData) {
+                ImageView icon = root.findViewById(R.id.itemAttachmentUrlPreview_icon);
+                Glide.with(root.getContext())
+                    .load(metaData.getImageurl())
+                    .into(icon);
+                TextView content = root.findViewById(R.id.itemAttachmentUrlPreview_title);
+                content.setText(metaData.getTitle());
+                TextView urlText = root.findViewById(R.id.itemAttachmentUrlPreview_urlText);
+                urlText.setText(metaData.getUrl());
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // @todo #0 Error icon for loading preview failed
             }
         });
-        icon.setOnLongClickListener(v -> {
-            showProperties(v, uri);
-            return true;
-        });
+        preview.getPreview(attachmentUri.toString());
     }
 
     private void updateEmptyAttachment(FrameLayout root) {
@@ -871,7 +887,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         } else if (mimeType.startsWith("audio")) {
             attachmentOnView.add(uri);
         } else {
-            if (new IsYoutubeUrl(uri.toString()).value()) {
+            if (uri.toString().startsWith("http")) {
                 attachmentOnView.add(uri);
             } else {
                 unsupportedCallback.run();
