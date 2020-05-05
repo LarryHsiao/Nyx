@@ -569,6 +569,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         new AlertDialog.Builder(getContext())
             .setTitle(R.string.delete)
             .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                new RemovalAttachmentByJotId(db, jot.id()).fire();
                 new JotRemoval(db, jot.id()).fire();
                 getParentFragmentManager().popBackStack();
             })
