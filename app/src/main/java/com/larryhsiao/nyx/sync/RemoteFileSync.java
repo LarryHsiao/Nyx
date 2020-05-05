@@ -117,7 +117,7 @@ public class RemoteFileSync implements Action {
             });
         } catch (IOException e) {
             e.printStackTrace();
-            // @todo #0 Handle open file stream failed.
+            // @todo #0 Handle open file download failed.
             syncAttachment(remoteRoot, iterator);
         }
     }

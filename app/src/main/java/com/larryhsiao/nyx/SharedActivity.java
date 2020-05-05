@@ -28,7 +28,7 @@ import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
 import static java.lang.Double.MIN_VALUE;
 
 /**
- * Activity that launched by third-party apps to create jot from the share list.
+ * Activity that launched by third-party apps to touch jot from the share list.
  */
 public class SharedActivity extends JotActivity {
     private static final int REQUEST_CODE_NEW_JOT = 1000;

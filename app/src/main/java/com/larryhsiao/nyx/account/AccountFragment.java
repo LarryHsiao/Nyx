@@ -14,6 +14,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
@@ -34,6 +37,7 @@ import com.silverhetch.clotho.source.ConstSource;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 import static android.graphics.Bitmap.Config.ARGB_8888;
@@ -42,7 +46,7 @@ import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 /**
  * Account page
  */
-public class AccountFragment extends JotFragment {
+public class AccountFragment extends JotFragment implements PurchasesUpdatedListener {
     private static final int REQUEST_CODE_LOG_IN = 1000;
 
     @Override
@@ -164,5 +168,10 @@ public class AccountFragment extends JotFragment {
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+    @Override
+    public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> list) {
+
     }
 }
