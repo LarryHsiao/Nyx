@@ -24,6 +24,7 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.backup.google.DriveBackupFragment;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
@@ -56,7 +57,11 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+        @NonNull LayoutInflater inflater,
+        @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState
+    ) {
         return inflater.inflate(R.layout.page_account, container, false);
     }
 
@@ -64,6 +69,9 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateView(view);
+        getChildFragmentManager().beginTransaction()
+            .replace(R.id.account_driveBackupContainer, new DriveBackupFragment())
+            .commit();
     }
 
     private void updateView(View view) {
@@ -82,26 +90,26 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
         staticsText.append("\n");
         staticsText.append(
             getString(R.string.tags_title,
-                "" + new QueriedTags(new AllTags(db)).value().size()));
+                "" + new QueriedTags(new AllTags(db)).value().size())
+        );
         staticsText.append("\n");
-        staticsText.append(getString(
-            R.string.Storage_usage_,
-            new SizeText(
-                new FileSize(
-                    new File(
-                        getContext().getFilesDir(),
-                        "attachments"
-                    ).toPath()
-                )
-            ).value()
+        staticsText.append(
+            getString(R.string.Storage_usage_,
+                new SizeText(
+                    new FileSize(
+                        new File(
+                            getContext().getFilesDir(),
+                            "attachments"
+                        ).toPath()
+                    )
+                ).value()
             )
         );
         staticsText.append("\n");
     }
 
     private void loadUserIcon(View view, FirebaseUser user) {
-        final CircularProgressDrawable placeholder
-            = new CircularProgressDrawable(view.getContext());
+        final CircularProgressDrawable placeholder = new CircularProgressDrawable(view.getContext());
         placeholder.setStyle(LARGE);
         final ImageView icon = view.findViewById(R.id.account_icon);
         Glide.with(this).load(user.getPhotoUrl())

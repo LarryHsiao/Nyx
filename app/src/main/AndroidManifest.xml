@@ -84,6 +84,5 @@
                 <data android:mimeType="audio/*"/>
             </intent-filter>
         </activity>
-        <activity android:name=".backup.google.DriveBackupActivity"/>
     </application>
 </manifest>

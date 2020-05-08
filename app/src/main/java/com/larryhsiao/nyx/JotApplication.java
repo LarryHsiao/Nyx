@@ -8,11 +8,7 @@ import org.flywaydb.core.api.android.ContextHolder;
 
 import java.io.File;
 import java.sql.Connection;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+
 
 /**
  * Application of Jot.
