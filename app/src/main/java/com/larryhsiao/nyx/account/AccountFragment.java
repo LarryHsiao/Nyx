@@ -1,58 +1,53 @@
 package com.larryhsiao.nyx.account;
 
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
+import com.android.billingclient.api.SkuDetails;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.backup.google.DriveBackupFragment;
 import com.larryhsiao.nyx.base.JotFragment;
-import com.larryhsiao.nyx.core.jots.AllJots;
-import com.larryhsiao.nyx.core.jots.QueriedJots;
-import com.larryhsiao.nyx.core.tags.AllTags;
-import com.larryhsiao.nyx.core.tags.QueriedTags;
-import com.larryhsiao.nyx.sync.SyncService;
-import com.silverhetch.aura.view.bitmap.CircledDrawable;
-import com.silverhetch.clotho.file.FileSize;
-import com.silverhetch.clotho.file.SizeText;
-import com.silverhetch.clotho.source.ConstSource;
+import com.larryhsiao.nyx.sync.PremiumFragment;
+import com.silverhetch.aura.view.alert.Alert;
 
-import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import static android.app.Activity.RESULT_OK;
-import static android.graphics.Bitmap.Config.ARGB_8888;
-import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
+import static com.android.billingclient.api.BillingClient.BillingResponseCode.OK;
+import static com.android.billingclient.api.BillingClient.SkuType.INAPP;
+import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
+import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
+import static com.android.billingclient.api.SkuDetailsParams.newBuilder;
+import static com.larryhsiao.nyx.JotApplication.SKU_DRIVE_BACKUP;
+import static com.larryhsiao.nyx.JotApplication.SKU_PREMIUM;
 
 /**
  * Account page
  */
 public class AccountFragment extends JotFragment implements PurchasesUpdatedListener {
-    private static final int REQUEST_CODE_LOG_IN = 1000;
+    private static final int REQUEST_CODE_ERROR = 1000;
+    private BillingClient billing;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        billing = BillingClient.newBuilder(getContext())
+            .enablePendingPurchases()
+            .setListener(this)
+            .build();
     }
 
     @Nullable
@@ -68,118 +63,131 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        updateView(view);
-        getChildFragmentManager().beginTransaction()
-            .replace(R.id.account_driveBackupContainer, new DriveBackupFragment())
-            .commit();
-    }
+        billing.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                if (billingResult.getResponseCode() == OK) {
+                    queryAvailable();
+                } else {
+                    Alert.Companion.newInstance(
+                        REQUEST_CODE_ERROR, getString(R.string.not_available)
+                    ).show(getChildFragmentManager(), null);
+                }
+            }
 
-    private void updateView(View view) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        boolean isLoggedIn = user != null;
-        if (isLoggedIn) {
-            updateViewLoggedIn(view, user);
-        } else {
-            updateViewLoggedOut(view);
-        }
-        TextView staticsText = view.findViewById(R.id.account_jot_statics);
-        staticsText.setText("");
-        staticsText.append(
-            getString(R.string.jots_title,
-                "" + new QueriedJots(new AllJots(db)).value().size()));
-        staticsText.append("\n");
-        staticsText.append(
-            getString(R.string.tags_title,
-                "" + new QueriedTags(new AllTags(db)).value().size())
-        );
-        staticsText.append("\n");
-        staticsText.append(
-            getString(R.string.Storage_usage_,
-                new SizeText(
-                    new FileSize(
-                        new File(
-                            getContext().getFilesDir(),
-                            "attachments"
-                        ).toPath()
-                    )
-                ).value()
-            )
-        );
-        staticsText.append("\n");
-    }
-
-    private void loadUserIcon(View view, FirebaseUser user) {
-        final CircularProgressDrawable placeholder = new CircularProgressDrawable(view.getContext());
-        placeholder.setStyle(LARGE);
-        final ImageView icon = view.findViewById(R.id.account_icon);
-        Glide.with(this).load(user.getPhotoUrl())
-            .error(getResources().getDrawable(R.drawable.ic_user, null))
-            .placeholder(placeholder)
-            .apply(RequestOptions.circleCropTransform())
-            .into(icon);
-    }
-
-    private void updateViewLoggedOut(View view) {
-        Bitmap bitmap = Bitmap.createBitmap(1, 1, ARGB_8888);
-        bitmap.eraseColor(Color.GRAY);
-        ImageView icon = view.findViewById(R.id.account_icon);
-        icon.setImageDrawable(new CircledDrawable(
-            getResources(),
-            new ConstSource<>(bitmap)
-        ).value());
-        TextView info = view.findViewById(R.id.account_info);
-        info.setText("");
-        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
-        loginLogoutBtn.setText(R.string.login);
-        loginLogoutBtn.setOnClickListener(v -> {
-            startActivityForResult(AuthUI.getInstance()
-                .createSignInIntentBuilder()
-                .setAvailableProviders(Arrays.asList(
-                    new AuthUI.IdpConfig.EmailBuilder().build(),
-                    new AuthUI.IdpConfig.GoogleBuilder().build()
-                )).build(), REQUEST_CODE_LOG_IN
-            );
+            @Override
+            public void onBillingServiceDisconnected() {
+            }
         });
     }
 
-    private void updateViewLoggedIn(View view, FirebaseUser user) {
-        TextView info = view.findViewById(R.id.account_info);
-        info.append(getString(R.string.name_title, user.getDisplayName()));
-        info.append("\n");
-        info.append(getString(R.string.email_title, user.getEmail()));
-        Button loginLogoutBtn = view.findViewById(R.id.account_login_logout);
-        loginLogoutBtn.setText(R.string.logout);
-        loginLogoutBtn.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            updateView(view);
-        });
-        loadUserIcon(view, user);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_LOG_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == RESULT_OK) {
-                updateView(getView());
-                SyncService.enqueue(getContext());
-            } else {
-                Toast.makeText(getContext(),
-                    "error " + response,
-                    Toast.LENGTH_SHORT).show();
+    private void queryAvailable() {
+        Set<String> available = new HashSet<>();
+        List<Purchase> purchasesList = billing.queryPurchases(INAPP).getPurchasesList();
+        if (purchasesList != null) {
+            for (Purchase purchase : purchasesList) {
+                if (SKU_DRIVE_BACKUP.equals(purchase.getSku())
+                    && purchase.getPurchaseState() == PURCHASED) {
+                    available.add(SKU_DRIVE_BACKUP);
+                }
             }
         }
+
+        List<Purchase> subList = billing.queryPurchases(SUBS).getPurchasesList();
+        if (subList != null) {
+            for (Purchase purchase : subList) {
+                if (SKU_PREMIUM.equals(purchase.getSku())
+                    && purchase.getPurchaseState() == PURCHASED) {
+                    available.add(SKU_PREMIUM);
+                }
+            }
+        }
+
+        updateDriveBlock(available);
+        updateFirebaseBlock(available);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void updateDriveBlock(Set<String> available) {
+        if (available.contains(SKU_DRIVE_BACKUP)) {
+            getChildFragmentManager().beginTransaction()
+                .replace(R.id.account_driveBackupContainer, new DriveBackupFragment())
+                .commit();
+        } else {
+            View view = LayoutInflater.from(getContext()).inflate(
+                R.layout.block_purchase,
+                getView().findViewById(R.id.account_driveBackupContainer)
+            );
+            view.findViewById(R.id.blockPurchase_purchaseButton).setOnClickListener(it ->
+                launchPurchase(SKU_DRIVE_BACKUP, INAPP)
+            );
+        }
+    }
+
+    private void updateFirebaseBlock(Set<String> available) {
+        if (available.contains(SKU_PREMIUM)) {
+            getChildFragmentManager().beginTransaction()
+                .replace(R.id.account_firebaseSyncContainer, new PremiumFragment())
+                .commit();
+        } else {
+            // @todo #1 Detect user unsubscribed every time launch the app.
+            FirebaseAuth.getInstance().signOut();
+            View view = LayoutInflater.from(getContext()).inflate(
+                R.layout.block_purchase,
+                getView().findViewById(R.id.account_firebaseSyncContainer)
+            );
+            view.findViewById(R.id.blockPurchase_purchaseButton).setOnClickListener(it ->
+                launchPurchase(SKU_PREMIUM, SUBS)
+            );
+        }
+    }
+
+    private void launchPurchase(String skuType, String purchaseType) {
+        billing.querySkuDetailsAsync(
+            newBuilder()
+                .setSkusList(Arrays.asList(skuType))
+                .setType(purchaseType)
+                .build(),
+            (billingResult, list) -> {
+                if (billingResult.getResponseCode() != OK) {
+                    return;
+                }
+                for (SkuDetails skuDetails : list) {
+                    if (skuType.equals(skuDetails.getSku())) {
+                        billing.launchBillingFlow(
+                            getActivity(),
+                            BillingFlowParams.newBuilder()
+                                .setSkuDetails(skuDetails)
+                                .build()
+                        );
+                    }
+                }
+            }
+        );
     }
 
     @Override
     public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> list) {
-
+        if (billingResult.getResponseCode() != OK || list == null) {
+            return;
+        }
+        for (Purchase purchase : list) {
+            if (purchase.getPurchaseState() == PURCHASED
+                && SKU_DRIVE_BACKUP.equals(purchase.getSku())) {
+                if (!purchase.isAcknowledged()) {
+                    billing.acknowledgePurchase(
+                        AcknowledgePurchaseParams.newBuilder()
+                            .setPurchaseToken(purchase.getPurchaseToken())
+                            .build(),
+                        res -> {
+                            ((ViewGroup) getView().findViewById(R.id.account_driveBackupContainer)).removeAllViews();
+                            getChildFragmentManager().beginTransaction()
+                                .replace(R.id.account_driveBackupContainer, new DriveBackupFragment())
+                                .commit();
+                        }
+                    );
+                }
+            }
+        }
     }
+
 }

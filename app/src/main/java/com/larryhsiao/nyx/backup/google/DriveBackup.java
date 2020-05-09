@@ -10,7 +10,6 @@ import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.file.FileDelete;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -65,19 +64,25 @@ public class DriveBackup implements Backup {
     }
 
     private void backupFiles() throws IOException {
-        for (Attachment attachment : new QueriedAttachments(new AllAttachments(db)).value()) {
+        for (Attachment attachment : new QueriedAttachments(new AllAttachments(db, true)).value()) {
             Uri uri = Uri.parse(attachment.uri());
             final String mimeType = new UriMimeType(context, uri.toString()).value();
             List<File> exist = driveFiles.byName(uri.getLastPathSegment());
-            if (exist.isEmpty()) {
-                driveFiles.save(
-                    driveFiles.touch(uri.getLastPathSegment(), mimeType),
-                    uri.getLastPathSegment(),
-                    context.getContentResolver().openInputStream(uri),
-                    mimeType
-                );
+            if (attachment.deleted()) {
+                if (!exist.isEmpty()) {
+                    driveFiles.delete(exist.get(0).getId());
+                }
             } else {
-                // @todo #0 Check the remote file and locale file are same.
+                if (exist.isEmpty()) {
+                    driveFiles.save(
+                        driveFiles.touch(uri.getLastPathSegment(), mimeType),
+                        uri.getLastPathSegment(),
+                        context.getContentResolver().openInputStream(uri),
+                        mimeType
+                    );
+                } else {
+                    // @todo #0 Check the remote file and locale file are same.
+                }
             }
         }
     }

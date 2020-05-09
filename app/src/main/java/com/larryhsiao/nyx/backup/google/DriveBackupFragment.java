@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
+import com.google.common.base.Strings;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.silverhetch.aura.view.span.ClickableStr;
@@ -67,11 +68,14 @@ public class DriveBackupFragment extends JotFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        TextView title = view.findViewById(R.id.backup_title);
+        title.setText(R.string.Google_Drive_backup);
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(view.getContext());
         if (account == null) {
             updateAccountUI();
         } else {
             updateAccountUI(account);
+            initDrive();
         }
     }
 
@@ -114,13 +118,13 @@ public class DriveBackupFragment extends JotFragment {
     private void updateAccountUI(GoogleSignInAccount account) {
         getView().findViewById(R.id.backup_backupBtn).setEnabled(true);
         getView().findViewById(R.id.backup_restoreBtn).setEnabled(true);
-        TextView accountText = getView().findViewById(R.id.backup_accountInfo);
-        accountText.setText("");
-        accountText.append(account.getDisplayName());
-        accountText.append("\n");
-        accountText.append(account.getEmail());
-        accountText.append("\n");
-        accountText.append(
+        TextView info = getView().findViewById(R.id.backup_accountInfo);
+        info.setText("");
+        info.append(Strings.nullToEmpty(account.getDisplayName()));
+        info.append("\n");
+        info.append(account.getEmail());
+        info.append("\n");
+        info.append(
             new ClickableStr(
                 new ColoredStr(
                     new ConstSource<>(getString(R.string.logout)),
@@ -132,10 +136,9 @@ public class DriveBackupFragment extends JotFragment {
                 }
             ).value()
         );
-        accountText.setMovementMethod(LinkMovementMethod.getInstance());
-
+        info.setMovementMethod(LinkMovementMethod.getInstance());
         final CircularProgressDrawable placeholder = new CircularProgressDrawable(
-            accountText.getContext()
+            info.getContext()
         );
         placeholder.setStyle(LARGE);
         ImageView icon = getView().findViewById(R.id.backup_userIcon);

@@ -14,6 +14,8 @@ import java.sql.Connection;
  * Application of Jot.
  */
 public class JotApplication extends Application {
+    public static final String SKU_DRIVE_BACKUP = "cloud_backup";
+    public static final String SKU_PREMIUM = "premium";
     public static final String URI_FILE_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments/";
     public static final String URI_FILE_TEMP_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments_temp/";
     public long lastAuthed = 0L;

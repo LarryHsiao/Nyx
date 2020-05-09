@@ -6,9 +6,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:padding="16dp"
     android:layout_height="wrap_content">
+    <TextView
+        app:layout_constraintTop_toTopOf="parent"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/backup_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <ImageView
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backup_title"
         app:layout_constraintStart_toStartOf="parent"
         android:id="@+id/backup_userIcon"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +44,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:text="@string/Backup"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/backup_centerVertical"
         app:layout_constraintTop_toBottomOf="@id/backup_accountInfo"/>
 
     <Button
@@ -46,11 +54,11 @@
         android:layout_marginStart="8dp"
         android:text="@string/Restore"
         app:layout_constraintBottom_toBottomOf="@+id/backup_backupBtn"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/backup_centerVertical"
         app:layout_constraintTop_toTopOf="@+id/backup_backupBtn"/>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
+        android:id="@+id/backup_centerVertical"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
