@@ -73,17 +73,21 @@ public class DriveBackup implements Backup {
                     driveFiles.delete(exist.get(0).getId());
                 }
             } else {
-                if (exist.isEmpty()) {
-                    driveFiles.save(
-                        driveFiles.touch(uri.getLastPathSegment(), mimeType),
-                        uri.getLastPathSegment(),
-                        context.getContentResolver().openInputStream(uri),
-                        mimeType
-                    );
-                } else {
-                    // @todo #0 Check the remote file and locale file are same.
-                }
+                backupFile(exist, mimeType, uri);
             }
+        }
+    }
+
+    private void backupFile(List<File> exist, String mimeType, Uri uri) throws IOException {
+        if (exist.isEmpty()) {
+            driveFiles.save(
+                driveFiles.touch(uri.getLastPathSegment(), mimeType),
+                uri.getLastPathSegment(),
+                context.getContentResolver().openInputStream(uri),
+                mimeType
+            );
+        } else {
+            // @todo #0 Check the remote file and locale file are same.
         }
     }
 

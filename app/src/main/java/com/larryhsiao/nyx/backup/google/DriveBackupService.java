@@ -62,8 +62,37 @@ public class DriveBackupService extends JobIntentService implements ServiceIds, 
                 "backup_jots"
             )
         );
+        switch (intent.getAction()) {
+            case ACTION_BACKUP:
+                notification(getString(R.string.BackingUp), false);
+                backup.save();
+                notification(getString(R.string.Backup_done), true);
+                break;
+            case ACTION_RESTORE:
+                notification(getString(R.string.Restoring), false);
+                backup.restore();
+                notification(getString(R.string.Restored), true);
+                break;
+            default:
+                break;
+        }
+    }
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+    private void notification(String title, boolean finished) {
+        NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+        NotificationCompat.Builder builder = notification(manager);
+        builder.setContentTitle(title);
+        if (finished) {
+            builder.setProgress(0, 0, false);
+            builder.setOngoing(false);
+        } else {
+            builder.setProgress(0, 0, true);
+            builder.setOngoing(true);
+        }
+        manager.notify(NOTIFICATION_ID_BACKUP_DRIVE, builder.build());
+    }
+
+    private NotificationCompat.Builder notification(NotificationManagerCompat notificationManager) {
         if (SDK_INT >= O) {
             NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID_BACKUP_DRIVE,
@@ -73,38 +102,12 @@ public class DriveBackupService extends JobIntentService implements ServiceIds, 
             channel.setDescription(getString(R.string.Backup_Restore_Jots_to_drives));
             notificationManager.createNotificationChannel(channel);
         }
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+        return new NotificationCompat.Builder(
             this,
             CHANNEL_ID_BACKUP_DRIVE
         ).setSmallIcon(R.drawable.ic_jotted)
             .setPriority(PRIORITY_DEFAULT)
             .setAutoCancel(false);
-        switch (intent.getAction()) {
-            case ACTION_BACKUP:
-                builder.setContentTitle(getString(R.string.BackingUp));
-                builder.setProgress(100, 0, true);
-                builder.setOngoing(true);
-                notificationManager.notify(NOTIFICATION_ID_BACKUP_DRIVE, builder.build());
-                backup.save();
-                builder.setContentTitle(getString(R.string.Backup_done));
-                builder.setProgress(0, 0, false);
-                builder.setOngoing(false);
-                notificationManager.notify(NOTIFICATION_ID_BACKUP_DRIVE, builder.build());
-                break;
-            case ACTION_RESTORE:
-                builder.setContentTitle(getString(R.string.Restoring));
-                builder.setProgress(100, 0, true);
-                builder.setOngoing(true);
-                notificationManager.notify(NOTIFICATION_ID_BACKUP_DRIVE, builder.build());
-                backup.restore();
-                builder.setContentTitle(getString(R.string.Restored));
-                builder.setProgress(0, 0, false);
-                builder.setOngoing(false);
-                notificationManager.notify(NOTIFICATION_ID_BACKUP_DRIVE, builder.build());
-                break;
-            default:
-                break;
-        }
     }
 
     private GoogleAccountCredential credential(GoogleSignInAccount account) {

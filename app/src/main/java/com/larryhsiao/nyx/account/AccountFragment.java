@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -35,7 +38,7 @@ import static com.larryhsiao.nyx.JotApplication.SKU_DRIVE_BACKUP;
 import static com.larryhsiao.nyx.JotApplication.SKU_PREMIUM;
 
 /**
- * Account page
+ * Account page.
  */
 public class AccountFragment extends JotFragment implements PurchasesUpdatedListener {
     private static final int REQUEST_CODE_ERROR = 1000;
@@ -108,6 +111,14 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
     }
 
     private void updateDriveBlock(Set<String> available) {
+        if (available.contains(SKU_PREMIUM)) {
+            Fragment fragment = getChildFragmentManager().findFragmentById(R.id.account_driveBackupContainer);
+            if (fragment != null) {
+                getChildFragmentManager().beginTransaction().remove(fragment).commit();
+            }
+            ((ViewGroup) getView().findViewById(R.id.account_driveBackupContainer)).removeAllViews();
+            return;
+        }
         if (available.contains(SKU_DRIVE_BACKUP)) {
             getChildFragmentManager().beginTransaction()
                 .replace(R.id.account_driveBackupContainer, new DriveBackupFragment())
@@ -117,6 +128,8 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
                 R.layout.block_purchase,
                 getView().findViewById(R.id.account_driveBackupContainer)
             );
+            ((TextView) view.findViewById(R.id.blockPurchase_functionName))
+                .setText(getString(R.string.Google_Drive_backup));
             view.findViewById(R.id.blockPurchase_purchaseButton).setOnClickListener(it ->
                 launchPurchase(SKU_DRIVE_BACKUP, INAPP)
             );
@@ -124,6 +137,8 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
     }
 
     private void updateFirebaseBlock(Set<String> available) {
+        ViewGroup root = getView().findViewById(R.id.account_firebaseSyncContainer);
+        root.removeAllViews();
         if (available.contains(SKU_PREMIUM)) {
             getChildFragmentManager().beginTransaction()
                 .replace(R.id.account_firebaseSyncContainer, new PremiumFragment())
@@ -133,11 +148,12 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
             FirebaseAuth.getInstance().signOut();
             View view = LayoutInflater.from(getContext()).inflate(
                 R.layout.block_purchase,
-                getView().findViewById(R.id.account_firebaseSyncContainer)
+                root
             );
-            view.findViewById(R.id.blockPurchase_purchaseButton).setOnClickListener(it ->
-                launchPurchase(SKU_PREMIUM, SUBS)
-            );
+            ((TextView) view.findViewById(R.id.blockPurchase_functionName)).setText(getString(R.string.Premium));
+            Button purchaseBtn = view.findViewById(R.id.blockPurchase_purchaseButton);
+            purchaseBtn.setText(getString(R.string.Subscribe));
+            purchaseBtn.setOnClickListener(it -> launchPurchase(SKU_PREMIUM, SUBS));
         }
     }
 
@@ -171,21 +187,13 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
             return;
         }
         for (Purchase purchase : list) {
-            if (purchase.getPurchaseState() == PURCHASED
-                && SKU_DRIVE_BACKUP.equals(purchase.getSku())) {
-                if (!purchase.isAcknowledged()) {
-                    billing.acknowledgePurchase(
-                        AcknowledgePurchaseParams.newBuilder()
-                            .setPurchaseToken(purchase.getPurchaseToken())
-                            .build(),
-                        res -> {
-                            ((ViewGroup) getView().findViewById(R.id.account_driveBackupContainer)).removeAllViews();
-                            getChildFragmentManager().beginTransaction()
-                                .replace(R.id.account_driveBackupContainer, new DriveBackupFragment())
-                                .commit();
-                        }
-                    );
-                }
+            if (purchase.getPurchaseState() == PURCHASED && !purchase.isAcknowledged()) {
+                billing.acknowledgePurchase(
+                    AcknowledgePurchaseParams.newBuilder()
+                        .setPurchaseToken(purchase.getPurchaseToken())
+                        .build(),
+                    res -> queryAvailable()
+                );
             }
         }
     }
