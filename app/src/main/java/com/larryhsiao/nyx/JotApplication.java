@@ -1,6 +1,8 @@
 package com.larryhsiao.nyx;
 
 import android.app.Application;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.larryhsiao.nyx.core.NyxDb;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
@@ -20,6 +22,7 @@ public class JotApplication extends Application {
     public static final String URI_FILE_TEMP_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments_temp/";
     public long lastAuthed = 0L;
     public Source<Connection> db;
+    public FirebaseRemoteConfig remoteConfig;
 
     @Override
     public void onCreate() {
@@ -27,5 +30,13 @@ public class JotApplication extends Application {
         ContextHolder.setContext(this);
         File dbFile = new File(getFilesDir(), "jot");
         db = new SingleConn(new NyxDb(dbFile));
+        remoteConfig = FirebaseRemoteConfig.getInstance();
+        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults);
+        remoteConfig.setConfigSettingsAsync(
+            new FirebaseRemoteConfigSettings.Builder()
+                .setFetchTimeoutInSeconds(60)
+                .build()
+        );
+        remoteConfig.fetchAndActivate();
     }
 }

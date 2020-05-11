@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.account;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -107,11 +108,13 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
         }
 
         updateDriveBlock(available);
-        updateFirebaseBlock(available);
+        if (remoteConfig.getBoolean("premium_enabled")) {
+            updateFirebaseBlock(available);
+        }
     }
 
     private void updateDriveBlock(Set<String> available) {
-        if (available.contains(SKU_PREMIUM)) {
+        if (available.contains(SKU_PREMIUM) && remoteConfig.getBoolean("premium_enabled")) {
             Fragment fragment = getChildFragmentManager().findFragmentById(R.id.account_driveBackupContainer);
             if (fragment != null) {
                 getChildFragmentManager().beginTransaction().remove(fragment).commit();
