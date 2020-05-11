@@ -7,6 +7,7 @@ import androidx.core.app.JobIntentService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.ServiceIds;
 import com.silverhetch.clotho.Source;
 
 import java.sql.Connection;
@@ -16,11 +17,10 @@ import java.sql.Connection;
  *
  * @todo #1 Inform user to resolve conflict if the local data will be override.
  */
-public class SyncService extends JobIntentService {
-    private static final int JOB_ID = 1000;
+public class SyncService extends JobIntentService implements ServiceIds {
 
     public static void enqueue(Context context) {
-        enqueueWork(context, SyncService.class, JOB_ID, new Intent());
+        enqueueWork(context, SyncService.class, SYNC, new Intent());
     }
 
     @Override

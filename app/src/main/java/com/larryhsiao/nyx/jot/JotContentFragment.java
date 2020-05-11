@@ -50,6 +50,7 @@ import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.NewAttachment;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.core.attachments.RemovalAttachment;
+import com.larryhsiao.nyx.core.attachments.RemovalAttachmentByJotId;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotRemoval;
@@ -112,12 +113,15 @@ import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
 import static java.lang.Double.MIN_VALUE;
+import static java.util.Calendar.ZONE_OFFSET;
 
 /**
  * Fragment that shows the Jot content.
  *
- * @todo #0 One click create template jot with geometry, and some pictures.
+ * @todo #0 One click touch template jot with geometry, and some pictures.
  * @todo #0 Survey capture image, video and audio in app or use third-party apps.
+ * @todo #0 Handle removing http url will still touch new attachment.
+ * @todo #0 Loading progress for loading preview url image.
  */
 public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
@@ -569,6 +573,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         new AlertDialog.Builder(getContext())
             .setTitle(R.string.delete)
             .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                new RemovalAttachmentByJotId(db, jot.id()).fire();
                 new JotRemoval(db, jot.id()).fire();
                 getParentFragmentManager().popBackStack();
             })
@@ -923,11 +928,9 @@ public class JotContentFragment extends JotFragment implements BackControl {
         jot = new WrappedJot(jot) {
             @Override
             public long createdTime() {
-                // @todo #0 Find out better solution for determining the time zone of the exif timestamp.
-                //          For now this solution is base on the picture is on the same time zone when saving this jot.
-                //          So the date time should be correct if user creating new jot from at same time zone as the picture took.
+                // @todo #0 Time zone determination for EXIF info.
                 TimeZone tz = TimeZone.getDefault();
-                return time - tz.getOffset(Calendar.ZONE_OFFSET);
+                return time - tz.getOffset(ZONE_OFFSET);
             }
         };
         updateDateIndicator();

@@ -18,7 +18,7 @@
     <string name="settings">Settings</string>
     <string name="calendar">Calendar</string>
     <string name="jotted">Jotted</string>
-    <string name="restore">Restore</string>
+    <string name="Restore">Restore</string>
     <string name="restore_with_">Restore with %s?</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
@@ -30,7 +30,9 @@
     <string name="tag">Tag</string>
     <string name="tag_title">Tag: %s</string>
     <string name="enter_new_tag">Enter new tag</string>
-    <string name="want_to_support_this_app">Want to support this app? How about buy me a coffee.</string>
+    <string name="want_to_support_this_app">Want to support this app? How about
+        buy me a coffee.
+    </string>
     <string name="support">Support</string>
     <string name="support_this_app">Support this app</string>
     <string name="thanks">Thanks!</string>
@@ -69,4 +71,25 @@
     <string name="no_location">No location</string>
     <string name="used_">Used: %s</string>
     <string name="Storage_usage_">Storage usage: %s</string>
+    <string name="Backup">Backup</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
+    <string
+        name="Restore_from_Google_Drive_will_remove_all_data_at_this_device_Proceed_">
+        Restore from Google Drvive will remove all data at this device. Proceed?
+    </string>
+    <string name="Backup_service_Drive_">Backup service(Drive)</string>
+    <string name="Backup_Restore_Jots_to_drives">Backup/Restore Jots to Drives
+    </string>
+    <string name="Backup_in_progress">Backup in progress</string>
+    <string name="Backup_Successfully">Backup Successfully</string>
+    <string name="BackingUp">Backing up</string>
+    <string name="Backup_done">Backup done</string>
+    <string name="Restoring">Restoring</string>
+    <string name="Restored">Restored</string>
+    <string name="Purchase">Purchase</string>
+    <string name="not_available">Not available</string>
+    <string name="Google_Drive_backup">Google Drive backup</string>
+    <string name="Premium">Premium</string>
+    <string name="Subscribe">Subscribe</string>
 </resources>

@@ -29,7 +29,8 @@ import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
  * Fragment that shows the attachments.
  *
  * @todo #0 Attachment sorting by created time.
- * @todo #0 Attachment comment in page.
+ * @todo #0 Attachment comment in pages.
+ * @todo #0 Preloader from Glide for RecyclerView.
  */
 public class AttachmentsFragment extends FullScreenDialogFragment {
     private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";

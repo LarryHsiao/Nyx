@@ -165,7 +165,9 @@ public class CalendarFragment extends JotFragment {
             getFragmentManager().popBackStack();
             new Handler().postDelayed(() -> {
                 root.shrink();
-                jotList.smoothScrollToPosition(adapter.getItemCount() - 1);
+                if (adapter.getItemCount() > 0) {
+                    jotList.smoothScrollToPosition(adapter.getItemCount() - 1);
+                }
             }, 100);
         }
     }

@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="default" uuid="0cab4c67-52d5-4edd-abf1-1552ffc33683">
+    <data-source source="LOCAL" name="jot.mv(2).db" uuid="e402c1d3-2e4b-4b1e-a49e-0038c2efa262">
       <driver-ref>h2.unified</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.h2.Driver</jdbc-driver>
-      <jdbc-url>jdbc:h2:mem:default</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="h2DBTemp" uuid="7c741a7b-06a4-41e2-8102-bfba9c26bb1d">
-      <driver-ref>h2.unified</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.h2.Driver</jdbc-driver>
-      <jdbc-url>jdbc:h2:file:$USER_HOME$/h2DBTemp</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="aaa.db" uuid="c289f50b-c354-4a07-9fd1-9efda465a939">
-      <driver-ref>h2.unified</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.h2.Driver</jdbc-driver>
-      <jdbc-url>jdbc:h2:file:$USER_HOME$/aaa.db;MV_STORE=false</jdbc-url>
+      <jdbc-url>jdbc:h2:file:$USER_HOME$/Downloads/jot.mv(2).db</jdbc-url>
     </data-source>
   </component>
 </project>

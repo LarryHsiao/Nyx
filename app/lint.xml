@@ -2,8 +2,9 @@
 <lint>
     <issue id="InvalidPackage">
         <!-- Can not control apache library includes javax-->
-        <ignore path="*/h2-*.jar" />
-        <ignore path="*/jts-*.jar" />
-        <ignore path="*/bsh-*.jar" />
+        <ignore path="*/h2-*.jar"/>
+        <ignore path="*/jts-*.jar"/>
+        <ignore path="*/bsh-*.jar"/>
+        <ignore path="*/httpclient-*.jar"/>
     </issue>
 </lint>

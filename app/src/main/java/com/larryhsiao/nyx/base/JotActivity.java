@@ -17,7 +17,7 @@ import java.sql.Connection;
  * Activity for Jot.
  */
 public abstract class JotActivity extends AuraActivity {
-    private Source<Connection> db;
+    protected Source<Connection> db;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

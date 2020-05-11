@@ -8,16 +8,14 @@ import org.flywaydb.core.api.android.ContextHolder;
 
 import java.io.File;
 import java.sql.Connection;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+
 
 /**
  * Application of Jot.
  */
 public class JotApplication extends Application {
+    public static final String SKU_DRIVE_BACKUP = "cloud_backup";
+    public static final String SKU_PREMIUM = "premium";
     public static final String URI_FILE_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments/";
     public static final String URI_FILE_TEMP_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments_temp/";
     public long lastAuthed = 0L;

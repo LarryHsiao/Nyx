@@ -17,8 +17,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
-def nyxVersionName = "v3.4.0"
-def nyxVersionCode = 30400
+def nyxVersionName = "v3.5.0"
+def nyxVersionCode = 30500
 
 android {
     compileSdkVersion 29
@@ -34,7 +34,7 @@ android {
         buildConfigField("String", "URI_HOST", "\"https://larryhsiao.com\"")
     }
     buildTypes {
-        debug{
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -58,12 +58,23 @@ android {
     packagingOptions {
     }
 
-    lintOptions{
+    lintOptions {
         lintConfig file("lint.xml")
     }
 
-    sourceSets{
-        main { assets.srcDirs += "../core/src/main/resources"}
+    sourceSets {
+        main { assets.srcDirs += "../core/src/main/resources" }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
     }
 }
 configurations.all {
@@ -72,10 +83,11 @@ configurations.all {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project (':nyx-core')
+    implementation project(':nyx-core')
+    implementation 'com.android.billingclient:billing:2.1.0'
     implementation group: 'com.linkedin.urls', name: 'url-detector', version: '0.1.17'
     implementation 'io.github.ponnamkarthik:richlinkpreview:1.0.9'
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
@@ -97,6 +109,13 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.1.0"
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
     implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation 'com.google.http-client:google-http-client-gson:1.26.0'
+    implementation('com.google.api-client:google-api-client-android:1.26.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
     testImplementation 'junit:junit:4.13'
     testImplementation "org.robolectric:robolectric:4.3.1"
     androidTestImplementation "androidx.test:runner:1.2.0"

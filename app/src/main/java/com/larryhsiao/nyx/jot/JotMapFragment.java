@@ -207,7 +207,9 @@ public class JotMapFragment extends JotFragment {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
             }
         } else {
-            map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+            if (cameraPos!=null) {
+                map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+            }
         }
     }
 
