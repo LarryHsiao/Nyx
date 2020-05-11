@@ -51,3 +51,5 @@
 
 -keep class com.larryhsiao.nyx.jot.JotMonthView { *; }
 -keep class com.larryhsiao.nyx.jot.JotWeekView { *; }
+
+-keep class androidx.exifinterface.media.ExifInterface { *; }
