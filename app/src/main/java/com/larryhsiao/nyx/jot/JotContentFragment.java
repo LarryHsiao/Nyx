@@ -71,6 +71,7 @@ import com.larryhsiao.nyx.core.tags.TagsByJotId;
 import com.larryhsiao.nyx.core.tags.TagsByKeyword;
 import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.util.EmbedMapFragment;
+import com.larryhsiao.nyx.util.JpegComparator;
 import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
 import com.schibstedspain.leku.LocationPickerActivity;
@@ -817,6 +818,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void browseAttachments() {
+        attachmentOnView.sort(new JpegComparator(getContext()));
         FullScreenDialogFragment dialog = AttachmentsFragment.newInstance(attachmentOnView);
         dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
         dialog.show(getParentFragmentManager(), null);
