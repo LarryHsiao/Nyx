@@ -29,7 +29,7 @@ public class JpegComparator implements Comparator<Uri> {
             String mimeType1 = new UriMimeType(context, o1.toString()).value();
             String mimeType2 = new UriMimeType(context, o2.toString()).value();
             if ("image/jpeg".equals(mimeType1) && "image/jpeg".equals(mimeType2)) {
-                return (int) (datetime(o2) - datetime(o1));
+                return (int) (datetime(o1) - datetime(o2));
             } else {
                 return 0;
             }
