@@ -8,11 +8,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="com.android.vending.BILLING"/>
 
     <uses-feature android:name="android.hardware.location.network"
                   android:required="false"/>
     <uses-feature android:name="android.hardware.location.gps"
+                  android:required="false"/>
+    <uses-feature android:name="android.hardware.camera"
                   android:required="false"/>
 
     <application
@@ -70,7 +72,7 @@
         <service android:name=".sync.SyncService"
                  android:permission="android.permission.BIND_JOB_SERVICE"/>
         <service android:name=".backup.google.DriveBackupService"
-        android:permission="android.permission.BIND_JOB_SERVICE"
+                 android:permission="android.permission.BIND_JOB_SERVICE"
         />
         <activity android:name=".SharedActivity"
                   android:label="@string/new_jot">

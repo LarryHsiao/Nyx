@@ -17,8 +17,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
-def nyxVersionName = "v3.5.3"
-def nyxVersionCode = 30503
+def nyxVersionName = "v3.5.4"
+def nyxVersionCode = 30504
 
 android {
     compileSdkVersion 29

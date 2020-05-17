@@ -32,6 +32,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -40,6 +41,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.larryhsiao.nyx.BuildConfig;
+import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.attachments.AttachmentPickerIntent;
@@ -92,6 +94,7 @@ import io.github.ponnamkarthik.richlinkpreview.MetaData;
 import io.github.ponnamkarthik.richlinkpreview.ResponseListener;
 import io.github.ponnamkarthik.richlinkpreview.RichPreview;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,10 +109,13 @@ import java.util.stream.Collectors;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.ACTION_VIEW;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
+import static android.provider.MediaStore.EXTRA_OUTPUT;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static androidx.appcompat.app.AlertDialog.Builder;
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
+import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
 import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
@@ -131,10 +137,16 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
     private static final int REQUEST_CODE_ALERT = 1003;
     private static final int REQUEST_CODE_ATTACHMENT_DIALOG = 1004;
+    private static final int REQUEST_CODE_TAKE_PICTURE = 1005;
 
     private static final String ARG_JOT_JSON = "ARG_JOT";
     private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
     private static final String ARG_REQUEST_CODE = "ARG_REQUEST_CODE";
+    /**
+     * We use fixed file name for taking picture, make sure to move the previous taken file
+     * before taking new one.
+     */
+    private static final String TEMP_FILE_NAME = "JotContentTakePicture.jpg";
     private List<Uri> attachmentOnView = new ArrayList<>();
     private Handler mainHandler = new Handler();
     private HandlerThread backgroundThread;
@@ -576,6 +588,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         new AlertDialog.Builder(getContext())
             .setTitle(R.string.delete)
             .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                deleteTempAttachments();
                 new RemovalAttachmentByJotId(db, jot.id()).fire();
                 new JotRemoval(db, jot.id()).fire();
                 getParentFragmentManager().popBackStack();
@@ -597,6 +610,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             new AlertDialog.Builder(getContext())
                 .setTitle(R.string.discard)
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    deleteTempAttachments();
                     getParentFragmentManager().popBackStack();
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -654,6 +668,34 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 addAttachment(uri, this::unsupportedDialog);
             }
             updateAttachmentView();
+        } else if (requestCode == REQUEST_CODE_TAKE_PICTURE) {
+            if (resultCode == RESULT_OK) {
+                File tempDir = new File(getContext().getFilesDir(), "attachments_temp");
+                File fileNameByTime = new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
+                new File(tempDir, TEMP_FILE_NAME).renameTo(fileNameByTime);
+                addAttachment(
+                    FileProvider.getUriForFile(
+                        getContext(),
+                        JotApplication.FILE_PROVIDER_AUTHORITY,
+                        fileNameByTime
+                    ), () -> unsupportedDialog()
+                );
+            }
+            updateAttachmentView();
+        }
+    }
+
+    private void deleteTempAttachments() {
+        for (Uri uri : attachmentOnView) {
+            if (uri.toString().startsWith(URI_FILE_TEMP_PROVIDER)) {
+                new File(
+                    new File(
+                        getContext().getFilesDir(),
+                        "attachments_temp"
+                    ),
+                    uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
+                ).delete();
+            }
         }
     }
 
@@ -747,10 +789,40 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void startPicker() {
-        startActivityForResult(
-            new AttachmentPickerIntent().value(),
-            REQUEST_CODE_PICK_FILE
-        );
+        new AlertDialog.Builder(getContext())
+            .setTitle(R.string.new_attachment)
+            .setItems(R.array.newAttachmentMethods, (dialog, which) -> {
+                switch (which) {
+                    case 0:
+                        takePicture();
+                        break;
+                    default:
+                    case 1:
+                        startActivityForResult(
+                            new AttachmentPickerIntent().value(),
+                            REQUEST_CODE_PICK_FILE
+                        );
+                }
+            })
+            .show();
+    }
+
+    private void takePicture() {
+        try {
+            Intent intent = new Intent(ACTION_IMAGE_CAPTURE);
+            if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                File tempDir = new File(getContext().getFilesDir(), "attachments_temp");
+                tempDir.mkdir();
+                intent.putExtra(EXTRA_OUTPUT, FileProvider.getUriForFile(
+                    getContext(),
+                    JotApplication.FILE_PROVIDER_AUTHORITY,
+                    new File(tempDir, TEMP_FILE_NAME)
+                ));
+                startActivityForResult(intent, REQUEST_CODE_TAKE_PICTURE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateVideo(FrameLayout root, Uri uri) {
@@ -991,6 +1063,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             discardFlow();
             return true;
         } else {
+            deleteTempAttachments();
             return false;
         }
     }

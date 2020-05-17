@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="newAttachmentMethods">
+        <item>@string/Capture_a_picture</item>
+        <item>@string/Choose_exist_files</item>
+    </string-array>
+</resources>

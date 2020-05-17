@@ -17,11 +17,18 @@ import java.sql.Connection;
  * Application of Jot.
  */
 public class JotApplication extends Application {
-    public static final String URI_FILE_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments/";
-    public static final String URI_FILE_TEMP_PROVIDER = "content://com.larryhsiao.nyx.fileprovider/attachments_temp/";
+    public static final String FILE_PROVIDER_AUTHORITY;
+    public static final String URI_FILE_PROVIDER;
+    public static final String URI_FILE_TEMP_PROVIDER;
     public long lastAuthed = 0L;
     public Source<Connection> db;
     public FirebaseRemoteConfig remoteConfig;
+
+    static {
+        FILE_PROVIDER_AUTHORITY = "com.larryhsiao.nyx.fileprovider";
+        URI_FILE_PROVIDER = "content://" + FILE_PROVIDER_AUTHORITY + "/attachments/";
+        URI_FILE_TEMP_PROVIDER = "content://" + FILE_PROVIDER_AUTHORITY + "/attachments_temp/";
+    }
 
     @Override
     public void onCreate() {

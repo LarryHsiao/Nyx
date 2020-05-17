@@ -21,15 +21,15 @@ public class IsLocalExist implements Source<Boolean> {
 
     @Override
     public Boolean value() {
-        if (!uri.startsWith(URI_FILE_PROVIDER)){
+        if (!uri.startsWith(URI_FILE_PROVIDER)) {
             throw new RuntimeException("Not a Jot Uri");
         }
         return new File(
-                new File(
-                    context.getFilesDir(),
-                    "attachments"
-                ),
-                uri.replace(URI_FILE_PROVIDER, "")
-            ).exists();
+            new File(
+                context.getFilesDir(),
+                "attachments"
+            ),
+            uri.replace(URI_FILE_PROVIDER, "")
+        ).exists();
     }
 }
