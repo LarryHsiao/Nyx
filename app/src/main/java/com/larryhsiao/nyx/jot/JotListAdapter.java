@@ -7,15 +7,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
-import com.bumptech.glide.Glide;
-import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.attachments.JotImageLoading;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.core.jots.Jot;
-import com.silverhetch.aura.location.LocationAddress;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.ViewHolder;
 import com.silverhetch.clotho.Source;
@@ -27,8 +24,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 
 /**
  * Adapter for showing Jot list
@@ -74,12 +69,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         final ImageView image = holder.itemView.findViewById(R.id.itemJot_image);
         if (attachments.size() > 0) {
             image.setVisibility(View.VISIBLE);
-            CircularProgressDrawable progress = new CircularProgressDrawable(image.getContext());
-            progress.setStyle(LARGE);
-            Glide.with(image.getContext())
-                .load(attachments.get(0).uri())
-                .placeholder(progress)
-                .into(image);
+            new JotImageLoading(image, attachments.get(0).uri()).fire();
         } else {
             image.setVisibility(View.GONE);
         }

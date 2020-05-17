@@ -9,13 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.bumptech.glide.Glide;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.attachments.IsLocalExist;
+import com.larryhsiao.nyx.attachments.JotImageLoading;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.aura.view.ViewHolder;
 import com.stfalcon.imageviewer.StfalconImageViewer;
@@ -28,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static android.content.Intent.ACTION_VIEW;
-import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 
 /**
  * Adapter for displaying attachments.
@@ -133,59 +134,70 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             context,
             Collections.singletonList(uri),
             (imageView, image) -> {
-                CircularProgressDrawable progress2 = new CircularProgressDrawable(
-                    context
-                );
-                progress2.setStyle(LARGE);
-                Glide.with(context)
-                    .load(image)
-                    .placeholder(progress2)
-                    .into(imageView);
+                new JotImageLoading(imageView, uri.toString()).fire();
             }
         ).show();
     }
 
     private void onBindAudio(Uri uri, ViewHolder holder) {
         ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentAudio_icon);
-        imageView.setOnClickListener(v -> {
-            final Intent intent = new Intent(ACTION_VIEW);
-            intent.setDataAndType(uri, "audio/*");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            context.startActivity(intent);
-        });
-        imageView.setOnLongClickListener(v -> {
-            showProperties(holder, uri);
-            return true;
-        });
+        if (new IsLocalExist(context, uri.toString()).value()) {
+            imageView.setOnClickListener(v -> {
+                final Intent intent = new Intent(ACTION_VIEW);
+                intent.setDataAndType(uri, "audio/*");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                context.startActivity(intent);
+            });
+            imageView.setOnLongClickListener(v -> {
+                showProperties(holder, uri);
+                return true;
+            });
+        } else {
+            imageView.setImageResource(R.drawable.ic_syncing);
+            imageView.setOnClickListener(v ->
+                Toast.makeText(
+                    imageView.getContext(),
+                    R.string.File_no_yet_synced,
+                    Toast.LENGTH_SHORT
+                ).show()
+            );
+        }
     }
 
     private void onBindVideo(Uri uri, ViewHolder holder) {
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(context, uri);
         ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentVideo_icon);
-        imageView.setImageBitmap(mmr.getFrameAtTime());
-        imageView.setOnClickListener(v -> {
-            final Intent intent = new Intent(ACTION_VIEW);
-            intent.setDataAndType(uri, "video/*");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            context.startActivity(intent);
-        });
+        if (new IsLocalExist(context, uri.toString()).value()) {
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(context, uri);
+            imageView.setImageBitmap(mmr.getFrameAtTime());
+            imageView.setOnClickListener(v -> {
+                final Intent intent = new Intent(ACTION_VIEW);
+                intent.setDataAndType(uri, "video/*");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                context.startActivity(intent);
+            });
+            mmr.release();
+        } else {
+            imageView.setImageResource(R.drawable.ic_syncing);
+            imageView.setOnClickListener(v ->
+                Toast.makeText(
+                    imageView.getContext(),
+                    R.string.File_no_yet_synced,
+                    Toast.LENGTH_SHORT
+                ).show()
+            );
+        }
         imageView.setOnLongClickListener(v -> {
             showProperties(holder, uri);
             return true;
         });
-        mmr.release();
     }
 
     private void onBindImage(Uri uri, ViewHolder holder, Runnable onClick) {
         final ImageView icon = holder.getImageView(R.id.itemAttachmentImage_icon);
-        CircularProgressDrawable progress = new CircularProgressDrawable(icon.getContext());
-        progress.setStyle(LARGE);
-        Glide.with(context)
-            .load(uri)
-            .into(icon);
+        new JotImageLoading(icon, uri.toString()).fire();
         icon.setOnClickListener(v -> {
             onClick.run();
         });
