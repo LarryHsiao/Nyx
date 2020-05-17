@@ -16,10 +16,10 @@ import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
 /**
  * Comparator for file uri which is a JPEG file.
  */
-public class JpegComparator implements Comparator<Uri> {
+public class JpegDateComparator implements Comparator<Uri> {
     private final Context context;
 
-    public JpegComparator(Context context) {
+    public JpegDateComparator(Context context) {
         this.context = context;
     }
 

@@ -28,13 +28,13 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -44,6 +44,8 @@ import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.attachments.AttachmentPickerIntent;
 import com.larryhsiao.nyx.attachments.AttachmentsFragment;
+import com.larryhsiao.nyx.attachments.IsLocalExist;
+import com.larryhsiao.nyx.attachments.JotImageLoading;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
@@ -71,7 +73,7 @@ import com.larryhsiao.nyx.core.tags.TagsByJotId;
 import com.larryhsiao.nyx.core.tags.TagsByKeyword;
 import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.util.EmbedMapFragment;
-import com.larryhsiao.nyx.util.JpegComparator;
+import com.larryhsiao.nyx.util.JpegDateComparator;
 import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
 import com.schibstedspain.leku.LocationPickerActivity;
@@ -108,7 +110,6 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static androidx.appcompat.app.AlertDialog.Builder;
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
-import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
@@ -265,6 +266,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             }
 
             private final Runnable handler = () -> {
+                // @todo #10 Detects too many unusable uri.I
                 List<Url> detect = new UrlDetector(
                     contentEditText.getText().toString(),
                     Default
@@ -752,43 +754,56 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void updateVideo(FrameLayout root, Uri uri) {
+        boolean isLocalExist = new IsLocalExist(root.getContext(), uri.toString()).value();
         LayoutInflater.from(getContext())
             .inflate(R.layout.item_attachment_video, root, true);
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(root.getContext(), uri);
         ImageView imageView = root.findViewById(R.id.itemAttachmentVideo_icon);
-        imageView.setImageBitmap(mmr.getFrameAtTime());
+
+        if (isLocalExist) {
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(root.getContext(), uri);
+            imageView.setImageBitmap(mmr.getFrameAtTime());
+            mmr.release();
+        } else {
+            imageView.setImageResource(R.drawable.ic_syncing);
+        }
         imageView.setOnClickListener(v -> {
             if (attachmentOnView.size() > 1) {
                 browseAttachments();
-            } else {
+            } else if (isLocalExist) {
                 final Intent intent = new Intent(ACTION_VIEW);
                 intent.setDataAndType(uri, "video/*");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
+            } else {
+                Toast.makeText(getContext(), R.string.File_no_yet_synced, Toast.LENGTH_SHORT).show();
             }
         });
         imageView.setOnLongClickListener(v -> {
             showProperties(v, uri);
             return true;
         });
-        mmr.release();
     }
 
     private void updateAudio(FrameLayout root, Uri uri) {
-        LayoutInflater.from(getContext())
-            .inflate(R.layout.item_attachment_audio, root, true);
+        boolean isLocalExist = new IsLocalExist(root.getContext(), uri.toString()).value();
+        LayoutInflater.from(getContext()).inflate(R.layout.item_attachment_audio, root, true);
         ImageView imageView = root.findViewById(R.id.itemAttachmentAudio_icon);
+        if (!isLocalExist) {
+            imageView.setImageResource(R.drawable.ic_syncing);
+        }
         imageView.setOnClickListener(v -> {
             if (attachmentOnView.size() > 1) {
                 browseAttachments();
-            } else {
+            } else if (isLocalExist) {
                 final Intent intent = new Intent(ACTION_VIEW);
                 intent.setDataAndType(uri, "audio/*");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
+            } else {
+                Toast.makeText(getContext(), R.string.File_no_yet_synced, Toast.LENGTH_SHORT).show();
             }
         });
         imageView.setOnLongClickListener(v -> {
@@ -801,9 +816,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         LayoutInflater.from(getContext())
             .inflate(R.layout.item_attachment_image, root, true);
         final ImageView icon = root.findViewById(R.id.itemAttachmentImage_icon);
-        CircularProgressDrawable progress = new CircularProgressDrawable(icon.getContext());
-        progress.setStyle(LARGE);
-        Glide.with(root.getContext()).load(uri).into(icon);
+        new JotImageLoading(icon, uri.toString()).fire();
         icon.setOnClickListener(v -> {
             if (attachmentOnView.size() > 1) {
                 browseAttachments();
@@ -818,7 +831,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void browseAttachments() {
-        attachmentOnView.sort(new JpegComparator(getContext()));
+        attachmentOnView.sort(new JpegDateComparator(getContext()));
         FullScreenDialogFragment dialog = AttachmentsFragment.newInstance(attachmentOnView);
         dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
         dialog.show(getParentFragmentManager(), null);
@@ -829,14 +842,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             context,
             Collections.singletonList(uri),
             (imageView, image) -> {
-                CircularProgressDrawable progress2 = new CircularProgressDrawable(
-                    context
-                );
-                progress2.setStyle(LARGE);
-                Glide.with(imageView.getContext())
-                    .load(image)
-                    .placeholder(progress2)
-                    .into(imageView);
+                new JotImageLoading(imageView, image.toString()).fire();
             }
         ).show();
     }
