@@ -103,14 +103,15 @@ public class LocalFileSync implements Action {
     }
 
     private void compressToInternal(File internalRoot, Attachment attachment) throws IOException {
-        final File temp = Files.createTempFile("temp", "").toFile();
         final File compressTemp = Files.createTempFile("compressedTemp", "").toFile();
+        final File temp;
         if (attachment.uri().startsWith(URI_FILE_TEMP_PROVIDER)) {
-            new File(
+            temp = new File(
                 new File(context.getFilesDir(), "attachments_temp"),
                 attachment.uri().replace(URI_FILE_TEMP_PROVIDER, "")
-            ).renameTo(temp);
-        }else {
+            );
+        } else {
+            temp = Files.createTempFile("temp", "").toFile();
             new ToFile(
                 context.getContentResolver().openInputStream(Uri.parse(attachment.uri())),
                 temp,
@@ -118,6 +119,7 @@ public class LocalFileSync implements Action {
             ).fire();
         }
         new JpegCompress(temp, compressTemp).fire();
+        temp.delete();
         final String fileName = generateFileName(
             "jpg",
             new MD5(new FileInputStream(compressTemp)).value()
@@ -129,6 +131,7 @@ public class LocalFileSync implements Action {
                 return URI_FILE_PROVIDER + fileName;
             }
         }).fire();
+        temp.delete();
     }
 
     private String generateFileName(String ext, String md5) {
@@ -146,7 +149,7 @@ public class LocalFileSync implements Action {
                 new File(context.getFilesDir(), "attachments_temp"),
                 uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
             ).renameTo(new File(internalRoot, fileName));
-        }else {
+        } else {
             new ToFile(
                 context.getContentResolver().openInputStream(uri),
                 new File(internalRoot, fileName),
