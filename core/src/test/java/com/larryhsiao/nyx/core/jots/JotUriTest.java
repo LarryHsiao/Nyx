@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.jots;
+package com.larryhsiao.nyx.core.jots;
 
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.JotUri;

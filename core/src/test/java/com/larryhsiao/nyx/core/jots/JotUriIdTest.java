@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.jots;
+package com.larryhsiao.nyx.core.jots;
 
 import com.larryhsiao.nyx.core.jots.JotUriId;
 import org.junit.jupiter.api.Assertions;

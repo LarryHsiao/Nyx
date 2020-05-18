@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.jots;
+package com.larryhsiao.nyx.core.jots;
 
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotsByLocation;
@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class JotsByLocationTest {
     /**
-     * Check created time exist
+     * Check search by geometry works.
      */
     @Test
     public void createdTimeExist() throws Exception {

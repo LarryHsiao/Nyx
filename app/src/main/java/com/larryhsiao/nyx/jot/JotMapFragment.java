@@ -207,7 +207,7 @@ public class JotMapFragment extends JotFragment {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
             }
         } else {
-            if (cameraPos!=null) {
+            if (cameraPos != null) {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
             }
         }
@@ -252,12 +252,10 @@ public class JotMapFragment extends JotFragment {
                 if (map != null) {
                     loadData(new JotsByKeyword(db, newText));
                 } else {
-                    searchView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            onQueryTextChange(newText);
-                        }
-                    }, 100);
+                    searchView.postDelayed(
+                        () -> onQueryTextChange(newText),
+                        100
+                    );
                 }
                 return true;
             }
