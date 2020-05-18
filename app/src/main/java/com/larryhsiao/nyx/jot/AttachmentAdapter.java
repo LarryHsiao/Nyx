@@ -2,6 +2,8 @@ package com.larryhsiao.nyx.jot;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -30,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static android.content.Intent.ACTION_VIEW;
+import static android.graphics.Color.WHITE;
 
 /**
  * Adapter for displaying attachments.
@@ -134,7 +137,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             context,
             Collections.singletonList(uri),
             (imageView, image) -> {
-                new JotImageLoading(imageView, uri.toString()).fire();
+                new JotImageLoading(imageView, uri.toString(), WHITE).fire();
             }
         ).show();
     }
@@ -155,6 +158,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             });
         } else {
             imageView.setImageResource(R.drawable.ic_syncing);
+            imageView.setImageTintList(ColorStateList.valueOf(WHITE));
             imageView.setOnClickListener(v ->
                 Toast.makeText(
                     imageView.getContext(),
@@ -181,6 +185,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             mmr.release();
         } else {
             imageView.setImageResource(R.drawable.ic_syncing);
+            imageView.setImageTintList(ColorStateList.valueOf(WHITE));
             imageView.setOnClickListener(v ->
                 Toast.makeText(
                     imageView.getContext(),
@@ -197,7 +202,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private void onBindImage(Uri uri, ViewHolder holder, Runnable onClick) {
         final ImageView icon = holder.getImageView(R.id.itemAttachmentImage_icon);
-        new JotImageLoading(icon, uri.toString()).fire();
+        new JotImageLoading(icon, uri.toString(), WHITE).fire();
         icon.setOnClickListener(v -> {
             onClick.run();
         });
