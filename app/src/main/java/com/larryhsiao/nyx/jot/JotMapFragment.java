@@ -205,10 +205,12 @@ public class JotMapFragment extends JotFragment {
                 );
             } else {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+                cameraPos = null;
             }
         } else {
             if (cameraPos != null) {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+                cameraPos = null;
             }
         }
     }
