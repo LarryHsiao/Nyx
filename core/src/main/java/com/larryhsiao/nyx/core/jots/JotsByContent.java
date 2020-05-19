@@ -7,17 +7,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 /**
- * Source to build {@link ResultSet} that search Jots by keyword.
- * <p>
- * Search scope:
- * - Jot content
- * - Tag name
+ * Source to query jots by given ids.
+ *
+ * @todo #183 Consider to remove this
  */
-public class JotsByKeyword implements Source<ResultSet> {
+public class JotsByContent implements Source<ResultSet> {
     private final Source<Connection> dbSource;
     private final String keyword;
 
-    public JotsByKeyword(Source<Connection> dbSource, String keyword) {
+    public JotsByContent(Source<Connection> dbSource, String keyword) {
         this.dbSource = dbSource;
         this.keyword = keyword;
     }
@@ -28,14 +26,11 @@ public class JotsByKeyword implements Source<ResultSet> {
             PreparedStatement stmt = dbSource.value().prepareStatement(
                 // language=H2
                 "SELECT * FROM jots " +
-                    "LEFT JOIN TAG_JOT ON TAG_JOT.JOT_ID = JOTS.ID " +
-                    "LEFT JOIN TAGS ON TAG_JOT.TAG_ID = TAGS.ID " +
-                    "WHERE UPPER(JOTS.content) like UPPER(?) OR UPPER(TAGS.TITLE) like UPPER(?) " +
-                    "AND JOTS.DELETE = 0 " +
-                    "ORDER BY JOTS.CREATEDTIME DESC;"
+                    "WHERE UPPER(CONTENT) like UPPER(?) " +
+                    "AND DELETE = 0 " +
+                    "ORDER BY CREATEDTIME DESC;"
             );
             stmt.setString(1, "%" + keyword + "%");
-            stmt.setString(2, "%" + keyword + "%");
             return stmt.executeQuery();
         } catch (Exception e) {
             throw new IllegalArgumentException(e);

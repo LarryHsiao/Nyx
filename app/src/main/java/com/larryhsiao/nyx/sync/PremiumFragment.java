@@ -178,6 +178,7 @@ public class PremiumFragment extends JotFragment {
     private void loadUserIcon(View view, FirebaseUser user) {
         final CircularProgressDrawable placeholder = new CircularProgressDrawable(view.getContext());
         placeholder.setStyle(LARGE);
+        placeholder.start();
         final ImageView icon = view.findViewById(R.id.backup_userIcon);
         Glide.with(this).load(user.getPhotoUrl())
             .error(getResources().getDrawable(R.drawable.ic_user, null))

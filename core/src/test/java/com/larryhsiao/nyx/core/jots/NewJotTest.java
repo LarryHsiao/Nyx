@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.jots;
+package com.larryhsiao.nyx.core.jots;
 
 import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.JotsDb;

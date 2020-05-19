@@ -24,7 +24,7 @@ public class TagsByKeyword implements Source<ResultSet> {
             PreparedStatement stmt = connSource.value().prepareStatement(
                 //language=H2
                 "SELECT  * FROM TAGS " +
-                    "WHERE TITLE LIKE ? AND DELETE = 0;"
+                    "WHERE UPPER(TITLE) LIKE UPPER(?) AND DELETE = 0;"
             );
             stmt.setString(1, "%" + keyword + "%");
             return stmt.executeQuery();
