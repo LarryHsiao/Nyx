@@ -13,9 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -251,6 +251,7 @@ public class JotMapFragment extends JotFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                new TagSuggestion(db, newText, searchView).fire();
                 if (map != null) {
                     loadData(new JotsByKeyword(db, newText));
                 } else {
