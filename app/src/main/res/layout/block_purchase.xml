@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <View android:layout_width="0dp"
           app:layout_constraintStart_toStartOf="parent"
@@ -18,7 +18,7 @@
 
     <LinearLayout android:layout_width="wrap_content"
                   app:layout_constraintStart_toStartOf="parent"
-                  android:padding="16dp"
+                  android:padding="58dp"
                   app:layout_constraintEnd_toEndOf="parent"
                   app:layout_constraintTop_toTopOf="parent"
                   android:orientation="vertical"
@@ -31,8 +31,17 @@
                   android:textAppearance="@style/TextAppearance.AppCompat.Title"
                   android:layout_height="wrap_content"/>
 
+        <TextView android:layout_width="wrap_content"
+                  tools:text="This is sample stirng to describe the product that we want user to by"
+                  android:id="@+id/blockPurchase_description"
+                  android:gravity="center"
+                  android:layout_marginTop="16dp"
+                  android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                  android:layout_height="wrap_content"/>
+
         <Button android:layout_width="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

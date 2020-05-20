@@ -92,7 +92,17 @@
     <string name="Google_Drive_backup">Google Drive backup</string>
     <string name="Premium">Premium</string>
     <string name="Subscribe">Subscribe</string>
+    <string name="Subscribe____month">Subscribe %s/month</string>
     <string name="File_no_yet_synced">File no yet synced.</string>
     <string name="Capture_a_picture">Capture a picture</string>
     <string name="Choose_exist_files">Choose exist files</string>
+    <string name="todo">TODOS</string>
+    <string name="Text_detected">Text detected</string>
+    <string
+        name="There_are_some_texts_detected_in_the_picture_do_you_want_to_append_to_the_content_">
+        There are some texts detected in the picture, do you want to append to
+        the content?
+    </string>
+    <string name="Hand_writing">Hand writing</string>
+    <string name="Subscribe_for_AI_magics">Subscribe for AI magics</string>
 </resources>
