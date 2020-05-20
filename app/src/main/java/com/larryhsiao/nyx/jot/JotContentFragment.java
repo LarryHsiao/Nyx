@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.jot;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ClipData;
 import android.content.Context;
@@ -28,20 +27,28 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.firebase.ml.vision.cloud.landmark.FirebaseVisionCloudLandmark;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.common.FirebaseVisionLatLng;
 import com.google.gson.Gson;
 import com.larryhsiao.nyx.BuildConfig;
-import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.attachments.AttachmentPickerIntent;
@@ -113,8 +120,13 @@ import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
 import static android.provider.MediaStore.EXTRA_OUTPUT;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static android.widget.Toast.LENGTH_SHORT;
+import static android.widget.Toast.makeText;
 import static androidx.appcompat.app.AlertDialog.Builder;
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
+import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
+import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
+import static com.larryhsiao.nyx.JotApplication.FILE_PROVIDER_AUTHORITY;
 import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
 import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
 import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
@@ -131,13 +143,14 @@ import static java.util.Calendar.ZONE_OFFSET;
  * @todo #0 Handle removing http url will still touch new attachment.
  * @todo #0 Loading progress for loading preview url image.
  */
-public class JotContentFragment extends JotFragment implements BackControl {
+public class JotContentFragment extends JotFragment implements BackControl, BillingClientStateListener {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
     private static final int REQUEST_CODE_ALERT = 1003;
     private static final int REQUEST_CODE_ATTACHMENT_DIALOG = 1004;
     private static final int REQUEST_CODE_TAKE_PICTURE = 1005;
+    private static final int REQUEST_CODE_AI_MAGIC_CAPTURE = 1006;
 
     private static final String ARG_JOT_JSON = "ARG_JOT";
     private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
@@ -156,6 +169,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     private TextView locationText;
     private TextView moodText;
     private Jot jot;
+    private BillingClient billing;
 
     public static Fragment newInstance() {
         return newInstance(
@@ -232,6 +246,13 @@ public class JotContentFragment extends JotFragment implements BackControl {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        billing = BillingClient.newBuilder(requireContext())
+            .setListener((res, list) -> {
+
+            })
+            .enablePendingPurchases()
+            .build();
+        billing.startConnection(this);
         dateText = view.findViewById(R.id.jot_date);
         dateText.setOnClickListener(v -> {
             DatePickerDialog dialog = new DatePickerDialog(view.getContext());
@@ -339,23 +360,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 .setView(editText)
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     final String preferTagName = editText.getText().toString();
-                    Tag tag = null;
-                    for (Tag searched : new QueriedTags(new TagsByKeyword(db, preferTagName)).value()) {
-                        if (searched.title().equals(preferTagName)) {
-                            tag = searched;
-                            break;
-                        }
-                    }
-                    if (tag == null) {
-                        tag = new NewTag(db, editText.getText().toString()).value();
-                    }
-                    final Chip tagChip = new Chip(v.getContext());
-                    tagChip.setText(tag.title());
-                    tagChip.setLines(1);
-                    tagChip.setMaxLines(1);
-                    tagChip.setTag(tag);
-                    tagChip.setOnClickListener(v1 -> tagChipClicked(tagChip));
-                    chipGroup.addView(tagChip);
+                    newChip(preferTagName);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .create().show();
@@ -432,6 +437,29 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 moodDialog.dismiss();
             });
         });
+        view.findViewById(R.id.jot_ai_magic).setOnClickListener(v ->
+            takePicture(REQUEST_CODE_AI_MAGIC_CAPTURE)
+        );
+    }
+
+    private void newChip(String preferTagName) {
+        Tag tag = null;
+        for (Tag searched : new QueriedTags(new TagsByKeyword(db, preferTagName)).value()) {
+            if (searched.title().equals(preferTagName)) {
+                tag = searched;
+                break;
+            }
+        }
+        if (tag == null) {
+            tag = new NewTag(db, preferTagName).value();
+        }
+        final Chip tagChip = new Chip(requireContext());
+        tagChip.setText(tag.title());
+        tagChip.setLines(1);
+        tagChip.setMaxLines(1);
+        tagChip.setTag(tag);
+        tagChip.setOnClickListener(v1 -> tagChipClicked(tagChip));
+        chipGroup.addView(tagChip);
     }
 
     @Override
@@ -454,6 +482,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
     public void onPause() {
         super.onPause();
         detachFab();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        billing.endConnection();
     }
 
     private void updateAddress(Location location) {
@@ -673,15 +707,69 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 File tempDir = new File(getContext().getFilesDir(), "attachments_temp");
                 File fileNameByTime = new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
                 new File(tempDir, TEMP_FILE_NAME).renameTo(fileNameByTime);
-                addAttachment(
+                Uri fileUri = FileProvider.getUriForFile(getContext(), FILE_PROVIDER_AUTHORITY, fileNameByTime);
+                addAttachment(fileUri, this::unsupportedDialog);
+                updateAttachmentView();
+            }
+        } else if (requestCode == REQUEST_CODE_AI_MAGIC_CAPTURE) {
+            if (resultCode == RESULT_OK) {
+                premiumAIMagic(
                     FileProvider.getUriForFile(
-                        getContext(),
-                        JotApplication.FILE_PROVIDER_AUTHORITY,
-                        fileNameByTime
-                    ), () -> unsupportedDialog()
+                        requireContext(),
+                        FILE_PROVIDER_AUTHORITY,
+                        new File(
+                            new File(requireContext().getFilesDir(), "attachments_temp"),
+                            TEMP_FILE_NAME
+                        )
+                    )
                 );
             }
-            updateAttachmentView();
+        }
+    }
+
+    private void premiumAIMagic(Uri fileUri) {
+        try {
+            FirebaseVisionImage image = FirebaseVisionImage.fromFilePath(requireContext(), fileUri);
+            final EditText contentEditText = getView().findViewById(R.id.jot_content);
+            FirebaseVision.getInstance()
+                .getCloudDocumentTextRecognizer()
+                .processImage(image)
+                .addOnSuccessListener(text -> {
+                        if (getView() == null) {
+                            return;
+                        }
+                        contentEditText.append(text.getText());
+                    }
+                )
+                .addOnCompleteListener(task -> FirebaseVision.getInstance()
+                    .getVisionBarcodeDetector()
+                    .detectInImage(image)
+                    .addOnSuccessListener(it -> {
+                            for (FirebaseVisionBarcode barcode : it) {
+                                contentEditText.append("\n");
+                                contentEditText.append(barcode.getDisplayValue());
+                            }
+                        }
+                    ).addOnCompleteListener(it2 -> FirebaseVision.getInstance()
+                        .getVisionCloudLandmarkDetector()
+                        .detectInImage(image)
+                        .addOnSuccessListener(it3 -> {
+                            it3.sort((o1, o2) -> (int) ((o1.getConfidence() - o2.getConfidence()) * 100));
+                            if (it3.size() > 0) {
+                                FirebaseVisionCloudLandmark landmark = it3.get(0);
+                                newChip(landmark.getLandmark());
+                                if (landmark.getLocations().size() > 0) {
+                                    updateJotLocation(landmark.getLocations().get(0));
+                                }
+                            }
+                        }).addOnCompleteListener(it -> {
+                            addAttachmentGrantPermission(fileUri);
+                            updateAttachmentView();
+                        })
+                    )
+                );
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -690,7 +778,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             if (uri.toString().startsWith(URI_FILE_TEMP_PROVIDER)) {
                 new File(
                     new File(
-                        getContext().getFilesDir(),
+                        requireContext().getFilesDir(),
                         "attachments_temp"
                     ),
                     uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
@@ -700,12 +788,12 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void updateAttachmentView() {
-        final FrameLayout root = getView().findViewById(R.id.jot_attachment_container);
-        final TextView newAttachment = getView().findViewById(R.id.jot_attachment_new);
+        final FrameLayout root = requireView().findViewById(R.id.jot_attachment_container);
+        final TextView newAttachment = requireView().findViewById(R.id.jot_attachment_new);
         newAttachment.setVisibility(VISIBLE);
         newAttachment.setOnClickListener(v -> startPicker());
 
-        final TextView countText = getView().findViewById(R.id.jot_attachment_count);
+        final TextView countText = requireView().findViewById(R.id.jot_attachment_count);
         countText.setVisibility(VISIBLE);
         countText.setText(attachmentOnView.size() + "");
         root.removeAllViews();
@@ -778,9 +866,9 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void updateEmptyAttachment(FrameLayout root) {
-        final TextView countText = getView().findViewById(R.id.jot_attachment_count);
+        final TextView countText = requireView().findViewById(R.id.jot_attachment_count);
         countText.setVisibility(GONE);
-        final TextView attachmentCount = getView().findViewById(R.id.jot_attachment_new);
+        final TextView attachmentCount = requireView().findViewById(R.id.jot_attachment_new);
         attachmentCount.setVisibility(GONE);
         LayoutInflater.from(root.getContext()).inflate(
             R.layout.item_add_attachment,
@@ -789,7 +877,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void startPicker() {
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(requireContext())
             .setTitle(R.string.new_attachment)
             .setItems(R.array.newAttachmentMethods, (dialog, which) -> {
                 switch (which) {
@@ -808,17 +896,21 @@ public class JotContentFragment extends JotFragment implements BackControl {
     }
 
     private void takePicture() {
+        takePicture(REQUEST_CODE_TAKE_PICTURE);
+    }
+
+    private void takePicture(int requestCode) {
         try {
             Intent intent = new Intent(ACTION_IMAGE_CAPTURE);
-            if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                File tempDir = new File(getContext().getFilesDir(), "attachments_temp");
+            if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
+                File tempDir = new File(requireContext().getFilesDir(), "attachments_temp");
                 tempDir.mkdir();
                 intent.putExtra(EXTRA_OUTPUT, FileProvider.getUriForFile(
-                    getContext(),
-                    JotApplication.FILE_PROVIDER_AUTHORITY,
+                    requireContext(),
+                    FILE_PROVIDER_AUTHORITY,
                     new File(tempDir, TEMP_FILE_NAME)
                 ));
-                startActivityForResult(intent, REQUEST_CODE_TAKE_PICTURE);
+                startActivityForResult(intent, requestCode);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -849,7 +941,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
             } else {
-                Toast.makeText(getContext(), R.string.File_no_yet_synced, Toast.LENGTH_SHORT).show();
+                makeText(getContext(), R.string.File_no_yet_synced, LENGTH_SHORT).show();
             }
         });
         imageView.setOnLongClickListener(v -> {
@@ -875,7 +967,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
             } else {
-                Toast.makeText(getContext(), R.string.File_no_yet_synced, Toast.LENGTH_SHORT).show();
+                makeText(getContext(), R.string.File_no_yet_synced, LENGTH_SHORT).show();
             }
         });
         imageView.setOnLongClickListener(v -> {
@@ -929,7 +1021,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
         popup.getMenu()
             .add(view.getContext().getString(R.string.properties))
             .setOnMenuItemClickListener(item -> {
-                final androidx.appcompat.app.AlertDialog dialog = new Builder(view.getContext())
+                final AlertDialog dialog = new Builder(view.getContext())
                     .setView(R.layout.dialog_properties)
                     .show();
                 ((TextView) dialog.findViewById(R.id.properties_text)).setText(
@@ -985,7 +1077,7 @@ public class JotContentFragment extends JotFragment implements BackControl {
             final ExifInterface exif = new ExifInterface(
                 getContext().getContentResolver().openInputStream(data)
             );
-            updateJotLocationByExif(exif);
+            updateJotLocation(exif);
             updateJotDateByExif(exif);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1016,22 +1108,36 @@ public class JotContentFragment extends JotFragment implements BackControl {
         updateDateIndicator();
     }
 
-    private void updateJotLocationByExif(ExifInterface exif) {
+    private boolean isLocationSetup() {
+        return !Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+            && !Arrays.equals(jot.location(), new double[]{0.0, 0.0});
+    }
+
+    private void updateJotLocation(ExifInterface exif) {
         final double[] latLong = exif.getLatLong();
-        if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-            && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})
-            || latLong == null) {
+        if (isLocationSetup() || latLong == null) {
             return;
         }
+        updateJotLocation(latLong[0], latLong[1]);
+    }
+
+    private void updateJotLocation(FirebaseVisionLatLng latLng) {
+        if (isLocationSetup()) {
+            return;
+        }
+        updateJotLocation(latLng.getLatitude(), latLng.getLongitude());
+    }
+
+    private void updateJotLocation(double latitude, double longitude) {
         jot = new WrappedJot(jot) {
             @Override
             public double[] location() {
-                return new double[]{latLong[1], latLong[0]};
+                return new double[]{longitude, latitude};
             }
         };
         Location location = new Location("constant");
-        location.setLatitude(latLong[0]);
-        location.setLongitude(latLong[1]);
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
         updateAddress(location);
         loadEmbedMapByJot();
     }
@@ -1074,5 +1180,27 @@ public class JotContentFragment extends JotFragment implements BackControl {
         } else {
             deleteFlow();
         }
+    }
+
+    @Override
+    public void onBillingSetupFinished(BillingResult billingResult) {
+        List<Purchase> purchasesList = billing.queryPurchases(SUBS).getPurchasesList();
+        if (purchasesList != null) {
+            for (Purchase purchase : purchasesList) {
+                if ("premium".equals(purchase.getSku())
+                    && purchase.getPurchaseState() == PURCHASED) {
+                    View view = getView();
+                    if (view != null) {
+                        view.findViewById(R.id.jot_ai_magic).setVisibility(VISIBLE);
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onBillingServiceDisconnected() {
+
     }
 }
