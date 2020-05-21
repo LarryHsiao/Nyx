@@ -704,12 +704,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
             updateAttachmentView();
         } else if (requestCode == REQUEST_CODE_TAKE_PICTURE) {
             if (resultCode == RESULT_OK) {
-                File tempDir = new File(getContext().getFilesDir(), "attachments_temp");
-                File fileNameByTime = new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
-                new File(tempDir, TEMP_FILE_NAME).renameTo(fileNameByTime);
-                Uri fileUri = FileProvider.getUriForFile(getContext(), FILE_PROVIDER_AUTHORITY, fileNameByTime);
-                addAttachment(fileUri, this::unsupportedDialog);
-                updateAttachmentView();
+                takeTempPhoto();
             }
         } else if (requestCode == REQUEST_CODE_AI_MAGIC_CAPTURE) {
             if (resultCode == RESULT_OK) {
@@ -725,6 +720,20 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                 );
             }
         }
+    }
+
+    private void takeTempPhoto() {
+        File tempDir = new File(requireContext().getFilesDir(), "attachments_temp");
+        File fileNameByTime = new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
+        new File(tempDir, TEMP_FILE_NAME).renameTo(fileNameByTime);
+        addAttachment(
+            FileProvider.getUriForFile(
+                requireContext(),
+                FILE_PROVIDER_AUTHORITY,
+                fileNameByTime
+            ), this::unsupportedDialog
+        );
+        updateAttachmentView();
     }
 
     private void premiumAIMagic(Uri fileUri) {
@@ -762,10 +771,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                                     updateJotLocation(landmark.getLocations().get(0));
                                 }
                             }
-                        }).addOnCompleteListener(it -> {
-                            addAttachmentGrantPermission(fileUri);
-                            updateAttachmentView();
-                        })
+                        }).addOnCompleteListener(it -> takeTempPhoto())
                     )
                 );
         } catch (Exception e) {
