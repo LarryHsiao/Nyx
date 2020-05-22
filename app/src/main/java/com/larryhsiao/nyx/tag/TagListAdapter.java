@@ -41,7 +41,9 @@ public class TagListAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ((TextView) holder.getRootView()).setText(data.get(position).title());
-        holder.itemView.setOnClickListener(v -> clicked.apply(data.get(holder.getAdapterPosition())));
+        holder.itemView.setOnClickListener(v ->
+            clicked.apply(data.get(holder.getAdapterPosition()))
+        );
         holder.itemView.setOnLongClickListener(v -> {
             longClicked.apply(data.get(holder.getAdapterPosition()));
             return true;

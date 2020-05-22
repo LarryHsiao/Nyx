@@ -29,7 +29,8 @@ import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
 /**
  * Account page.
  */
-public class AccountFragment extends JotFragment implements PurchasesUpdatedListener, BillingClientStateListener {
+public class AccountFragment extends JotFragment
+    implements PurchasesUpdatedListener, BillingClientStateListener {
     private BillingClient client;
 
     @Override
@@ -77,12 +78,12 @@ public class AccountFragment extends JotFragment implements PurchasesUpdatedList
                     AcknowledgePurchaseParams.newBuilder()
                         .setPurchaseToken(purchase.getPurchaseToken())
                         .build();
-                client.acknowledgePurchase(param, res -> onSubscribed(param, res));
+                client.acknowledgePurchase(param, res -> onSubscribed());
             }
         }
     }
 
-    private void onSubscribed(AcknowledgePurchaseParams param, BillingResult res) {
+    private void onSubscribed() {
         SyncService.enqueue(getContext());
         toPremium();
     }
