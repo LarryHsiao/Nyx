@@ -8,7 +8,6 @@ import androidx.appcompat.app.ActionBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.larryhsiao.nyx.account.AccountFragment;
 import com.larryhsiao.nyx.base.JotActivity;
-import com.larryhsiao.nyx.jot.CalendarFragment;
 import com.larryhsiao.nyx.jot.JotListFragment;
 import com.larryhsiao.nyx.sync.SyncService;
 
@@ -42,10 +41,6 @@ public class MainActivity extends JotActivity {
             if (item.getItemId() == R.id.menuItem_jots) {
                 currentPage = R.id.menuItem_jots;
                 rootPage(new JotListFragment());
-                return true;
-            } else if (item.getItemId() == R.id.menuItem_calendar) {
-                currentPage = R.id.menuItem_calendar;
-                rootPage(new CalendarFragment());
                 return true;
             } else if (item.getItemId() == R.id.menuItem_account) {
                 currentPage = R.id.menuItem_account;

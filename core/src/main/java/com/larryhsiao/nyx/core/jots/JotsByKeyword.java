@@ -27,11 +27,12 @@ public class JotsByKeyword implements Source<ResultSet> {
         try {
             PreparedStatement stmt = dbSource.value().prepareStatement(
                 // language=H2
-                "SELECT * FROM jots " +
+                "SELECT JOTS.* FROM jots " +
                     "LEFT JOIN TAG_JOT ON TAG_JOT.JOT_ID = JOTS.ID " +
                     "LEFT JOIN TAGS ON TAG_JOT.TAG_ID = TAGS.ID " +
-                    "WHERE UPPER(JOTS.content) like UPPER(?) OR UPPER(TAGS.TITLE) like UPPER(?) " +
+                    "WHERE (UPPER(JOTS.content) like UPPER(?) OR UPPER(TAGS.TITLE) like UPPER(?))" +
                     "AND JOTS.DELETE = 0 " +
+                    "GROUP BY JOTS.ID, JOTS.CREATEDTIME " +
                     "ORDER BY JOTS.CREATEDTIME DESC;"
             );
             stmt.setString(1, "%" + keyword + "%");
