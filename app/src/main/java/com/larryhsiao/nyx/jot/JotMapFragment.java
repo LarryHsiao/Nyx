@@ -1,8 +1,6 @@
 package com.larryhsiao.nyx.jot;
 
 import android.app.AlertDialog;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -15,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,14 +25,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.base.JotFragment;
-import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotById;
 import com.larryhsiao.nyx.core.jots.JotUriId;
-import com.larryhsiao.nyx.core.jots.JotsByKeyword;
+import com.larryhsiao.nyx.core.jots.JotsByCheckedFilter;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
+import com.larryhsiao.nyx.core.jots.filter.Filter;
 import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.Source;
 
@@ -49,17 +45,23 @@ import static java.lang.Double.MIN_VALUE;
 /**
  * Fragment that shows jots by map.
  *
- * @todo #0 Filter by date.
  * @todo #0 Preview image on a marker.
- * @todo #0 Filter by tag.
  */
-public class JotMapFragment extends JotFragment {
+public class JotMapFragment extends JotListingFragment {
     private static final int REQUEST_CODE_NEW_JOT = 1000;
     private static final int REQUEST_CODE_UPDATE_JOT = 1001;
     private ClusterManager<JotMapItem> clusterManger;
     private GoogleMap map;
     private CameraPosition cameraPos;
     private Marker selectedMarker = null;
+
+    public static Fragment newInstance(JotListingFragment listingFrag) {
+        JotMapFragment frag = new JotMapFragment();
+        Bundle bundle = new Bundle();
+        listingFrag.setupFilterArgs(bundle);
+        frag.setArguments(bundle);
+        return frag;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,7 +100,7 @@ public class JotMapFragment extends JotFragment {
         mapFrag.getMapAsync(googleMap -> {
             map = googleMap;
             setupMap();
-            loadData(new AllJots(db));
+            loadJots();
         });
         getChildFragmentManager().beginTransaction()
             .replace(R.id.map_container, mapFrag)
@@ -106,12 +108,12 @@ public class JotMapFragment extends JotFragment {
     }
 
     private void setupMap() {
-        clusterManger = new ClusterManager<>(getContext(), map);
+        clusterManger = new ClusterManager<>(requireContext(), map);
         map.setOnCameraIdleListener(clusterManger);
         map.setOnMarkerClickListener(clusterManger);
         map.setOnInfoWindowClickListener(clusterManger);
         clusterManger.setRenderer(new DefaultClusterRenderer<>(
-            getContext(),
+            requireContext(),
             map,
             clusterManger
         ));
@@ -150,9 +152,9 @@ public class JotMapFragment extends JotFragment {
             final Location location = new Location("Address");
             location.setLongitude(marker.getPosition().longitude);
             location.setLatitude(marker.getPosition().latitude);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1);
             adapter.add(getString(R.string.new_jot));
-            new AlertDialog.Builder(getContext())
+            new AlertDialog.Builder(requireContext())
                 .setTitle(
                     marker.getPosition().latitude + ", " + marker.getPosition().longitude
                 ).setAdapter(adapter, (dialog, which) -> {
@@ -172,9 +174,15 @@ public class JotMapFragment extends JotFragment {
                     frag.setTargetFragment(JotMapFragment.this, REQUEST_CODE_NEW_JOT);
                     nextPage(frag);
                 }
-            })
-                .show();
+            }).show();
         });
+    }
+
+    @Override
+    protected void loadJots(Filter filter) {
+        if (map != null) {
+            loadData(new JotsByCheckedFilter(db, filter));
+        }
     }
 
     private void loadData(Source<ResultSet> query) {
@@ -185,7 +193,7 @@ public class JotMapFragment extends JotFragment {
             .collect(Collectors.toList());
         clusterManger.clearItems();
         clusterManger.setRenderer(new DefaultClusterRenderer<>(
-            getContext(),
+            requireContext(),
             map,
             clusterManger
         ));
@@ -222,6 +230,7 @@ public class JotMapFragment extends JotFragment {
         final Fragment mapFrag = getChildFragmentManager().findFragmentById(R.id.map_container);
         if (mapFrag != null) {
             cameraPos = map.getCameraPosition();
+            map = null;
             getChildFragmentManager().beginTransaction()
                 .remove(mapFrag)
                 .commit();
@@ -231,78 +240,31 @@ public class JotMapFragment extends JotFragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.jot_list, menu);
         menu.findItem(R.id.menuItem_viewMode).setIcon(R.drawable.ic_agenda);
-
-        SearchManager searchManager = ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));
-        MenuItem searchMenuItem = menu.findItem(R.id.menuItem_search);
-        SearchView searchView = (SearchView) searchMenuItem.getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        searchView.setOnCloseListener(() -> {
-            searchMenuItem.collapseActionView();
-            loadData(new AllJots(db));
-            return false;
-        });
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                new TagSuggestion(db, newText, searchView).fire();
-                if (map != null) {
-                    loadData(new JotsByKeyword(db, newText));
-                } else {
-                    searchView.postDelayed(
-                        () -> onQueryTextChange(newText),
-                        100
-                    );
-                }
-                return true;
-            }
-        });
-        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                searchView.setQuery("", true);
-                return true;
-            }
-        });
-        searchMenuItem.setOnMenuItemClickListener(item -> {
-            searchView.onActionViewExpanded();
-            return false;
-        });
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_viewMode) {
-            rootPage(new JotListFragment());
+            rootPage(JotListFragment.newInstance(this));
         }
-        return false;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_NEW_JOT && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_NEW_JOT && resultCode == RESULT_OK && data != null) {
             clusterManger.addItem(new JotMapItem(
                 new JotById(
                     new JotUriId(
                         data.getData().toString()).value(), db
                 ).value()
             ));
-            getFragmentManager().popBackStack();
+            getParentFragmentManager().popBackStack();
         }
 
-        if (requestCode == REQUEST_CODE_UPDATE_JOT && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_UPDATE_JOT && resultCode == RESULT_OK && data != null) {
             long updatedId = new JotUriId(data.getData().toString()).value();
             JotMapItem updateItem = null;
             for (JotMapItem item : clusterManger.getAlgorithm().getItems()) {
@@ -315,7 +277,7 @@ public class JotMapFragment extends JotFragment {
             clusterManger.addItem(new JotMapItem(
                 new JotById(updatedId, db).value()
             ));
-            getFragmentManager().popBackStack();
+            getParentFragmentManager().popBackStack();
         }
     }
 }

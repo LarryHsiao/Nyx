@@ -27,7 +27,8 @@ import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
  *
  * @todo #1 Inform user to resolve conflict if the local data will be override.
  */
-public class SyncService extends JobIntentService implements ServiceIds, PurchasesUpdatedListener, BillingClientStateListener {
+public class SyncService extends JobIntentService
+    implements ServiceIds, PurchasesUpdatedListener, BillingClientStateListener {
     private Source<Connection> db;
     private BillingClient client;
 

@@ -105,4 +105,9 @@
     </string>
     <string name="Hand_writing">Hand writing</string>
     <string name="Subscribe_for_AI_magics">Subscribe for AI magics</string>
+    <string name="Uri___">Uri: %s</string>
+    <string name="Pick_days">Pick days</string>
+    <string name="Clear">Clear</string>
+    <string name="Started_from">Started from</string>
+    <string name="Ended_at">Ended at</string>
 </resources>

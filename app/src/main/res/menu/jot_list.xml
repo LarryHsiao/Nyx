@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:title="@string/search"
         android:id="@+id/menuItem_search"
         app:iconTint="#fff"
         app:showAsAction="collapseActionView|ifRoom"
         android:icon="@drawable/ic_search"
-        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
     <item
         android:title="@string/view_mode"
         android:id="@+id/menuItem_viewMode"
         app:iconTint="#fff"
         app:showAsAction="always"
         android:icon="@drawable/ic_map"
-        />
+    />
+    <item
+        android:title="@string/Pick_days"
+        android:id="@+id/menuItem_datePicker"
+        app:iconTint="#fff"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_calendar"
+    />
 </menu>

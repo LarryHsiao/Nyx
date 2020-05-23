@@ -1,48 +1,49 @@
 package com.larryhsiao.nyx.jot;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.base.JotFragment;
-import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.ConstJot;
-import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotById;
 import com.larryhsiao.nyx.core.jots.JotUriId;
-import com.larryhsiao.nyx.core.jots.JotsByIds;
-import com.larryhsiao.nyx.core.jots.JotsByKeyword;
+import com.larryhsiao.nyx.core.jots.JotsByCheckedFilter;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
+import com.larryhsiao.nyx.core.jots.filter.Filter;
 import com.larryhsiao.nyx.util.EmptyView;
 import com.silverhetch.aura.view.EmptyListAdapter;
 import com.silverhetch.aura.view.fab.FabBehavior;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
+import static java.util.Arrays.stream;
 
 /**
  * Fragment for showing Jot list.
  */
-public class JotListFragment extends JotFragment {
+public class JotListFragment extends JotListingFragment {
     private static final String ARG_JOT_IDS = "ARG_JOT_IDS";
     private static final String ARG_TITLE = "ARG_TITLE";
     private static final int REQUEST_CODE_CREATE_JOT = 1000;
     private static final int REQUEST_CODE_JOT_CONTENT = 1001;
     private JotListAdapter adapter;
+
+    public static Fragment newInstance(JotListingFragment listingFragment) {
+        JotListFragment frag = new JotListFragment();
+        Bundle bundle = new Bundle();
+        listingFragment.setupFilterArgs(bundle);
+        frag.setArguments(bundle);
+        return frag;
+    }
 
     public JotListFragment() {
         setArguments(new Bundle());
@@ -63,15 +64,13 @@ public class JotListFragment extends JotFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(requireArguments().getString(ARG_TITLE, getString(R.string.jots)));
         adapter = new JotListAdapter(db, jot -> {
             Fragment frag = JotContentFragment.newInstance(new ConstJot(jot));
             frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
             nextPage(frag);
             return null;
         });
-        final Bundle args = getArguments();
-        setHasOptionsMenu(args == null || args.getLongArray(ARG_JOT_IDS) == null);
-        setTitle(getArguments().getString(ARG_TITLE, getString(R.string.jots)));
     }
 
     @Nullable
@@ -87,73 +86,29 @@ public class JotListFragment extends JotFragment {
         final RecyclerView list = view.findViewById(R.id.list);
         list.setLayoutManager(new LinearLayoutManager(view.getContext()));
         list.setAdapter(new EmptyListAdapter(adapter, new EmptyView(view.getContext())));
-        adapter.loadJots(loadJotsByArg());
+        loadJots();
     }
 
-    private List<Jot> loadJotsByArg() {
+    @Override
+    protected void loadJots(Filter filter) {
         final Bundle args = getArguments();
-        long[] jotIds = new long[0];
+        final long[] jotIds;
         if (args != null && args.getLongArray(ARG_JOT_IDS) != null) {
             jotIds = args.getLongArray(ARG_JOT_IDS);
-        }
-        if (args != null && args.getLongArray(ARG_JOT_IDS) != null) {
-            return new QueriedJots(new JotsByIds(db, jotIds)).value();
         } else {
-            return new QueriedJots(new AllJots(db)).value();
+            jotIds = new long[0];
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.jot_list, menu);
-
-        SearchManager searchManager = ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));
-        MenuItem searchMenuItem = menu.findItem(R.id.menuItem_search);
-        SearchView searchView = (SearchView) searchMenuItem.getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        searchView.setOnCloseListener(() -> {
-            searchMenuItem.collapseActionView();
-            return false;
-        });
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                new TagSuggestion(db, newText, searchView).fire();
-                adapter.loadJots(new QueriedJots(new JotsByKeyword(db, newText)).value());
-                return true;
-            }
-        });
-        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                searchView.setQuery("", true);
-                return true;
-            }
-        });
-        searchMenuItem.setOnMenuItemClickListener(item -> {
-            searchView.onActionViewExpanded();
-            return false;
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menuItem_viewMode) {
-            rootPage(new JotMapFragment());
-            return true;
+        if (args != null && jotIds != null && jotIds.length > 0) {
+            adapter.loadJots(
+                new QueriedJots(new JotsByCheckedFilter(db, filter))
+                    .value()
+                    .stream()
+                    .filter(it -> stream(jotIds).anyMatch(value -> it.id() == value))
+                    .collect(Collectors.toList())
+            );
+        } else {
+            adapter.loadJots(new QueriedJots(new JotsByCheckedFilter(db, filter)).value());
         }
-        return false;
     }
 
     @Override
@@ -183,12 +138,21 @@ public class JotListFragment extends JotFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CREATE_JOT && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_CREATE_JOT && resultCode == RESULT_OK && data != null) {
             adapter.insertJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
-            getFragmentManager().popBackStack();
-        } else if (requestCode == REQUEST_CODE_JOT_CONTENT && resultCode == RESULT_OK) {
+            getParentFragmentManager().popBackStack();
+        } else if (requestCode == REQUEST_CODE_JOT_CONTENT && resultCode == RESULT_OK && data != null) {
             adapter.updateJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
-            getFragmentManager().popBackStack();
+            getParentFragmentManager().popBackStack();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menuItem_viewMode) {
+            rootPage(JotMapFragment.newInstance(this));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

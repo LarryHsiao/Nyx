@@ -31,7 +31,10 @@ import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 /**
  * Fragment for indicates user to subscribe the cloud functions.
  */
-public class PurchaseFragment extends JotFragment implements BillingClientStateListener, PurchasesUpdatedListener {
+public class PurchaseFragment extends JotFragment implements
+    BillingClientStateListener,
+    PurchasesUpdatedListener
+{
     private BillingClient client;
 
     @Override
@@ -46,7 +49,9 @@ public class PurchaseFragment extends JotFragment implements BillingClientStateL
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.block_purchase, container, false);
     }
 
@@ -112,7 +117,10 @@ public class PurchaseFragment extends JotFragment implements BillingClientStateL
         if (res.getResponseCode() == OK) {
             for (SkuDetails skuDetails : list) {
                 if ("premium".equals(skuDetails.getSku())) {
-                    purchaseBtn.setText(getString(R.string.Subscribe____month, skuDetails.getPrice()));
+                    purchaseBtn.setText(getString(
+                        R.string.Subscribe____month,
+                        skuDetails.getPrice())
+                    );
                     return;
                 }
             }

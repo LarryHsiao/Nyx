@@ -102,6 +102,7 @@ import io.github.ponnamkarthik.richlinkpreview.ResponseListener;
 import io.github.ponnamkarthik.richlinkpreview.RichPreview;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,7 +144,8 @@ import static java.util.Calendar.ZONE_OFFSET;
  * @todo #0 Handle removing http url will still touch new attachment.
  * @todo #0 Loading progress for loading preview url image.
  */
-public class JotContentFragment extends JotFragment implements BackControl, BillingClientStateListener {
+public class JotContentFragment extends JotFragment
+    implements BackControl, BillingClientStateListener {
     private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
     private static final int REQUEST_CODE_PICK_FILE = 1001;
     private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
@@ -160,8 +162,8 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
      * before taking new one.
      */
     private static final String TEMP_FILE_NAME = "JotContentTakePicture.jpg";
-    private List<Uri> attachmentOnView = new ArrayList<>();
-    private Handler mainHandler = new Handler();
+    private final List<Uri> attachmentOnView = new ArrayList<>();
+    private final Handler mainHandler = new Handler();
     private HandlerThread backgroundThread;
     private Handler backgroundHandler;
     private ChipGroup chipGroup;
@@ -418,7 +420,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                         REQUEST_CODE_INPUT_CUSTOM_MOOD
                     );
                     dialog.setTargetFragment(this, REQUEST_CODE_INPUT_CUSTOM_MOOD);
-                    dialog.show(getFragmentManager(), null);
+                    dialog.show(getParentFragmentManager(), null);
                     return;
                 }
                 final String newMood;
@@ -506,16 +508,16 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
             build.withLocation(jot.location()[1], jot.location()[0]);
         }
         startActivityForResult(
-            build.build(getContext()),
+            build.build(requireContext()),
             REQUEST_CODE_LOCATION_PICKER
         );
     }
 
     private void tagChipClicked(Chip tagChip) {
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(requireContext())
             .setTitle(tagChip.getText().toString())
             .setAdapter(new ArrayAdapter<>(
-                getContext(),
+                requireContext(),
                 android.R.layout.simple_list_item_1,
                 new String[]{
                     getString(R.string.delete)
@@ -525,18 +527,14 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
     }
 
     private void onTagOptionClicked(Chip tagChip, int which1) {
-        switch (which1) {
-            case 0:
-                new AlertDialog.Builder(getContext())
-                    .setTitle(tagChip.getText().toString())
-                    .setMessage(getString(R.string.delete))
-                    .setPositiveButton(R.string.confirm, (dialog2, which2) ->
-                        chipGroup.removeView(tagChip)
-                    ).setNegativeButton(R.string.cancel, null)
-                    .show();
-                break;
-            default:
-                break;
+        if (which1 == 0) {
+            new Builder(requireContext())
+                .setTitle(tagChip.getText().toString())
+                .setMessage(getString(R.string.delete))
+                .setPositiveButton(R.string.confirm, (dialog2, which2) ->
+                    chipGroup.removeView(tagChip)
+                ).setNegativeButton(R.string.cancel, null)
+                .show();
         }
     }
 
@@ -562,13 +560,13 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
         jot = new PostedJot(db, jot).value();
         saveAttachment();
         saveTag();
-        SyncService.enqueue(getContext());
+        SyncService.enqueue(requireContext());
         final Intent intent = new Intent();
         intent.setData(
             Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
         );
         sendResult(
-            getArguments().getInt(ARG_REQUEST_CODE, 0),
+            requireArguments().getInt(ARG_REQUEST_CODE, 0),
             RESULT_OK,
             intent
         );
@@ -619,7 +617,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
     }
 
     private void deleteFlow() {
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(requireContext())
             .setTitle(R.string.delete)
             .setPositiveButton(R.string.confirm, (dialog, which) -> {
                 deleteTempAttachments();
@@ -641,7 +639,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
             }
         }
         if (jot instanceof WrappedJot) { // modified
-            new AlertDialog.Builder(getContext())
+            new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.discard)
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     deleteTempAttachments();
@@ -657,7 +655,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_LOCATION_PICKER && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_LOCATION_PICKER && resultCode == RESULT_OK && data != null) {
             jot = new WrappedJot(jot) {
                 @Override
                 public double[] location() {
@@ -670,20 +668,22 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
             Address address = data.getParcelableExtra(ADDRESS);
             locationText.setText(address == null ? "" : new LocationString(address).value());
             loadEmbedMapByJot();
-        } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK && data != null) {
             if (data.getData() != null) {
                 addAttachmentGrantPermission(data.getData());
             } else {
                 ClipData clip = data.getClipData();
-                for (int i = 0; i < clip.getItemCount(); i++) {
-                    addAttachmentGrantPermission(clip.getItemAt(i).getUri());
+                if (clip != null) {
+                    for (int i = 0; i < clip.getItemCount(); i++) {
+                        addAttachmentGrantPermission(clip.getItemAt(i).getUri());
+                    }
                 }
             }
             updateAttachmentView();
-        } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK && data != null) {
             final String newMoodRaw = data.getStringExtra("INPUT_FIELD");
             final String newMood;
-            if (newMoodRaw.length() > 1) {
+            if (newMoodRaw != null && newMoodRaw.length() > 1) {
                 newMood = newMoodRaw.substring(0, 2);
             } else {
                 newMood = "+";
@@ -695,8 +695,11 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                     return newMood;
                 }
             };
-        } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG) {
+        } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG && data != null) {
             List<Uri> uris = data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
+            if (uris == null) {
+                return;
+            }
             attachmentOnView.clear();
             for (Uri uri : uris) {
                 addAttachment(uri, this::unsupportedDialog);
@@ -704,16 +707,11 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
             updateAttachmentView();
         } else if (requestCode == REQUEST_CODE_TAKE_PICTURE) {
             if (resultCode == RESULT_OK) {
-                File tempDir = new File(getContext().getFilesDir(), "attachments_temp");
-                File fileNameByTime = new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
-                new File(tempDir, TEMP_FILE_NAME).renameTo(fileNameByTime);
-                Uri fileUri = FileProvider.getUriForFile(getContext(), FILE_PROVIDER_AUTHORITY, fileNameByTime);
-                addAttachment(fileUri, this::unsupportedDialog);
-                updateAttachmentView();
+                takeTempPhoto();
             }
         } else if (requestCode == REQUEST_CODE_AI_MAGIC_CAPTURE) {
             if (resultCode == RESULT_OK) {
-                premiumAIMagic(
+                premiumAiMagic(
                     FileProvider.getUriForFile(
                         requireContext(),
                         FILE_PROVIDER_AUTHORITY,
@@ -727,10 +725,24 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
         }
     }
 
-    private void premiumAIMagic(Uri fileUri) {
+    private void takeTempPhoto() {
+        File tempDir = new File(requireContext().getFilesDir(), "attachments_temp");
+        File fileNameByTime = new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
+        new File(tempDir, TEMP_FILE_NAME).renameTo(fileNameByTime);
+        addAttachment(
+            FileProvider.getUriForFile(
+                requireContext(),
+                FILE_PROVIDER_AUTHORITY,
+                fileNameByTime
+            ), this::unsupportedDialog
+        );
+        updateAttachmentView();
+    }
+
+    private void premiumAiMagic(Uri fileUri) {
         try {
             FirebaseVisionImage image = FirebaseVisionImage.fromFilePath(requireContext(), fileUri);
-            final EditText contentEditText = getView().findViewById(R.id.jot_content);
+            final EditText contentEditText = requireView().findViewById(R.id.jot_content);
             FirebaseVision.getInstance()
                 .getCloudDocumentTextRecognizer()
                 .processImage(image)
@@ -754,7 +766,8 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                         .getVisionCloudLandmarkDetector()
                         .detectInImage(image)
                         .addOnSuccessListener(it3 -> {
-                            it3.sort((o1, o2) -> (int) ((o1.getConfidence() - o2.getConfidence()) * 100));
+                            it3.sort((o1, o2) ->
+                                (int) ((o1.getConfidence() - o2.getConfidence()) * 100));
                             if (it3.size() > 0) {
                                 FirebaseVisionCloudLandmark landmark = it3.get(0);
                                 newChip(landmark.getLandmark());
@@ -762,10 +775,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                                     updateJotLocation(landmark.getLocations().get(0));
                                 }
                             }
-                        }).addOnCompleteListener(it -> {
-                            addAttachmentGrantPermission(fileUri);
-                            updateAttachmentView();
-                        })
+                        }).addOnCompleteListener(it -> takeTempPhoto())
                     )
                 );
         } catch (Exception e) {
@@ -826,7 +836,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
     }
 
     private void updatePreview(FrameLayout root, Uri attachmentUri) {
-        LayoutInflater.from(getContext()).inflate(
+        LayoutInflater.from(requireContext()).inflate(
             R.layout.item_attachment_link_preview,
             root,
             true
@@ -919,7 +929,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
 
     private void updateVideo(FrameLayout root, Uri uri) {
         boolean isLocalExist = new IsLocalExist(root.getContext(), uri.toString()).value();
-        LayoutInflater.from(getContext())
+        LayoutInflater.from(requireContext())
             .inflate(R.layout.item_attachment_video, root, true);
         ImageView imageView = root.findViewById(R.id.itemAttachmentVideo_icon);
 
@@ -941,7 +951,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
             } else {
-                makeText(getContext(), R.string.File_no_yet_synced, LENGTH_SHORT).show();
+                makeText(requireContext(), R.string.File_no_yet_synced, LENGTH_SHORT).show();
             }
         });
         imageView.setOnLongClickListener(v -> {
@@ -952,7 +962,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
 
     private void updateAudio(FrameLayout root, Uri uri) {
         boolean isLocalExist = new IsLocalExist(root.getContext(), uri.toString()).value();
-        LayoutInflater.from(getContext()).inflate(R.layout.item_attachment_audio, root, true);
+        LayoutInflater.from(requireContext()).inflate(R.layout.item_attachment_audio, root, true);
         ImageView imageView = root.findViewById(R.id.itemAttachmentAudio_icon);
         if (!isLocalExist) {
             imageView.setImageResource(R.drawable.ic_syncing);
@@ -967,7 +977,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
             } else {
-                makeText(getContext(), R.string.File_no_yet_synced, LENGTH_SHORT).show();
+                makeText(requireContext(), R.string.File_no_yet_synced, LENGTH_SHORT).show();
             }
         });
         imageView.setOnLongClickListener(v -> {
@@ -977,7 +987,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
     }
 
     private void updateImage(FrameLayout root, Uri uri) {
-        LayoutInflater.from(getContext())
+        LayoutInflater.from(requireContext())
             .inflate(R.layout.item_attachment_image, root, true);
         final ImageView icon = root.findViewById(R.id.itemAttachmentImage_icon);
         new JotImageLoading(icon, uri.toString()).fire();
@@ -995,7 +1005,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
     }
 
     private void browseAttachments() {
-        attachmentOnView.sort(new JpegDateComparator(getContext()));
+        attachmentOnView.sort(new JpegDateComparator(requireContext()));
         FullScreenDialogFragment dialog = AttachmentsFragment.newInstance(attachmentOnView);
         dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
         dialog.show(getParentFragmentManager(), null);
@@ -1005,9 +1015,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
         new StfalconImageViewer.Builder<>(
             context,
             Collections.singletonList(uri),
-            (imageView, image) -> {
-                new JotImageLoading(imageView, image.toString()).fire();
-            }
+            (imageView, image) -> new JotImageLoading(imageView, image.toString()).fire()
         ).show();
     }
 
@@ -1025,7 +1033,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
                     .setView(R.layout.dialog_properties)
                     .show();
                 ((TextView) dialog.findViewById(R.id.properties_text)).setText(
-                    "Uri: " + uri.toString()
+                    getString(R.string.Uri___, uri.toString())
                 );
                 return true;
             });
@@ -1034,7 +1042,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
 
     private void addAttachmentGrantPermission(Uri uri) {
         try {
-            getContext().getContentResolver().takePersistableUriPermission(
+            requireContext().getContentResolver().takePersistableUriPermission(
                 uri,
                 FLAG_GRANT_READ_URI_PERMISSION
             );
@@ -1055,7 +1063,7 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
         if (attachmentOnView.contains(uri)) {
             return;
         }
-        final String mimeType = new UriMimeType(getContext(), uri.toString()).value();
+        final String mimeType = new UriMimeType(requireContext(), uri.toString()).value();
         if (mimeType.startsWith("image")) {
             updateJotWithExif(uri);
             attachmentOnView.add(uri);
@@ -1074,9 +1082,11 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
 
     private void updateJotWithExif(Uri data) {
         try {
-            final ExifInterface exif = new ExifInterface(
-                getContext().getContentResolver().openInputStream(data)
-            );
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(data);
+            if (inputStream == null) {
+                return;
+            }
+            final ExifInterface exif = new ExifInterface(inputStream);
             updateJotLocation(exif);
             updateJotDateByExif(exif);
         } catch (Exception e) {
@@ -1148,18 +1158,15 @@ public class JotContentFragment extends JotFragment implements BackControl, Bill
             && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
             mgr.beginTransaction().replace(
                 R.id.jot_embedMapContainer,
-                EmbedMapFragment.newInstance(
-                    jot.location()[0],
-                    jot.location()[1]
-                )
+                EmbedMapFragment.newInstance(jot.location()[0], jot.location()[1])
             ).commit();
-            getView().findViewById(R.id.jot_embedMapContainer).setVisibility(VISIBLE);
+            requireView().findViewById(R.id.jot_embedMapContainer).setVisibility(VISIBLE);
         } else {
             Fragment map = mgr.findFragmentById(R.id.jot_embedMapContainer);
             if (map != null) {
                 mgr.beginTransaction().remove(map).commit();
             }
-            getView().findViewById(R.id.jot_embedMapContainer).setVisibility(GONE);
+            requireView().findViewById(R.id.jot_embedMapContainer).setVisibility(GONE);
         }
     }
 
