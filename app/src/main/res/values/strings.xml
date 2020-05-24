@@ -96,7 +96,6 @@
     <string name="File_no_yet_synced">File no yet synced.</string>
     <string name="Capture_a_picture">Capture a picture</string>
     <string name="Choose_exist_files">Choose exist files</string>
-    <string name="todo">TODOS</string>
     <string name="Text_detected">Text detected</string>
     <string
         name="There_are_some_texts_detected_in_the_picture_do_you_want_to_append_to_the_content_">
@@ -110,4 +109,11 @@
     <string name="Clear">Clear</string>
     <string name="Started_from">Started from</string>
     <string name="Ended_at">Ended at</string>
+    <string name="Syncs">Syncs</string>
+    <string
+        name="Subscribe_to_enable_the_cloud_syncing_and_all_the_smart_functionns">
+        Subscribe to ennnable the cloud syncinng and AI functions!
+    </string>
+    <string name="Cloud_syncs">Cloud syncs</string>
+    <string name="Clouds">Clouds</string>
 </resources>

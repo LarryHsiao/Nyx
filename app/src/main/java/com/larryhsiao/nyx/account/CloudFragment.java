@@ -15,7 +15,7 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
-import com.larryhsiao.nyx.sync.PremiumFragment;
+import com.larryhsiao.nyx.sync.SyncsFragment;
 import com.larryhsiao.nyx.sync.SyncService;
 
 import java.util.ArrayList;
@@ -27,9 +27,9 @@ import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
 
 /**
- * Account page.
+ * Cloud syc page.
  */
-public class AccountFragment extends JotFragment
+public class CloudFragment extends JotFragment
     implements PurchasesUpdatedListener, BillingClientStateListener {
     private BillingClient client;
 
@@ -85,7 +85,7 @@ public class AccountFragment extends JotFragment
 
     private void onSubscribed() {
         SyncService.enqueue(getContext());
-        toPremium();
+        toSyncPage();
     }
 
     @Override
@@ -112,16 +112,16 @@ public class AccountFragment extends JotFragment
         for (Purchase purchase : purchases) {
             if (purchase.getPurchaseState() == PURCHASED
                 && "premium".equals(purchase.getSku())) {
-                toPremium();
+                toSyncPage();
                 return;
             }
         }
         toPurchase();
     }
 
-    private void toPremium() {
+    private void toSyncPage() {
         getChildFragmentManager().beginTransaction()
-            .replace(R.id.account_pageContainer, new PremiumFragment())
+            .replace(R.id.account_pageContainer, new SyncsFragment())
             .commit();
     }
 
