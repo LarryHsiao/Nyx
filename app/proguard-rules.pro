@@ -51,5 +51,7 @@
 
 -keep class com.larryhsiao.nyx.jot.JotMonthView { *; }
 -keep class com.larryhsiao.nyx.jot.JotWeekView { *; }
+-keep class com.larryhsiao.nyx.jot.SelectRangeMonthView { *; }
+-keep class * extends com.haibin.calendarview.MonthView {*;}
 
 -keep class androidx.exifinterface.media.ExifInterface { *; }
