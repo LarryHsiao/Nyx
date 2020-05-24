@@ -95,6 +95,7 @@ import com.silverhetch.aura.view.alert.Alert;
 import com.silverhetch.aura.view.dialog.FullScreenDialogFragment;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.fab.FabBehavior;
+import com.silverhetch.clotho.date.DateCalendar;
 import com.silverhetch.clotho.source.ConstSource;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 import io.github.ponnamkarthik.richlinkpreview.MetaData;
@@ -134,6 +135,7 @@ import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
 import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
 import static java.lang.Double.MIN_VALUE;
+import static java.util.Calendar.YEAR;
 import static java.util.Calendar.ZONE_OFFSET;
 
 /**
@@ -258,6 +260,12 @@ public class JotContentFragment extends JotFragment
         dateText = view.findViewById(R.id.jot_date);
         dateText.setOnClickListener(v -> {
             DatePickerDialog dialog = new DatePickerDialog(view.getContext());
+            Calendar calendar = new DateCalendar(jot.createdTime(), Calendar.getInstance()).value();
+            dialog.getDatePicker().updateDate(
+                calendar.get(YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            );
             dialog.setOnDateSetListener((view1, year, month, dayOfMonth) -> {
                 jot = new WrappedJot(jot) {
                     @Override
