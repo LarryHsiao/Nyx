@@ -101,6 +101,9 @@ import com.stfalcon.imageviewer.StfalconImageViewer;
 import io.github.ponnamkarthik.richlinkpreview.MetaData;
 import io.github.ponnamkarthik.richlinkpreview.ResponseListener;
 import io.github.ponnamkarthik.richlinkpreview.RichPreview;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.File;
 import java.io.InputStream;
@@ -315,12 +318,7 @@ public class JotContentFragment extends JotFragment
                     Default
                 ).detect();
                 if (detect.size() > 0) {
-                    addAttachment(
-                        Uri.parse(detect.get(detect.size() - 1).toString()),
-                        () -> {
-                        }
-                    );
-                    updateAttachmentView();
+                    preferEnterUrl(detect.get(detect.size() - 1).toString());
                 }
             };
         });
@@ -450,6 +448,38 @@ public class JotContentFragment extends JotFragment
         view.findViewById(R.id.jot_ai_magic).setOnClickListener(v ->
             takePicture(REQUEST_CODE_AI_MAGIC_CAPTURE)
         );
+    }
+
+    private void preferEnterUrl(String url) {
+        new Thread(() -> {
+            try {
+                OkHttpClient client = new OkHttpClient();
+                Response res = client.newCall(
+                    new Request.Builder()
+                        .method("HEAD", null)
+                        .url(url)
+                        .build()
+                ).execute();
+                if (res.code() >= 200 && res.code() <= 299) {
+                    postAddAttachment(url);
+                }
+            } catch (Exception ignore) {
+            }
+        }).start();
+    }
+
+    private void postAddAttachment(String url) {
+        getView().post(new Runnable() {
+            @Override
+            public void run() {
+                addAttachment(
+                    Uri.parse(url),
+                    () -> {
+                    }
+                );
+                updateAttachmentView();
+            }
+        });
     }
 
     private void newChip(String preferTagName) {
