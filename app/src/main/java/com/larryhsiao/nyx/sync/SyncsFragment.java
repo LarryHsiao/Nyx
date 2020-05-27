@@ -45,7 +45,7 @@ import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 /**
  * Fragment for login Firebase.
  */
-public class PremiumFragment extends JotFragment {
+public class SyncsFragment extends JotFragment {
     private static final int REQUEST_CODE_LOG_IN = 1000;
 
     @Override
@@ -71,7 +71,7 @@ public class PremiumFragment extends JotFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final TextView title = view.findViewById(R.id.backup_title);
-        title.setText(getString(R.string.Premium));
+        title.setText(getString(R.string.Syncs));
         view.findViewById(R.id.backup_backupBtn).setVisibility(GONE);
         view.findViewById(R.id.backup_restoreBtn).setVisibility(GONE);
         updateView(view);

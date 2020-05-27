@@ -59,9 +59,9 @@ public class PurchaseFragment extends JotFragment implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ((TextView) view.findViewById(R.id.blockPurchase_functionName))
-            .setText(R.string.Premium);
+            .setText(R.string.Cloud_syncs);
         ((TextView) view.findViewById(R.id.blockPurchase_description))
-            .setText(R.string.todo);
+            .setText(R.string.Subscribe_to_enable_the_cloud_syncing_and_all_the_smart_functionns);
 
         Button purchaseBtn = view.findViewById(R.id.blockPurchase_purchaseButton);
         purchaseBtn.setText(R.string.Subscribe);

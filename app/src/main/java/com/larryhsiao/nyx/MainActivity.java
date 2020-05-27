@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.larryhsiao.nyx.account.AccountFragment;
+import com.larryhsiao.nyx.account.CloudFragment;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.jot.JotListFragment;
 import com.larryhsiao.nyx.sync.SyncService;
@@ -42,9 +42,9 @@ public class MainActivity extends JotActivity {
                 currentPage = R.id.menuItem_jots;
                 rootPage(new JotListFragment());
                 return true;
-            } else if (item.getItemId() == R.id.menuItem_account) {
-                currentPage = R.id.menuItem_account;
-                rootPage(new AccountFragment());
+            } else if (item.getItemId() == R.id.menuItem_clouds) {
+                currentPage = R.id.menuItem_clouds;
+                rootPage(new CloudFragment());
                 return true;
             } else {
                 return false;

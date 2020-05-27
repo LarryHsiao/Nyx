@@ -10,8 +10,8 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:title="@string/account"
+        android:title="@string/Clouds"
         app:showAsAction="ifRoom"
-        android:id="@+id/menuItem_account"
-        android:icon="@drawable/ic_account"/>
+        android:id="@+id/menuItem_clouds"
+        android:icon="@drawable/ic_cloud_sync"/>
 </menu>
