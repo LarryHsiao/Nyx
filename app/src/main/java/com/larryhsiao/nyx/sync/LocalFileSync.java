@@ -118,7 +118,7 @@ public class LocalFileSync implements Action {
                 it -> null
             ).fire();
         }
-        new JpegCompress(temp, compressTemp).fire();
+        new JpegCompress(temp, compressTemp, 90).fire();
         temp.delete();
         final String fileName = generateFileName(
             "jpg",
