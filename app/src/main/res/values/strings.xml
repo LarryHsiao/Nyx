@@ -116,4 +116,10 @@
     </string>
     <string name="Cloud_syncs">Cloud syncs</string>
     <string name="Clouds">Clouds</string>
+    <string name="Invalid_purchase_state">Invalid purchase state</string>
+    <string
+        name="User_not_as_same_as_previous_logged_in__change_to_this_account_">
+        User not as same as previous logged in, change to this account?
+    </string>
+    <string name="Change_account">Change account</string>
 </resources>

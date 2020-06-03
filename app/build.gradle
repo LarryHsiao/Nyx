@@ -17,8 +17,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
-def nyxVersionName = "v3.7.1"
-def nyxVersionCode = 30701
+def nyxVersionName = "v3.7.2"
+def nyxVersionCode = 30702
 
 android {
     compileSdkVersion 29
@@ -84,13 +84,15 @@ configurations.all {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':nyx-core')
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.google.firebase:firebase-ml-vision:24.0.3'
     implementation 'com.android.billingclient:billing:2.1.0'
     implementation group: 'com.linkedin.urls', name: 'url-detector', version: '0.1.17'
     implementation 'io.github.ponnamkarthik:richlinkpreview:1.0.9'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
+    implementation 'com.firebaseui:firebase-ui-auth:6.2.1'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
     implementation "androidx.biometric:biometric:1.0.1"
