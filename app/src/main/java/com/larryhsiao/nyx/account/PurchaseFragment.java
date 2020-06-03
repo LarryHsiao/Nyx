@@ -33,8 +33,7 @@ import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
  */
 public class PurchaseFragment extends JotFragment implements
     BillingClientStateListener,
-    PurchasesUpdatedListener
-{
+    PurchasesUpdatedListener {
     private BillingClient client;
 
     @Override
@@ -58,14 +57,6 @@ public class PurchaseFragment extends JotFragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ((TextView) view.findViewById(R.id.blockPurchase_functionName))
-            .setText(R.string.Cloud_syncs);
-        ((TextView) view.findViewById(R.id.blockPurchase_description))
-            .setText(R.string.Subscribe_to_enable_the_cloud_syncing_and_all_the_smart_functionns);
-
-        Button purchaseBtn = view.findViewById(R.id.blockPurchase_purchaseButton);
-        purchaseBtn.setText(R.string.Subscribe);
-        purchaseBtn.setOnClickListener(it -> querySku());
     }
 
     private void querySku() {
@@ -113,21 +104,30 @@ public class PurchaseFragment extends JotFragment implements
     }
 
     private void updatePrice(BillingResult res, List<SkuDetails> list) {
+        if (getView() == null) {
+            return;
+        }
+        ((TextView) getView().findViewById(R.id.blockPurchase_functionName))
+            .setText(R.string.Cloud_syncs);
+
         Button purchaseBtn = getView().findViewById(R.id.blockPurchase_purchaseButton);
+        TextView desc = getView().findViewById(R.id.blockPurchase_description);
         if (res.getResponseCode() == OK) {
             for (SkuDetails skuDetails : list) {
                 if ("premium".equals(skuDetails.getSku())) {
+                    desc.setText(skuDetails.getDescription());
                     purchaseBtn.setText(getString(
                         R.string.Subscribe____month,
                         skuDetails.getPrice())
                     );
+                    purchaseBtn.setOnClickListener(it -> querySku());
                     return;
                 }
             }
+        } else {
+            purchaseBtn.setEnabled(false);
+            purchaseBtn.setText(R.string.error);
         }
-        purchaseBtn.setEnabled(false);
-        purchaseBtn.setText(R.string.error);
-        purchaseBtn.setOnClickListener(null);
     }
 
     @Override

@@ -15,8 +15,8 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
-import com.larryhsiao.nyx.sync.SyncsFragment;
 import com.larryhsiao.nyx.sync.SyncService;
+import com.larryhsiao.nyx.sync.SyncsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,14 +78,14 @@ public class CloudFragment extends JotFragment
                     AcknowledgePurchaseParams.newBuilder()
                         .setPurchaseToken(purchase.getPurchaseToken())
                         .build();
-                client.acknowledgePurchase(param, res -> onSubscribed());
+                client.acknowledgePurchase(param, res -> onSubscribed(purchase.getPurchaseToken()));
             }
         }
     }
 
-    private void onSubscribed() {
+    private void onSubscribed(String purchaseToken) {
         SyncService.enqueue(getContext());
-        toSyncPage();
+        toSyncPage(purchaseToken);
     }
 
     @Override
@@ -112,16 +112,16 @@ public class CloudFragment extends JotFragment
         for (Purchase purchase : purchases) {
             if (purchase.getPurchaseState() == PURCHASED
                 && "premium".equals(purchase.getSku())) {
-                toSyncPage();
+                toSyncPage(purchase.getPurchaseToken());
                 return;
             }
         }
         toPurchase();
     }
 
-    private void toSyncPage() {
+    private void toSyncPage(String token) {
         getChildFragmentManager().beginTransaction()
-            .replace(R.id.account_pageContainer, new SyncsFragment())
+            .replace(R.id.account_pageContainer, SyncsFragment.newInstance(token))
             .commit();
     }
 
