@@ -4,6 +4,7 @@ Nyx
 Instant jot app on Android.
 
 [![We recommend IntelliJ IDEA](http://www.elegantobjects.org/intellij-idea.svg)](https://www.jetbrains.com/idea/)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLarryHsiao%2FNyx.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FLarryHsiao%2FNyx?ref=badge_shield)
 
 [![PDD status](http://www.0pdd.com/svg?name=LarryHsiao/Nyx)](http://www.0pdd.com/p?name=LarryHsiao/Nyx)
 
@@ -12,3 +13,6 @@ Instant jot app on Android.
 [![Hits-of-Code](https://hitsofcode.com/github/Larryhsiao/Nyx)](https://hitsofcode.com/view/github/Larryhsiao/Nyx)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLarryHsiao%2FNyx.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FLarryHsiao%2FNyx?ref=badge_large)
