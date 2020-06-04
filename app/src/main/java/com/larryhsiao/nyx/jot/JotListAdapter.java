@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
@@ -23,15 +22,12 @@ import com.silverhetch.clotho.date.DateCalendar;
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.Calendar.SHORT;
-import static java.util.Calendar.SHORT_FORMAT;
+import static java.lang.Math.abs;
+import static java.text.DateFormat.getDateInstance;
 import static java.util.Calendar.getInstance;
 
 /**
@@ -52,7 +48,8 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(
+        @NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
             R.layout.item_jot, parent, false
         ));
@@ -66,7 +63,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
         holder.getTextView(R.id.itemJot_title).setText(
-            DateFormat.getDateInstance().format(new Date(jot.createdTime()))
+            getDateInstance().format(new Date(jot.createdTime()))
         );
         holder.getTextView(R.id.itemJot_content).setText(
             (jot.mood() + " " + jot.content() + "\n").trim()
@@ -78,7 +75,8 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
                 attachment.uri()
             ).value().startsWith("image")
         ).limit(4).collect(Collectors.toList());
-        final ImageView image = holder.itemView.findViewById(R.id.itemJot_image);
+        final ImageView image =
+            holder.itemView.findViewById(R.id.itemJot_image);
         if (attachments.size() > 0) {
             image.setVisibility(View.VISIBLE);
             new JotImageLoading(image, attachments.get(0).uri()).fire();
@@ -89,20 +87,23 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
             data.get(holder.getAdapterPosition()))
         );
         int margin = ((int) new DP(holder.itemView.getContext(), 4).px());
-        RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+        RecyclerView.LayoutParams layoutParams =
+            (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
         switch (getItemViewType(position)) {
             case ITEM_END:
                 layoutParams.bottomMargin = margin;
                 layoutParams.topMargin = 0;
                 holder.getTextView(R.id.itemJot_title).setText(
-                    SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(jot.createdTime()))
+                    SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
+                        .format(new Date(jot.createdTime()))
                 );
                 break;
             case ITEM_MIDDLE:
                 layoutParams.topMargin = 0;
                 layoutParams.bottomMargin = 0;
                 holder.getTextView(R.id.itemJot_title).setText(
-                    SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(jot.createdTime()))
+                    SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
+                        .format(new Date(jot.createdTime()))
                 );
                 break;
             case ITEM_TOP:
@@ -110,14 +111,17 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
                 layoutParams.topMargin = margin;
                 layoutParams.bottomMargin = 0;
                 if (position != data.size() - 1 &&
-                    new DateCalendar(jot.createdTime(), Calendar.getInstance()).value().equals(
-                        new DateCalendar(data.get(position + 1).createdTime(), Calendar.getInstance()).value()
+                    new DateCalendar(jot.createdTime(), Calendar.getInstance())
+                        .value().equals(
+                        new DateCalendar(data.get(position + 1).createdTime(),
+                            Calendar.getInstance()).value()
                     )
                 ) {
                     holder.getTextView(R.id.itemJot_title).append(
                         String.format(
                             "\n%s",
-                            SimpleDateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(jot.createdTime()))
+                            SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
+                                .format(new Date(jot.createdTime()))
                         )
                     );
                 }
@@ -172,7 +176,23 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void loadJots(List<Jot> data) {
         this.data.clear();
         this.data.addAll(data);
+        this.data.sort((o1, o2) -> {
+            if (abs(o1.createdTime() - o2.createdTime()) < 86400000
+                && dateStr(o1).equals(dateStr(o2))) {
+                return (int) (
+                    o1.createdTime() / 1000f - o2.createdTime() / 1000f
+                );
+            } else {
+                return (int) (
+                    o2.createdTime() / 1000f - o1.createdTime() / 1000f
+                );
+            }
+        });
         notifyDataSetChanged();
+    }
+
+    private String dateStr(Jot jot) {
+        return getDateInstance().format(new Date(jot.createdTime()));
     }
 
     /**
