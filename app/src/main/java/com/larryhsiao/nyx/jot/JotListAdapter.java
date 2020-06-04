@@ -1,14 +1,10 @@
 package com.larryhsiao.nyx.jot;
 
 import android.location.Location;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.attachments.JotImageLoading;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
@@ -18,17 +14,26 @@ import com.silverhetch.aura.view.ViewHolder;
 import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.date.DateCalendar;
+import com.smarteist.autoimageslider.SliderView;
 
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import static android.view.LayoutInflater.from;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static com.smarteist.autoimageslider.IndicatorAnimations.WORM;
+import static com.smarteist.autoimageslider.SliderAnimations.FADETRANSFORMATION;
 import static java.lang.Math.abs;
 import static java.text.DateFormat.getDateInstance;
 import static java.util.Calendar.getInstance;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Adapter for showing Jot list
@@ -50,7 +55,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(
         @NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
+        return new ViewHolder(from(parent.getContext()).inflate(
             R.layout.item_jot, parent, false
         ));
     }
@@ -74,17 +79,25 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
                 holder.itemView.getContext(),
                 attachment.uri()
             ).value().startsWith("image")
-        ).limit(4).collect(Collectors.toList());
-        final ImageView image =
+        ).collect(toList());
+        final SliderView image =
             holder.itemView.findViewById(R.id.itemJot_image);
+        final AttachmentSliderAdapter adapter = new AttachmentSliderAdapter(
+            attachment -> clicked.apply(jot)
+        );
+        image.setSliderAdapter(adapter);
         if (attachments.size() > 0) {
-            image.setVisibility(View.VISIBLE);
-            new JotImageLoading(image, attachments.get(0).uri()).fire();
+            adapter.renewItems(attachments);
+            image.setVisibility(VISIBLE);
+            image.startAutoCycle();
+            image.setIndicatorAnimation(WORM);
+            image.setSliderTransformAnimation(FADETRANSFORMATION);
         } else {
-            image.setVisibility(View.GONE);
+            image.stopAutoCycle();
+            image.setVisibility(GONE);
         }
-        holder.getRootView().setOnClickListener(v -> clicked.apply(
-            data.get(holder.getAdapterPosition()))
+        holder.getRootView().setOnClickListener(v ->
+            clicked.apply(data.get(holder.getAdapterPosition()))
         );
         int margin = ((int) new DP(holder.itemView.getContext(), 4).px());
         RecyclerView.LayoutParams layoutParams =

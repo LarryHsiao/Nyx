@@ -32,15 +32,26 @@
                   app:layout_constraintTop_toBottomOf="@id/itemJot_title"
                   android:layout_height="wrap_content"/>
 
-        <ImageView
+        <com.smarteist.autoimageslider.SliderView
             android:layout_width="match_parent"
             android:id="@+id/itemJot_image"
-            android:scaleType="centerCrop"
             android:visibility="gone"
-            android:adjustViewBounds="true"
             tools:visibility="visible"
-            tools:src="@drawable/ic_tag"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="450dp"
+            app:sliderAnimationDuration="600"
+            app:sliderAutoCycleDirection="back_and_forth"
+            app:sliderAutoCycleEnabled="true"
+            app:sliderIndicatorAnimationDuration="600"
+            app:sliderIndicatorGravity="center_horizontal|bottom"
+            app:sliderIndicatorMargin="15dp"
+            app:sliderIndicatorOrientation="horizontal"
+            app:sliderIndicatorPadding="3dp"
+            app:sliderIndicatorRadius="2dp"
+            app:sliderIndicatorSelectedColor="#5A5A5A"
+            app:sliderIndicatorUnselectedColor="#FFF"
+            app:sliderScrollTimeInSec="3"
+            app:sliderStartAutoCycle="true"
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
