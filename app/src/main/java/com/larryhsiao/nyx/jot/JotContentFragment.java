@@ -2,11 +2,9 @@ package com.larryhsiao.nyx.jot;
 
 import android.app.DatePickerDialog;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,19 +12,8 @@ import android.os.HandlerThread;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.*;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -35,11 +22,11 @@ import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
-import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -53,33 +40,15 @@ import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.attachments.AttachmentPickerIntent;
 import com.larryhsiao.nyx.attachments.AttachmentsFragment;
-import com.larryhsiao.nyx.attachments.IsLocalExist;
-import com.larryhsiao.nyx.attachments.JotImageLoading;
+import com.larryhsiao.nyx.attachments.LaunchAttachment;
 import com.larryhsiao.nyx.base.JotFragment;
-import com.larryhsiao.nyx.core.attachments.Attachment;
-import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
-import com.larryhsiao.nyx.core.attachments.NewAttachment;
-import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
-import com.larryhsiao.nyx.core.attachments.RemovalAttachment;
-import com.larryhsiao.nyx.core.attachments.RemovalAttachmentByJotId;
-import com.larryhsiao.nyx.core.jots.ConstJot;
-import com.larryhsiao.nyx.core.jots.Jot;
-import com.larryhsiao.nyx.core.jots.JotRemoval;
-import com.larryhsiao.nyx.core.jots.JotUri;
-import com.larryhsiao.nyx.core.jots.PostedJot;
-import com.larryhsiao.nyx.core.jots.WrappedJot;
+import com.larryhsiao.nyx.core.attachments.*;
+import com.larryhsiao.nyx.core.jots.*;
 import com.larryhsiao.nyx.core.jots.moods.DefaultMoods;
 import com.larryhsiao.nyx.core.jots.moods.MergedMoods;
 import com.larryhsiao.nyx.core.jots.moods.RankedMood;
 import com.larryhsiao.nyx.core.jots.moods.RankedMoods;
-import com.larryhsiao.nyx.core.tags.AllTags;
-import com.larryhsiao.nyx.core.tags.JotTagRemoval;
-import com.larryhsiao.nyx.core.tags.NewJotTag;
-import com.larryhsiao.nyx.core.tags.NewTag;
-import com.larryhsiao.nyx.core.tags.QueriedTags;
-import com.larryhsiao.nyx.core.tags.Tag;
-import com.larryhsiao.nyx.core.tags.TagsByJotId;
-import com.larryhsiao.nyx.core.tags.TagsByKeyword;
+import com.larryhsiao.nyx.core.tags.*;
 import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.util.EmbedMapFragment;
 import com.larryhsiao.nyx.util.JpegDateComparator;
@@ -95,12 +64,9 @@ import com.silverhetch.aura.view.alert.Alert;
 import com.silverhetch.aura.view.dialog.FullScreenDialogFragment;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.fab.FabBehavior;
+import com.silverhetch.aura.view.recyclerview.Slider;
 import com.silverhetch.clotho.date.DateCalendar;
 import com.silverhetch.clotho.source.ConstSource;
-import com.stfalcon.imageviewer.StfalconImageViewer;
-import io.github.ponnamkarthik.richlinkpreview.MetaData;
-import io.github.ponnamkarthik.richlinkpreview.ResponseListener;
-import io.github.ponnamkarthik.richlinkpreview.RichPreview;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -108,25 +74,15 @@ import okhttp3.Response;
 import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Intent.ACTION_VIEW;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
 import static android.provider.MediaStore.EXTRA_OUTPUT;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static android.widget.Toast.LENGTH_SHORT;
-import static android.widget.Toast.makeText;
 import static androidx.appcompat.app.AlertDialog.Builder;
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
 import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
@@ -134,12 +90,11 @@ import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
 import static com.larryhsiao.nyx.JotApplication.FILE_PROVIDER_AUTHORITY;
 import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
 import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
-import static com.schibstedspain.leku.LocationPickerActivityKt.ADDRESS;
-import static com.schibstedspain.leku.LocationPickerActivityKt.LATITUDE;
-import static com.schibstedspain.leku.LocationPickerActivityKt.LONGITUDE;
+import static com.schibstedspain.leku.LocationPickerActivityKt.*;
 import static java.lang.Double.MIN_VALUE;
 import static java.util.Calendar.YEAR;
 import static java.util.Calendar.ZONE_OFFSET;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Fragment that shows the Jot content.
@@ -175,6 +130,7 @@ public class JotContentFragment extends JotFragment
     private TextView dateText;
     private TextView locationText;
     private TextView moodText;
+    private AttachmentSliderAdapter adapter;
     private Jot jot;
     private BillingClient billing;
 
@@ -202,7 +158,8 @@ public class JotContentFragment extends JotFragment
         return newInstance(jot, new ArrayList<>(), requestCode);
     }
 
-    public static Fragment newInstance(Jot jot, ArrayList<String> uris, int requestCode) {
+    public static Fragment newInstance(
+        Jot jot, ArrayList<String> uris, int requestCode) {
         final Fragment frag = new JotContentFragment();
         Bundle args = new Bundle();
         args.putString(ARG_JOT_JSON, new Gson().toJson(jot));
@@ -246,12 +203,29 @@ public class JotContentFragment extends JotFragment
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.page_jot, container, false);
+    public View onCreateView(
+        @NonNull LayoutInflater inflater,
+        @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.page_jot, container, false);
+        RecyclerView slider = view.findViewById(R.id.jot_attachment_container);
+        adapter = new AttachmentSliderAdapter(
+            slider.getContext(),
+            (clickedView, uri, longClicked) -> {
+                if (longClicked) {
+                    showProperties(clickedView, Uri.parse(uri));
+                } else {
+                    showContent(clickedView, uri);
+                }
+            });
+        slider.setAdapter(adapter);
+        new Slider(slider).fire();
+        return view;
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(
+        @NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         billing = BillingClient.newBuilder(requireContext())
             .setListener((res, list) -> {
@@ -263,7 +237,9 @@ public class JotContentFragment extends JotFragment
         dateText = view.findViewById(R.id.jot_date);
         dateText.setOnClickListener(v -> {
             DatePickerDialog dialog = new DatePickerDialog(view.getContext());
-            Calendar calendar = new DateCalendar(jot.createdTime(), Calendar.getInstance()).value();
+            Calendar calendar =
+                new DateCalendar(jot.createdTime(), Calendar.getInstance())
+                    .value();
             dialog.getDatePicker().updateDate(
                 calendar.get(YEAR),
                 calendar.get(Calendar.MONTH),
@@ -288,12 +264,14 @@ public class JotContentFragment extends JotFragment
         contentEditText.setText(jot.content());
         contentEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public void beforeTextChanged(
+                CharSequence s, int start, int count, int after) {
                 // Leave it empty
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public void onTextChanged(
+                CharSequence s, int start, int before, int count) {
                 // Leave it empty
             }
 
@@ -335,11 +313,12 @@ public class JotContentFragment extends JotFragment
                 .value()
                 .stream()
                 .map(it -> Uri.parse(it.uri()))
-                .collect(Collectors.toList())
+                .collect(toList())
         );
 
         if (getArguments() != null) {
-            final List<String> attachments = getArguments().getStringArrayList(ARG_ATTACHMENT_URI);
+            final List<String> attachments =
+                getArguments().getStringArrayList(ARG_ATTACHMENT_URI);
             if (attachments != null) {
                 for (String uri : attachments) {
                     addAttachmentGrantPermission(Uri.parse(uri));
@@ -350,7 +329,8 @@ public class JotContentFragment extends JotFragment
 
         ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
         tagIcon.setOnClickListener(v -> {
-            final AutoCompleteTextView editText = new AutoCompleteTextView(v.getContext());
+            final AutoCompleteTextView editText =
+                new AutoCompleteTextView(v.getContext());
             editText.setLines(1);
             editText.setMaxLines(1);
             editText.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -359,7 +339,7 @@ public class JotContentFragment extends JotFragment
                     android.R.layout.simple_dropdown_item_1line,
                     new QueriedTags(
                         new AllTags(db)
-                    ).value().stream().map(Tag::title).collect(Collectors.toList())
+                    ).value().stream().map(Tag::title).collect(toList())
                 )
             );
             new AlertDialog.Builder(v.getContext())
@@ -406,7 +386,7 @@ public class JotContentFragment extends JotFragment
                             new RankedMoods(db).value()
                                 .stream()
                                 .map(RankedMood::mood)
-                                .collect(Collectors.toList())
+                                .collect(toList())
                         ),
                         new DefaultMoods()
                     ).value()
@@ -419,13 +399,15 @@ public class JotContentFragment extends JotFragment
                 .setView(gridView)
                 .show();
             gridView.setOnItemClickListener((parent, view12, position, id) -> {
-                if (position == gridView.getAdapter().getCount() - 1) { // last custom dialog
+                if (position == gridView.getAdapter().getCount() -
+                    1) { // last custom dialog
                     moodDialog.dismiss();
                     InputDialog dialog = InputDialog.Companion.newInstance(
                         getString(R.string.moods),
                         REQUEST_CODE_INPUT_CUSTOM_MOOD
                     );
-                    dialog.setTargetFragment(this, REQUEST_CODE_INPUT_CUSTOM_MOOD);
+                    dialog.setTargetFragment(this,
+                        REQUEST_CODE_INPUT_CUSTOM_MOOD);
                     dialog.show(getParentFragmentManager(), null);
                     return;
                 }
@@ -484,7 +466,8 @@ public class JotContentFragment extends JotFragment
 
     private void newChip(String preferTagName) {
         Tag tag = null;
-        for (Tag searched : new QueriedTags(new TagsByKeyword(db, preferTagName)).value()) {
+        for (Tag searched : new QueriedTags(
+            new TagsByKeyword(db, preferTagName)).value()) {
             if (searched.title().equals(preferTagName)) {
                 tag = searched;
                 break;
@@ -540,7 +523,8 @@ public class JotContentFragment extends JotFragment
     }
 
     private void pickLocation() {
-        LocationPickerActivity.Builder build = new LocationPickerActivity.Builder();
+        LocationPickerActivity.Builder build =
+            new LocationPickerActivity.Builder();
         if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
             && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
             build.withLocation(jot.location()[1], jot.location()[0]);
@@ -577,11 +561,13 @@ public class JotContentFragment extends JotFragment
     }
 
     private void updateDateIndicator() {
-        dateText.setText(SimpleDateFormat.getDateInstance().format(new Date(jot.createdTime())));
+        dateText.setText(SimpleDateFormat.getDateInstance()
+            .format(new Date(jot.createdTime())));
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(
+        @NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.jot_edit, menu);
     }
@@ -601,7 +587,8 @@ public class JotContentFragment extends JotFragment
         SyncService.enqueue(requireContext());
         final Intent intent = new Intent();
         intent.setData(
-            Uri.parse(new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
+            Uri.parse(
+                new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
         );
         sendResult(
             requireArguments().getInt(ARG_REQUEST_CODE, 0),
@@ -611,10 +598,11 @@ public class JotContentFragment extends JotFragment
     }
 
     private void saveTag() {
-        final Map<Long, Tag> dbTags = new QueriedTags(new TagsByJotId(db, jot.id()))
-            .value()
-            .stream()
-            .collect(Collectors.toMap(Tag::id, tag -> tag));
+        final Map<Long, Tag> dbTags =
+            new QueriedTags(new TagsByJotId(db, jot.id()))
+                .value()
+                .stream()
+                .collect(Collectors.toMap(Tag::id, tag -> tag));
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
             Tag tagOnView = ((Tag) chipGroup.getChildAt(i).getTag());
             if (!dbTags.containsKey(tagOnView.id())) {
@@ -628,7 +616,8 @@ public class JotContentFragment extends JotFragment
                 dbTags.remove(tagOnView.id());
             }
         }
-        dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
+        dbTags.forEach(
+            (aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
     }
 
     private void saveAttachment() {
@@ -691,9 +680,11 @@ public class JotContentFragment extends JotFragment
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(
+        int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_LOCATION_PICKER && resultCode == RESULT_OK && data != null) {
+        if (requestCode == REQUEST_CODE_LOCATION_PICKER &&
+            resultCode == RESULT_OK && data != null) {
             jot = new WrappedJot(jot) {
                 @Override
                 public double[] location() {
@@ -704,21 +695,25 @@ public class JotContentFragment extends JotFragment
                 }
             };
             Address address = data.getParcelableExtra(ADDRESS);
-            locationText.setText(address == null ? "" : new LocationString(address).value());
+            locationText.setText(
+                address == null ? "" : new LocationString(address).value());
             loadEmbedMapByJot();
-        } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == RESULT_OK && data != null) {
+        } else if (requestCode == REQUEST_CODE_PICK_FILE &&
+            resultCode == RESULT_OK && data != null) {
             if (data.getData() != null) {
                 addAttachmentGrantPermission(data.getData());
             } else {
                 ClipData clip = data.getClipData();
                 if (clip != null) {
                     for (int i = 0; i < clip.getItemCount(); i++) {
-                        addAttachmentGrantPermission(clip.getItemAt(i).getUri());
+                        addAttachmentGrantPermission(
+                            clip.getItemAt(i).getUri());
                     }
                 }
             }
             updateAttachmentView();
-        } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == RESULT_OK && data != null) {
+        } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD &&
+            resultCode == RESULT_OK && data != null) {
             final String newMoodRaw = data.getStringExtra("INPUT_FIELD");
             final String newMood;
             if (newMoodRaw != null && newMoodRaw.length() > 1) {
@@ -733,8 +728,10 @@ public class JotContentFragment extends JotFragment
                     return newMood;
                 }
             };
-        } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG && data != null) {
-            List<Uri> uris = data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
+        } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG &&
+            data != null) {
+            List<Uri> uris =
+                data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
             if (uris == null) {
                 return;
             }
@@ -754,7 +751,8 @@ public class JotContentFragment extends JotFragment
                         requireContext(),
                         FILE_PROVIDER_AUTHORITY,
                         new File(
-                            new File(requireContext().getFilesDir(), "attachments_temp"),
+                            new File(requireContext().getFilesDir(),
+                                "attachments_temp"),
                             TEMP_FILE_NAME
                         )
                     )
@@ -764,8 +762,10 @@ public class JotContentFragment extends JotFragment
     }
 
     private void takeTempPhoto() {
-        File tempDir = new File(requireContext().getFilesDir(), "attachments_temp");
-        File fileNameByTime = new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
+        File tempDir =
+            new File(requireContext().getFilesDir(), "attachments_temp");
+        File fileNameByTime =
+            new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
         new File(tempDir, TEMP_FILE_NAME).renameTo(fileNameByTime);
         addAttachment(
             FileProvider.getUriForFile(
@@ -779,8 +779,10 @@ public class JotContentFragment extends JotFragment
 
     private void premiumAiMagic(Uri fileUri) {
         try {
-            FirebaseVisionImage image = FirebaseVisionImage.fromFilePath(requireContext(), fileUri);
-            final EditText contentEditText = requireView().findViewById(R.id.jot_content);
+            FirebaseVisionImage image =
+                FirebaseVisionImage.fromFilePath(requireContext(), fileUri);
+            final EditText contentEditText =
+                requireView().findViewById(R.id.jot_content);
             FirebaseVision.getInstance()
                 .getCloudDocumentTextRecognizer()
                 .processImage(image)
@@ -805,12 +807,16 @@ public class JotContentFragment extends JotFragment
                         .detectInImage(image)
                         .addOnSuccessListener(it3 -> {
                             it3.sort((o1, o2) ->
-                                (int) ((o1.getConfidence() - o2.getConfidence()) * 100));
+                                (int) (
+                                    (o1.getConfidence() - o2.getConfidence()) *
+                                        100));
                             if (it3.size() > 0) {
-                                FirebaseVisionCloudLandmark landmark = it3.get(0);
+                                FirebaseVisionCloudLandmark landmark =
+                                    it3.get(0);
                                 newChip(landmark.getLandmark());
                                 if (landmark.getLocations().size() > 0) {
-                                    updateJotLocation(landmark.getLocations().get(0));
+                                    updateJotLocation(
+                                        landmark.getLocations().get(0));
                                 }
                             }
                         }).addOnCompleteListener(it -> takeTempPhoto())
@@ -828,100 +834,61 @@ public class JotContentFragment extends JotFragment
                     new File(
                         requireContext().getFilesDir(),
                         "attachments_temp"
-                    ),
-                    uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
+                    ), uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
                 ).delete();
             }
         }
     }
 
     private void updateAttachmentView() {
-        final FrameLayout root = requireView().findViewById(R.id.jot_attachment_container);
-        final TextView newAttachment = requireView().findViewById(R.id.jot_attachment_new);
+        final TextView newAttachment =
+            requireView().findViewById(R.id.jot_attachment_new);
         newAttachment.setVisibility(VISIBLE);
         newAttachment.setOnClickListener(v -> startPicker());
 
-        final TextView countText = requireView().findViewById(R.id.jot_attachment_count);
+        final TextView countText =
+            requireView().findViewById(R.id.jot_attachment_count);
         countText.setVisibility(VISIBLE);
         countText.setText(attachmentOnView.size() + "");
-        root.removeAllViews();
 
-        if (attachmentOnView.size() == 0) {
-            updateEmptyAttachment(root);
-            return;
-        }
-        updateAttachmentViewByMimeType(root);
+        updateAttachmentViewByMimeType();
     }
 
-    private void updateAttachmentViewByMimeType(FrameLayout root) {
-        final Uri attachmentUri = attachmentOnView.get(0);
-        final String mimeType = new UriMimeType(
-            root.getContext(), attachmentUri.toString()
-        ).value();
-        if (mimeType.startsWith("video/")) {
-            updateVideo(root, attachmentUri);
-        } else if (mimeType.startsWith("audio/")) {
-            updateAudio(root, attachmentUri);
-        } else if (mimeType.startsWith("image/")) {
-            updateImage(root, attachmentUri);
-        } else {
-            if (attachmentUri.toString().startsWith("http")) {
-                updatePreview(root, attachmentUri);
-            } else {
-                updateImage(root, attachmentUri);
-            }
-        }
+    private void updateAttachmentViewByMimeType() {
+        adapter.renewItems(attachmentOnView.stream()
+            .map(Uri::toString)
+            .collect(toList()));
     }
 
-    private void updatePreview(FrameLayout root, Uri attachmentUri) {
-        LayoutInflater.from(requireContext()).inflate(
-            R.layout.item_attachment_link_preview,
-            root,
-            true
-        );
-        root.setOnClickListener(v -> {
-                if (attachmentOnView.size() > 1) {
-                    browseAttachments();
-                } else {
-                    root.getContext().startActivity(new Intent(ACTION_VIEW, attachmentUri));
-                }
-            }
-        );
-        root.setOnLongClickListener(v -> {
-                showProperties(root, attachmentUri);
+    private void showProperties(View view, Uri uri) {
+        final androidx.appcompat.widget.PopupMenu popup =
+            new PopupMenu(view.getContext(), view);
+        popup.getMenu().add(R.string.delete)
+            .setOnMenuItemClickListener(item -> {
+                attachmentOnView.remove(uri);
+                updateAttachmentView();
                 return true;
-            }
-        );
-        RichPreview preview = new RichPreview(new ResponseListener() {
-            @Override
-            public void onData(MetaData metaData) {
-                ImageView icon = root.findViewById(R.id.itemAttachmentUrlPreview_icon);
-                Glide.with(root.getContext())
-                    .load(metaData.getImageurl())
-                    .into(icon);
-                TextView content = root.findViewById(R.id.itemAttachmentUrlPreview_title);
-                content.setText(metaData.getTitle());
-                TextView urlText = root.findViewById(R.id.itemAttachmentUrlPreview_urlText);
-                urlText.setText(metaData.getUrl());
-            }
-
-            @Override
-            public void onError(Exception e) {
-                // @todo #0 Error icon for loading preview failed
-            }
-        });
-        preview.getPreview(attachmentUri.toString());
+            });
+        popup.getMenu()
+            .add(view.getContext().getString(R.string.properties))
+            .setOnMenuItemClickListener(item -> {
+                final AlertDialog dialog = new Builder(view.getContext())
+                    .setView(R.layout.dialog_properties)
+                    .show();
+                ((TextView) dialog.findViewById(R.id.properties_text)).setText(
+                    getString(R.string.Uri___, uri.toString())
+                );
+                return true;
+            });
+        popup.show();
     }
 
-    private void updateEmptyAttachment(FrameLayout root) {
-        final TextView countText = requireView().findViewById(R.id.jot_attachment_count);
-        countText.setVisibility(GONE);
-        final TextView attachmentCount = requireView().findViewById(R.id.jot_attachment_new);
-        attachmentCount.setVisibility(GONE);
-        LayoutInflater.from(root.getContext()).inflate(
-            R.layout.item_add_attachment,
-            root
-        ).setOnClickListener(it -> startPicker());
+    private void showContent(View view, String uri) {
+        if (attachmentOnView.size() > 1) {
+            browseAttachments(uri);
+        } else {
+            new LaunchAttachment(view.getContext(), uri).fire();
+        }
     }
 
     private void startPicker() {
@@ -950,8 +917,10 @@ public class JotContentFragment extends JotFragment
     private void takePicture(int requestCode) {
         try {
             Intent intent = new Intent(ACTION_IMAGE_CAPTURE);
-            if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
-                File tempDir = new File(requireContext().getFilesDir(), "attachments_temp");
+            if (intent.resolveActivity(requireContext().getPackageManager()) !=
+                null) {
+                File tempDir = new File(requireContext().getFilesDir(),
+                    "attachments_temp");
                 tempDir.mkdir();
                 intent.putExtra(EXTRA_OUTPUT, FileProvider.getUriForFile(
                     requireContext(),
@@ -965,117 +934,12 @@ public class JotContentFragment extends JotFragment
         }
     }
 
-    private void updateVideo(FrameLayout root, Uri uri) {
-        boolean isLocalExist = new IsLocalExist(root.getContext(), uri.toString()).value();
-        LayoutInflater.from(requireContext())
-            .inflate(R.layout.item_attachment_video, root, true);
-        ImageView imageView = root.findViewById(R.id.itemAttachmentVideo_icon);
-
-        if (isLocalExist) {
-            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(root.getContext(), uri);
-            imageView.setImageBitmap(mmr.getFrameAtTime());
-            mmr.release();
-        } else {
-            imageView.setImageResource(R.drawable.ic_syncing);
-        }
-        imageView.setOnClickListener(v -> {
-            if (attachmentOnView.size() > 1) {
-                browseAttachments();
-            } else if (isLocalExist) {
-                final Intent intent = new Intent(ACTION_VIEW);
-                intent.setDataAndType(uri, "video/*");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(intent);
-            } else {
-                makeText(requireContext(), R.string.File_no_yet_synced, LENGTH_SHORT).show();
-            }
-        });
-        imageView.setOnLongClickListener(v -> {
-            showProperties(v, uri);
-            return true;
-        });
-    }
-
-    private void updateAudio(FrameLayout root, Uri uri) {
-        boolean isLocalExist = new IsLocalExist(root.getContext(), uri.toString()).value();
-        LayoutInflater.from(requireContext()).inflate(R.layout.item_attachment_audio, root, true);
-        ImageView imageView = root.findViewById(R.id.itemAttachmentAudio_icon);
-        if (!isLocalExist) {
-            imageView.setImageResource(R.drawable.ic_syncing);
-        }
-        imageView.setOnClickListener(v -> {
-            if (attachmentOnView.size() > 1) {
-                browseAttachments();
-            } else if (isLocalExist) {
-                final Intent intent = new Intent(ACTION_VIEW);
-                intent.setDataAndType(uri, "audio/*");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(intent);
-            } else {
-                makeText(requireContext(), R.string.File_no_yet_synced, LENGTH_SHORT).show();
-            }
-        });
-        imageView.setOnLongClickListener(v -> {
-            showProperties(v, uri);
-            return true;
-        });
-    }
-
-    private void updateImage(FrameLayout root, Uri uri) {
-        LayoutInflater.from(requireContext())
-            .inflate(R.layout.item_attachment_image, root, true);
-        final ImageView icon = root.findViewById(R.id.itemAttachmentImage_icon);
-        new JotImageLoading(icon, uri.toString()).fire();
-        icon.setOnClickListener(v -> {
-            if (attachmentOnView.size() > 1) {
-                browseAttachments();
-            } else {
-                showImage(root.getContext(), uri);
-            }
-        });
-        icon.setOnLongClickListener(v -> {
-            showProperties(v, uri);
-            return true;
-        });
-    }
-
-    private void browseAttachments() {
+    private void browseAttachments(String selectedUri) {
         attachmentOnView.sort(new JpegDateComparator(requireContext()));
-        FullScreenDialogFragment dialog = AttachmentsFragment.newInstance(attachmentOnView);
+        FullScreenDialogFragment dialog =
+            AttachmentsFragment.newInstance(attachmentOnView, selectedUri);
         dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
         dialog.show(getParentFragmentManager(), null);
-    }
-
-    private void showImage(Context context, Uri uri) {
-        new StfalconImageViewer.Builder<>(
-            context,
-            Collections.singletonList(uri),
-            (imageView, image) -> new JotImageLoading(imageView, image.toString()).fire()
-        ).show();
-    }
-
-    private void showProperties(View view, Uri uri) {
-        final PopupMenu popup = new PopupMenu(view.getContext(), view);
-        popup.getMenu().add(R.string.delete).setOnMenuItemClickListener(item -> {
-            attachmentOnView.remove(uri);
-            updateAttachmentView();
-            return true;
-        });
-        popup.getMenu()
-            .add(view.getContext().getString(R.string.properties))
-            .setOnMenuItemClickListener(item -> {
-                final AlertDialog dialog = new Builder(view.getContext())
-                    .setView(R.layout.dialog_properties)
-                    .show();
-                ((TextView) dialog.findViewById(R.id.properties_text)).setText(
-                    getString(R.string.Uri___, uri.toString())
-                );
-                return true;
-            });
-        popup.show();
     }
 
     private void addAttachmentGrantPermission(Uri uri) {
@@ -1101,7 +965,8 @@ public class JotContentFragment extends JotFragment
         if (attachmentOnView.contains(uri)) {
             return;
         }
-        final String mimeType = new UriMimeType(requireContext(), uri.toString()).value();
+        final String mimeType =
+            new UriMimeType(requireContext(), uri.toString()).value();
         if (mimeType.startsWith("image")) {
             updateJotWithExif(uri);
             attachmentOnView.add(uri);
@@ -1120,7 +985,8 @@ public class JotContentFragment extends JotFragment
 
     private void updateJotWithExif(Uri data) {
         try {
-            InputStream inputStream = requireContext().getContentResolver().openInputStream(data);
+            InputStream inputStream =
+                requireContext().getContentResolver().openInputStream(data);
             if (inputStream == null) {
                 return;
             }
@@ -1157,8 +1023,9 @@ public class JotContentFragment extends JotFragment
     }
 
     private boolean isLocationSetup() {
-        return !Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-            && !Arrays.equals(jot.location(), new double[]{0.0, 0.0});
+        return
+            !Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
+                && !Arrays.equals(jot.location(), new double[]{0.0, 0.0});
     }
 
     private void updateJotLocation(ExifInterface exif) {
@@ -1196,15 +1063,18 @@ public class JotContentFragment extends JotFragment
             && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
             mgr.beginTransaction().replace(
                 R.id.jot_embedMapContainer,
-                EmbedMapFragment.newInstance(jot.location()[0], jot.location()[1])
+                EmbedMapFragment
+                    .newInstance(jot.location()[0], jot.location()[1])
             ).commit();
-            requireView().findViewById(R.id.jot_embedMapContainer).setVisibility(VISIBLE);
+            requireView().findViewById(R.id.jot_embedMapContainer)
+                .setVisibility(VISIBLE);
         } else {
             Fragment map = mgr.findFragmentById(R.id.jot_embedMapContainer);
             if (map != null) {
                 mgr.beginTransaction().remove(map).commit();
             }
-            requireView().findViewById(R.id.jot_embedMapContainer).setVisibility(GONE);
+            requireView().findViewById(R.id.jot_embedMapContainer)
+                .setVisibility(GONE);
         }
     }
 
@@ -1229,14 +1099,16 @@ public class JotContentFragment extends JotFragment
 
     @Override
     public void onBillingSetupFinished(BillingResult billingResult) {
-        List<Purchase> purchasesList = billing.queryPurchases(SUBS).getPurchasesList();
+        List<Purchase> purchasesList =
+            billing.queryPurchases(SUBS).getPurchasesList();
         if (purchasesList != null) {
             for (Purchase purchase : purchasesList) {
                 if ("premium".equals(purchase.getSku())
                     && purchase.getPurchaseState() == PURCHASED) {
                     View view = getView();
                     if (view != null) {
-                        view.findViewById(R.id.jot_ai_magic).setVisibility(VISIBLE);
+                        view.findViewById(R.id.jot_ai_magic)
+                            .setVisibility(VISIBLE);
                     }
                     return;
                 }

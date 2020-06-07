@@ -1,8 +1,11 @@
 package com.larryhsiao.nyx.account.api;
 
+import androidx.annotation.Keep;
+
 /**
  * Request DTO for Subscription api.
  */
+@Keep
 public class SubReq {
     /**
      * The user id.
