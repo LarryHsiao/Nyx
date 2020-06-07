@@ -89,13 +89,14 @@
             android:layout_height="50dp"/>
 
         <FrameLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/jot_locationContainer"
             android:id="@+id/jot_attachment_container"
             android:orientation="horizontal"
+            android:minHeight="150dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_height="150dp"/>
+            android:layout_height="wrap_content"/>
 
         <LinearLayout android:layout_width="0dp"
                       android:layout_height="wrap_content"

@@ -16,14 +16,10 @@ import com.haibin.calendarview.CalendarLayout;
 import com.haibin.calendarview.CalendarView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
-import com.larryhsiao.nyx.core.jots.AllJots;
-import com.larryhsiao.nyx.core.jots.ConstJot;
-import com.larryhsiao.nyx.core.jots.Jot;
-import com.larryhsiao.nyx.core.jots.JotsByDate;
-import com.larryhsiao.nyx.core.jots.QueriedJots;
+import com.larryhsiao.nyx.core.jots.*;
 import com.larryhsiao.nyx.util.EmptyView;
-import com.silverhetch.aura.view.EmptyListAdapter;
 import com.silverhetch.aura.view.fab.FabBehavior;
+import com.silverhetch.aura.view.recyclerview.EmptyListAdapter;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -59,7 +55,6 @@ public class CalendarFragment extends JotFragment {
             Fragment frag = JotContentFragment.newInstance(new ConstJot(item));
             frag.setTargetFragment(this, REQUEST_CODE_DIARY_CONTENT);
             nextPage(frag);
-            return null;
         });
         jotList.setAdapter(new EmptyListAdapter(adapter, new EmptyView(view.getContext())));
         setTitle(dateString());

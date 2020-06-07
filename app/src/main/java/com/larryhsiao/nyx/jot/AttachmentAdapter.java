@@ -3,7 +3,6 @@ package com.larryhsiao.nyx.jot;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -21,7 +20,7 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.attachments.IsLocalExist;
 import com.larryhsiao.nyx.attachments.JotImageLoading;
 import com.silverhetch.aura.uri.UriMimeType;
-import com.silverhetch.aura.view.ViewHolder;
+import com.silverhetch.aura.view.recyclerview.ViewHolder;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 import io.github.ponnamkarthik.richlinkpreview.MetaData;
 import io.github.ponnamkarthik.richlinkpreview.ResponseListener;
@@ -84,6 +83,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         final Uri uri = data.get(position);
         switch (getItemViewType(position)) {
             default:
@@ -107,13 +107,13 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
             @Override
             public void onData(MetaData metaData) {
                 final View root = holder.getRootView();
-                ImageView icon = root.findViewById(R.id.itemAttachmentUrlPreview_icon);
+                ImageView icon = root.findViewById(R.id.itemUrlPreview_icon);
                 Glide.with(icon.getContext())
                     .load(metaData.getImageurl())
                     .into(icon);
-                TextView urlText = root.findViewById(R.id.itemAttachmentUrlPreview_urlText);
+                TextView urlText = root.findViewById(R.id.itemUrlPreview_urlText);
                 urlText.setText(metaData.getUrl());
-                TextView title = root.findViewById(R.id.itemAttachmentUrlPreview_title);
+                TextView title = root.findViewById(R.id.itemUrlPreview_title);
                 title.setText(metaData.getTitle());
                 root.setOnClickListener(it ->
                     it.getContext().startActivity(new Intent(ACTION_VIEW, uri))

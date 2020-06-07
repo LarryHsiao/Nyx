@@ -6,7 +6,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.core.tags.Tag;
-import com.silverhetch.aura.view.ViewHolder;
+import com.silverhetch.aura.view.recyclerview.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;

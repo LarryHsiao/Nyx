@@ -12,15 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.core.jots.ConstJot;
-import com.larryhsiao.nyx.core.jots.JotById;
-import com.larryhsiao.nyx.core.jots.JotUriId;
-import com.larryhsiao.nyx.core.jots.JotsByCheckedFilter;
-import com.larryhsiao.nyx.core.jots.QueriedJots;
+import com.larryhsiao.nyx.core.jots.*;
 import com.larryhsiao.nyx.core.jots.filter.Filter;
 import com.larryhsiao.nyx.util.EmptyView;
-import com.silverhetch.aura.view.EmptyListAdapter;
 import com.silverhetch.aura.view.fab.FabBehavior;
+import com.silverhetch.aura.view.recyclerview.EmptyListAdapter;
 
 import java.util.stream.Collectors;
 
@@ -69,7 +65,6 @@ public class JotListFragment extends JotListingFragment {
             Fragment frag = JotContentFragment.newInstance(new ConstJot(jot));
             frag.setTargetFragment(this, REQUEST_CODE_JOT_CONTENT);
             nextPage(frag);
-            return null;
         });
     }
 

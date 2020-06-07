@@ -1,20 +1,24 @@
 package com.larryhsiao.nyx.jot;
 
 import android.location.Location;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.attachments.LaunchAttachment;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.core.jots.Jot;
-import com.silverhetch.aura.uri.UriMimeType;
-import com.silverhetch.aura.view.ViewHolder;
 import com.silverhetch.aura.view.measures.DP;
+import com.silverhetch.aura.view.recyclerview.Slider;
+import com.silverhetch.aura.view.recyclerview.ViewHolder;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.date.DateCalendar;
-import com.smarteist.autoimageslider.SliderView;
 
 import java.sql.Connection;
 import java.text.DateFormat;
@@ -23,13 +27,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Function;
 
 import static android.view.LayoutInflater.from;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.smarteist.autoimageslider.IndicatorAnimations.WORM;
-import static com.smarteist.autoimageslider.SliderAnimations.FADETRANSFORMATION;
 import static java.lang.Math.abs;
 import static java.text.DateFormat.getDateInstance;
 import static java.util.Calendar.getInstance;
@@ -39,14 +40,18 @@ import static java.util.stream.Collectors.toList;
  * Adapter for showing Jot list
  */
 public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
+    public interface OnClickListener {
+        void onClicked(Jot uri);
+    }
+
     private static final int ITEM_TOP = 1;
     private static final int ITEM_MIDDLE = 2;
     private static final int ITEM_END = 3;
     private final Source<Connection> db;
     private final List<Jot> data = new ArrayList<>();
-    private final Function<Jot, Void> clicked;
+    private final OnClickListener clicked;
 
-    public JotListAdapter(Source<Connection> db, Function<Jot, Void> clicked) {
+    public JotListAdapter(Source<Connection> db, OnClickListener clicked) {
         this.db = db;
         this.clicked = clicked;
     }
@@ -55,16 +60,18 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(
         @NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(from(parent.getContext()).inflate(
+        ViewHolder holder = new ViewHolder(from(parent.getContext()).inflate(
             R.layout.item_jot, parent, false
         ));
+        RecyclerView slider = holder.itemView.findViewById(R.id.itemJot_image);
+        new Slider(slider).fire();
+        return holder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Location location = new Location("Constant");
         final Jot jot = data.get(position);
-
         location.setLongitude(jot.location()[0]);
         location.setLatitude(jot.location()[1]);
         holder.getTextView(R.id.itemJot_title).setText(
@@ -75,30 +82,29 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         );
         List<Attachment> attachments = new QueriedAttachments(
             new AttachmentsByJotId(db, jot.id())
-        ).value().stream().filter(attachment -> new UriMimeType(
-                holder.itemView.getContext(),
-                attachment.uri()
-            ).value().startsWith("image")
-        ).collect(toList());
-        final SliderView image =
+        ).value();
+        final RecyclerView image =
             holder.itemView.findViewById(R.id.itemJot_image);
         final AttachmentSliderAdapter adapter = new AttachmentSliderAdapter(
-            attachment -> clicked.apply(jot)
+            image.getContext(),
+            (view, uri, longClicked) -> {
+                if (longClicked){
+                    showAttachmentProperties(view, uri);
+                }else {
+                    new LaunchAttachment(view.getContext(), uri).fire();
+                }
+            }
         );
-        image.setSliderAdapter(adapter);
+        image.setAdapter(adapter);
         if (attachments.size() > 0) {
-            adapter.renewItems(attachments);
+            adapter.renewItems(attachments.stream()
+                .map(Attachment::uri)
+                .collect(toList()));
             image.setVisibility(VISIBLE);
-            image.startAutoCycle();
-            image.setIndicatorAnimation(WORM);
-            image.setSliderTransformAnimation(FADETRANSFORMATION);
         } else {
-            image.stopAutoCycle();
             image.setVisibility(GONE);
         }
-        holder.getRootView().setOnClickListener(v ->
-            clicked.apply(data.get(holder.getAdapterPosition()))
-        );
+        holder.itemView.setOnClickListener(v -> clicked.onClicked(jot));
         int margin = ((int) new DP(holder.itemView.getContext(), 4).px());
         RecyclerView.LayoutParams layoutParams =
             (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
@@ -176,6 +182,22 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         } else {
             return ITEM_TOP;
         }
+    }
+
+    private void showAttachmentProperties(View view, String uri) {
+        final PopupMenu popup = new PopupMenu(view.getContext(),view );
+        popup.getMenu()
+            .add(view.getContext().getString(R.string.properties))
+            .setOnMenuItemClickListener(item -> {
+                final AlertDialog dialog = new AlertDialog.Builder(view.getContext())
+                    .setView(R.layout.dialog_properties)
+                    .show();
+                ((TextView) dialog.findViewById(R.id.properties_text)).setText(
+                    "Uri: " + uri
+                );
+                return true;
+            });
+        popup.show();
     }
 
     @Override
