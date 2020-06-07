@@ -4,4 +4,4 @@
     android:layout_width="match_parent"
     android:id="@+id/itemAttachmentImage_icon"
     tools:src="@android:drawable/ic_notification_clear_all"
-    android:layout_height="150dp" />
+    android:layout_height="match_parent" />

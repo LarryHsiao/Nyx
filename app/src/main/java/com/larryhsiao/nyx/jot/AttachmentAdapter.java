@@ -20,6 +20,7 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.attachments.IsLocalExist;
 import com.larryhsiao.nyx.attachments.JotImageLoading;
 import com.silverhetch.aura.uri.UriMimeType;
+import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.aura.view.recyclerview.ViewHolder;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 import io.github.ponnamkarthik.richlinkpreview.MetaData;
@@ -32,6 +33,7 @@ import java.util.List;
 
 import static android.content.Intent.ACTION_VIEW;
 import static android.graphics.Color.WHITE;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 /**
  * Adapter for displaying attachments.
@@ -51,44 +53,62 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(
+        @NonNull ViewGroup parent, int viewType) {
+        ViewHolder holder;
         switch (viewType) {
             case ITEM_TYPE_AUDIO:
-                return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.item_attachment_audio,
-                    parent,
-                    false
-                ));
+                holder = new ViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.item_attachment_audio,
+                        parent,
+                        false
+                    ));
+                break;
             case ITEM_TYPE_VIDEO:
-                return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.item_attachment_video,
-                    parent,
-                    false
-                ));
+                holder = new ViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.item_attachment_video,
+                        parent,
+                        false
+                    ));
+                break;
             case ITEM_TYPE_PREVIEW_URL:
-                return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.item_attachment_link_preview,
-                    parent,
-                    false
-                ));
+                holder = new ViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.item_attachment_link_preview,
+                        parent,
+                        false
+                    ));
+                break;
             default:
             case ITEM_TYPE_IMAGE:
-                return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.item_attachment_image,
-                    parent,
-                    false
-                ));
+                holder = new ViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.item_attachment_image,
+                        parent,
+                        false
+                    ));
+                break;
         }
+        holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(
+            MATCH_PARENT,
+            ((int) new DP(parent.getContext(), 150).px())
+        ));
+        return holder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         final Uri uri = data.get(position);
         switch (getItemViewType(position)) {
             default:
             case ITEM_TYPE_IMAGE:
-                onBindImage(uri, holder, () -> showFullScreenImage(context, uri));
+                onBindImage(
+                    uri,
+                    holder,
+                    () -> showFullScreenImage(context, uri)
+                );
                 break;
             case ITEM_TYPE_VIDEO:
                 onBindVideo(uri, holder);
@@ -111,7 +131,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
                 Glide.with(icon.getContext())
                     .load(metaData.getImageurl())
                     .into(icon);
-                TextView urlText = root.findViewById(R.id.itemUrlPreview_urlText);
+                TextView urlText =
+                    root.findViewById(R.id.itemUrlPreview_urlText);
                 urlText.setText(metaData.getUrl());
                 TextView title = root.findViewById(R.id.itemUrlPreview_title);
                 title.setText(metaData.getTitle());
@@ -143,7 +164,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private void onBindAudio(Uri uri, ViewHolder holder) {
-        ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentAudio_icon);
+        ImageView imageView =
+            holder.itemView.findViewById(R.id.itemAttachmentAudio_icon);
         if (new IsLocalExist(context, uri.toString()).value()) {
             imageView.setOnClickListener(v -> {
                 final Intent intent = new Intent(ACTION_VIEW);
@@ -170,7 +192,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private void onBindVideo(Uri uri, ViewHolder holder) {
-        ImageView imageView = holder.itemView.findViewById(R.id.itemAttachmentVideo_icon);
+        ImageView imageView =
+            holder.itemView.findViewById(R.id.itemAttachmentVideo_icon);
         if (new IsLocalExist(context, uri.toString()).value()) {
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
             mmr.setDataSource(context, uri);
@@ -201,7 +224,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private void onBindImage(Uri uri, ViewHolder holder, Runnable onClick) {
-        final ImageView icon = holder.getImageView(R.id.itemAttachmentImage_icon);
+        final ImageView icon =
+            holder.getImageView(R.id.itemAttachmentImage_icon);
         new JotImageLoading(icon, uri.toString(), WHITE).fire();
         icon.setOnClickListener(v -> {
             onClick.run();
@@ -214,12 +238,13 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private void showProperties(ViewHolder holder, Uri uri) {
         final PopupMenu popup = new PopupMenu(context, holder.itemView);
-        popup.getMenu().add(R.string.delete).setOnMenuItemClickListener(item -> {
-            int index = holder.getAdapterPosition();
-            data.remove(index);
-            notifyItemRemoved(index);
-            return true;
-        });
+        popup.getMenu().add(R.string.delete)
+            .setOnMenuItemClickListener(item -> {
+                int index = holder.getAdapterPosition();
+                data.remove(index);
+                notifyItemRemoved(index);
+                return true;
+            });
         popup.getMenu()
             .add(context.getString(R.string.properties))
             .setOnMenuItemClickListener(item -> {

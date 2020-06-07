@@ -8,7 +8,6 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:padding="16dp"
         android:layout_height="wrap_content">
 
         <View
@@ -88,13 +87,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_height="50dp"/>
 
-        <FrameLayout
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
+            tools:listitem="@layout/item_attachment_audio"
+            tools:itemCount="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/jot_locationContainer"
             android:id="@+id/jot_attachment_container"
-            android:orientation="horizontal"
-            android:minHeight="150dp"
+            android:minHeight="450dp"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_height="wrap_content"/>
 

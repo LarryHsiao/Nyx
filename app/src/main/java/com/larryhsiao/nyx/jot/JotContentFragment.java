@@ -81,7 +81,6 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
 import static android.provider.MediaStore.EXTRA_OUTPUT;
-import static android.view.LayoutInflater.from;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static androidx.appcompat.app.AlertDialog.Builder;
@@ -131,6 +130,7 @@ public class JotContentFragment extends JotFragment
     private TextView dateText;
     private TextView locationText;
     private TextView moodText;
+    private AttachmentSliderAdapter adapter;
     private Jot jot;
     private BillingClient billing;
 
@@ -204,9 +204,23 @@ public class JotContentFragment extends JotFragment
     @Nullable
     @Override
     public View onCreateView(
-        @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+        @NonNull LayoutInflater inflater,
+        @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.page_jot, container, false);
+        View view = inflater.inflate(R.layout.page_jot, container, false);
+        RecyclerView slider = view.findViewById(R.id.jot_attachment_container);
+        adapter = new AttachmentSliderAdapter(
+            slider.getContext(),
+            (clickedView, uri, longClicked) -> {
+                if (longClicked) {
+                    showProperties(clickedView, Uri.parse(uri));
+                } else {
+                    showContent(clickedView, uri);
+                }
+            });
+        slider.setAdapter(adapter);
+        new Slider(slider).fire();
+        return view;
     }
 
     @Override
@@ -827,8 +841,6 @@ public class JotContentFragment extends JotFragment
     }
 
     private void updateAttachmentView() {
-        final FrameLayout root =
-            requireView().findViewById(R.id.jot_attachment_container);
         final TextView newAttachment =
             requireView().findViewById(R.id.jot_attachment_new);
         newAttachment.setVisibility(VISIBLE);
@@ -838,34 +850,11 @@ public class JotContentFragment extends JotFragment
             requireView().findViewById(R.id.jot_attachment_count);
         countText.setVisibility(VISIBLE);
         countText.setText(attachmentOnView.size() + "");
-        root.removeAllViews();
 
-        if (attachmentOnView.size() == 0) {
-            updateEmptyAttachment(root);
-        } else {
-            updateAttachmentViewByMimeType(root);
-        }
+        updateAttachmentViewByMimeType();
     }
 
-    private void updateAttachmentViewByMimeType(FrameLayout root) {
-        RecyclerView slider =
-            ((RecyclerView) ((ViewGroup) from(root.getContext())
-                .inflate(
-                    R.layout.component_slider_view,
-                    root,
-                    true
-                )).getChildAt(0));
-        new Slider(slider).fire();
-        AttachmentSliderAdapter adapter = new AttachmentSliderAdapter(
-            root.getContext(),
-            (view, uri, longClicked) -> {
-                if (longClicked) {
-                    showProperties(view, Uri.parse(uri));
-                } else {
-                    showContent(view, uri);
-                }
-            });
-        slider.setAdapter(adapter);
+    private void updateAttachmentViewByMimeType() {
         adapter.renewItems(attachmentOnView.stream()
             .map(Uri::toString)
             .collect(toList()));
@@ -896,23 +885,10 @@ public class JotContentFragment extends JotFragment
 
     private void showContent(View view, String uri) {
         if (attachmentOnView.size() > 1) {
-            browseAttachments();
+            browseAttachments(uri);
         } else {
             new LaunchAttachment(view.getContext(), uri).fire();
         }
-    }
-
-    private void updateEmptyAttachment(FrameLayout root) {
-        final TextView countText =
-            requireView().findViewById(R.id.jot_attachment_count);
-        countText.setVisibility(GONE);
-        final TextView attachmentCount =
-            requireView().findViewById(R.id.jot_attachment_new);
-        attachmentCount.setVisibility(GONE);
-        from(root.getContext()).inflate(
-            R.layout.item_add_attachment,
-            root
-        ).setOnClickListener(it -> startPicker());
     }
 
     private void startPicker() {
@@ -958,10 +934,10 @@ public class JotContentFragment extends JotFragment
         }
     }
 
-    private void browseAttachments() {
+    private void browseAttachments(String selectedUri) {
         attachmentOnView.sort(new JpegDateComparator(requireContext()));
         FullScreenDialogFragment dialog =
-            AttachmentsFragment.newInstance(attachmentOnView);
+            AttachmentsFragment.newInstance(attachmentOnView, selectedUri);
         dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
         dialog.show(getParentFragmentManager(), null);
     }

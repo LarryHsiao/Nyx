@@ -34,16 +34,21 @@ import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
  */
 public class AttachmentsFragment extends FullScreenDialogFragment {
     private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
+    private static final String ARG_SELECTED_URI = "ARG_SELECTED_URI";
     private static final int REQUEST_CODE_PICK_FILE = 1000;
     private static final int REQUEST_CODE_ALERT = 1001;
 
     private List<Uri> uris;
     private AttachmentAdapter adapter;
 
-    public static FullScreenDialogFragment newInstance(List<Uri> uris) {
+    public static FullScreenDialogFragment newInstance(
+        List<Uri> uris,
+        String selectedUri
+    ) {
         FullScreenDialogFragment frag = new AttachmentsFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(ARG_ATTACHMENT_URI, new ArrayList<>(uris));
+        bundle.putString(ARG_SELECTED_URI, selectedUri);
         frag.setArguments(bundle);
         return frag;
     }
@@ -98,6 +103,13 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
         });
         listView.setLayoutManager(manager);
         adapter.loadAttachments(uris);
+
+        final String selected = requireArguments().getString(ARG_SELECTED_URI, "");
+        if (selected != null && !selected.isEmpty()){
+            listView.scrollToPosition(
+                uris.indexOf(Uri.parse(selected))
+            );
+        }
 
         view.findViewById(R.id.attachments_plus).setOnClickListener(v -> {
             startActivityForResult(

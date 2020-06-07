@@ -23,6 +23,8 @@ import io.github.ponnamkarthik.richlinkpreview.RichPreview;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.widget.ImageView.ScaleType.CENTER_CROP;
+
 /**
  * Adapter for showing slide view of attachment.
  */
@@ -130,6 +132,7 @@ public class AttachmentSliderAdapter extends RecyclerView.Adapter<ViewHolder> {
     private void onBindVideo(View view, String uri) {
         boolean isLocalExist = new IsLocalExist(view.getContext(), uri).value();
         ImageView imageView = view.findViewById(R.id.itemAttachmentVideo_icon);
+        imageView.setScaleType(CENTER_CROP);
         if (isLocalExist) {
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
             mmr.setDataSource(view.getContext(), Uri.parse(uri));
@@ -150,6 +153,7 @@ public class AttachmentSliderAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private void onBindImage(View view, String uri) {
         final ImageView icon = view.findViewById(R.id.itemAttachmentImage_icon);
+        icon.setScaleType(CENTER_CROP);
         new JotImageLoading(icon, uri).fire();
     }
 
