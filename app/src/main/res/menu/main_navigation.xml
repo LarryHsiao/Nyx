@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:title="@string/jots"
-        android:id="@+id/menuItem_jots"
-        android:icon="@drawable/ic_agenda"
-        app:iconTint="@color/colorPrimaryDark"/>
+    <group android:checkableBehavior="single">
+        <item
+            android:title="@string/jots"
+            android:id="@+id/menuItem_jots"
+            android:icon="@drawable/ic_agenda"
+            app:iconTint="@color/colorPrimaryDark" />
+
+        <item
+            android:title="@string/settings"
+            android:icon="@drawable/ic_config"
+            android:visible="false"
+            app:iconTint="@color/colorPrimaryDark"
+            android:id="@+id/menuItem_settings" />
+    </group>
 </menu>
