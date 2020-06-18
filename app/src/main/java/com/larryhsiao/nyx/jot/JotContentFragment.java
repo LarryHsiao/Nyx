@@ -64,7 +64,8 @@ import com.silverhetch.aura.view.alert.Alert;
 import com.silverhetch.aura.view.dialog.FullScreenDialogFragment;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.fab.FabBehavior;
-import com.silverhetch.aura.view.recyclerview.Slider;
+import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration;
+import com.silverhetch.aura.view.recyclerview.slider.Slider;
 import com.silverhetch.clotho.date.DateCalendar;
 import com.silverhetch.clotho.source.ConstSource;
 import okhttp3.OkHttpClient;
@@ -85,6 +86,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static androidx.appcompat.app.AlertDialog.Builder;
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
+import static androidx.recyclerview.widget.RecyclerView.ItemDecoration;
 import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
 import static com.larryhsiao.nyx.JotApplication.FILE_PROVIDER_AUTHORITY;
@@ -133,6 +135,7 @@ public class JotContentFragment extends JotFragment
     private AttachmentSliderAdapter adapter;
     private Jot jot;
     private BillingClient billing;
+    private RecyclerView slider;
 
     public static Fragment newInstance() {
         return newInstance(
@@ -208,7 +211,7 @@ public class JotContentFragment extends JotFragment
         @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.page_jot, container, false);
-        RecyclerView slider = view.findViewById(R.id.jot_attachment_container);
+        slider = view.findViewById(R.id.jot_attachment_container);
         adapter = new AttachmentSliderAdapter(
             slider.getContext(),
             (clickedView, uri, longClicked) -> {
@@ -858,6 +861,12 @@ public class JotContentFragment extends JotFragment
         adapter.renewItems(attachmentOnView.stream()
             .map(Uri::toString)
             .collect(toList()));
+        for (int i = 0; i < slider.getItemDecorationCount(); i++) {
+            ItemDecoration decoration = slider.getItemDecorationAt(i);
+            if (decoration instanceof DotIndicatorDecoration){
+                ((DotIndicatorDecoration) decoration).attachTo(slider);
+            }
+        }
     }
 
     private void showProperties(View view, Uri uri) {

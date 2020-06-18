@@ -15,8 +15,9 @@ import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.silverhetch.aura.view.measures.DP;
-import com.silverhetch.aura.view.recyclerview.Slider;
 import com.silverhetch.aura.view.recyclerview.ViewHolder;
+import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration;
+import com.silverhetch.aura.view.recyclerview.slider.Slider;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.date.DateCalendar;
 
@@ -101,6 +102,12 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
                 .map(Attachment::uri)
                 .collect(toList()));
             image.setVisibility(VISIBLE);
+            for (int i = 0; i < image.getItemDecorationCount(); i++) {
+                RecyclerView.ItemDecoration decoration = image.getItemDecorationAt(i);
+                if (decoration instanceof DotIndicatorDecoration){
+                    ((DotIndicatorDecoration) decoration).attachTo(image);
+                }
+            }
         } else {
             image.setVisibility(GONE);
         }
