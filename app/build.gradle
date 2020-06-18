@@ -12,13 +12,17 @@ buildscript {
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.0.0-beta02'
     }
 }
-
+plugins {
+    id "com.larryhsiao.thea" version "1.4.7"
+}
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
-def nyxVersionName = "v3.7.3"
-def nyxVersionCode = 30703
+System.out.println(thea.indicator.apply(""))
+
+def nyxVersionName = thea.version.version().versionName()
+def nyxVersionCode = thea.version.version().versionCode()
 
 android {
     compileSdkVersion 29
@@ -96,7 +100,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
     implementation "androidx.biometric:biometric:1.0.1"
-    implementation 'com.silverhetch:aura:1.22.3'
+    implementation 'com.silverhetch:aura:1.22.5'
     implementation 'com.google.firebase:firebase-config:19.1.4'
     implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.google.firebase:firebase-crashlytics:17.0.0-beta01'
