@@ -122,4 +122,6 @@
         User not as same as previous logged in, change to this account?
     </string>
     <string name="Change_account">Change account</string>
+    <string name="Open">Open</string>
+    <string name="Close">Close</string>
 </resources>

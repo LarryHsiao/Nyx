@@ -4,9 +4,8 @@ import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.*;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
@@ -29,9 +28,7 @@ import java.util.List;
 import static android.content.Context.SEARCH_SERVICE;
 import static android.graphics.Color.WHITE;
 import static java.text.DateFormat.SHORT;
-import static java.util.Calendar.DAY_OF_MONTH;
-import static java.util.Calendar.MONTH;
-import static java.util.Calendar.YEAR;
+import static java.util.Calendar.*;
 
 /**
  * Base fragment for jot listing. implements the common functions.
@@ -150,10 +147,10 @@ abstract class JotListingFragment extends JotFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_datePicker) {
-            CalendarView view = new CalendarView(requireContext());
+            View root = LayoutInflater.from(getContext()).inflate(R.layout.dialog_date_picker, null , false);
+            CalendarView view = root.findViewById(R.id.datePicker_calendar);
             AlertDialog dialogBuilder = new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.Pick_days)
-                .setView(view)
+                .setView(root)
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     final long started;
                     final long ended;
@@ -206,9 +203,10 @@ abstract class JotListingFragment extends JotFragment {
                 @Override
                 public void onCalendarRangeSelect(Calendar calendar, boolean isEnd) {
                     final DateFormat formatter = SimpleDateFormat.getDateInstance(SHORT);
+                    final TextView selected = root.findViewById(R.id.datePicker_selected);
                     if (isEnd) {
                         List<Calendar> range = view.getSelectCalendarRange();
-                        dialogBuilder.setTitle(String.format(
+                        selected.setText(String.format(
                             "%s~%s",
                             formatter.format(new Date(range.get(0).getTimeInMillis())),
                             formatter.format(
@@ -216,7 +214,7 @@ abstract class JotListingFragment extends JotFragment {
                             )
                         ));
                     } else {
-                        dialogBuilder.setTitle(
+                        selected.setText(
                             formatter.format(new Date(
                                 view.getSelectedCalendar().getTimeInMillis())
                             )
@@ -224,6 +222,14 @@ abstract class JotListingFragment extends JotFragment {
                     }
                 }
             });
+            TextView yearText = root.findViewById(R.id.datePicker_year);
+            yearText.setText(String.valueOf(view.getCurYear()));
+            yearText.setOnClickListener(v ->
+                view.showYearSelectLayout(view.getCurYear())
+            );
+            view.setOnYearChangeListener(year ->
+                yearText.setText(String.valueOf(year))
+            );
             if (filter.dateRange()[0] == 0L && filter.dateRange()[1] == 0L) {
                 view.setSelectCalendarRange(
                     calendarByDatetime(System.currentTimeMillis()),
