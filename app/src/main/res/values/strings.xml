@@ -126,4 +126,5 @@
     <string name="Close">Close</string>
     <string name="Version">Version</string>
     <string name="v__">v%s</string>
+    <string name="Log_in">Log in</string>
 </resources>
