@@ -4,12 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,20 +12,10 @@ import androidx.fragment.app.Fragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.*;
 import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.core.jots.ConstJot;
-import com.larryhsiao.nyx.core.jots.Jot;
-import com.larryhsiao.nyx.core.jots.JotById;
-import com.larryhsiao.nyx.core.jots.JotUriId;
-import com.larryhsiao.nyx.core.jots.JotsByCheckedFilter;
-import com.larryhsiao.nyx.core.jots.QueriedJots;
+import com.larryhsiao.nyx.core.jots.*;
 import com.larryhsiao.nyx.core.jots.filter.Filter;
 import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.clotho.Source;
@@ -112,10 +97,11 @@ public class JotMapFragment extends JotListingFragment {
         map.setOnCameraIdleListener(clusterManger);
         map.setOnMarkerClickListener(clusterManger);
         map.setOnInfoWindowClickListener(clusterManger);
-        clusterManger.setRenderer(new DefaultClusterRenderer<>(
+        clusterManger.setRenderer(new MapRenderer(
             requireContext(),
             map,
-            clusterManger
+            clusterManger,
+            db
         ));
         clusterManger.setOnClusterClickListener(cluster -> {
             nextPage(JotListFragment.newInstanceByJotIds(
@@ -192,10 +178,11 @@ public class JotMapFragment extends JotListingFragment {
                 it.location()[0] != 0.0 && it.location()[1] != 0.0)
             .collect(Collectors.toList());
         clusterManger.clearItems();
-        clusterManger.setRenderer(new DefaultClusterRenderer<>(
+        clusterManger.setRenderer(new MapRenderer(
             requireContext(),
             map,
-            clusterManger
+            clusterManger,
+            db
         ));
 
         if (jots.size() > 0) {

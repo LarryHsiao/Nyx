@@ -15,4 +15,10 @@
             app:iconTint="@color/colorPrimaryDark"
             android:id="@+id/menuItem_settings" />
     </group>
+
+    <item
+        android:title="@string/Version"
+        android:id="@+id/menuItem_version"
+        app:iconTint="@color/colorPrimaryDark"
+        android:icon="@drawable/ic_info" />
 </menu>
