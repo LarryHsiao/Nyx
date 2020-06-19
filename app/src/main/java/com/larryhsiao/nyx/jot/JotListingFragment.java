@@ -54,14 +54,27 @@ abstract class JotListingFragment extends JotFragment {
 
     private void initialFilter() {
         try {
-            Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Filter.class, new FilterTypeAdapter())
-                .create();
-            filter = gson.fromJson(
-                requireArguments().getString(ARG_FILTER, "{}"),
-                new TypeToken<Filter>() {
-                }.getType()
-            );
+            String json = requireArguments().getString(ARG_FILTER, "");
+            if (json.isEmpty()){
+                filter = new WrappedFilter(filter){
+                    @Override
+                    public long[] dateRange() {
+                        return new long[]{
+                            System.currentTimeMillis()-2592000000L, // 30-day
+                            System.currentTimeMillis()
+                        };
+                    }
+                };
+            }else{
+                Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Filter.class, new FilterTypeAdapter())
+                    .create();
+                filter = gson.fromJson(
+                    json,
+                    new TypeToken<Filter>() {
+                    }.getType()
+                );
+            }
         } catch (Exception e) {
             filter = new ConstFilter(new long[]{0L, 0L}, "");
         }

@@ -14,6 +14,7 @@ import com.larryhsiao.nyx.settings.SettingFragment;
 import com.larryhsiao.nyx.sync.SyncService;
 
 import static android.view.Gravity.LEFT;
+import static com.larryhsiao.nyx.BuildConfig.VERSION_NAME;
 
 /**
  * Entry Activity of Nyx.
@@ -51,7 +52,7 @@ public class MainActivity extends JotActivity {
         toggle.syncState();
         NavigationView navigationView = findViewById(R.id.main_navigation);
         navigationView.getMenu().findItem(R.id.menuItem_version)
-            .setTitle(BuildConfig.VERSION_NAME);
+            .setTitle(getString(R.string.v__, VERSION_NAME));
         navigationView.setNavigationItemSelectedListener(item -> {
                 if (item.getItemId() == currentPage) {
                     return false;
