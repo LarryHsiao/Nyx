@@ -141,7 +141,7 @@ public class MainActivity extends JotActivity {
             userIcon.setImageResource(R.drawable.ic_user);
             text.setText(new ClickableStr(
                 new ColoredStr(
-                    new ConstSource<CharSequence>(getString(R.string.Log_in)),
+                    new ConstSource<>(getString(R.string.Log_in)),
                     BLUE
                 ),
                 () -> startActivityForResult(
@@ -172,7 +172,7 @@ public class MainActivity extends JotActivity {
             text.append("\n");
             text.append(new ClickableStr(
                 new ColoredStr(
-                    new ConstSource<CharSequence>(getString(R.string.logout)),
+                    new ConstSource<>(getString(R.string.logout)),
                     BLUE
                 ),
                 () -> {

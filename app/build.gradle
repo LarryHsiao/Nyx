@@ -111,6 +111,7 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'com.google.android.material:material:1.2.0-alpha05'
     implementation 'com.schibstedspain.android:leku:6.4.0'
+    implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
     implementation "androidx.core:core:1.2.0"
     implementation "androidx.cardview:cardview:1.0.0"
