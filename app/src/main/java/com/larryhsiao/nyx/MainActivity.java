@@ -50,6 +50,8 @@ public class MainActivity extends JotActivity {
         );
         toggle.syncState();
         NavigationView navigationView = findViewById(R.id.main_navigation);
+        navigationView.getMenu().findItem(R.id.menuItem_version)
+            .setTitle(BuildConfig.VERSION_NAME);
         navigationView.setNavigationItemSelectedListener(item -> {
                 if (item.getItemId() == currentPage) {
                     return false;
@@ -60,6 +62,8 @@ public class MainActivity extends JotActivity {
                 } else if (item.getItemId() == R.id.menuItem_settings) {
                     currentPage = R.id.menuItem_settings;
                     rootPage(new SettingFragment());
+                } else {
+                    return true;
                 }
                 navigationView.getMenu()
                     .findItem(currentPage)

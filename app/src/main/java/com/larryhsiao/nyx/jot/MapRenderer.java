@@ -45,7 +45,7 @@ public class MapRenderer extends DefaultClusterRenderer<JotMapItem> {
         JotMapItem item,
         MarkerOptions options
     ) {
-        if (width==0){
+        if (width == 0) {
             width = ((int) new DP(context, 100).px());
         }
         List<Attachment> content = new QueriedAttachments(
@@ -64,7 +64,7 @@ public class MapRenderer extends DefaultClusterRenderer<JotMapItem> {
                                 Uri.parse(content.get(0).uri())
                             )
                         )
-                    ),width
+                    ), width
                 ).value()));
             } catch (Exception e) {
                 e.printStackTrace();

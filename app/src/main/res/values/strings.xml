@@ -124,4 +124,5 @@
     <string name="Change_account">Change account</string>
     <string name="Open">Open</string>
     <string name="Close">Close</string>
+    <string name="Version">Version</string>
 </resources>
