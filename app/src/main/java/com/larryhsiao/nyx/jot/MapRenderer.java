@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.jot;
 
 import android.content.Context;
+import android.graphics.BitmapFactory.Options;
 import android.net.Uri;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -57,12 +58,16 @@ public class MapRenderer extends DefaultClusterRenderer<JotMapItem> {
             .collect(toList());
         if (content.size() > 0) {
             try {
+                Options decodeOptions = new Options();
+                decodeOptions.inSampleSize = 8;
                 options.icon(fromBitmap(new ResizedImage(
                     new ConstSource<>(
                         decodeStream(
                             context.getContentResolver().openInputStream(
                                 Uri.parse(content.get(0).uri())
-                            )
+                            ),
+                            null,
+                            decodeOptions
                         )
                     ), width
                 ).value()));
