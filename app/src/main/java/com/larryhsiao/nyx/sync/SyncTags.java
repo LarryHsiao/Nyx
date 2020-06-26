@@ -1,15 +1,11 @@
 package com.larryhsiao.nyx.sync;
 
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.larryhsiao.nyx.core.tags.AllTags;
-import com.larryhsiao.nyx.core.tags.ConstTag;
-import com.larryhsiao.nyx.core.tags.NewTagById;
-import com.larryhsiao.nyx.core.tags.QueriedTags;
-import com.larryhsiao.nyx.core.tags.Tag;
-import com.larryhsiao.nyx.core.tags.UpdateTag;
+import com.larryhsiao.nyx.core.tags.*;
+import com.larryhsiao.nyx.sync.encryption.StringEncryptor;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
 
@@ -17,23 +13,29 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
+
 /**
  * Action to sync to firebase.
  */
 public class SyncTags implements Action {
-    private final String userId;
+    private final DocumentReference dataRef;
     private final Source<Connection> db;
+    private final StringEncryptor encryptor;
 
-    public SyncTags(String userId, Source<Connection> db) {
-        this.userId = userId;
+    public SyncTags(
+        DocumentReference dataRef,
+        Source<Connection> db,
+        StringEncryptor encrypt) {
+        this.dataRef = dataRef;
         this.db = db;
+        this.encryptor = encrypt;
     }
 
     @Override
     public void fire() {
-        CollectionReference remote = FirebaseFirestore.getInstance().collection(
-            userId + "/data/tags"
-        );
+        CollectionReference remote = dataRef.collection("tags");
         remote.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 sync(remote, task.getResult());
@@ -63,7 +65,7 @@ public class SyncTags implements Action {
         if (dbTag == null) {
             newLocalTag(remoteTag);
         } else {
-            long remoteVersion = remoteTag.getLong("version");
+            long remoteVersion = Long.parseLong(encryptor.decrypt(remoteTag.getString("version")));
             if (dbTag.version() > remoteVersion) {
                 updateRemoteTag(remote, dbTag);
             } else if (dbTag.version() < remoteVersion) {
@@ -77,10 +79,10 @@ public class SyncTags implements Action {
         new UpdateTag(
             db,
             new ConstTag(
-                Long.parseLong(remoteTag.getId()),
-                remoteTag.getString("title"),
-                remoteTag.getLong("version").intValue(),
-                remoteTag.getLong("delete").intValue() == 1
+                parseLong(remoteTag.getId()),
+                encryptor.decrypt(remoteTag.getString("title")),
+                parseInt(encryptor.decrypt(remoteTag.getString("version"))),
+                parseInt(encryptor.decrypt(remoteTag.getString("delete"))) == 1
             ), false
         ).fire();
     }
@@ -89,19 +91,19 @@ public class SyncTags implements Action {
         new NewTagById(
             db,
             new ConstTag(
-                Long.parseLong(remoteTag.getId()),
-                remoteTag.getString("title"),
-                remoteTag.getLong("version").intValue(),
-                remoteTag.getLong("delete") == 1
+                parseLong(remoteTag.getId()),
+                encryptor.decrypt(remoteTag.getString("title")),
+                parseInt(encryptor.decrypt(remoteTag.getString("version"))),
+                parseInt(encryptor.decrypt(remoteTag.getString("delete"))) == 1
             )
         ).value();
     }
 
     private void updateRemoteTag(CollectionReference tagRef, Tag tag) {
         Map<String, Object> data = new HashMap<>();
-        data.put("title", tag.title());
-        data.put("version", tag.version());
-        data.put("delete", tag.deleted() ? 1 : 0);
+        data.put("title", encryptor.encrypt(tag.title()));
+        data.put("version", encryptor.encrypt(tag.version() + ""));
+        data.put("delete", encryptor.encrypt((tag.deleted() ? 1 : 0) + ""));
         tagRef.document(tag.id() + "").set(data);
     }
 }

@@ -106,6 +106,7 @@ public class RemoteFileSync implements Action {
         File localFile,
         Iterator<Attachment> iterator
     ) {
+
         try {
             remoteRoot.child(localFile.getName()).putStream(
                 new FileInputStream(localFile)

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="fingerprint_auth"
+        android:defaultValue="true"
+        android:icon="@drawable/ic_fingerprint"
+        android:title="@string/Touch_ID" />
+
+    <EditTextPreference
+        android:key="encrypt_key"
+        android:title="@string/Encryption_key"
+        android:summary="@string/App_use_this_key_to_encrypt_your_data"
+        android:icon="@drawable/ic_key" />
+</PreferenceScreen>

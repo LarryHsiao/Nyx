@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.sync;
 
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.larryhsiao.nyx.core.tags.NewJotTagById;
@@ -19,18 +19,17 @@ import java.util.Map;
  * Action to sync to firebase.
  */
 public class SyncTagJot implements Action {
-    private final String userId;
+    private final DocumentReference dataRef;
     private final Source<Connection> db;
 
-    public SyncTagJot(String userId, Source<Connection> db) {
-        this.userId = userId;
+    public SyncTagJot(DocumentReference dataRef, Source<Connection> db) {
+        this.dataRef = dataRef;
         this.db = db;
     }
 
     @Override
     public void fire() {
-        CollectionReference remote = FirebaseFirestore.getInstance()
-            .collection(userId + "/data/tag_jot");
+        CollectionReference remote = dataRef.collection("tag_jot");
         remote.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 sync(remote, task.getResult());

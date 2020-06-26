@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+import androidx.preference.PreferenceManager;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.larryhsiao.nyx.JotApplication;
 import com.silverhetch.aura.AuraActivity;
@@ -36,7 +37,10 @@ public abstract class JotActivity extends AuraActivity {
         Fingerprint fingerprint = new FingerprintImpl(
             FingerprintManagerCompat.from(this), new MemoryCeres()
         );
-        fingerprint.enable(true); // enabled by default
+        fingerprint.enable(
+            PreferenceManager.getDefaultSharedPreferences(this )
+                .getBoolean("fingerprint_auth", true)
+        );
         JotApplication app = (JotApplication) getApplicationContext();
         if (fingerprint.isEnabled() && 300000 < System.currentTimeMillis() - app.lastAuthed) {
             Intent intent = new Intent(this, AuthActivity.class);
