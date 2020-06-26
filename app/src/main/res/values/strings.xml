@@ -128,4 +128,16 @@
     <string name="v__">v%s</string>
     <string name="Log_in">Log in</string>
     <string name="Touch_ID">Touch ID</string>
+    <string name="Encryption_key">Encryption key</string>
+    <string name="App_use_this_key_to_encrypt_your_data">App Use this key to encrypt your data</string>
+    <string name="Sync_service">Sync service</string>
+    <string name="Service_syncs_jots_to_cloud">Service sync jots to cloud</string>
+    <string name="Encryption_key_not_valid">Encryption key not valid</string>
+    <string name="The_local_encryption_key_is_not_match_to_cloud_one_please_choose_which_one_to_keep">The local encryption key is not match to cloud one, please choose which one to keep.</string>
+    <string name="Change_encryption_key">Change encryption key</string>
+    <string name="The_encryption_key_is_conflicted_to_cloud_one__To_make_sync_wokring_you_have_to_enter_correct_key_or_use_local_key_Delete_cloud_data_">
+        The encryption key is conflicted to cloud one. To make sync working you have to enter correct key or user local key(Delete cloud data).
+    </string>
+    <string name="Enter_new_key">Enter new key</string>
+    <string name="Use_local_key_Delete_remote_data__">Use local key(Delete remote data).</string>
 </resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:padding="16dp"
+    android:layout_marginStart="46dp"
+    android:layout_marginEnd="46dp"
+    android:background="@drawable/bg_dialog"
+    android:gravity="center"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:text="@string/Encryption_key_not_valid"
+        android:layout_width="wrap_content"
+        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:text="@string/The_encryption_key_is_conflicted_to_cloud_one__To_make_sync_wokring_you_have_to_enter_correct_key_or_use_local_key_Delete_cloud_data_"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:padding="16dp"
+        android:id="@+id/changEncryptKey_changeLocal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:text="@string/Change_encryption_key"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:padding="16dp"
+        android:id="@+id/changEncryptKey_deleteRemote"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:text="@string/Use_local_key_Delete_remote_data__"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

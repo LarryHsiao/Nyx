@@ -6,5 +6,6 @@
         <ignore path="*/jts-*.jar"/>
         <ignore path="*/bsh-*.jar"/>
         <ignore path="*/httpclient-*.jar"/>
+        <ignore path="*/jasypt-*.jar"/>
     </issue>
 </lint>
