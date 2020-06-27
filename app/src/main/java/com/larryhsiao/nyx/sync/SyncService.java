@@ -19,10 +19,15 @@ import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.KeyChangingActivity;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.ServiceIds;
+import com.larryhsiao.nyx.account.api.ChangeEncryptKeyReq;
+import com.larryhsiao.nyx.account.api.NyxApi;
 import com.larryhsiao.nyx.sync.encryption.JasyptStringEncryptor;
 import com.larryhsiao.nyx.sync.encryption.StringEncryptor;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.encryption.MD5;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
@@ -74,16 +79,32 @@ public class SyncService extends JobIntentService
         final CollectionReference userRef = FirebaseFirestore.getInstance()
             .collection(user.getUid());
         userRef.document("account").get().addOnSuccessListener(doc -> {
+            final DocumentReference dataRef = userRef.document(keyHash);
             if (doc.contains("key_hash")) {
                 if ((keyHash + "").equals(doc.getString("key_hash"))) {
-                    final DocumentReference dataRef = userRef.document(keyHash);
-                    syncToCloud(dataRef, new JasyptStringEncryptor(encryptKey));
                     cancelKeyNotMatchNotification();
+                    syncToCloud(dataRef, new JasyptStringEncryptor(encryptKey));
                 } else {
                     notifyKeyNotMatch();
                 }
             } else {
-                notifyKeyNotMatch();
+                // Ignore failure, try again next time sync
+                final ChangeEncryptKeyReq req = new ChangeEncryptKeyReq();
+                req.keyHash = keyHash;
+                req.uid = user.getUid();
+                NyxApi.client().changeEncryptKey(req).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            cancelKeyNotMatchNotification();
+                            syncToCloud(dataRef, new JasyptStringEncryptor(encryptKey));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                    }
+                });
             }
         });
     }
@@ -146,6 +167,7 @@ public class SyncService extends JobIntentService
                 encryptKey = UUID.randomUUID()
                     .toString()
                     .replace("-", "")
+                    .substring(0, 7)
             ).apply();
         }
         return encryptKey;
