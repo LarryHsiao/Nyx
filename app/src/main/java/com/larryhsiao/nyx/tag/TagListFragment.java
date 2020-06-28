@@ -61,7 +61,8 @@ public class TagListFragment extends JotFragment {
                 JotListFragment.newInstanceByJotIds(
                     getString(R.string.tag_title, tag.title()),
                     new QueriedJots(new JotsByTagId(db, new ConstSource<>(tag.id())))
-                        .value().stream().mapToLong(Jot::id).toArray()
+                        .value().stream().mapToLong(Jot::id).toArray(),
+                    null
                 )
             );
             return new Object();
