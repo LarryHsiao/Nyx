@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.sync;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.android.gms.tasks.Tasks.await;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 
@@ -35,12 +37,16 @@ public class SyncTags implements Action {
 
     @Override
     public void fire() {
-        CollectionReference remote = dataRef.collection("tags");
-        remote.get().addOnCompleteListener(task -> {
+        try {
+            CollectionReference remote = dataRef.collection("tags");
+            Task<QuerySnapshot> task = remote.get();
+            QuerySnapshot result = await(task);
             if (task.isSuccessful()) {
-                sync(remote, task.getResult());
+                sync(remote, result);
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void sync(CollectionReference remote, QuerySnapshot result) {
@@ -51,9 +57,7 @@ public class SyncTags implements Action {
         for (QueryDocumentSnapshot remoteTag : result) {
             syncTag(dbTags, remoteTag, remote);
         }
-        dbTags.forEach((s, tag) -> {
-            updateRemoteTag(remote, tag);
-        });
+        dbTags.forEach((s, tag) -> updateRemoteTag(remote, tag));
     }
 
     private void syncTag(
@@ -100,10 +104,14 @@ public class SyncTags implements Action {
     }
 
     private void updateRemoteTag(CollectionReference tagRef, Tag tag) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("title", encryptor.encrypt(tag.title()));
-        data.put("version", encryptor.encrypt(tag.version() + ""));
-        data.put("delete", encryptor.encrypt((tag.deleted() ? 1 : 0) + ""));
-        tagRef.document(tag.id() + "").set(data);
+        try {
+            Map<String, Object> data = new HashMap<>();
+            data.put("title", encryptor.encrypt(tag.title()));
+            data.put("version", encryptor.encrypt(tag.version() + ""));
+            data.put("delete", encryptor.encrypt((tag.deleted() ? 1 : 0) + ""));
+            await(tagRef.document(tag.id() + "").set(data));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

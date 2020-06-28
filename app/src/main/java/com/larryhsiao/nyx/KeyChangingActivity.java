@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import retrofit2.Response;
 
 import java.io.ByteArrayInputStream;
 
+import static android.widget.Toast.LENGTH_SHORT;
 import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.larryhsiao.nyx.sync.SyncService.enqueue;
 
@@ -44,28 +46,33 @@ public class KeyChangingActivity extends JotActivity implements InputDialog.Call
             final ChangeEncryptKeyReq req = new ChangeEncryptKeyReq();
             req.keyHash = new MD5(new ByteArrayInputStream(encryptKey.getBytes())).value();
             req.uid = FirebaseAuth.getInstance().getUid();
+            final ProgressDialog dialog = new ProgressDialog(this);
+            dialog.setMessage(getString(R.string.fui_progress_dialog_loading));
+            dialog.setCancelable(false);
+            dialog.show();
             NyxApi.client().changeEncryptKey(req).enqueue(new Callback<Void>() {
                 @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
+                public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
                     if (response.isSuccessful()) {
                         enqueue(KeyChangingActivity.this);
-                        finish();
                     } else {
                         Toast.makeText(
                             KeyChangingActivity.this,
                             R.string.appError_unknown,
-                            Toast.LENGTH_SHORT
+                            LENGTH_SHORT
                         ).show();
                     }
+                    finish();
                 }
 
                 @Override
-                public void onFailure(Call<Void> call, Throwable t) {
+                public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
                     Toast.makeText(
                         KeyChangingActivity.this,
                         R.string.appError_unknown,
-                        Toast.LENGTH_SHORT
+                        LENGTH_SHORT
                     ).show();
+                    finish();
                 }
             });
         });
@@ -73,7 +80,7 @@ public class KeyChangingActivity extends JotActivity implements InputDialog.Call
 
     @Override
     public void onInputDialogResult(int requestCode, int result, @NotNull Intent intent) {
-        if (requestCode == REQUEST_CODE_NEW_KEY && result == RESULT_OK){
+        if (requestCode == REQUEST_CODE_NEW_KEY && result == RESULT_OK) {
             final SharedPreferences pref = getDefaultSharedPreferences(this);
             pref.edit().putString("encrypt_key", intent.getStringExtra("INPUT_FIELD")).commit();
             SyncService.enqueue(this);

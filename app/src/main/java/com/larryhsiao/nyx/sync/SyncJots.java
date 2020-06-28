@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.sync;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -17,6 +18,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.android.gms.tasks.Tasks.await;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 
@@ -40,12 +42,16 @@ public class SyncJots implements Action {
 
     @Override
     public void fire() {
-        CollectionReference remoteJots = dataRef.collection("jots");
-        remoteJots.get().addOnCompleteListener(task -> {
+        try {
+            CollectionReference remoteJots = dataRef.collection("jots");
+            Task<QuerySnapshot> task = remoteJots.get();
+            QuerySnapshot snapshot = await(task);
             if (task.isSuccessful()) {
-                sync(remoteJots, task.getResult());
+                sync(remoteJots, snapshot);
             }
-        });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void sync(CollectionReference remoteJots, QuerySnapshot result) {
@@ -56,9 +62,7 @@ public class SyncJots implements Action {
         for (QueryDocumentSnapshot remoteJot : result) {
             syncJot(dbJots, remoteJot, remoteJots);
         }
-        dbJots.forEach((s, jot) -> {
-            updateRemoteJot(remoteJots, jot);
-        });
+        dbJots.forEach((s, jot) -> updateRemoteJot(remoteJots, jot));
     }
 
     private void syncJot(
@@ -116,21 +120,25 @@ public class SyncJots implements Action {
     }
 
     private void updateRemoteJot(CollectionReference jotsRef, Jot jot) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("content", encryptor.encrypt(jot.content()));
-        data.put("mood", encryptor.encrypt(jot.mood()));
-        data.put("createdTime", encryptor.encrypt(jot.createdTime() + ""));
-        data.put("location", encryptor.encrypt(
-            new Point(
-                new CoordinateArraySequence(
-                    new Coordinate[]{
-                        new Coordinate(jot.location()[0], jot.location()[1])
-                    }
-                ), new GeometryFactory()
-            ).toText()
-        ));
-        data.put("version", encryptor.encrypt(jot.version() + ""));
-        data.put("delete", encryptor.encrypt((jot.deleted() ? 1 : 0) + ""));
-        jotsRef.document(jot.id() + "").set(data);
+        try {
+            Map<String, Object> data = new HashMap<>();
+            data.put("content", encryptor.encrypt(jot.content()));
+            data.put("mood", encryptor.encrypt(jot.mood()));
+            data.put("createdTime", encryptor.encrypt(jot.createdTime() + ""));
+            data.put("location", encryptor.encrypt(
+                new Point(
+                    new CoordinateArraySequence(
+                        new Coordinate[]{
+                            new Coordinate(jot.location()[0], jot.location()[1])
+                        }
+                    ), new GeometryFactory()
+                ).toText()
+            ));
+            data.put("version", encryptor.encrypt(jot.version() + ""));
+            data.put("delete", encryptor.encrypt((jot.deleted() ? 1 : 0) + ""));
+            await(jotsRef.document(jot.id() + "").set(data));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

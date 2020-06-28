@@ -1,22 +1,18 @@
 package com.larryhsiao.nyx.sync;
 
 import android.content.Context;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.larryhsiao.nyx.core.attachments.AllAttachments;
-import com.larryhsiao.nyx.core.attachments.Attachment;
-import com.larryhsiao.nyx.core.attachments.ConstAttachment;
-import com.larryhsiao.nyx.core.attachments.NewAttachmentById;
-import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
-import com.larryhsiao.nyx.core.attachments.UpdateAttachment;
+import com.larryhsiao.nyx.core.attachments.*;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
 
 import java.sql.Connection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -25,24 +21,34 @@ import java.util.stream.Collectors;
  */
 public class SyncAttachments implements Action {
     private final Context context;
-    private final String uid;
+    private final DocumentReference dataRef;
     private final Source<Connection> db;
+    private final String uid;
 
-    public SyncAttachments(Context context, String uid, Source<Connection> db) {
+    public SyncAttachments(
+        Context context,
+        DocumentReference dataRef,
+        Source<Connection> db,
+        String uid
+    ) {
         this.context = context;
-        this.uid = uid;
+        this.dataRef = dataRef;
         this.db = db;
+        this.uid = uid;
     }
 
     @Override
     public void fire() {
-        CollectionReference remoteDb = FirebaseFirestore.getInstance()
-            .collection(uid + "/data/attachments");
-        remoteDb.get().addOnCompleteListener(task -> {
+        try {
+            CollectionReference remoteDb = dataRef.collection("attachments");
+            Task<QuerySnapshot> task = remoteDb.get();
+            QuerySnapshot result = Tasks.await(task);
             if (task.isSuccessful()) {
-                sync(remoteDb, task.getResult());
+                sync(remoteDb, result);
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void sync(CollectionReference remoteDb, QuerySnapshot result) {
@@ -64,7 +70,11 @@ public class SyncAttachments implements Action {
             }
         }
         // new Items or local version is newer
-        updateRemoteItem(remoteDb, dbItems.values().iterator());
+        for (Attachment attachment : dbItems.values()) {
+            updateRemoteItem(remoteDb, attachment);
+        }
+        new LocalFileSync(context, db, integer -> null).fire(); // for deleted items
+        new RemoteFileSync(context, db, uid).fire();
     }
 
     private void updateLocalItem(QueryDocumentSnapshot remoteItem) {
@@ -93,22 +103,16 @@ public class SyncAttachments implements Action {
         ).fire();
     }
 
-    private void updateRemoteItem(CollectionReference remoteDb, Iterator<Attachment> iterator) {
-        if (!iterator.hasNext()) {
-            new LocalFileSync(context, db, integer -> null).fire(); // for deleted items
-            new RemoteFileSync(context, db, uid).fire();
-            return;
+    private void updateRemoteItem(CollectionReference remoteDb, Attachment attachment) {
+        try {
+            Map<String, Object> data = new HashMap<>();
+            data.put("delete", attachment.deleted() ? 1 : 0);
+            data.put("version", attachment.version());
+            data.put("jot_id", attachment.jotId());
+            data.put("uri", attachment.uri());
+            Tasks.await(remoteDb.document(attachment.id() + "").set(data));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Attachment attachment = iterator.next();
-        Map<String, Object> data = new HashMap<>();
-        data.put("delete", attachment.deleted() ? 1 : 0);
-        data.put("version", attachment.version());
-        data.put("jot_id", attachment.jotId());
-        data.put("uri", attachment.uri());
-        remoteDb.document(attachment.id() + "")
-            .set(data)
-            .addOnCompleteListener(it -> {
-                updateRemoteItem(remoteDb, iterator);
-            });
     }
 }

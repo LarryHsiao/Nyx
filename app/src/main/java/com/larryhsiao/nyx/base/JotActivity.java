@@ -39,7 +39,7 @@ public abstract class JotActivity extends AuraActivity {
         );
         fingerprint.enable(
             PreferenceManager.getDefaultSharedPreferences(this )
-                .getBoolean("fingerprint_auth", true)
+                .getBoolean("fingerprint_auth", false)
         );
         JotApplication app = (JotApplication) getApplicationContext();
         if (fingerprint.isEnabled() && 300000 < System.currentTimeMillis() - app.lastAuthed) {

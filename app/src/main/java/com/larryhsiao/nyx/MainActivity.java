@@ -1,7 +1,6 @@
 package com.larryhsiao.nyx;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
@@ -14,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.preference.PreferenceManager;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
@@ -114,15 +112,11 @@ public class MainActivity extends JotActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .registerOnSharedPreferenceChangeListener(this::onSharedPreferenceChanged);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        PreferenceManager.getDefaultSharedPreferences(this)
-//            .unregisterOnSharedPreferenceChangeListener(this::onSharedPreferenceChanged);
     }
 
     @Override
@@ -223,12 +217,6 @@ public class MainActivity extends JotActivity {
             drawer.closeDrawer(LEFT);
         } else {
             super.onBackPressed();
-        }
-    }
-
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (currentPage == R.id.menuItem_settings) {
-            rootPage(new SettingFragment());
         }
     }
 }

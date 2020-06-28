@@ -2,6 +2,10 @@ package com.larryhsiao.nyx.jot;
 
 import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.*;
@@ -9,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -27,6 +32,7 @@ import java.util.List;
 
 import static android.content.Context.SEARCH_SERVICE;
 import static android.graphics.Color.WHITE;
+import static com.larryhsiao.nyx.NyxActions.SYNC_CHECKPOINT;
 import static java.text.DateFormat.SHORT;
 import static java.util.Calendar.*;
 
@@ -36,6 +42,12 @@ import static java.util.Calendar.*;
 abstract class JotListingFragment extends JotFragment {
     private static final String ARG_FILTER = "ARG_FILTER";
     private Filter filter = new ConstFilter(new long[]{0L, 0L}, "");
+    private final BroadcastReceiver jotChanged = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadJots();
+        }
+    };
 
     protected void setupFilterArgs(Bundle args) {
         Gson gson = new GsonBuilder()
@@ -89,6 +101,20 @@ abstract class JotListingFragment extends JotFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         initialFilter();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        LocalBroadcastManager.getInstance(view.getContext()).registerReceiver(
+            jotChanged, new IntentFilter(SYNC_CHECKPOINT)
+        );
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(jotChanged);
     }
 
     @Override

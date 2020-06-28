@@ -59,7 +59,7 @@ public class MapRenderer extends DefaultClusterRenderer<JotMapItem> {
         if (content.size() > 0) {
             try {
                 Options decodeOptions = new Options();
-                decodeOptions.inSampleSize = 8;
+                decodeOptions.inSampleSize = 10;
                 options.icon(fromBitmap(new ResizedImage(
                     new ConstSource<>(
                         decodeStream(

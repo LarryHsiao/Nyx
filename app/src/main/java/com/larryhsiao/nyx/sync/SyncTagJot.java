@@ -1,5 +1,7 @@
 package com.larryhsiao.nyx.sync;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -29,12 +31,16 @@ public class SyncTagJot implements Action {
 
     @Override
     public void fire() {
-        CollectionReference remote = dataRef.collection("tag_jot");
-        remote.get().addOnCompleteListener(task -> {
+        try {
+            CollectionReference remote = dataRef.collection("tag_jot");
+            Task<QuerySnapshot> task = remote.get();
+            Tasks.await(task);
             if (task.isSuccessful()) {
                 sync(remote, task.getResult());
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void sync(CollectionReference remote, QuerySnapshot result) {
@@ -100,7 +106,11 @@ public class SyncTagJot implements Action {
         String id,
         Map<String, Object> tagJot
     ) {
-        tagRef.document(id).set(tagJot);
+        try {
+            Tasks.await(tagRef.document(id).set(tagJot));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Map<String, Map<String, Object>> allDbTagJots() {

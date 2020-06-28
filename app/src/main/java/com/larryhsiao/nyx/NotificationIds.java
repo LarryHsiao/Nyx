@@ -14,12 +14,18 @@ public interface NotificationIds {
     String CHANNEL_ID_SYNC = "Sync";
 
     /**
-     * @see com.larryhsiao.nyx.backup.google.DriveBackupService
+     * @see com.larryhsiao.nyx.sync.SyncService
      */
+    String CHANNEL_ID_SYNCING = "Syncing";
+
     int NOTIFICATION_ID_BACKUP_DRIVE = 1000;
 
     /**
      * @see com.larryhsiao.nyx.sync.SyncService
      */
     int NOTIFICATION_ID_INVALID_ENCRYPT_KEY = 1001;
+    /**
+     * @see com.larryhsiao.nyx.sync.SyncService
+     */
+    int NOTIFICATION_ID_SYNCING = 1002;
 }
