@@ -140,4 +140,6 @@
     </string>
     <string name="Enter_new_key">Enter new key</string>
     <string name="Use_local_key_Delete_remote_data__">Use local key(Delete remote data).</string>
+    <string name="Jotted_is_syncing">Jotted is syncing</string>
+    <string name="The_app_is_syncing_Jots_to_cloud">The app is syncing Jots to cloud.</string>
 </resources>

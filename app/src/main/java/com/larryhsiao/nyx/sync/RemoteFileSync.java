@@ -1,6 +1,10 @@
 package com.larryhsiao.nyx.sync;
 
 import android.content.Context;
+import android.net.Uri;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.larryhsiao.nyx.core.attachments.AllAttachments;
@@ -11,9 +15,7 @@ import com.silverhetch.clotho.Source;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,94 +49,66 @@ public class RemoteFileSync implements Action {
             Function.identity(),
             (attachment, attachment2) -> attachment
         ));
-        syncAttachment(
-            FirebaseStorage.getInstance().getReference(uid),
-            attachmentMap.values().iterator()
-        );
-    }
-
-    private void syncAttachment(
-        StorageReference remoteRoot,
-        Iterator<Attachment> iterator
-    ) {
-        if (!iterator.hasNext()) {
-            return;
-        }
-        final Attachment attachment = iterator.next();
-        if (!attachment.uri().startsWith(URI_FILE_PROVIDER)) {
-            syncAttachment(remoteRoot, iterator); // Next
-        } else {
-            syncFile(remoteRoot, attachment, iterator);
+        for (Attachment attachment : attachmentMap.values()) {
+            syncAttachment(FirebaseStorage.getInstance().getReference(uid), attachment);
         }
     }
 
-    private void syncFile(
-        StorageReference remoteRoot,
-        Attachment attachment,
-        Iterator<Attachment> iterator
-    ) {
+    private void syncAttachment(StorageReference remoteRoot, Attachment attachment) {
+        if (attachment.uri().startsWith(URI_FILE_PROVIDER)) {
+            syncFile(remoteRoot, attachment);
+        }
+    }
+
+    private void syncFile(StorageReference remoteRoot, Attachment attachment) {
         final File localFile = new File(new File(
             context.getFilesDir(),
             "attachments"
         ), attachment.uri().replace(URI_FILE_PROVIDER, ""));
         final StorageReference ref = remoteRoot.child(localFile.getName());
-        ref.getMetadata().addOnSuccessListener(it -> {
-            if (attachment.deleted()) {
-                ref.delete().addOnCompleteListener(it2->{
-                   syncAttachment(remoteRoot, iterator);
-                });
-            } else {
-                if (localFile.exists()) {
-                    syncAttachment(remoteRoot, iterator); // exist
+        Task<Uri> task = ref.getDownloadUrl();
+        try {
+            Tasks.await(task);
+            if (task.isSuccessful()) {
+                if (attachment.deleted()) {
+                    Tasks.await(ref.delete());
                 } else {
-                    localFile.getParentFile().mkdirs();
-                    download(remoteRoot, localFile, iterator);
+                    if (!localFile.exists()) {
+                        localFile.getParentFile().mkdirs();
+                        download(remoteRoot, localFile);
+                    }
                 }
-            }
-        }).addOnFailureListener(it -> {
-            if (localFile.exists()&& !attachment.deleted()) {
-                upload(remoteRoot, localFile, iterator);
             } else {
-                syncAttachment(remoteRoot, iterator);
+                if (localFile.exists() && !attachment.deleted()) {
+                    upload(remoteRoot, localFile);
+                }
                 // @todo #0 Handle missing file.
             }
-        });
-    }
-
-    private void upload(
-        StorageReference remoteRoot,
-        File localFile,
-        Iterator<Attachment> iterator
-    ) {
-
-        try {
-            remoteRoot.child(localFile.getName()).putStream(
-                new FileInputStream(localFile)
-            ).addOnSuccessListener(it -> {
-                syncAttachment(remoteRoot, iterator);
-            }).addOnFailureListener(it -> {
-                // @todo #0 Handle upload failed.
-                syncAttachment(remoteRoot, iterator);
-            });
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            // @todo #0 Handle open file download failed.
-            syncAttachment(remoteRoot, iterator);
+            if (localFile.exists() && !attachment.deleted()) {
+                upload(remoteRoot, localFile);
+            }
         }
     }
 
-    private void download(
-        StorageReference remoteRoot,
-        File dist,
-        Iterator<Attachment> iterator
-    ) {
-        remoteRoot.child(dist.getName())
-            .getFile(dist)
-            .addOnSuccessListener(taskSnapshot ->
-                syncAttachment(remoteRoot, iterator)
-            ).addOnFailureListener(e ->
-            // @todo #0 handle download faild or survey if there are any side effect if we ignore it.
-            syncAttachment(remoteRoot, iterator)
-        );
+    private void upload(StorageReference remoteRoot, File localFile) {
+        try {
+            // @todo #0 Handle upload failed.
+            Tasks.await(remoteRoot.child(localFile.getName()).putStream(
+                new FileInputStream(localFile)
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void download(StorageReference remoteRoot, File dist) {
+        try {
+            FileDownloadTask task = remoteRoot.child(dist.getName()).getFile(dist);
+            Tasks.await(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

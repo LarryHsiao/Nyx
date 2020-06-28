@@ -4,16 +4,22 @@ import android.app.NotificationChannel;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.android.billingclient.api.*;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.KeyChangingActivity;
@@ -25,28 +31,27 @@ import com.larryhsiao.nyx.sync.encryption.JasyptStringEncryptor;
 import com.larryhsiao.nyx.sync.encryption.StringEncryptor;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.encryption.MD5;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.app.NotificationManager.IMPORTANCE_DEFAULT;
+import static android.app.NotificationManager.IMPORTANCE_LOW;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.app.PendingIntent.getActivity;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.O;
-import static androidx.core.app.NotificationCompat.Builder;
-import static androidx.core.app.NotificationCompat.PRIORITY_DEFAULT;
+import static androidx.core.app.NotificationCompat.*;
 import static androidx.core.app.NotificationManagerCompat.from;
 import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
-import static com.larryhsiao.nyx.NotificationIds.CHANNEL_ID_SYNC;
-import static com.larryhsiao.nyx.NotificationIds.NOTIFICATION_ID_INVALID_ENCRYPT_KEY;
+import static com.larryhsiao.nyx.NotificationIds.*;
+import static com.larryhsiao.nyx.NyxActions.SYNC_CHECKPOINT;
 
 /**
  * Service to sync data to server.
@@ -55,11 +60,9 @@ import static com.larryhsiao.nyx.NotificationIds.NOTIFICATION_ID_INVALID_ENCRYPT
  */
 public class SyncService extends JobIntentService
     implements ServiceIds,
-    PurchasesUpdatedListener,
-    BillingClientStateListener {
+    PurchasesUpdatedListener {
     private static final int REQUEST_CODE_ENCRYPTION_KEY_NOT_MATCHED = 1000;
     private Source<Connection> db;
-    private BillingClient client;
 
     public static void enqueue(Context context) {
         enqueueWork(context, SyncService.class, SYNC, new Intent());
@@ -67,50 +70,81 @@ public class SyncService extends JobIntentService
 
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
-        db = ((JotApplication) getApplication()).db;
-        new LocalFileSync(this, db, integer -> null).fire();
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            cancelKeyNotMatchNotification();
-            return;
+        try {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(this::notifySyncing, 30000);
+            db = ((JotApplication) getApplication()).db;
+            new LocalFileSync(this, db, integer -> null).fire();
+            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null) {
+                cancelKeyNotMatchNotification();
+                handler.removeCallbacksAndMessages(null);
+                from(this).cancel(NOTIFICATION_ID_SYNCING);
+                return;
+            }
+            syncAuthCheck(user);
+            handler.removeCallbacksAndMessages(null);
+            from(this).cancel(NOTIFICATION_ID_SYNCING);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    private void syncAuthCheck(FirebaseUser user) throws Exception {
         final String encryptKey = encryptKey();
         final String keyHash = new MD5(new ByteArrayInputStream(encryptKey.getBytes())).value();
         final CollectionReference userRef = FirebaseFirestore.getInstance()
             .collection(user.getUid());
-        userRef.document("account").get().addOnSuccessListener(doc -> {
-            final DocumentReference dataRef = userRef.document(keyHash);
-            if (doc.contains("key_hash")) {
-                if ((keyHash + "").equals(doc.getString("key_hash"))) {
-                    cancelKeyNotMatchNotification();
-                    syncToCloud(dataRef, new JasyptStringEncryptor(encryptKey));
-                } else {
-                    notifyKeyNotMatch();
-                }
+        Task<DocumentSnapshot> task = userRef.document("account").get();
+        DocumentSnapshot doc = Tasks.await(task);
+        final DocumentReference dataRef = userRef.document(keyHash);
+        if (doc.contains("key_hash")) {
+            if ((keyHash + "").equals(doc.getString("key_hash"))) {
+                cancelKeyNotMatchNotification();
+                syncToCloud(user, dataRef, new JasyptStringEncryptor(encryptKey));
             } else {
-                // Ignore failure, try again next time sync
-                final ChangeEncryptKeyReq req = new ChangeEncryptKeyReq();
-                req.keyHash = keyHash;
-                req.uid = user.getUid();
-                NyxApi.client().changeEncryptKey(req).enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        if (response.isSuccessful()) {
-                            cancelKeyNotMatchNotification();
-                            syncToCloud(dataRef, new JasyptStringEncryptor(encryptKey));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                    }
-                });
+                notifyKeyNotMatch();
             }
-        });
+        } else {
+            // Ignore failure, try again next time sync
+            final ChangeEncryptKeyReq req = new ChangeEncryptKeyReq();
+            req.keyHash = keyHash;
+            req.uid = user.getUid();
+            Response<Void> response = NyxApi.client().changeEncryptKey(req).execute();
+            if (response.isSuccessful()) {
+                cancelKeyNotMatchNotification();
+                syncToCloud(user, dataRef, new JasyptStringEncryptor(encryptKey));
+            }
+        }
     }
 
-    private void cancelKeyNotMatchNotification(){
+    private void cancelKeyNotMatchNotification() {
         from(this).cancel(NOTIFICATION_ID_INVALID_ENCRYPT_KEY);
+    }
+
+    private void notifySyncing() {
+        NotificationManagerCompat mgr = from(this);
+        if (SDK_INT >= O) {
+            NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID_SYNCING,
+                getString(R.string.Sync_service),
+                IMPORTANCE_LOW
+            );
+            channel.setShowBadge(false);
+            channel.setDescription(getString(R.string.Service_syncs_jots_to_cloud));
+            mgr.createNotificationChannel(channel);
+        }
+        mgr.notify(
+            NOTIFICATION_ID_SYNCING,
+            new Builder(this, CHANNEL_ID_SYNCING)
+                .setSmallIcon(R.drawable.ic_jotted)
+                .setPriority(PRIORITY_LOW)
+                .setAutoCancel(false)
+                .setContentTitle(getString(R.string.Jotted_is_syncing))
+                .setContentText(getString(R.string.The_app_is_syncing_Jots_to_cloud))
+                .build()
+        );
     }
 
     private void notifyKeyNotMatch() {
@@ -147,15 +181,45 @@ public class SyncService extends JobIntentService
     }
 
     private void syncToCloud(
+        FirebaseUser user,
         DocumentReference dataRef,
         JasyptStringEncryptor encrypt
     ) {
-        client = BillingClient.newBuilder(this)
-            .enablePendingPurchases()
-            .setListener(this)
-            .build();
-        client.startConnection(this);
-        syncNonPremium(dataRef, encrypt);
+        try {
+            AtomicBoolean purchased = new AtomicBoolean(false);
+            BillingClient client = BillingClient.newBuilder(this)
+                .enablePendingPurchases()
+                .setListener(this)
+                .build();
+            client.startConnection(new BillingClientStateListener() {
+                @Override
+                public void onBillingSetupFinished(BillingResult billingResult) {
+                    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user == null) {
+                        return;
+                    }
+                    List<Purchase> purchasesList = client.queryPurchases(SUBS).getPurchasesList();
+                    for (Purchase purchase : purchasesList) {
+                        if ("premium".equals(purchase.getSku()) &&
+                            purchase.getPurchaseState() == PURCHASED) {
+                            purchased.set(true);
+                            return;
+                        }
+                    }
+                }
+
+                @Override
+                public void onBillingServiceDisconnected() {
+                }
+            });
+            Thread.sleep(1000); // Wait for the purchase status
+            syncNonPremium(dataRef, encrypt);
+            if (purchased.get()) {
+                new SyncAttachments(this, dataRef, db, user.getUid()).fire();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private String encryptKey() {
@@ -178,8 +242,11 @@ public class SyncService extends JobIntentService
         StringEncryptor encrypt
     ) {
         new SyncJots(dataRef, db, encrypt).fire();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
         new SyncTags(dataRef, db, encrypt).fire();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
         new SyncTagJot(dataRef, db).fire();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
     }
 
     @Override
@@ -188,27 +255,5 @@ public class SyncService extends JobIntentService
         @Nullable List<Purchase> list
     ) {
         // Leave it empty
-    }
-
-    @Override
-    public void onBillingSetupFinished(BillingResult billingResult) {
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            return;
-        }
-        List<Purchase> purchasesList = client.queryPurchases(SUBS)
-            .getPurchasesList();
-        for (Purchase purchase : purchasesList) {
-            if ("premium".equals(purchase.getSku()) &&
-                purchase.getPurchaseState() == PURCHASED) {
-                new SyncAttachments(this, user.getUid(), db).fire();
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void onBillingServiceDisconnected() {
-
     }
 }
