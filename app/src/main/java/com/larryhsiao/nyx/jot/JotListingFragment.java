@@ -53,13 +53,7 @@ abstract class JotListingFragment extends JotFragment {
         Gson gson = new GsonBuilder()
             .registerTypeAdapter(Filter.class, new FilterTypeAdapter())
             .create();
-        args.putString(
-            ARG_FILTER,
-            gson.toJson(
-                filter, new TypeToken<Filter>() {
-                }.getType()
-            )
-        );
+        args.putString(ARG_FILTER, gson.toJson(filter, new TypeToken<Filter>() {}.getType()));
     }
 
     protected abstract void loadJots(Filter filter);
@@ -67,17 +61,7 @@ abstract class JotListingFragment extends JotFragment {
     private void initialFilter() {
         try {
             String json = requireArguments().getString(ARG_FILTER, "");
-            if (json.isEmpty()){
-                filter = new WrappedFilter(filter){
-                    @Override
-                    public long[] dateRange() {
-                        return new long[]{
-                            System.currentTimeMillis()-2592000000L, // 30-day
-                            System.currentTimeMillis()
-                        };
-                    }
-                };
-            }else{
+            if (!json.isEmpty()) {
                 Gson gson = new GsonBuilder()
                     .registerTypeAdapter(Filter.class, new FilterTypeAdapter())
                     .create();
@@ -122,7 +106,8 @@ abstract class JotListingFragment extends JotFragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.jot_list, menu);
 
-        SearchManager searchManager = ((SearchManager) requireContext().getSystemService(SEARCH_SERVICE));
+        SearchManager searchManager =
+            ((SearchManager) requireContext().getSystemService(SEARCH_SERVICE));
         MenuItem searchMenuItem = menu.findItem(R.id.menuItem_search);
         SearchView searchView = (SearchView) searchMenuItem.getActionView();
         searchView.setSearchableInfo(
@@ -132,7 +117,7 @@ abstract class JotListingFragment extends JotFragment {
             searchMenuItem.collapseActionView();
             return false;
         });
-        searchView.postDelayed(()->{
+        searchView.postDelayed(() -> {
             searchView.setQuery(filter.keyword(), false);
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -153,7 +138,7 @@ abstract class JotListingFragment extends JotFragment {
                     return true;
                 }
             });
-        },300);
+        }, 300);
         searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
@@ -186,7 +171,8 @@ abstract class JotListingFragment extends JotFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_datePicker) {
-            View root = LayoutInflater.from(getContext()).inflate(R.layout.dialog_date_picker, null , false);
+            View root =
+                LayoutInflater.from(getContext()).inflate(R.layout.dialog_date_picker, null, false);
             CalendarView view = root.findViewById(R.id.datePicker_calendar);
             AlertDialog dialogBuilder = new AlertDialog.Builder(requireContext())
                 .setView(root)

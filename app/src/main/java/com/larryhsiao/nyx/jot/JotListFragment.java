@@ -33,26 +33,31 @@ public class JotListFragment extends JotListingFragment {
     private static final int REQUEST_CODE_JOT_CONTENT = 1001;
     private JotListAdapter adapter;
 
-    public static Fragment newInstance(JotListingFragment listingFragment) {
+    public static Fragment newInstance(JotListingFragment listingFrag) {
         JotListFragment frag = new JotListFragment();
         Bundle bundle = new Bundle();
-        listingFragment.setupFilterArgs(bundle);
+        listingFrag.setupFilterArgs(bundle);
         frag.setArguments(bundle);
         return frag;
     }
 
-    public JotListFragment() {
-        setArguments(new Bundle());
-    }
+    public JotListFragment() { setArguments(new Bundle()); }
 
     /**
      * Show by jot ids.
      */
-    public static Fragment newInstanceByJotIds(String title, long[] jotIds) {
+    public static Fragment newInstanceByJotIds(
+        String title, 
+        long[] jotIds,
+        JotListingFragment listingFrag
+    ) {
         Fragment frag = new JotListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
         args.putLongArray(ARG_JOT_IDS, jotIds);
+        if (listingFrag!=null){
+            listingFrag.setupFilterArgs(args);
+        }
         frag.setArguments(args);
         return frag;
     }
@@ -70,7 +75,9 @@ public class JotListFragment extends JotListingFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+        @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.list, container, false);
     }
 
@@ -131,13 +138,17 @@ public class JotListFragment extends JotListingFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
+    public void onActivityResult(
+        int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CREATE_JOT && resultCode == RESULT_OK && data != null) {
-            adapter.insertJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
+            adapter.insertJot(
+                new JotById(new JotUriId(data.getData().toString()).value(), db).value());
             getParentFragmentManager().popBackStack();
-        } else if (requestCode == REQUEST_CODE_JOT_CONTENT && resultCode == RESULT_OK && data != null) {
-            adapter.updateJot(new JotById(new JotUriId(data.getData().toString()).value(), db).value());
+        } else if (requestCode == REQUEST_CODE_JOT_CONTENT && resultCode == RESULT_OK &&
+            data != null) {
+            adapter.updateJot(
+                new JotById(new JotUriId(data.getData().toString()).value(), db).value());
             getParentFragmentManager().popBackStack();
         }
     }

@@ -108,7 +108,8 @@ public class JotMapFragment extends JotListingFragment {
                 cluster.getPosition().latitude + ", " + cluster.getPosition().longitude + "",
                 cluster.getItems().stream()
                     .mapToLong(it -> it.getJot().id())
-                    .toArray()
+                    .toArray(),
+                this
             ));
             return true;
         });

@@ -242,11 +242,8 @@ public class SyncService extends JobIntentService
         StringEncryptor encrypt
     ) {
         new SyncJots(dataRef, db, encrypt).fire();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
         new SyncTags(dataRef, db, encrypt).fire();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
         new SyncTagJot(dataRef, db).fire();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
     }
 
     @Override
