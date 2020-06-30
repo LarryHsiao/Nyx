@@ -4,8 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.NyxRemoteConfig;
+import com.larryhsiao.nyx.NyxRemoteConfigImpl;
 import com.larryhsiao.nyx.settings.DefaultPreference;
 import com.larryhsiao.nyx.settings.NyxSettings;
 import com.larryhsiao.nyx.settings.NyxSettingsImpl;
@@ -23,7 +24,7 @@ import java.sql.Connection;
  */
 public abstract class JotActivity extends AuraActivity {
     protected Source<Connection> db;
-    protected FirebaseRemoteConfig remoteConfig;
+    protected NyxRemoteConfig remoteConfig;
     protected NyxSettings settings;
 
     @Override
@@ -32,8 +33,8 @@ public abstract class JotActivity extends AuraActivity {
         JotApplication app = ((JotApplication) getApplicationContext());
         db = app.db;
         settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
-        remoteConfig = app.remoteConfig;
-        remoteConfig.fetchAndActivate();
+        app.remoteConfig.fetchAndActivate();
+        remoteConfig = new NyxRemoteConfigImpl();
     }
 
     @Override
