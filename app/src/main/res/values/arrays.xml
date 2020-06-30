@@ -4,4 +4,14 @@
         <item>@string/Capture_a_picture</item>
         <item>@string/Choose_exist_files</item>
     </string-array>
+    <string-array name="quality_itemValues">
+        <item>HIGH</item>
+        <item>GOOD</item>
+        <item>LOW</item>
+    </string-array>
+    <string-array name="quality_items">
+        <item>@string/High_More_space_</item>
+        <item>@string/Good</item>
+        <item>@string/Low_Noticeable_quality_loss_</item>
+    </string-array>
 </resources>

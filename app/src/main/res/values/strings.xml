@@ -142,4 +142,10 @@
     <string name="Use_local_key_Delete_remote_data__">Use local key(Delete remote data).</string>
     <string name="Jotted_is_syncing">Jotted is syncing</string>
     <string name="The_app_is_syncing_Jots_to_cloud">The app is syncing Jots to cloud.</string>
+    <string name="Delete_all_remote_data_">Delete all remote data?</string>
+    <string name="Are_you_sure_to_delete_all_data_at_cloude_due_to_the_encryption_key_change_">Are you sure to delete all data at cloud due to the encryption key change?</string>
+    <string name="High_More_space_">High(More space)</string>
+    <string name="Good">Good</string>
+    <string name="Low_Noticeable_quality_loss_">Low(Noticeable Quality Loss)</string>
+    <string name="Image_quality">Image quality</string>
 </resources>

@@ -3,7 +3,6 @@ package com.larryhsiao.nyx.sync;
 import android.app.NotificationChannel;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
@@ -27,16 +26,19 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.ServiceIds;
 import com.larryhsiao.nyx.account.api.ChangeEncryptKeyReq;
 import com.larryhsiao.nyx.account.api.NyxApi;
+import com.larryhsiao.nyx.settings.DefaultPreference;
+import com.larryhsiao.nyx.settings.NyxSettings;
+import com.larryhsiao.nyx.settings.NyxSettingsImpl;
 import com.larryhsiao.nyx.sync.encryption.Encryptor;
 import com.larryhsiao.nyx.sync.encryption.JasyptStringEncryptor;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.encryption.MD5;
+import com.silverhetch.clotho.source.SingleRefSource;
 import retrofit2.Response;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.app.NotificationManager.IMPORTANCE_DEFAULT;
@@ -47,7 +49,6 @@ import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.O;
 import static androidx.core.app.NotificationCompat.*;
 import static androidx.core.app.NotificationManagerCompat.from;
-import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
 import static com.larryhsiao.nyx.NotificationIds.*;
@@ -63,6 +64,7 @@ public class SyncService extends JobIntentService
     PurchasesUpdatedListener {
     private static final int REQUEST_CODE_ENCRYPTION_KEY_NOT_MATCHED = 1000;
     private Source<Connection> db;
+    private NyxSettings settings;
 
     public static void enqueue(Context context) {
         enqueueWork(context, SyncService.class, SYNC, new Intent());
@@ -73,6 +75,7 @@ public class SyncService extends JobIntentService
         try {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(this::notifySyncing, 30000);
+            settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
             db = ((JotApplication) getApplication()).db;
             new LocalFileSync(this, db, integer -> null).fire();
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -92,7 +95,7 @@ public class SyncService extends JobIntentService
     }
 
     private void syncAuthCheck(FirebaseUser user) throws Exception {
-        final String encryptKey = encryptKey();
+        final String encryptKey = settings.encryptionKey();
         final String keyHash = new MD5(new ByteArrayInputStream(encryptKey.getBytes())).value();
         final CollectionReference userRef = FirebaseFirestore.getInstance()
             .collection(user.getUid());
@@ -215,31 +218,22 @@ public class SyncService extends JobIntentService
             Thread.sleep(1000); // Wait for the purchase status
             syncNonPremium(dataRef, encrypt);
             if (purchased.get()) {
-                new SyncAttachments(this, dataRef, db, user.getUid(), encryptKey()).fire();
+                new SyncAttachments(
+                    this,
+                    dataRef,
+                    db,
+                    user.getUid(),
+                    settings.encryptionKey()
+                ).fire();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private String encryptKey() {
-        SharedPreferences pref = getDefaultSharedPreferences(this);
-        String encryptKey = pref.getString("encrypt_key", "");
-        if (encryptKey.isEmpty()) {
-            pref.edit().putString(
-                "encrypt_key",
-                encryptKey = UUID.randomUUID()
-                    .toString()
-                    .replace("-", "")
-                    .substring(0, 7)
-            ).apply();
-        }
-        return encryptKey;
-    }
-
     private void syncNonPremium(
         DocumentReference dataRef,
-        Encryptor encrypt
+        Encryptor<String> encrypt
     ) {
         new SyncJots(dataRef, db, encrypt).fire();
         new SyncTags(dataRef, db, encrypt).fire();

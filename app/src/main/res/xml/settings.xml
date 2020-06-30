@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
     <SwitchPreference
         android:key="fingerprint_auth"
         android:defaultValue="false"
         android:icon="@drawable/ic_fingerprint"
         android:title="@string/Touch_ID" />
 
-    <EditTextPreference
-        android:key="encrypt_key"
-        android:dialogIcon="@drawable/ic_key"
-        android:title="@string/Encryption_key"
-        android:summary="@string/App_use_this_key_to_encrypt_your_data"
-        android:icon="@drawable/ic_key" />
+    <PreferenceCategory android:title="@string/Cloud_syncs">
+        <EditTextPreference
+            android:key="encrypt_key"
+            android:dialogIcon="@drawable/ic_key"
+            android:title="@string/Encryption_key"
+            android:summary="@string/App_use_this_key_to_encrypt_your_data"
+            android:icon="@drawable/ic_key" />
+        <ListPreference
+            android:title="@string/Image_quality"
+            android:key="image_quality"
+            android:summary="%s"
+            android:icon="@drawable/ic_hq"
+            tools:summary="Good"
+            android:defaultValue="GOOD"
+            android:entries="@array/quality_items"
+            android:entryValues="@array/quality_itemValues" />
+    </PreferenceCategory>
 </PreferenceScreen>
