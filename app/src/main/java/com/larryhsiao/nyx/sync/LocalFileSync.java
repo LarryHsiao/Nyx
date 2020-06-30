@@ -3,17 +3,17 @@ package com.larryhsiao.nyx.sync;
 import android.content.Context;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
-import com.larryhsiao.nyx.core.attachments.AllAttachments;
-import com.larryhsiao.nyx.core.attachments.Attachment;
-import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
-import com.larryhsiao.nyx.core.attachments.UpdateAttachment;
-import com.larryhsiao.nyx.core.attachments.WrappedAttachment;
+import com.larryhsiao.nyx.core.attachments.*;
+import com.larryhsiao.nyx.settings.DefaultPreference;
+import com.larryhsiao.nyx.settings.NyxSettings;
+import com.larryhsiao.nyx.settings.NyxSettingsImpl;
 import com.silverhetch.aura.images.JpegCompress;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.encryption.MD5;
 import com.silverhetch.clotho.file.ToFile;
+import com.silverhetch.clotho.source.SingleRefSource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +39,7 @@ public class LocalFileSync implements Action {
     private final Context context;
     private final Source<Connection> db;
     private final Function<Integer, Void> progress;
+    private final NyxSettings settings;
 
     public LocalFileSync(
         Context context,
@@ -48,6 +49,7 @@ public class LocalFileSync implements Action {
         this.context = context;
         this.db = db;
         this.progress = progress;
+        this.settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(context)));
     }
 
     @Override
@@ -118,7 +120,7 @@ public class LocalFileSync implements Action {
                 it -> null
             ).fire();
         }
-        new JpegCompress(temp, compressTemp, 90).fire();
+        new JpegCompress(temp, compressTemp, settings.imageQuality().amount).fire();
         temp.delete();
         final String fileName = generateFileName(
             "jpg",
@@ -138,7 +140,8 @@ public class LocalFileSync implements Action {
         return md5 + "-" + UUID.randomUUID().toString().substring(0, 7) + "." + ext;
     }
 
-    private void copyToInternal(String ext, File internalRoot, Attachment attachment) throws IOException {
+    private void copyToInternal(String ext, File internalRoot, Attachment attachment)
+        throws IOException {
         final Uri uri = Uri.parse(attachment.uri());
         final String fileName = generateFileName(
             ext,

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.larryhsiao.nyx.account.api.ChangeEncryptKeyReq;
 import com.larryhsiao.nyx.account.api.NyxApi;
@@ -41,40 +42,50 @@ public class KeyChangingActivity extends JotActivity implements InputDialog.Call
                 .show(getSupportFragmentManager(), null));
 
         findViewById(R.id.changEncryptKey_deleteRemote).setOnClickListener(v -> {
-            final SharedPreferences pref = getDefaultSharedPreferences(this);
-            final String encryptKey = pref.getString("encrypt_key", "");
-            final ChangeEncryptKeyReq req = new ChangeEncryptKeyReq();
-            req.keyHash = new MD5(new ByteArrayInputStream(encryptKey.getBytes())).value();
-            req.uid = FirebaseAuth.getInstance().getUid();
-            final ProgressDialog dialog = new ProgressDialog(this);
-            dialog.setMessage(getString(R.string.fui_progress_dialog_loading));
-            dialog.setCancelable(false);
-            dialog.show();
-            NyxApi.client().changeEncryptKey(req).enqueue(new Callback<Void>() {
-                @Override
-                public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                    if (response.isSuccessful()) {
-                        enqueue(KeyChangingActivity.this);
-                    } else {
-                        Toast.makeText(
-                            KeyChangingActivity.this,
-                            R.string.appError_unknown,
-                            LENGTH_SHORT
-                        ).show();
-                    }
-                    finish();
-                }
+            new AlertDialog.Builder(v.getContext())
+                .setTitle(R.string.Delete_all_remote_data_)
+                .setMessage(R.string.Are_you_sure_to_delete_all_data_at_cloude_due_to_the_encryption_key_change_)
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                })
+                .setPositiveButton(R.string.confirm, (dialog, which) -> deleteRemote())
+                .show();
+        });
+    }
 
-                @Override
-                public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+    private void deleteRemote() {
+        final SharedPreferences pref = getDefaultSharedPreferences(this);
+        final String encryptKey = pref.getString("encrypt_key", "");
+        final ChangeEncryptKeyReq req = new ChangeEncryptKeyReq();
+        req.keyHash = new MD5(new ByteArrayInputStream(encryptKey.getBytes())).value();
+        req.uid = FirebaseAuth.getInstance().getUid();
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.fui_progress_dialog_loading));
+        dialog.setCancelable(false);
+        dialog.show();
+        NyxApi.client().changeEncryptKey(req).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    enqueue(KeyChangingActivity.this);
+                } else {
                     Toast.makeText(
                         KeyChangingActivity.this,
                         R.string.appError_unknown,
                         LENGTH_SHORT
                     ).show();
-                    finish();
                 }
-            });
+                finish();
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                Toast.makeText(
+                    KeyChangingActivity.this,
+                    R.string.appError_unknown,
+                    LENGTH_SHORT
+                ).show();
+                finish();
+            }
         });
     }
 

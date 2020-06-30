@@ -5,8 +5,11 @@ import android.os.Build;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.larryhsiao.nyx.core.NyxDb;
+import com.larryhsiao.nyx.settings.DefaultPreference;
+import com.larryhsiao.nyx.settings.NyxSettingsImpl;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
+import com.silverhetch.clotho.source.SingleRefSource;
 import org.flywaydb.core.api.android.ContextHolder;
 
 import java.io.File;
@@ -47,5 +50,14 @@ public class JotApplication extends Application {
                 .build()
         );
         remoteConfig.fetchAndActivate();
+
+        /**
+         * Initial encryption key
+         */
+        new NyxSettingsImpl(
+            new SingleRefSource<>(
+                new DefaultPreference(this)
+            )
+        ).encryptionKey();
     }
 }
