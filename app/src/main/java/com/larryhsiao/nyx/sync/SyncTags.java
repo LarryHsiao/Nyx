@@ -6,7 +6,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.larryhsiao.nyx.core.tags.*;
-import com.larryhsiao.nyx.sync.encryption.StringEncryptor;
+import com.larryhsiao.nyx.sync.encryption.Encryptor;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
 
@@ -24,12 +24,12 @@ import static java.lang.Long.parseLong;
 public class SyncTags implements Action {
     private final DocumentReference dataRef;
     private final Source<Connection> db;
-    private final StringEncryptor encryptor;
+    private final Encryptor<String> encryptor;
 
     public SyncTags(
         DocumentReference dataRef,
         Source<Connection> db,
-        StringEncryptor encrypt) {
+        Encryptor<String> encrypt) {
         this.dataRef = dataRef;
         this.db = db;
         this.encryptor = encrypt;

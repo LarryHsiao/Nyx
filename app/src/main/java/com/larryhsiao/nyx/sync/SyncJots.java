@@ -6,7 +6,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.larryhsiao.nyx.core.jots.*;
-import com.larryhsiao.nyx.sync.encryption.StringEncryptor;
+import com.larryhsiao.nyx.sync.encryption.Encryptor;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
 import org.locationtech.jts.geom.Coordinate;
@@ -28,12 +28,12 @@ import static java.lang.Long.parseLong;
 public class SyncJots implements Action {
     private final DocumentReference dataRef;
     private final Source<Connection> db;
-    private final StringEncryptor encryptor;
+    private final Encryptor<String> encryptor;
 
     public SyncJots(
         DocumentReference dataRef,
         Source<Connection> db,
-        StringEncryptor encryptor
+        Encryptor<String> encryptor
     ) {
         this.dataRef = dataRef;
         this.db = db;

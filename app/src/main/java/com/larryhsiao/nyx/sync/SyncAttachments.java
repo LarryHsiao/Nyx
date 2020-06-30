@@ -24,17 +24,19 @@ public class SyncAttachments implements Action {
     private final DocumentReference dataRef;
     private final Source<Connection> db;
     private final String uid;
+    private final String key;
 
     public SyncAttachments(
         Context context,
         DocumentReference dataRef,
         Source<Connection> db,
-        String uid
-    ) {
+        String uid,
+        String key) {
         this.context = context;
         this.dataRef = dataRef;
         this.db = db;
         this.uid = uid;
+        this.key = key;
     }
 
     @Override
@@ -74,7 +76,7 @@ public class SyncAttachments implements Action {
             updateRemoteItem(remoteDb, attachment);
         }
         new LocalFileSync(context, db, integer -> null).fire(); // for deleted items
-        new RemoteFileSync(context, db, uid).fire();
+        new RemoteFileSync(context, db, uid, key).fire();
     }
 
     private void updateLocalItem(QueryDocumentSnapshot remoteItem) {
