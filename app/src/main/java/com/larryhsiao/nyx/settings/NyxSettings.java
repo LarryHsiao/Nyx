@@ -17,7 +17,7 @@ public interface NyxSettings {
     /**
      * The Image quality user prefer to upload. Note: only affected to Jpeg.
      */
-    Quality ImageQuality();
+    Quality imageQuality();
 
     /**
      * Quality of stored image quality.
@@ -26,14 +26,21 @@ public interface NyxSettings {
         /**
          * Almost no quality loss, so as size of image.
          */
-        HIGH,
+        HIGH(95),
         /**
          * Balanced quality/size consume.
          */
-        GOOD,
+        GOOD(90),
         /**
          * Noticeable quality loss, with significant size reduced.
          */
-        LOW
+        LOW(80);
+
+        /**
+         * The jpeg compressed quality.
+         */
+        public final int amount;
+
+        Quality(int amount) {this.amount = amount;}
     }
 }
