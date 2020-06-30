@@ -27,8 +27,8 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.ServiceIds;
 import com.larryhsiao.nyx.account.api.ChangeEncryptKeyReq;
 import com.larryhsiao.nyx.account.api.NyxApi;
+import com.larryhsiao.nyx.sync.encryption.Encryptor;
 import com.larryhsiao.nyx.sync.encryption.JasyptStringEncryptor;
-import com.larryhsiao.nyx.sync.encryption.StringEncryptor;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.encryption.MD5;
 import retrofit2.Response;
@@ -215,7 +215,7 @@ public class SyncService extends JobIntentService
             Thread.sleep(1000); // Wait for the purchase status
             syncNonPremium(dataRef, encrypt);
             if (purchased.get()) {
-                new SyncAttachments(this, dataRef, db, user.getUid()).fire();
+                new SyncAttachments(this, dataRef, db, user.getUid(), encryptKey()).fire();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -239,7 +239,7 @@ public class SyncService extends JobIntentService
 
     private void syncNonPremium(
         DocumentReference dataRef,
-        StringEncryptor encrypt
+        Encryptor encrypt
     ) {
         new SyncJots(dataRef, db, encrypt).fire();
         new SyncTags(dataRef, db, encrypt).fire();

@@ -1,32 +1,32 @@
 package com.larryhsiao.nyx.sync.encryption;
 
-import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
+import org.jasypt.encryption.pbe.PooledPBEByteEncryptor;
 import org.jasypt.iv.RandomIvGenerator;
 
 /**
  * Jasypt implementation of {@link Encryptor}.
  */
-public class JasyptStringEncryptor implements Encryptor<String> {
+public class JasyptEncryptor implements Encryptor<byte[]> {
     private final String key;
-    private PooledPBEStringEncryptor encryptor = null;
+    private PooledPBEByteEncryptor encryptor = null;
 
-    public JasyptStringEncryptor(String key) {
+    public JasyptEncryptor(String key) {
         this.key = key;
     }
 
     @Override
-    public String encrypt(String input) {
+    public byte[] encrypt(byte[] input) {
         return getEncryptor().encrypt(input);
     }
 
     @Override
-    public String decrypt(String input) {
+    public byte[] decrypt(byte[] input) {
         return getEncryptor().decrypt(input);
     }
 
-    private PooledPBEStringEncryptor getEncryptor() {
+    private PooledPBEByteEncryptor getEncryptor() {
         if (encryptor == null) {
-            this.encryptor = new PooledPBEStringEncryptor();
+            this.encryptor = new PooledPBEByteEncryptor();
             this.encryptor.setPoolSize(Runtime.getRuntime().availableProcessors());
             this.encryptor.setAlgorithm("PBEWithMD5AndDES");
             this.encryptor.setPassword(key);
