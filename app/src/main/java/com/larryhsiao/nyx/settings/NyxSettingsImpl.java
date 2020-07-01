@@ -17,7 +17,7 @@ public class NyxSettingsImpl implements NyxSettings {
 
     @Override
     public boolean bioAuthEnabled() {
-        return pref.value().getBoolean("fingerprint_auth", true);
+        return pref.value().getBoolean("fingerprint_auth", false);
     }
 
     @Override
