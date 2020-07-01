@@ -8,10 +8,6 @@ import androidx.annotation.Keep;
 @Keep
 public class SubReq {
     /**
-     * The user id.
-     */
-    public String uid;
-    /**
      * The purchased product id.
      */
     public String sku_id;

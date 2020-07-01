@@ -113,8 +113,10 @@ public class SyncService extends JobIntentService
             // Ignore failure, try again next time sync
             final ChangeEncryptKeyReq req = new ChangeEncryptKeyReq();
             req.keyHash = keyHash;
-            req.uid = user.getUid();
-            Response<Void> response = NyxApi.client().changeEncryptKey(req).execute();
+            Response<Void> response = NyxApi.client().changeEncryptKey(
+                "Bearer " + Tasks.await(user.getIdToken(true)).getToken(),
+                req
+            ).execute();
             if (response.isSuccessful()) {
                 cancelKeyNotMatchNotification();
                 syncToCloud(user, dataRef, new JasyptStringEncryptor(encryptKey));

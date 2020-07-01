@@ -11,7 +11,7 @@ import retrofit2.http.*;
 public interface NyxApi {
     static NyxApi client() {
         return new Retrofit.Builder()
-            .baseUrl(" https://us-central1-elizabeth-7687c.cloudfunctions.net")
+            .baseUrl("https://us-central1-elizabeth-7687c.cloudfunctions.net/app/")
             .addConverterFactory(GsonConverterFactory.create())
             .build().create(NyxApi.class);
     }
@@ -19,19 +19,28 @@ public interface NyxApi {
     /**
      * @param subReq Subscription data for confirm the subscription.
      */
-    @POST("/subscription")
-    Call<Void> subscription(@Body SubReq subReq);
+    @POST("subscription")
+    Call<Void> subscription(
+        @Header("Authorization") String authorization,
+        @Body SubReq subReq
+    );
 
     /**
      * @param uid The user UID.
      * @return Current encrypt key MD5 hash of the user.
      */
-    @GET("/encryptKey")
-    Call<GetEncryptKeyRes> encryptKey(@Query("uid") String uid);
+    @GET("encryptKey")
+    Call<GetEncryptKeyRes> encryptKey(
+        @Header("Authorization") String authorization,
+        @Query("uid") String uid
+    );
 
     /**
      * Change current user's encrypt key on Firestore.
      */
-    @PUT("/encryptKey")
-    Call<Void> changeEncryptKey(@Body ChangeEncryptKeyReq req);
+    @PUT("encryptKey")
+    Call<Void> changeEncryptKey(
+        @Header("Authorization") String authorization,
+        @Body ChangeEncryptKeyReq req
+    );
 }

@@ -7,10 +7,6 @@ import androidx.annotation.Keep;
  */
 @Keep
 public class ChangeEncryptKeyReq {
-    /**
-     * The uid of the user.
-     */
-    public String uid;
 
     /**
      * The new hash of encryption key.
