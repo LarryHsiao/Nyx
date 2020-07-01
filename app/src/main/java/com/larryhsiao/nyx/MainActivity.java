@@ -94,7 +94,7 @@ public class MainActivity extends JotActivity {
                 } else if (item.getItemId() == R.id.menuItem_cloudSync) {
                     currentPage = R.id.menuItem_cloudSync;
                     rootPage(new CloudFragment());
-                } else {
+                }  else {
                     return true;
                 }
                 navigationView.getMenu()
@@ -142,7 +142,8 @@ public class MainActivity extends JotActivity {
             } else {
                 Toast.makeText(
                     this,
-                    "error " + response, LENGTH_SHORT
+                    "error " + response,
+                    LENGTH_SHORT
                 ).show();
             }
         }

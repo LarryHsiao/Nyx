@@ -15,7 +15,6 @@ import org.flywaydb.core.api.android.ContextHolder;
 import java.io.File;
 import java.sql.Connection;
 
-
 /**
  * Application of Jot.
  */
@@ -51,13 +50,7 @@ public class JotApplication extends Application {
         );
         remoteConfig.fetchAndActivate();
 
-        /**
-         * Initial encryption key
-         */
-        new NyxSettingsImpl(
-            new SingleRefSource<>(
-                new DefaultPreference(this)
-            )
-        ).encryptionKey();
+        /* Initial encryption key. */
+        new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this))).encryptionKey();
     }
 }

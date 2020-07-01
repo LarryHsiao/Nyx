@@ -31,7 +31,8 @@ public class SyncAttachments implements Action {
         DocumentReference dataRef,
         Source<Connection> db,
         String uid,
-        String key) {
+        String key
+    ) {
         this.context = context;
         this.dataRef = dataRef;
         this.db = db;

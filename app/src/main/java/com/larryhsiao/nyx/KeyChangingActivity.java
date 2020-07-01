@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.account.api.ChangeEncryptKeyReq;
 import com.larryhsiao.nyx.account.api.NyxApi;
 import com.larryhsiao.nyx.base.JotActivity;
@@ -52,17 +53,28 @@ public class KeyChangingActivity extends JotActivity implements InputDialog.Call
         });
     }
 
-    private void deleteRemote() {
+    private void deleteRemote(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null){
+            user.getIdToken(true).addOnSuccessListener(getTokenResult ->
+                deleteRemote(getTokenResult.getToken())
+            );
+        }
+    }
+
+    private void deleteRemote(String token) {
         final SharedPreferences pref = getDefaultSharedPreferences(this);
         final String encryptKey = pref.getString("encrypt_key", "");
         final ChangeEncryptKeyReq req = new ChangeEncryptKeyReq();
         req.keyHash = new MD5(new ByteArrayInputStream(encryptKey.getBytes())).value();
-        req.uid = FirebaseAuth.getInstance().getUid();
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.fui_progress_dialog_loading));
         dialog.setCancelable(false);
         dialog.show();
-        NyxApi.client().changeEncryptKey(req).enqueue(new Callback<Void>() {
+        NyxApi.client().changeEncryptKey(
+            "Bearer " + token,
+            req
+        ).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
                 if (response.isSuccessful()) {

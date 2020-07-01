@@ -38,10 +38,7 @@ public class NyxSettingsImpl implements NyxSettings {
     @Override
     public Quality imageQuality() {
         return Quality.valueOf(
-            pref.value().getString(
-                "image_quality",
-                "GOOD"
-            )
+            pref.value().getString("image_quality", "GOOD")
         );
     }
 }
