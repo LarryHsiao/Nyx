@@ -1,8 +1,6 @@
 package com.larryhsiao.nyx.sync;
 
 import android.content.Context;
-import android.net.Uri;
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -45,14 +43,25 @@ public class RemoteFileSync implements Action {
     private final Source<Connection> db;
     private final String uid;
     private final String keyStr;
+    private final Progress progress;
     private SecretKeySpec key;
 
+    public interface Progress {
+        void onProgress(int total, int progress);
+    }
+
     public RemoteFileSync(
-        Context context, Source<Connection> db, String uid, String keyStr) {
+        Context context,
+        Source<Connection> db,
+        String uid,
+        String keyStr,
+        Progress progress
+    ) {
         this.context = context;
         this.db = db;
         this.uid = uid;
         this.keyStr = keyStr;
+        this.progress = progress;
     }
 
     @Override
@@ -66,8 +75,20 @@ public class RemoteFileSync implements Action {
                 Function.identity(),
                 (attachment, attachment2) -> attachment
             ));
-            for (Attachment attachment : attachmentMap.values()) {
-                syncAttachment(FirebaseStorage.getInstance().getReference(uid), attachment);
+            StorageReference remote = FirebaseStorage.getInstance().getReference(uid);
+            Map<String, StorageReference> remoteItems = Tasks.await(remote.listAll())
+                .getItems()
+                .stream()
+                .collect(Collectors.toMap(StorageReference::getName, it -> it));
+            Map<String, Attachment> dbItems = attachmentMap.values().stream()
+                .filter(it -> it.uri().startsWith(URI_FILE_PROVIDER))
+                .collect(Collectors.toMap(
+                    it -> it.uri().replace(URI_FILE_PROVIDER, ""),
+                    it -> it));
+            int i = 1;
+            for (Map.Entry<String, Attachment> entry : dbItems.entrySet()) {
+                syncFile(remote, entry, remoteItems);
+                progress.onProgress(dbItems.size(), i++);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -75,47 +96,41 @@ public class RemoteFileSync implements Action {
     }
 
     private void initKey() throws NoSuchAlgorithmException {
-        key = new SecretKeySpec(
-            Arrays.copyOf(
-                MessageDigest.getInstance("SHA-1").digest(keyStr.getBytes(UTF_8)),
-                16
-            ), "AES"
-        );
+        key = new SecretKeySpec(Arrays.copyOf(
+            MessageDigest.getInstance("SHA-1").digest(keyStr.getBytes(UTF_8)),
+            16
+        ), "AES");
     }
 
-    private void syncAttachment(StorageReference remoteRoot, Attachment attachment) {
-        if (attachment.uri().startsWith(URI_FILE_PROVIDER)) {
-            syncFile(remoteRoot, attachment);
-        }
-    }
-
-    private void syncFile(StorageReference remoteRoot, Attachment attachment) {
+    private void syncFile(
+        StorageReference remoteRoot,
+        Map.Entry<String, Attachment> entry,
+        Map<String, StorageReference> remoteItems
+    ) {
         final File localFile = new File(new File(
             context.getFilesDir(),
             "attachments"
-        ), attachment.uri().replace(URI_FILE_PROVIDER, ""));
-        final StorageReference ref = remoteRoot.child(localFile.getName());
-        Task<Uri> task = ref.getDownloadUrl();
+        ), entry.getKey());
         try {
-            Tasks.await(task);
-            if (task.isSuccessful()) {
-                if (attachment.deleted()) {
-                    Tasks.await(ref.delete());
+            StorageReference remoteRef = remoteItems.get(localFile.getName());
+            if (remoteRef == null) {
+                if (localFile.exists() && !entry.getValue().deleted()) {
+                    upload(remoteRoot, localFile);
+                }
+                // @todo #0 Handle missing file.
+            } else {
+                if (entry.getValue().deleted()) {
+                    Tasks.await(remoteRef.delete());
                 } else {
                     if (!localFile.exists()) {
                         localFile.getParentFile().mkdirs();
                         download(remoteRoot, localFile);
                     }
                 }
-            } else {
-                if (localFile.exists() && !attachment.deleted()) {
-                    upload(remoteRoot, localFile);
-                }
-                // @todo #0 Handle missing file.
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (localFile.exists() && !attachment.deleted()) {
+            if (localFile.exists() && !entry.getValue().deleted()) {
                 upload(remoteRoot, localFile);
             }
         }

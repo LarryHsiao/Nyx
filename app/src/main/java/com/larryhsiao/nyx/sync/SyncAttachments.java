@@ -76,8 +76,6 @@ public class SyncAttachments implements Action {
         for (Attachment attachment : dbItems.values()) {
             updateRemoteItem(remoteDb, attachment);
         }
-        new LocalFileSync(context, db, integer -> null).fire(); // for deleted items
-        new RemoteFileSync(context, db, uid, key).fire();
     }
 
     private void updateLocalItem(QueryDocumentSnapshot remoteItem) {

@@ -3,8 +3,6 @@ package com.larryhsiao.nyx.sync;
 import android.app.NotificationChannel;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.JobIntentService;
@@ -60,8 +58,7 @@ import static com.larryhsiao.nyx.NyxActions.SYNC_CHECKPOINT;
  * @todo #1 Inform user to resolve conflict if the local data will be override.
  */
 public class SyncService extends JobIntentService
-    implements ServiceIds,
-    PurchasesUpdatedListener {
+    implements ServiceIds, PurchasesUpdatedListener {
     private static final int REQUEST_CODE_ENCRYPTION_KEY_NOT_MATCHED = 1000;
     private Source<Connection> db;
     private NyxSettings settings;
@@ -73,24 +70,22 @@ public class SyncService extends JobIntentService
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         try {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(this::notifySyncing, 30000);
+            from(this).cancel(NOTIFICATION_ID_SYNCING);
             settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
             db = ((JotApplication) getApplication()).db;
             new LocalFileSync(this, db, integer -> null).fire();
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user == null) {
                 cancelKeyNotMatchNotification();
-                handler.removeCallbacksAndMessages(null);
                 from(this).cancel(NOTIFICATION_ID_SYNCING);
                 return;
             }
             syncAuthCheck(user);
-            handler.removeCallbacksAndMessages(null);
             from(this).cancel(NOTIFICATION_ID_SYNCING);
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
         } catch (Exception e) {
             e.printStackTrace();
+            from(this).cancel(NOTIFICATION_ID_SYNCING);
         }
     }
 
@@ -128,7 +123,7 @@ public class SyncService extends JobIntentService
         from(this).cancel(NOTIFICATION_ID_INVALID_ENCRYPT_KEY);
     }
 
-    private void notifySyncing() {
+    private void notifySyncing(int total, int progress) {
         NotificationManagerCompat mgr = from(this);
         if (SDK_INT >= O) {
             NotificationChannel channel = new NotificationChannel(
@@ -146,8 +141,10 @@ public class SyncService extends JobIntentService
                 .setSmallIcon(R.drawable.ic_jotted)
                 .setPriority(PRIORITY_LOW)
                 .setAutoCancel(false)
+                .setOngoing(true)
+                .setProgress(total, progress, false)
                 .setContentTitle(getString(R.string.Jotted_is_syncing))
-                .setContentText(getString(R.string.The_app_is_syncing_Jots_to_cloud))
+                .setContentText(getString(R.string.Syncing______, progress+"", total))
                 .build()
         );
     }
@@ -226,6 +223,14 @@ public class SyncService extends JobIntentService
                     db,
                     user.getUid(),
                     settings.encryptionKey()
+                ).fire();
+                new LocalFileSync(this, db, integer -> null).fire(); // for deleted items
+                new RemoteFileSync(
+                    this,
+                    db,
+                    user.getUid(),
+                    settings.encryptionKey(),
+                    this::notifySyncing
                 ).fire();
             }
         } catch (InterruptedException e) {

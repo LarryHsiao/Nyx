@@ -20,10 +20,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.account.api.NyxApi;
 import com.larryhsiao.nyx.account.api.SubReq;
@@ -71,13 +69,6 @@ public class SyncsFragment extends JotFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(true).addOnSuccessListener(
-            new OnSuccessListener<GetTokenResult>() {
-                @Override
-                public void onSuccess(GetTokenResult getTokenResult) {
-                    System.out.println(getTokenResult.getToken()+"  AAAA++++");
-                }
-            });
     }
 
     @Nullable
