@@ -20,6 +20,7 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.larryhsiao.nyx.account.CloudFragment;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.jot.JotListFragment;
@@ -78,9 +79,15 @@ public class MainActivity extends JotActivity {
         navigationView.getMenu()
             .findItem(R.id.menuItem_version)
             .setTitle(getString(R.string.v__, VERSION_NAME));
+        FirebaseRemoteConfig remoteConfig = ((JotApplication) getApplicationContext()).remoteConfig;
+        remoteConfig.fetchAndActivate().addOnSuccessListener(aBoolean -> {
+            navigationView.getMenu()
+                .findItem(R.id.menuItem_cloudSync)
+                .setVisible(new NyxRemoteConfigImpl().premiumEnabled());
+        });
         navigationView.getMenu()
             .findItem(R.id.menuItem_cloudSync)
-            .setVisible(remoteConfig.premiumEnabled());
+            .setVisible(new NyxRemoteConfigImpl().premiumEnabled());
         navigationView.setNavigationItemSelectedListener(item -> {
                 if (item.getItemId() == currentPage) {
                     return false;
@@ -94,7 +101,7 @@ public class MainActivity extends JotActivity {
                 } else if (item.getItemId() == R.id.menuItem_cloudSync) {
                     currentPage = R.id.menuItem_cloudSync;
                     rootPage(new CloudFragment());
-                }  else {
+                } else {
                     return true;
                 }
                 navigationView.getMenu()

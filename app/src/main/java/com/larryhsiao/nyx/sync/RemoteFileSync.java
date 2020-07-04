@@ -24,10 +24,10 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toMap;
 import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 
@@ -70,7 +70,7 @@ public class RemoteFileSync implements Action {
             initKey();
             Map<String, Attachment> attachmentMap = new QueriedAttachments(
                 new AllAttachments(db, true)
-            ).value().stream().collect(Collectors.toMap(
+            ).value().stream().collect(toMap(
                 Attachment::uri,
                 Function.identity(),
                 (attachment, attachment2) -> attachment
@@ -79,10 +79,10 @@ public class RemoteFileSync implements Action {
             Map<String, StorageReference> remoteItems = Tasks.await(remote.listAll())
                 .getItems()
                 .stream()
-                .collect(Collectors.toMap(StorageReference::getName, it -> it));
+                .collect(toMap(StorageReference::getName, it -> it));
             Map<String, Attachment> dbItems = attachmentMap.values().stream()
                 .filter(it -> it.uri().startsWith(URI_FILE_PROVIDER))
-                .collect(Collectors.toMap(
+                .collect(toMap(
                     it -> it.uri().replace(URI_FILE_PROVIDER, ""),
                     it -> it));
             int i = 1;

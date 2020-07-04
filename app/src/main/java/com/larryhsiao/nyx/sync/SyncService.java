@@ -73,7 +73,7 @@ public class SyncService extends JobIntentService
             from(this).cancel(NOTIFICATION_ID_SYNCING);
             settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
             db = ((JotApplication) getApplication()).db;
-            new LocalFileSync(this, db, integer -> null).fire();
+            new LocalFileSync(this, db).fire();
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user == null) {
                 cancelKeyNotMatchNotification();
@@ -92,8 +92,8 @@ public class SyncService extends JobIntentService
     private void syncAuthCheck(FirebaseUser user) throws Exception {
         final String encryptKey = settings.encryptionKey();
         final String keyHash = new MD5(new ByteArrayInputStream(encryptKey.getBytes())).value();
-        final CollectionReference userRef = FirebaseFirestore.getInstance()
-            .collection(user.getUid());
+        final CollectionReference userRef =
+            FirebaseFirestore.getInstance().collection(user.getUid());
         Task<DocumentSnapshot> task = userRef.document("account").get();
         DocumentSnapshot doc = Tasks.await(task);
         final DocumentReference dataRef = userRef.document(keyHash);
@@ -144,7 +144,7 @@ public class SyncService extends JobIntentService
                 .setOngoing(true)
                 .setProgress(total, progress, false)
                 .setContentTitle(getString(R.string.Jotted_is_syncing))
-                .setContentText(getString(R.string.Syncing______, progress+"", total))
+                .setContentText(getString(R.string.Syncing______, progress+"", total+""))
                 .build()
         );
     }
@@ -224,7 +224,7 @@ public class SyncService extends JobIntentService
                     user.getUid(),
                     settings.encryptionKey()
                 ).fire();
-                new LocalFileSync(this, db, integer -> null).fire(); // for deleted items
+                new LocalFileSync(this, db).fire(); // for deleted items
                 new RemoteFileSync(
                     this,
                     db,
