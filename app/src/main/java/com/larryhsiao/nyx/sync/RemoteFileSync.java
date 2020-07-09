@@ -22,6 +22,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -50,6 +51,13 @@ public class RemoteFileSync implements Action {
         void onProgress(int total, int progress);
     }
 
+    private enum SYNC_ACTION {
+        NONE,
+        UPLOAD,
+        DOWNLOAD,
+        DELETE
+    }
+
     public RemoteFileSync(
         Context context,
         Source<Connection> db,
@@ -75,8 +83,8 @@ public class RemoteFileSync implements Action {
                 Function.identity(),
                 (attachment, attachment2) -> attachment
             ));
-            StorageReference remote = FirebaseStorage.getInstance().getReference(uid);
-            Map<String, StorageReference> remoteItems = Tasks.await(remote.listAll())
+            StorageReference remoteRoot = FirebaseStorage.getInstance().getReference(uid);
+            Map<String, StorageReference> remoteItems = Tasks.await(remoteRoot.listAll())
                 .getItems()
                 .stream()
                 .collect(toMap(StorageReference::getName, it -> it));
@@ -85,10 +93,40 @@ public class RemoteFileSync implements Action {
                 .collect(toMap(
                     it -> it.uri().replace(URI_FILE_PROVIDER, ""),
                     it -> it));
-            int i = 1;
+            Map<File, StorageReference> upload = new HashMap<>();
+            Map<File, StorageReference> download = new HashMap<>();
+            Map<File, StorageReference> delete = new HashMap<>();
             for (Map.Entry<String, Attachment> entry : dbItems.entrySet()) {
-                syncFile(remote, entry, remoteItems);
-                progress.onProgress(dbItems.size(), i++);
+                final File localFile = new File(new File(
+                    context.getFilesDir(),
+                    "attachments"
+                ), entry.getKey());
+                final StorageReference remoteFileRef = remoteItems.get(localFile.getName());
+                switch (syncFile(localFile, entry, remoteFileRef)) {
+                    case UPLOAD:
+                        upload.put(localFile, remoteRoot.child(entry.getKey()));
+                        break;
+                    case DOWNLOAD:
+                        download.put(localFile, remoteFileRef);
+                        break;
+                    case DELETE:
+                        delete.put(localFile, remoteFileRef);
+                        break;
+                }
+            }
+            int count = 0;
+            final int total = upload.size() + download.size() + delete.size();
+            for (File file : upload.keySet()) {
+                upload(upload.get(file), file);
+                progress.onProgress(total, ++count);
+            }
+            for (File file : download.keySet()) {
+                download(download.get(file), file);
+                progress.onProgress(total, ++count);
+            }
+            for (File file : delete.keySet()) {
+                Tasks.await(delete.get(file).delete());
+                progress.onProgress(total, ++count);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -102,46 +140,43 @@ public class RemoteFileSync implements Action {
         ), "AES");
     }
 
-    private void syncFile(
-        StorageReference remoteRoot,
+    private SYNC_ACTION syncFile(
+        File localFile,
         Map.Entry<String, Attachment> entry,
-        Map<String, StorageReference> remoteItems
+        StorageReference remoteFileRef
     ) {
-        final File localFile = new File(new File(
-            context.getFilesDir(),
-            "attachments"
-        ), entry.getKey());
         try {
-            StorageReference remoteRef = remoteItems.get(localFile.getName());
-            if (remoteRef == null) {
+            if (remoteFileRef == null) {
                 if (localFile.exists() && !entry.getValue().deleted()) {
-                    upload(remoteRoot, localFile);
+                    return SYNC_ACTION.UPLOAD;
                 }
                 // @todo #0 Handle missing file.
             } else {
                 if (entry.getValue().deleted()) {
-                    Tasks.await(remoteRef.delete());
+                    return SYNC_ACTION.DELETE;
                 } else {
                     if (!localFile.exists()) {
                         localFile.getParentFile().mkdirs();
-                        download(remoteRoot, localFile);
+                        return SYNC_ACTION.DOWNLOAD;
                     }
                 }
             }
+            return SYNC_ACTION.NONE;
         } catch (Exception e) {
             e.printStackTrace();
             if (localFile.exists() && !entry.getValue().deleted()) {
-                upload(remoteRoot, localFile);
+                return SYNC_ACTION.UPLOAD;
             }
+            return SYNC_ACTION.NONE;
         }
     }
 
-    private void upload(StorageReference remoteRoot, File localFile) {
+    private void upload(StorageReference remoteFileRef, File localFile) {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(ENCRYPT_MODE, key);
             // @todo #0 Handle upload failed.
-            Tasks.await(remoteRoot.child(localFile.getName()).putStream(
+            Tasks.await(remoteFileRef.putStream(
                 new CipherInputStream(new FileInputStream(localFile), cipher))
             );
         } catch (Exception e) {
@@ -153,8 +188,7 @@ public class RemoteFileSync implements Action {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(DECRYPT_MODE, key);
-            StreamDownloadTask task = remoteRoot.child(dist.getName()).getStream(
-                (taskSnapshot, inputStream) -> {
+            StreamDownloadTask task = remoteRoot.getStream((taskSnapshot, inputStream) -> {
                     Files.copy(
                         new CipherInputStream(inputStream, cipher),
                         dist.toPath(),
