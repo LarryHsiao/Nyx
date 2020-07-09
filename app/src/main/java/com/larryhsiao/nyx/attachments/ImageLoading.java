@@ -38,7 +38,8 @@ public class ImageLoading implements Action {
             !new IsLocalExist(image.getContext(), uri).value() &&
             user != null
         ) {
-            final CircularProgressDrawable progress = new CircularProgressDrawable(image.getContext());
+            final CircularProgressDrawable progress =
+                new CircularProgressDrawable(image.getContext());
             progress.setColorSchemeColors(progressColor);
             progress.setStyle(LARGE);
             progress.start();
@@ -47,6 +48,7 @@ public class ImageLoading implements Action {
                 .getReference()
                 .child(user.getUid() + "/" + uri.replace(URI_FILE_PROVIDER, ""))
                 .getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                // @todo #1 Fallback loading from Firebase directly.
                 Glide.with(image.getContext())
                     .load(downloadUrl)
                     .placeholder(progress)

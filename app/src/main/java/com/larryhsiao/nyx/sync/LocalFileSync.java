@@ -22,11 +22,10 @@ import java.nio.file.Files;
 import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
 import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Action to sync the attachment files to internal to prevent permission losing.
@@ -38,18 +37,14 @@ public class LocalFileSync implements Action {
     private final MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
     private final Context context;
     private final Source<Connection> db;
-    private final Function<Integer, Void> progress;
     private final NyxSettings settings;
 
-    public LocalFileSync(
-        Context context,
-        Source<Connection> db,
-        Function<Integer, Void> progress
-    ) {
+    public LocalFileSync(Context context, Source<Connection> db) {
         this.context = context;
         this.db = db;
-        this.progress = progress;
-        this.settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(context)));
+        this.settings = new NyxSettingsImpl(
+            new SingleRefSource<>(new DefaultPreference(context))
+        );
     }
 
     @Override
@@ -61,7 +56,7 @@ public class LocalFileSync implements Action {
         ).value()
             .stream()
             .filter(it -> !it.uri().isEmpty())
-            .collect(Collectors.toList());
+            .collect(toList());
         for (Attachment attachment : dbAttachments) {
             if (attachment.uri().startsWith("content:")) {
                 check(internalRoot, attachment);

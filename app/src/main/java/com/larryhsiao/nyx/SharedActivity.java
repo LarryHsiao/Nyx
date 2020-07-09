@@ -159,9 +159,7 @@ public class SharedActivity extends JotActivity {
 
     private double[] exifGeometry(ExifInterface exif) {
         try {
-            return new double[]{
-                exif.getLatLong()[1], exif.getLatLong()[0]
-            };
+            return new double[]{exif.getLatLong()[1], exif.getLatLong()[0]};
         } catch (Exception e) {
             e.printStackTrace();
             return new double[]{MIN_VALUE, MIN_VALUE};
@@ -176,7 +174,6 @@ public class SharedActivity extends JotActivity {
                 temp,
                 it -> null
             ).fire();
-
             return new FileText(temp).value();
         } catch (Exception e) {
             e.printStackTrace();

@@ -148,4 +148,5 @@
     <string name="Good">Good</string>
     <string name="Low_Noticeable_quality_loss_">Low(Noticeable Quality Loss)</string>
     <string name="Image_quality">Image quality</string>
+    <string name="Syncing______">Syncing %s/%s</string>
 </resources>

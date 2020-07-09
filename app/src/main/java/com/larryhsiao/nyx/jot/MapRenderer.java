@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory.Options;
 import android.net.Uri;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.core.attachments.Attachment;
@@ -42,6 +43,11 @@ public class MapRenderer extends DefaultClusterRenderer<JotMapItem> {
     }
 
     @Override
+    protected boolean shouldRenderAsCluster(Cluster<JotMapItem> cluster) {
+        return cluster.getSize() > 1;
+    }
+
+    @Override
     protected void onBeforeClusterItemRendered(
         JotMapItem item,
         MarkerOptions options
@@ -58,18 +64,17 @@ public class MapRenderer extends DefaultClusterRenderer<JotMapItem> {
             .collect(toList());
         if (content.size() > 0) {
             try {
+                // @todo #1 Picture rotation not applied by exif.
                 Options decodeOptions = new Options();
                 decodeOptions.inSampleSize = 10;
                 options.icon(fromBitmap(new ResizedImage(
-                    new ConstSource<>(
-                        decodeStream(
-                            context.getContentResolver().openInputStream(
-                                Uri.parse(content.get(0).uri())
-                            ),
-                            null,
-                            decodeOptions
-                        )
-                    ), width
+                    new ConstSource<>(decodeStream(
+                        context.getContentResolver().openInputStream(
+                            Uri.parse(content.get(0).uri())
+                        ),
+                        null,
+                        decodeOptions
+                    )), width
                 ).value()));
             } catch (Exception e) {
                 e.printStackTrace();

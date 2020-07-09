@@ -20,10 +20,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.account.api.NyxApi;
 import com.larryhsiao.nyx.account.api.SubReq;
@@ -71,13 +69,6 @@ public class SyncsFragment extends JotFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(true).addOnSuccessListener(
-            new OnSuccessListener<GetTokenResult>() {
-                @Override
-                public void onSuccess(GetTokenResult getTokenResult) {
-                    System.out.println(getTokenResult.getToken()+"  AAAA++++");
-                }
-            });
     }
 
     @Nullable
@@ -86,13 +77,7 @@ public class SyncsFragment extends JotFragment {
         @NonNull LayoutInflater inflater,
         @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState
-    ) {
-        return inflater.inflate(
-            R.layout.page_backup,
-            container,
-            false
-        );
-    }
+    ) { return inflater.inflate(R.layout.page_backup, container, false); }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -187,11 +172,14 @@ public class SyncsFragment extends JotFragment {
         AuthUI.getInstance().signOut(view.getContext());
         FirebaseAuth.getInstance().signOut();
         updateView(view);
-
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
+    public void onActivityResult(
+        int requestCode,
+        int resultCode,
+        @org.jetbrains.annotations.Nullable Intent data
+    ) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_LOG_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
@@ -203,22 +191,22 @@ public class SyncsFragment extends JotFragment {
         }
     }
 
-    private void requestSub(boolean changeUser){
+    private void requestSub(boolean changeUser) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user!=null){
+        if (user != null) {
             user.getIdToken(true).addOnSuccessListener(getTokenResult -> {
                 requestSub(changeUser, getTokenResult.getToken());
             });
         }
     }
 
-    private void requestSub(boolean changeUser, String token) {
+    private void requestSub(boolean changeUser, String userTokenId) {
         SubReq req = new SubReq();
         req.sku_id = "premium";
         req.purchase_token = getArguments().getString(ARG_PURCHASE_TOKEN, "");
         req.changeUser = changeUser;
         NyxApi.client().subscription(
-            "Bearer " +token,
+            "Bearer " + userTokenId,
             req
         ).enqueue(new Callback<Void>() {
             @Override
@@ -230,7 +218,8 @@ public class SyncsFragment extends JotFragment {
                     new AlertDialog.Builder(getContext())
                         .setCancelable(false)
                         .setTitle(R.string.Change_account)
-                        .setMessage(R.string.User_not_as_same_as_previous_logged_in__change_to_this_account_)
+                        .setMessage(
+                            R.string.User_not_as_same_as_previous_logged_in__change_to_this_account_)
                         .setPositiveButton(R.string.Yes, (dialog, which) -> requestSub(true))
                         .setNegativeButton(R.string.cancel, (dialog, which) -> logout())
                         .show();
@@ -251,13 +240,13 @@ public class SyncsFragment extends JotFragment {
     }
 
     private void loadUserIcon(View view, FirebaseUser user) {
-        final CircularProgressDrawable placeholder = new CircularProgressDrawable(view.getContext());
-        placeholder.setStyle(LARGE);
-        placeholder.start();
+        final CircularProgressDrawable placeHolder = new CircularProgressDrawable(view.getContext());
+        placeHolder.setStyle(LARGE);
+        placeHolder.start();
         final ImageView icon = view.findViewById(R.id.backup_userIcon);
         Glide.with(this).load(user.getPhotoUrl())
             .error(getResources().getDrawable(R.drawable.ic_user, null))
-            .placeholder(placeholder)
+            .placeholder(placeHolder)
             .apply(RequestOptions.circleCropTransform())
             .into(icon);
     }
