@@ -6,24 +6,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.android.billingclient.api.AcknowledgePurchaseParams;
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.*;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.sync.SyncsFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.android.billingclient.api.BillingClient.BillingResponseCode.OK;
 import static com.android.billingclient.api.BillingClient.BillingResponseCode.USER_CANCELED;
-import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
 
 /**
@@ -96,25 +88,10 @@ public class CloudFragment extends JotFragment
     }
 
     private void checkIfSubscribed() {
-        List<String> skuList = new ArrayList<>();
-        skuList.add("premium");
-        SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-        params.setSkusList(skuList).setType(SUBS);
-        // @todo #195 Find out if the cached query state is reliable.
-        List<Purchase> purchases = client.queryPurchases(SUBS).getPurchasesList();
-        if (purchases != null) {
-            checkPurchases(purchases);
-        }
-        // @todo #194 Record the subscribe at firebase for checking availability.
-    }
-
-    private void checkPurchases(List<Purchase> purchases) {
-        for (Purchase purchase : purchases) {
-            if (purchase.getPurchaseState() == PURCHASED
-                && "premium".equals(purchase.getSku())) {
-                toSyncPage(purchase.getPurchaseToken());
-                return;
-            }
+        String token = new PlaySubToken(client).value();
+        if (token != null && !token.isEmpty()) {
+            toSyncPage(token);
+            return;
         }
         toPurchase();
     }

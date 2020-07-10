@@ -49,7 +49,9 @@ public class TagListFragment extends JotFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+        @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.list, container, false);
     }
 
@@ -164,10 +166,12 @@ public class TagListFragment extends JotFragment {
         inflater.inflate(R.menu.jot_list, menu);
         menu.findItem(R.id.menuItem_viewMode).setVisible(false);
 
-        SearchManager searchManager = ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));
+        SearchManager searchManager =
+            ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));
         MenuItem searchMenuItem = menu.findItem(R.id.menuItem_search);
         SearchView searchView = (SearchView) searchMenuItem.getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView
+            .setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setOnCloseListener(() -> {
             searchMenuItem.collapseActionView();
             return false;
@@ -210,9 +214,9 @@ public class TagListFragment extends JotFragment {
         });
     }
 
-
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
+    public void onActivityResult(
+        int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (REQUEST_CODE_NEW_TAG == requestCode && RESULT_OK == resultCode) {
             final String newTagName = data.getStringExtra("INPUT_FIELD");

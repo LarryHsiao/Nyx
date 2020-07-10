@@ -171,35 +171,27 @@ public class RemoteFileSync implements Action {
         }
     }
 
-    private void upload(StorageReference remoteFileRef, File localFile) {
-        try {
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(ENCRYPT_MODE, key);
-            // @todo #0 Handle upload failed.
-            Tasks.await(remoteFileRef.putStream(
-                new CipherInputStream(new FileInputStream(localFile), cipher))
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void upload(StorageReference remoteFileRef, File localFile) throws Exception{
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(ENCRYPT_MODE, key);
+        // @todo #0 Handle upload failed.
+        Tasks.await(remoteFileRef.putStream(
+            new CipherInputStream(new FileInputStream(localFile), cipher))
+        );
     }
 
-    private void download(StorageReference remoteRoot, File dist) {
-        try {
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(DECRYPT_MODE, key);
-            StreamDownloadTask task = remoteRoot.getStream((taskSnapshot, inputStream) -> {
-                    Files.copy(
-                        new CipherInputStream(inputStream, cipher),
-                        dist.toPath(),
-                        StandardCopyOption.REPLACE_EXISTING
-                    );
-                    inputStream.close();
-                }
-            );
-            Tasks.await(task);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void download(StorageReference remoteRoot, File dist) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(DECRYPT_MODE, key);
+        StreamDownloadTask task = remoteRoot.getStream((taskSnapshot, inputStream) -> {
+                Files.copy(
+                    new CipherInputStream(inputStream, cipher),
+                    dist.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING
+                );
+                inputStream.close();
+            }
+        );
+        Tasks.await(task);
     }
 }
