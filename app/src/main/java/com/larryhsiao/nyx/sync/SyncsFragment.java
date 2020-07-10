@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.sync;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -23,23 +22,19 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.account.api.NyxApi;
-import com.larryhsiao.nyx.account.api.SubReq;
+import com.larryhsiao.nyx.account.LogoutAction;
+import com.larryhsiao.nyx.account.SubCheck;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.tags.AllTags;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
-import com.silverhetch.aura.view.alert.Alert;
 import com.silverhetch.aura.view.bitmap.CircledDrawable;
 import com.silverhetch.aura.view.span.ClickableStr;
 import com.silverhetch.aura.view.span.ColoredStr;
 import com.silverhetch.clotho.file.FileSize;
 import com.silverhetch.clotho.file.SizeText;
 import com.silverhetch.clotho.source.ConstSource;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import java.io.File;
 import java.util.Collections;
@@ -54,7 +49,7 @@ import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
 /**
  * Fragment for login Firebase.
  */
-public class SyncsFragment extends JotFragment {
+public class SyncsFragment extends JotFragment implements FirebaseAuth.AuthStateListener {
     private static final int REQUEST_CODE_LOG_IN = 1000;
     private static final String ARG_PURCHASE_TOKEN = "ARG_PURCHASE_TOKEN";
 
@@ -87,6 +82,22 @@ public class SyncsFragment extends JotFragment {
         view.findViewById(R.id.backup_backupBtn).setVisibility(GONE);
         view.findViewById(R.id.backup_restoreBtn).setVisibility(GONE);
         updateView(view);
+        FirebaseAuth.getInstance().addAuthStateListener(this);
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        View view = getView();
+        if (view == null) {
+            return;
+        }
+        updateView(view);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        FirebaseAuth.getInstance().removeAuthStateListener(this);
     }
 
     private void updateView(View view) {
@@ -155,7 +166,10 @@ public class SyncsFragment extends JotFragment {
                 new ConstSource<>(getString(R.string.logout)),
                 BLUE
             ),
-            this::logout
+            () -> {
+                new LogoutAction(view.getContext()).fire();
+                updateView(getView());
+            }
         ).value());
         info.append("\n");
         info.append(getString(R.string.name_title, user.getDisplayName()));
@@ -164,14 +178,6 @@ public class SyncsFragment extends JotFragment {
         info.append("\n");
         info.setMovementMethod(LinkMovementMethod.getInstance());
         loadUserIcon(view, user);
-    }
-
-    private void logout() {
-        View view = requireView();
-        view.getContext().stopService(new Intent(view.getContext(), SyncService.class));
-        AuthUI.getInstance().signOut(view.getContext());
-        FirebaseAuth.getInstance().signOut();
-        updateView(view);
     }
 
     @Override
@@ -184,63 +190,22 @@ public class SyncsFragment extends JotFragment {
         if (requestCode == REQUEST_CODE_LOG_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                requestSub(false);
+                updateView(getView());
+                new SubCheck(
+                    requireContext(),
+                    getChildFragmentManager(),
+                    getArguments().getString(ARG_PURCHASE_TOKEN, ""),
+                    () -> updateView(getView())
+                ).fire();
             } else {
                 Toast.makeText(getContext(), "error " + response, LENGTH_SHORT).show();
             }
         }
     }
 
-    private void requestSub(boolean changeUser) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            user.getIdToken(true).addOnSuccessListener(getTokenResult -> {
-                requestSub(changeUser, getTokenResult.getToken());
-            });
-        }
-    }
-
-    private void requestSub(boolean changeUser, String userTokenId) {
-        SubReq req = new SubReq();
-        req.sku_id = "premium";
-        req.purchase_token = getArguments().getString(ARG_PURCHASE_TOKEN, "");
-        req.changeUser = changeUser;
-        NyxApi.client().subscription(
-            "Bearer " + userTokenId,
-            req
-        ).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    updateView(getView());
-                    SyncService.enqueue(getContext());
-                } else if (response.code() == 409) {
-                    new AlertDialog.Builder(getContext())
-                        .setCancelable(false)
-                        .setTitle(R.string.Change_account)
-                        .setMessage(
-                            R.string.User_not_as_same_as_previous_logged_in__change_to_this_account_)
-                        .setPositiveButton(R.string.Yes, (dialog, which) -> requestSub(true))
-                        .setNegativeButton(R.string.cancel, (dialog, which) -> logout())
-                        .show();
-                } else {
-                    logout();
-                    Alert.Companion.newInstance(
-                        100,
-                        getString(R.string.Invalid_purchase_state)
-                    ).show(getChildFragmentManager(), null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                logout();
-            }
-        });
-    }
-
     private void loadUserIcon(View view, FirebaseUser user) {
-        final CircularProgressDrawable placeHolder = new CircularProgressDrawable(view.getContext());
+        final CircularProgressDrawable placeHolder =
+            new CircularProgressDrawable(view.getContext());
         placeHolder.setStyle(LARGE);
         placeHolder.start();
         final ImageView icon = view.findViewById(R.id.backup_userIcon);

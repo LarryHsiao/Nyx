@@ -14,6 +14,9 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingResult;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -22,6 +25,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.larryhsiao.nyx.account.CloudFragment;
+import com.larryhsiao.nyx.account.PlaySubToken;
+import com.larryhsiao.nyx.account.SubCheck;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.jot.JotListFragment;
 import com.larryhsiao.nyx.settings.SettingFragment;
@@ -43,7 +48,7 @@ import static com.larryhsiao.nyx.BuildConfig.VERSION_NAME;
 /**
  * Entry Activity of Nyx.
  */
-public class MainActivity extends JotActivity {
+public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateListener {
     private static final int REQUEST_CODE_LOG_IN = 1000;
     private int currentPage = -1;
     private DrawerLayout drawer;
@@ -120,6 +125,12 @@ public class MainActivity extends JotActivity {
             rootPage(new JotListFragment());
             SyncService.enqueue(this);
         }
+        FirebaseAuth.getInstance().addAuthStateListener(this);
+        updateLoginState();
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         updateLoginState();
     }
 
@@ -134,6 +145,12 @@ public class MainActivity extends JotActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        FirebaseAuth.getInstance().removeAuthStateListener(this);
+    }
+
+    @Override
     protected void onActivityResult(
         int requestCode,
         int resultCode,
@@ -142,10 +159,9 @@ public class MainActivity extends JotActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_LOG_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
-
             if (resultCode == RESULT_OK) {
                 updateLoginState();
-                SyncService.enqueue(this);
+                checkingSubs();
             } else {
                 Toast.makeText(
                     this,
@@ -154,6 +170,32 @@ public class MainActivity extends JotActivity {
                 ).show();
             }
         }
+    }
+
+    private void checkingSubs() {
+        BillingClient client = BillingClient.newBuilder(this)
+            .enablePendingPurchases()
+            .setListener((billingResult, list) -> {})
+            .build();
+        client.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                String subToken = new PlaySubToken(client).value();
+                if (subToken == null || subToken.isEmpty()) {
+                    return; // no subs at play.
+                }
+                new SubCheck(
+                    MainActivity.this,
+                    getSupportFragmentManager(),
+                    subToken,
+                    () -> {}
+                ).fire();
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+            }
+        });
     }
 
     private void updateLoginState() {
