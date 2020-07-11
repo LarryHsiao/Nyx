@@ -22,6 +22,7 @@ import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.KeyChangingActivity;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.ServiceIds;
+import com.larryhsiao.nyx.account.action.UpdateLastSyncedAction;
 import com.larryhsiao.nyx.account.api.ChangeEncryptKeyReq;
 import com.larryhsiao.nyx.account.api.NyxApi;
 import com.larryhsiao.nyx.settings.DefaultPreference;
@@ -81,6 +82,7 @@ public class SyncService extends JobIntentService
                 return;
             }
             syncAuthCheck(user);
+            new UpdateLastSyncedAction(this).fire();
             from(this).cancel(NOTIFICATION_ID_SYNCING);
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
         } catch (Exception e) {

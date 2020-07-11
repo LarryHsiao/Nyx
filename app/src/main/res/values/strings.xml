@@ -149,4 +149,7 @@
     <string name="Low_Noticeable_quality_loss_">Low(Noticeable Quality Loss)</string>
     <string name="Image_quality">Image quality</string>
     <string name="Syncing______">Syncing %s/%s</string>
+    <string name="Sync_now">Sync now</string>
+    <string name="last_synced___">Last synced: %s</string>
+    <string name="none">none</string>
 </resources>

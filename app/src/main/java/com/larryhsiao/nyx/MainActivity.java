@@ -26,7 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.larryhsiao.nyx.account.CloudFragment;
 import com.larryhsiao.nyx.account.PlaySubToken;
-import com.larryhsiao.nyx.account.SubCheck;
+import com.larryhsiao.nyx.account.action.SubCheck;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.jot.JotListFragment;
 import com.larryhsiao.nyx.settings.SettingFragment;
