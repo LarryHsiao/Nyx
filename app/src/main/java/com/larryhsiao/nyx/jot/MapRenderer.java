@@ -1,8 +1,13 @@
 package com.larryhsiao.nyx.jot;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
+import android.graphics.Matrix;
 import android.net.Uri;
+import androidx.annotation.Nullable;
+import androidx.exifinterface.media.ExifInterface;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
@@ -11,15 +16,13 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
-import com.silverhetch.aura.view.bitmap.ResizedImage;
 import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.source.ConstSource;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
 
-import static android.graphics.BitmapFactory.decodeStream;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap;
 import static java.util.stream.Collectors.toList;
 
@@ -48,10 +51,7 @@ public class MapRenderer extends DefaultClusterRenderer<JotMapItem> {
     }
 
     @Override
-    protected void onBeforeClusterItemRendered(
-        JotMapItem item,
-        MarkerOptions options
-    ) {
+    protected void onBeforeClusterItemRendered(JotMapItem item, MarkerOptions options) {
         if (width == 0) {
             width = ((int) new DP(context, 100).px());
         }
@@ -64,22 +64,49 @@ public class MapRenderer extends DefaultClusterRenderer<JotMapItem> {
             .collect(toList());
         if (content.size() > 0) {
             try {
-                // @todo #1 Picture rotation not applied by exif.
-                Options decodeOptions = new Options();
-                decodeOptions.inSampleSize = 10;
-                options.icon(fromBitmap(new ResizedImage(
-                    new ConstSource<>(decodeStream(
-                        context.getContentResolver().openInputStream(
-                            Uri.parse(content.get(0).uri())
-                        ),
-                        null,
-                        decodeOptions
-                    )), width
-                ).value()));
+                Bitmap bitmap = iconBitmap(Uri.parse(content.get(0).uri()));
+                if (bitmap != null) {
+                    options.icon(fromBitmap(bitmap));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         super.onBeforeClusterItemRendered(item, options);
+    }
+
+    @Nullable
+    private Bitmap iconBitmap(Uri uri) throws Exception {
+        Options decodeOptions = new Options();
+        decodeOptions.inSampleSize = loadSampleSize(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(
+            context.getContentResolver().openInputStream(uri),
+            null,
+            decodeOptions
+        );
+        ExifInterface exif = new ExifInterface(context.getContentResolver().openInputStream(uri));
+        final int rotationDegrees = exif.getRotationDegrees();
+        if (rotationDegrees == 0 || bitmap == null) {
+            return bitmap;
+        } else {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotationDegrees);
+            Bitmap rotated = Bitmap.createBitmap(
+                bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true
+            );
+            bitmap.recycle();
+            return rotated;
+        }
+    }
+
+    private int loadSampleSize(Uri uri) throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(
+            context.getContentResolver().openInputStream(uri),
+            null,
+            options
+        );
+        return (int) (options.outWidth / (width * 0.8f));
     }
 }
