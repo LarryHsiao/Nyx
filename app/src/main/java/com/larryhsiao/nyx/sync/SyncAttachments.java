@@ -1,12 +1,15 @@
 package com.larryhsiao.nyx.sync;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.core.attachments.*;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
@@ -106,6 +109,16 @@ public class SyncAttachments implements Action {
 
     private void updateRemoteItem(CollectionReference remoteDb, Attachment attachment) {
         try {
+            if (attachment.uri().startsWith(JotApplication.URI_FILE_PROVIDER)) {
+                ParcelFileDescriptor descriptor = context.getContentResolver().openFileDescriptor(
+                    Uri.parse(attachment.uri()),
+                    "r"
+                );
+                if (descriptor != null && descriptor.getStatSize() > 1024 * 1024 * 20) {
+                    // @todo #1 Config object for limiting attachment size.
+                    return;
+                }
+            }
             Map<String, Object> data = new HashMap<>();
             data.put("delete", attachment.deleted() ? 1 : 0);
             data.put("version", attachment.version());
