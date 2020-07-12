@@ -191,18 +191,18 @@ public class SyncService extends JobIntentService
     ) {
         try {
             AtomicBoolean purchased = new AtomicBoolean(false);
-            BillingClient client = BillingClient.newBuilder(this)
+            BillingClient billing = BillingClient.newBuilder(this)
                 .enablePendingPurchases()
                 .setListener(this)
                 .build();
-            client.startConnection(new BillingClientStateListener() {
+            billing.startConnection(new BillingClientStateListener() {
                 @Override
                 public void onBillingSetupFinished(BillingResult billingResult) {
                     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user == null) {
                         return;
                     }
-                    List<Purchase> purchasesList = client.queryPurchases(SUBS).getPurchasesList();
+                    List<Purchase> purchasesList = billing.queryPurchases(SUBS).getPurchasesList();
                     for (Purchase purchase : purchasesList) {
                         if ("premium".equals(purchase.getSku()) &&
                             purchase.getPurchaseState() == PURCHASED) {
@@ -217,6 +217,7 @@ public class SyncService extends JobIntentService
                 }
             });
             Thread.sleep(1000); // Wait for the purchase status
+            billing.endConnection();
             syncNonPremium(dataRef, encrypt);
             if (purchased.get()) {
                 new SyncAttachments(

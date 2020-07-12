@@ -10,14 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.*;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
 
@@ -39,11 +32,6 @@ public class PurchaseFragment extends JotFragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        client = BillingClient.newBuilder(requireContext())
-            .enablePendingPurchases()
-            .setListener(this)
-            .build();
-        client.startConnection(this);
     }
 
     @Nullable
@@ -57,6 +45,17 @@ public class PurchaseFragment extends JotFragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        client = BillingClient.newBuilder(requireContext())
+            .enablePendingPurchases()
+            .setListener(this)
+            .build();
+        client.startConnection(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        client.endConnection();
     }
 
     private void querySku() {

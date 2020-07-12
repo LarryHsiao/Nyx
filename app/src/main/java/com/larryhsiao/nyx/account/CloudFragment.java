@@ -51,6 +51,12 @@ public class CloudFragment extends JotFragment
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        client.endConnection();
+    }
+
+    @Override
     public void onPurchasesUpdated(BillingResult res, @Nullable List<Purchase> purchases) {
         if (res.getResponseCode() == OK && purchases != null) {
             for (Purchase purchase : purchases) {
