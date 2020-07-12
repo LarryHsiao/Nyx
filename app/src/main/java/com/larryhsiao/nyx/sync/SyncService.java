@@ -22,6 +22,7 @@ import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.KeyChangingActivity;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.ServiceIds;
+import com.larryhsiao.nyx.account.action.UpdateLastSyncedAction;
 import com.larryhsiao.nyx.account.api.ChangeEncryptKeyReq;
 import com.larryhsiao.nyx.account.api.NyxApi;
 import com.larryhsiao.nyx.settings.DefaultPreference;
@@ -81,6 +82,7 @@ public class SyncService extends JobIntentService
                 return;
             }
             syncAuthCheck(user);
+            new UpdateLastSyncedAction(this).fire();
             from(this).cancel(NOTIFICATION_ID_SYNCING);
             LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(SYNC_CHECKPOINT));
         } catch (Exception e) {
@@ -189,18 +191,18 @@ public class SyncService extends JobIntentService
     ) {
         try {
             AtomicBoolean purchased = new AtomicBoolean(false);
-            BillingClient client = BillingClient.newBuilder(this)
+            BillingClient billing = BillingClient.newBuilder(this)
                 .enablePendingPurchases()
                 .setListener(this)
                 .build();
-            client.startConnection(new BillingClientStateListener() {
+            billing.startConnection(new BillingClientStateListener() {
                 @Override
                 public void onBillingSetupFinished(BillingResult billingResult) {
                     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user == null) {
                         return;
                     }
-                    List<Purchase> purchasesList = client.queryPurchases(SUBS).getPurchasesList();
+                    List<Purchase> purchasesList = billing.queryPurchases(SUBS).getPurchasesList();
                     for (Purchase purchase : purchasesList) {
                         if ("premium".equals(purchase.getSku()) &&
                             purchase.getPurchaseState() == PURCHASED) {
@@ -215,6 +217,7 @@ public class SyncService extends JobIntentService
                 }
             });
             Thread.sleep(1000); // Wait for the purchase status
+            billing.endConnection();
             syncNonPremium(dataRef, encrypt);
             if (purchased.get()) {
                 new SyncAttachments(

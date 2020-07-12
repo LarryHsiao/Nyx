@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.account;
+package com.larryhsiao.nyx.account.action;
 
 import android.content.Context;
 import android.content.Intent;

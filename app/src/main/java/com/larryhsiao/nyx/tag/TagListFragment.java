@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.ArrayAdapter;
-import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
@@ -165,6 +165,7 @@ public class TagListFragment extends JotFragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.jot_list, menu);
         menu.findItem(R.id.menuItem_viewMode).setVisible(false);
+        menu.findItem(R.id.menuItem_datePicker).setVisible(false);
 
         SearchManager searchManager =
             ((SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE));

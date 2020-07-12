@@ -12,30 +12,38 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.core.jots.*;
-import com.larryhsiao.nyx.core.jots.filter.Filter;
+import com.larryhsiao.nyx.core.jots.ConstJot;
+import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.jots.JotById;
+import com.larryhsiao.nyx.core.jots.JotUriId;
+import com.larryhsiao.nyx.core.jots.filter.ConstFilter;
 import com.larryhsiao.nyx.util.EmptyView;
 import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.aura.view.recyclerview.EmptyListAdapter;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
-import static java.util.Arrays.stream;
 
 /**
  * Fragment for showing Jot list.
  */
 public class JotListFragment extends JotListingFragment {
-    private static final String ARG_JOT_IDS = "ARG_JOT_IDS";
     private static final String ARG_TITLE = "ARG_TITLE";
     private static final int REQUEST_CODE_CREATE_JOT = 1000;
     private static final int REQUEST_CODE_JOT_CONTENT = 1001;
     private JotListAdapter adapter;
 
     public static Fragment newInstance(JotListingFragment listingFrag) {
+        return newInstance(null, listingFrag);
+    }
+
+    public static Fragment newInstance(String title, JotListingFragment listingFrag) {
         JotListFragment frag = new JotListFragment();
         Bundle bundle = new Bundle();
+        if (title != null && !title.isEmpty()) {
+            bundle.putString(ARG_TITLE, title);
+        }
         listingFrag.setupFilterArgs(bundle);
         frag.setArguments(bundle);
         return frag;
@@ -47,16 +55,22 @@ public class JotListFragment extends JotListingFragment {
      * Show by jot ids.
      */
     public static Fragment newInstanceByJotIds(
-        String title, 
+        String title,
         long[] jotIds,
         JotListingFragment listingFrag
     ) {
         Fragment frag = new JotListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
-        args.putLongArray(ARG_JOT_IDS, jotIds);
-        if (listingFrag!=null){
-            listingFrag.setupFilterArgs(args);
+        if (listingFrag != null) {
+            listingFrag.setupFilterArgs(args, jotIds);
+        } else {
+            JotListingFragment.setupFilterArgs(args, new ConstFilter() {
+                @Override
+                public long[] ids() {
+                    return jotIds;
+                }
+            });
         }
         frag.setArguments(args);
         return frag;
@@ -92,25 +106,8 @@ public class JotListFragment extends JotListingFragment {
     }
 
     @Override
-    protected void loadJots(Filter filter) {
-        final Bundle args = getArguments();
-        final long[] jotIds;
-        if (args != null && args.getLongArray(ARG_JOT_IDS) != null) {
-            jotIds = args.getLongArray(ARG_JOT_IDS);
-        } else {
-            jotIds = new long[0];
-        }
-        if (args != null && jotIds != null && jotIds.length > 0) {
-            adapter.loadJots(
-                new QueriedJots(new JotsByCheckedFilter(db, filter))
-                    .value()
-                    .stream()
-                    .filter(it -> stream(jotIds).anyMatch(value -> it.id() == value))
-                    .collect(Collectors.toList())
-            );
-        } else {
-            adapter.loadJots(new QueriedJots(new JotsByCheckedFilter(db, filter)).value());
-        }
+    protected void loadJots(List<Jot> jots) {
+        adapter.loadJots(jots);
     }
 
     @Override
@@ -156,7 +153,18 @@ public class JotListFragment extends JotListingFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_viewMode) {
-            rootPage(JotMapFragment.newInstance(this));
+            if (getParentFragmentManager().getBackStackEntryCount()>0){
+                getParentFragmentManager().popBackStack();
+                nextPage(JotMapFragment.newInstance(
+                    getArguments().getString(ARG_TITLE, ""),
+                    this)
+                );
+            }else {
+                rootPage(JotMapFragment.newInstance(
+                    getArguments().getString(ARG_TITLE, ""),
+                    this)
+                );
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);

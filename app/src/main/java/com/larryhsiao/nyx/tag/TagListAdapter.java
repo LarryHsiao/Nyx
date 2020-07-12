@@ -5,7 +5,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.core.tags.Tag;
+import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.aura.view.recyclerview.ViewHolder;
 
 import java.util.ArrayList;
@@ -40,7 +42,10 @@ public class TagListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ((TextView) holder.getRootView()).setText(data.get(position).title());
+        TextView text = ((TextView) holder.getRootView());
+        text.setText(data.get(position).title());
+        text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_tag, 0, 0, 0);
+        text.setCompoundDrawablePadding(((int) new DP(text.getContext(), 16f).px()));
         holder.itemView.setOnClickListener(v ->
             clicked.apply(data.get(holder.getAdapterPosition()))
         );

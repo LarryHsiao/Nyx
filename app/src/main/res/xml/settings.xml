@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <SwitchPreference
         android:key="fingerprint_auth"
         android:defaultValue="false"
@@ -26,4 +25,12 @@
             android:entries="@array/quality_items"
             android:entryValues="@array/quality_itemValues" />
     </PreferenceCategory>
+
+    <Preference
+        android:key="sync_now"
+        android:title="@string/Sync_now"
+        tools:summary="2020/01/01"
+        app:summary=""
+        android:icon="@drawable/ic_sync"
+        />
 </PreferenceScreen>
