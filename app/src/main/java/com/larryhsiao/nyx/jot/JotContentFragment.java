@@ -460,9 +460,7 @@ public class JotContentFragment extends JotFragment
             @Override
             public void run() {
                 addAttachment(
-                    Uri.parse(url),
-                    () -> {
-                    }
+                    Uri.parse(url)
                 );
                 updateAttachmentView();
             }
@@ -742,7 +740,7 @@ public class JotContentFragment extends JotFragment
             }
             attachmentOnView.clear();
             for (Uri uri : uris) {
-                addAttachment(uri, this::unsupportedDialog);
+                addAttachment(uri);
             }
             updateAttachmentView();
         } else if (requestCode == REQUEST_CODE_TAKE_PICTURE) {
@@ -777,7 +775,7 @@ public class JotContentFragment extends JotFragment
                 requireContext(),
                 FILE_PROVIDER_AUTHORITY,
                 fileNameByTime
-            ), this::unsupportedDialog
+            )
         );
         updateAttachmentView();
     }
@@ -865,7 +863,7 @@ public class JotContentFragment extends JotFragment
             .collect(toList()));
         for (int i = 0; i < slider.getItemDecorationCount(); i++) {
             ItemDecoration decoration = slider.getItemDecorationAt(i);
-            if (decoration instanceof DotIndicatorDecoration){
+            if (decoration instanceof DotIndicatorDecoration) {
                 ((DotIndicatorDecoration) decoration).attachTo(slider);
             }
         }
@@ -962,7 +960,7 @@ public class JotContentFragment extends JotFragment
         } catch (Exception e) {
             e.printStackTrace();
         }
-        addAttachment(uri, this::unsupportedDialog);
+        addAttachment(uri);
     }
 
     private void unsupportedDialog() {
@@ -972,12 +970,11 @@ public class JotContentFragment extends JotFragment
         ).show(getChildFragmentManager(), null);
     }
 
-    private void addAttachment(Uri uri, Runnable unsupportedCallback) {
+    private void addAttachment(Uri uri) {
         if (attachmentOnView.contains(uri)) {
             return;
         }
-        final String mimeType =
-            new UriMimeType(requireContext(), uri.toString()).value();
+        final String mimeType = new UriMimeType(requireContext(), uri.toString()).value();
         if (mimeType.startsWith("image")) {
             updateJotWithExif(uri);
             attachmentOnView.add(uri);
@@ -989,7 +986,7 @@ public class JotContentFragment extends JotFragment
             if (uri.toString().startsWith("http")) {
                 attachmentOnView.add(uri);
             } else {
-                unsupportedCallback.run();
+                unsupportedDialog();
             }
         }
     }

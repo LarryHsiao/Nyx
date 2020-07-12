@@ -63,11 +63,18 @@ public class JotListFragment extends JotListingFragment {
         Bundle args = new Bundle();
         args.putString(ARG_TITLE, title);
         if (listingFrag != null) {
-            listingFrag.setupFilterArgs(args, jotIds);
+            if (jotIds.length == 0) {
+                listingFrag.setupFilterArgs(args, new long[]{-1L});
+            } else {
+                listingFrag.setupFilterArgs(args, jotIds);
+            }
         } else {
             JotListingFragment.setupFilterArgs(args, new ConstFilter() {
                 @Override
                 public long[] ids() {
+                    if (jotIds.length == 0) {
+                        return new long[]{-1L};
+                    }
                     return jotIds;
                 }
             });
@@ -153,13 +160,13 @@ public class JotListFragment extends JotListingFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_viewMode) {
-            if (getParentFragmentManager().getBackStackEntryCount()>0){
+            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack();
                 nextPage(JotMapFragment.newInstance(
                     getArguments().getString(ARG_TITLE, ""),
                     this)
                 );
-            }else {
+            } else {
                 rootPage(JotMapFragment.newInstance(
                     getArguments().getString(ARG_TITLE, ""),
                     this)
