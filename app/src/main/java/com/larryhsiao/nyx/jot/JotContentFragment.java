@@ -209,7 +209,9 @@ public class JotContentFragment extends JotFragment
     public View onCreateView(
         @NonNull LayoutInflater inflater,
         @Nullable ViewGroup container,
-        @Nullable Bundle savedInstanceState) {
+        @Nullable Bundle savedInstanceState
+    ) {
+        setTitle(getString(R.string.jots));
         View view = inflater.inflate(R.layout.page_jot, container, false);
         slider = view.findViewById(R.id.jot_attachment_container);
         adapter = new AttachmentSliderAdapter(

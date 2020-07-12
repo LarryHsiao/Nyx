@@ -31,6 +31,7 @@ import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.jot.JotListFragment;
 import com.larryhsiao.nyx.settings.SettingFragment;
 import com.larryhsiao.nyx.sync.SyncService;
+import com.larryhsiao.nyx.tag.TagListFragment;
 import com.silverhetch.aura.view.span.ClickableStr;
 import com.silverhetch.aura.view.span.ColoredStr;
 import com.silverhetch.clotho.source.ConstSource;
@@ -106,6 +107,9 @@ public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateL
                 } else if (item.getItemId() == R.id.menuItem_cloudSync) {
                     currentPage = R.id.menuItem_cloudSync;
                     rootPage(new CloudFragment());
+                } else if (item.getItemId() == R.id.menuItem_tags) {
+                    currentPage = R.id.menuItem_tags;
+                    rootPage(new TagListFragment());
                 } else {
                     return true;
                 }

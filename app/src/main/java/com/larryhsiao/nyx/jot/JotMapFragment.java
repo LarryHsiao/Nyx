@@ -15,12 +15,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 import com.google.maps.android.clustering.ClusterManager;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.core.jots.*;
-import com.larryhsiao.nyx.core.jots.filter.Filter;
+import com.larryhsiao.nyx.core.jots.ConstJot;
+import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.jots.JotById;
+import com.larryhsiao.nyx.core.jots.JotUriId;
 import com.silverhetch.aura.view.fab.FabBehavior;
-import com.silverhetch.clotho.Source;
 
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,14 +35,26 @@ import static java.lang.Double.MIN_VALUE;
 public class JotMapFragment extends JotListingFragment {
     private static final int REQUEST_CODE_NEW_JOT = 1000;
     private static final int REQUEST_CODE_UPDATE_JOT = 1001;
+    private static final String ARG_TITLE = "ARG_TITLE";
     private ClusterManager<JotMapItem> clusterManger;
     private GoogleMap map;
     private CameraPosition cameraPos;
     private Marker selectedMarker = null;
 
+    public JotMapFragment() {
+        setArguments(new Bundle());
+    }
+
     public static Fragment newInstance(JotListingFragment listingFrag) {
+        return newInstance(null, listingFrag);
+    }
+
+    public static Fragment newInstance(String title, JotListingFragment listingFrag) {
         JotMapFragment frag = new JotMapFragment();
         Bundle bundle = new Bundle();
+        if (title != null && !title.isEmpty()) {
+            bundle.putString(ARG_TITLE, title);
+        }
         listingFrag.setupFilterArgs(bundle);
         frag.setArguments(bundle);
         return frag;
@@ -52,12 +64,14 @@ public class JotMapFragment extends JotListingFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setTitle(getString(R.string.map));
+        setTitle(requireArguments().getString(ARG_TITLE, getString(R.string.map)));
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+        @NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
         return inflater.inflate(
             R.layout.page_map,
             container,
@@ -139,7 +153,8 @@ public class JotMapFragment extends JotListingFragment {
             final Location location = new Location("Address");
             location.setLongitude(marker.getPosition().longitude);
             location.setLatitude(marker.getPosition().latitude);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1);
+            ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1);
             adapter.add(getString(R.string.new_jot));
             new AlertDialog.Builder(requireContext())
                 .setTitle(
@@ -166,18 +181,19 @@ public class JotMapFragment extends JotListingFragment {
     }
 
     @Override
-    protected void loadJots(Filter filter) {
+    protected void loadJots(List<Jot> jots) {
         if (map != null) {
-            loadData(new JotsByCheckedFilter(db, filter));
+            loadData(
+                jots.stream()
+                    .filter(it -> it.location()[0] != MIN_VALUE &&
+                        it.location()[1] != MIN_VALUE &&
+                        it.location()[0] != 0.0 && it.location()[1] != 0.0)
+                    .collect(Collectors.toList())
+            );
         }
     }
 
-    private void loadData(Source<ResultSet> query) {
-        final List<Jot> jots = new QueriedJots(query).value()
-            .stream()
-            .filter(it -> it.location()[0] != MIN_VALUE && it.location()[1] != MIN_VALUE &&
-                it.location()[0] != 0.0 && it.location()[1] != 0.0)
-            .collect(Collectors.toList());
+    private void loadData(List<Jot> jots) {
         clusterManger.clearItems();
         clusterManger.setRenderer(new MapRenderer(
             requireContext(),
@@ -234,13 +250,29 @@ public class JotMapFragment extends JotListingFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menuItem_viewMode) {
-            rootPage(JotListFragment.newInstance(this));
+            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                getParentFragmentManager().popBackStackImmediate();
+                nextPage(
+                    JotListFragment.newInstance(
+                        requireArguments().getString(ARG_TITLE),
+                        this
+                    )
+                );
+            } else {
+                rootPage(
+                    JotListFragment.newInstance(
+                        requireArguments().getString(ARG_TITLE),
+                        this
+                    )
+                );
+            }
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
+    public void onActivityResult(
+        int requestCode, int resultCode, @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_NEW_JOT && resultCode == RESULT_OK && data != null) {
             clusterManger.addItem(new JotMapItem(

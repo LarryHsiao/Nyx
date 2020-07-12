@@ -19,4 +19,9 @@ public class WrappedFilter implements Filter {
     public long[] dateRange() {
         return filter.dateRange();
     }
+
+    @Override
+    public long[] ids() {
+        return filter.ids();
+    }
 }

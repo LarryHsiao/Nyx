@@ -8,6 +8,8 @@ import com.larryhsiao.nyx.core.jots.filter.ConstFilter;
 import com.larryhsiao.nyx.core.jots.filter.Filter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Adapter for filter type
@@ -19,6 +21,12 @@ public class FilterTypeAdapter extends TypeAdapter<Filter> {
         out.name("keyword").value(value.keyword());
         out.name("started").value(value.dateRange()[0]);
         out.name("ended").value(value.dateRange()[1]);
+        out.name("ids");
+        out.beginArray();
+        for (long id : value.ids()) {
+            out.value(id);
+        }
+        out.endArray();
         out.endObject();
     }
 
@@ -27,6 +35,7 @@ public class FilterTypeAdapter extends TypeAdapter<Filter> {
         String keyword = "";
         long started = 0L;
         long ended = 0L;
+        long[] ids = new long[0];
         in.beginObject();
         while (in.hasNext()) {
             String name = "";
@@ -42,8 +51,17 @@ public class FilterTypeAdapter extends TypeAdapter<Filter> {
             if ("ended".equals(name)) {
                 ended = in.nextLong();
             }
+            if ("ids".equals(name)) {
+                List<Long> idList = new ArrayList<>();
+                in.beginArray();
+                while (in.hasNext()) {
+                    idList.add(in.nextLong());
+                }
+                in.endArray();
+                ids = idList.stream().mapToLong(it -> it).toArray();
+            }
         }
         in.endObject();
-        return new ConstFilter(new long[]{started, ended}, keyword);
+        return new ConstFilter(new long[]{started, ended}, keyword, ids);
     }
 }

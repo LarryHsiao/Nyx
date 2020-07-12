@@ -9,6 +9,13 @@
             app:iconTint="@color/colorPrimaryDark" />
 
         <item
+            android:title="@string/tags"
+            android:id="@+id/menuItem_tags"
+            android:icon="@drawable/ic_tag"
+            app:iconTint="@color/colorPrimaryDark"
+            />
+
+        <item
             android:title="@string/settings"
             android:icon="@drawable/ic_config"
             app:iconTint="@color/colorPrimaryDark"

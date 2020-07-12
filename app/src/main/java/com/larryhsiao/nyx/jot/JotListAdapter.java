@@ -219,8 +219,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         this.data.clear();
         this.data.addAll(data);
         this.data.sort((o1, o2) -> {
-            if (abs(o1.createdTime() - o2.createdTime()) < 86400000
-                && dateStr(o1).equals(dateStr(o2))) {
+            if (abs(o1.createdTime() - o2.createdTime()) < 86400000 && dateStr(o1).equals(dateStr(o2))) {
                 return (int) (
                     o1.createdTime() / 1000f - o2.createdTime() / 1000f
                 );

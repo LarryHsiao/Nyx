@@ -21,6 +21,9 @@ import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotFragment;
+import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.jots.JotsByCheckedFilter;
+import com.larryhsiao.nyx.core.jots.QueriedJots;
 import com.larryhsiao.nyx.core.jots.filter.ConstFilter;
 import com.larryhsiao.nyx.core.jots.filter.Filter;
 import com.larryhsiao.nyx.core.jots.filter.WrappedFilter;
@@ -29,11 +32,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static android.content.Context.SEARCH_SERVICE;
 import static android.graphics.Color.WHITE;
 import static com.larryhsiao.nyx.NyxActions.SYNC_CHECKPOINT;
 import static java.text.DateFormat.SHORT;
+import static java.util.Arrays.stream;
 import static java.util.Calendar.*;
 
 /**
@@ -41,7 +46,7 @@ import static java.util.Calendar.*;
  */
 abstract class JotListingFragment extends JotFragment {
     private static final String ARG_FILTER = "ARG_FILTER";
-    private Filter filter = new ConstFilter(new long[]{0L, 0L}, "");
+    private Filter filter = new ConstFilter();
     private final BroadcastReceiver jotChanged = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -49,14 +54,43 @@ abstract class JotListingFragment extends JotFragment {
         }
     };
 
-    protected void setupFilterArgs(Bundle args) {
+    protected void setupFilterArgs(Bundle args){
+        setupFilterArgs(args, filter);
+    }
+
+    protected void setupFilterArgs(Bundle args, long[] jots) {
+        setupFilterArgs(args, new WrappedFilter(filter) {
+            @Override
+            public long[] ids() { return jots; }
+        });
+    }
+
+    protected static void setupFilterArgs(Bundle args, Filter filter) {
         Gson gson = new GsonBuilder()
             .registerTypeAdapter(Filter.class, new FilterTypeAdapter())
             .create();
-        args.putString(ARG_FILTER, gson.toJson(filter, new TypeToken<Filter>() {}.getType()));
+        args.putString(
+            ARG_FILTER,
+            gson.toJson(
+                filter,
+                new TypeToken<Filter>() {}.getType()
+            )
+        );
     }
 
-    protected abstract void loadJots(Filter filter);
+    protected abstract void loadJots(List<Jot> jots);
+
+    private void loadJots(Filter filter) {
+        loadJots(
+            new QueriedJots(new JotsByCheckedFilter(db, filter))
+                .value()
+                .stream()
+                .filter(it -> filter.ids().length == 0 ||
+                    stream(filter.ids()).anyMatch(value -> it.id() == value)
+                )
+                .collect(Collectors.toList())
+        );
+    }
 
     private void initialFilter() {
         try {
@@ -72,7 +106,7 @@ abstract class JotListingFragment extends JotFragment {
                 );
             }
         } catch (Exception e) {
-            filter = new ConstFilter(new long[]{0L, 0L}, "");
+            filter = new ConstFilter();
         }
     }
 
