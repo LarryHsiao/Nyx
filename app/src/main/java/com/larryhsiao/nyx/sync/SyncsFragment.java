@@ -209,7 +209,8 @@ public class SyncsFragment extends JotFragment implements FirebaseAuth.AuthState
         placeHolder.setStyle(LARGE);
         placeHolder.start();
         final ImageView icon = view.findViewById(R.id.backup_userIcon);
-        Glide.with(this).load(user.getPhotoUrl())
+        Glide.with(this)
+            .load(user.getPhotoUrl())
             .error(getResources().getDrawable(R.drawable.ic_user, null))
             .placeholder(placeHolder)
             .apply(RequestOptions.circleCropTransform())
