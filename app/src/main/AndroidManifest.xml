@@ -91,5 +91,17 @@
         <activity android:name=".KeyChangingActivity"
             android:theme="@style/Theme.AppCompat.Translucent"
             />
+
+        <provider
+            android:authorities="com.larryhsiao.nyx.attachments.provider"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:enabled="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS"
+            android:name=".attachments.AttachmentProvider">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
     </application>
 </manifest>
