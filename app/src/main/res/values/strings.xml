@@ -152,4 +152,6 @@
     <string name="Sync_now">Sync now</string>
     <string name="last_synced___">Last synced: %s</string>
     <string name="none">none</string>
+    <string name="Attachments_in_Jots">Attachments in Jots</string>
+    <string name="Untitled">Untitled</string>
 </resources>
