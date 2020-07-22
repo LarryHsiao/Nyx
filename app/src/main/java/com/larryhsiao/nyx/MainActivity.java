@@ -210,6 +210,8 @@ public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateL
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             userIcon.setImageResource(R.drawable.ic_user);
+            text.setMaxLines(1);
+            text.setLines(1);
             text.setText(new ClickableStr(
                 new ColoredStr(
                     new ConstSource<>(getString(R.string.Log_in)),
@@ -231,11 +233,14 @@ public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateL
                 new CircularProgressDrawable(this);
             placeholder.setStyle(LARGE);
             placeholder.start();
-            Glide.with(this).load(user.getPhotoUrl())
+            Glide.with(this)
+                .load(user.getPhotoUrl())
                 .error(getResources().getDrawable(R.drawable.ic_user, null))
                 .placeholder(placeholder)
                 .apply(circleCropTransform())
                 .into(userIcon);
+            text.setMaxLines(3);
+            text.setLines(3);
             text.setText(user.getDisplayName());
             text.append("\n");
             text.append(user.getEmail());
