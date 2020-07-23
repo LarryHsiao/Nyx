@@ -227,6 +227,8 @@ public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateL
                     REQUEST_CODE_LOG_IN
                 )
             ).value());
+            text.setMaxLines(1);
+            text.setLines(1);
             text.setMovementMethod(getInstance());
         } else {
             final CircularProgressDrawable placeholder =
