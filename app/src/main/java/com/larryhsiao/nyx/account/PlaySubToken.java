@@ -13,6 +13,8 @@ import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
 
 /**
  * Source to fetch purchase token at play store.
+ *
+ * Note: The token will be validated by nyx backend when user log in.
  */
 public class PlaySubToken implements Source<String> {
     private final BillingClient client;
@@ -27,7 +29,6 @@ public class PlaySubToken implements Source<String> {
         skuList.add("premium");
         SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
         params.setSkusList(skuList).setType(SUBS);
-        // @todo #195 Find out if the cached query state is reliable.
         List<Purchase> purchases = client.queryPurchases(SUBS).getPurchasesList();
         if (purchases != null) {
             for (Purchase purchase : purchases) {
@@ -38,7 +39,6 @@ public class PlaySubToken implements Source<String> {
                 }
             }
         }
-        // @todo #194 Record the subscribe at firebase for checking availability.
         return "";
     }
 }

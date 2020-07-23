@@ -48,7 +48,6 @@ public class ImageLoading implements Action {
                 .getReference()
                 .child(user.getUid() + "/" + uri.replace(URI_FILE_PROVIDER, ""))
                 .getDownloadUrl().addOnSuccessListener(downloadUrl -> {
-                // @todo #1 Fallback loading from Firebase directly.
                 Glide.with(image.getContext())
                     .load(downloadUrl)
                     .placeholder(progress)
