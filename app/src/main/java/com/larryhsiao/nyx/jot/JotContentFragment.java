@@ -102,9 +102,6 @@ import static java.util.stream.Collectors.toList;
  * Fragment that shows the Jot content.
  *
  * @todo #0 One click touch template jot with geometry, and some pictures.
- * @todo #0 Survey capture image, video and audio in app or use third-party apps.
- * @todo #0 Handle removing http url will still touch new attachment.
- * @todo #0 Loading progress for loading preview url image.
  */
 public class JotContentFragment extends JotFragment
     implements BackControl, BillingClientStateListener {
@@ -456,14 +453,11 @@ public class JotContentFragment extends JotFragment
     }
 
     private void postAddAttachment(String url) {
-        getView().post(new Runnable() {
-            @Override
-            public void run() {
-                addAttachment(
-                    Uri.parse(url)
-                );
-                updateAttachmentView();
-            }
+        getView().post(() -> {
+            addAttachment(
+                Uri.parse(url)
+            );
+            updateAttachmentView();
         });
     }
 
@@ -1022,7 +1016,10 @@ public class JotContentFragment extends JotFragment
         jot = new WrappedJot(jot) {
             @Override
             public long createdTime() {
-                // @todo #0 Time zone determination for EXIF info.
+                 /*
+                  * The picture recorded time is at same timezone of current place.
+                  * So minus the current phone timezone offset for the proper GMT time.
+                  */
                 TimeZone tz = TimeZone.getDefault();
                 return time - tz.getOffset(ZONE_OFFSET);
             }

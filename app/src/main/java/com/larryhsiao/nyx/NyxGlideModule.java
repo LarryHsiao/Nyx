@@ -27,6 +27,7 @@ public class NyxGlideModule extends AppGlideModule {
     @Override
     public void registerComponents(
         @NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
+        // Decrypt images when fetching from Firebase.
         registry.prepend(
             GlideUrl.class,
             InputStream.class,

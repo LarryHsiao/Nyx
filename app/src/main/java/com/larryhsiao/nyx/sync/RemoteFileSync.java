@@ -34,10 +34,6 @@ import static javax.crypto.Cipher.ENCRYPT_MODE;
 
 /**
  * Action to sync files to Firebase storage.
- *
- * @todo #2 syncing progress indicator.
- * @todo #3 File size limitation.
- * @todo #4 Query multiple remote files a time.
  */
 public class RemoteFileSync implements Action {
     private final Context context;
@@ -150,7 +146,7 @@ public class RemoteFileSync implements Action {
                 if (localFile.exists() && !entry.getValue().deleted()) {
                     return SYNC_ACTION.UPLOAD;
                 }
-                // @todo #0 Handle missing file.
+                // Missing if the file is still uploading from original phone
             } else {
                 if (entry.getValue().deleted()) {
                     return SYNC_ACTION.DELETE;

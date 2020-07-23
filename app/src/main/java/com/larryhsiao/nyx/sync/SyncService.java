@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.sync;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.content.Context;
 import android.content.Intent;
@@ -71,7 +72,7 @@ public class SyncService extends JobIntentService
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         try {
-            from(this).cancel(NOTIFICATION_ID_SYNCING);
+            notifySyncing(0, 0);
             settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
             db = ((JotApplication) getApplication()).db;
             new LocalFileSync(this, db).fire();
@@ -137,18 +138,21 @@ public class SyncService extends JobIntentService
             channel.setDescription(getString(R.string.Service_syncs_jots_to_cloud));
             mgr.createNotificationChannel(channel);
         }
-        mgr.notify(
-            NOTIFICATION_ID_SYNCING,
-            new Builder(this, CHANNEL_ID_SYNCING)
-                .setSmallIcon(R.drawable.ic_jotted)
-                .setPriority(PRIORITY_LOW)
-                .setAutoCancel(false)
-                .setOngoing(true)
-                .setProgress(total, progress, false)
-                .setContentTitle(getString(R.string.Jotted_is_syncing))
-                .setContentText(getString(R.string.Syncing______, progress+"", total+""))
-                .build()
-        );
+        mgr.notify(NOTIFICATION_ID_SYNCING, buildNotification(total, progress));
+    }
+
+    private Notification buildNotification(int total, int progress) {
+        Builder builder = new Builder(this, CHANNEL_ID_SYNCING)
+            .setSmallIcon(R.drawable.ic_jotted)
+            .setPriority(PRIORITY_LOW)
+            .setAutoCancel(false)
+            .setOngoing(true)
+            .setProgress(total, progress, total <= 0)
+            .setContentTitle(getString(R.string.Jotted_is_syncing));
+        if (progress > 0 && total > progress) {
+            builder.setContentText(getString(R.string.Syncing______, progress + "", total + ""));
+        }
+        return builder.build();
     }
 
     private void notifyKeyNotMatch() {
