@@ -119,7 +119,7 @@ public class AttachmentProvider extends DocumentsProvider {
         throws FileNotFoundException {
         final MatrixCursor res = new MatrixCursor(DEFAULT_DOCUMENT_PROJECTION);
         if (ROOT_DOC_ID.equals(parentId)) {
-            jotResult(res, new QueriedJots(new JotsWithAttachment(db)).value());
+            jotResult(res, new QueriedJots(new AllJots(db)).value());
         }
         if (parentId.startsWith(ID_PREFIX_JOT)) {
             attachmentsResult(
@@ -245,7 +245,7 @@ public class AttachmentProvider extends DocumentsProvider {
         if (ROOT_DOC_ID.equals(rootId)) {
             jotResult(
                 res,
-                new QueriedJots(new JotsWithAttachment(db))
+                new QueriedJots(new AllJots(db))
                     .value()
                     .stream()
                     .limit(10)
