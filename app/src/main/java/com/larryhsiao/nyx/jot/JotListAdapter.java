@@ -1,14 +1,14 @@
 package com.larryhsiao.nyx.jot;
 
 import android.location.Location;
+import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.attachments.AttachmentPropertiesDialog;
 import com.larryhsiao.nyx.attachments.LaunchAttachment;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
@@ -32,7 +32,6 @@ import java.util.List;
 import static android.view.LayoutInflater.from;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static java.lang.Math.abs;
 import static java.text.DateFormat.getDateInstance;
 import static java.util.Calendar.getInstance;
 import static java.util.stream.Collectors.toList;
@@ -196,12 +195,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         popup.getMenu()
             .add(view.getContext().getString(R.string.properties))
             .setOnMenuItemClickListener(item -> {
-                final AlertDialog dialog = new AlertDialog.Builder(view.getContext())
-                    .setView(R.layout.dialog_properties)
-                    .show();
-                ((TextView) dialog.findViewById(R.id.properties_text)).setText(
-                    "Uri: " + uri
-                );
+                new AttachmentPropertiesDialog(view.getContext(), Uri.parse(uri)).fire();
                 return true;
             });
         popup.show();
@@ -219,15 +213,15 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         this.data.clear();
         this.data.addAll(data);
         this.data.sort((o1, o2) -> {
-            if (abs(o1.createdTime() - o2.createdTime()) < 86400000 && dateStr(o1).equals(dateStr(o2))) {
-                return (int) (
-                    o1.createdTime() / 1000f - o2.createdTime() / 1000f
-                );
-            } else {
+//            if (abs(o1.createdTime() - o2.createdTime()) < 86400000 && dateStr(o1).equals(dateStr(o2))) {
+//                return (int) (
+//                    o1.createdTime() / 1000f - o2.createdTime() / 1000f
+//                );
+//            } else {
                 return (int) (
                     o2.createdTime() / 1000f - o1.createdTime() / 1000f
                 );
-            }
+//            }
         });
         notifyDataSetChanged();
     }

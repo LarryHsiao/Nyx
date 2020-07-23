@@ -197,14 +197,10 @@ abstract class JotListingFragment extends JotFragment {
             return false;
         });
         if (filter.dateRange()[0] == 0L && filter.dateRange()[0] == 0L) {
-            menu.findItem(R.id.menuItem_datePicker).setIconTintList(
-                ColorStateList.valueOf(WHITE)
-            );
+            menu.findItem(R.id.menuItem_datePicker).setIconTintList(ColorStateList.valueOf(WHITE));
         } else {
             menu.findItem(R.id.menuItem_datePicker).setIconTintList(
-                ColorStateList.valueOf(getResources().getColor(
-                    R.color.colorActive
-                ))
+                ColorStateList.valueOf(getResources().getColor(R.color.colorActive))
             );
         }
     }

@@ -39,6 +39,7 @@ import com.larryhsiao.nyx.BuildConfig;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.attachments.AttachmentPickerIntent;
+import com.larryhsiao.nyx.attachments.AttachmentPropertiesDialog;
 import com.larryhsiao.nyx.attachments.AttachmentsFragment;
 import com.larryhsiao.nyx.attachments.LaunchAttachment;
 import com.larryhsiao.nyx.base.JotFragment;
@@ -875,12 +876,7 @@ public class JotContentFragment extends JotFragment
         popup.getMenu()
             .add(view.getContext().getString(R.string.properties))
             .setOnMenuItemClickListener(item -> {
-                final AlertDialog dialog = new Builder(view.getContext())
-                    .setView(R.layout.dialog_properties)
-                    .show();
-                ((TextView) dialog.findViewById(R.id.properties_text)).setText(
-                    getString(R.string.Uri___, uri.toString())
-                );
+                new AttachmentPropertiesDialog(view.getContext(), uri).fire();
                 return true;
             });
         popup.show();
