@@ -54,7 +54,7 @@ abstract class JotListingFragment extends JotFragment {
         }
     };
 
-    protected void setupFilterArgs(Bundle args){
+    protected void setupFilterArgs(Bundle args) {
         setupFilterArgs(args, filter);
     }
 
@@ -76,6 +76,14 @@ abstract class JotListingFragment extends JotFragment {
                 new TypeToken<Filter>() {}.getType()
             )
         );
+    }
+
+    protected void onPreUpdateFilter(Filter filter) { }
+
+    protected void onUpdateFilter(Filter newFilter) {
+        onPreUpdateFilter(filter);
+        this.filter = newFilter;
+        loadJots(filter);
     }
 
     protected abstract void loadJots(List<Jot> jots);
@@ -162,13 +170,12 @@ abstract class JotListingFragment extends JotFragment {
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     new TagSuggestion(db, newText, searchView).fire();
-                    filter = new WrappedFilter(filter) {
+                    onUpdateFilter(new WrappedFilter(filter) {
                         @Override
                         public String keyword() {
                             return newText;
                         }
-                    };
-                    loadJots(filter);
+                    });
                     return true;
                 }
             });
@@ -221,25 +228,23 @@ abstract class JotListingFragment extends JotFragment {
                         started = range.get(0).getTimeInMillis();
                         ended = range.get(range.size() - 1).getTimeInMillis();
                     }
-                    filter = new WrappedFilter(filter) {
+                    onUpdateFilter(new WrappedFilter(filter) {
                         @Override
                         public long[] dateRange() {
                             return new long[]{started, ended};
                         }
-                    };
-                    loadJots(filter);
+                    });
                     item.setIconTintList(ColorStateList.valueOf(
                         getResources().getColor(R.color.colorActive)
                     ));
                 })
                 .setNeutralButton(R.string.Clear, (dialog, which) -> {
-                    filter = new WrappedFilter(filter) {
+                    onUpdateFilter(new WrappedFilter(filter) {
                         @Override
                         public long[] dateRange() {
                             return new long[]{0L, 0L};
                         }
-                    };
-                    loadJots(filter);
+                    });
                     item.setIconTintList(ColorStateList.valueOf(WHITE));
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {

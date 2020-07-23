@@ -14,11 +14,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.JotById;
 import com.larryhsiao.nyx.core.jots.JotUriId;
+import com.larryhsiao.nyx.core.jots.filter.Filter;
 import com.silverhetch.aura.view.fab.FabBehavior;
 
 import java.util.List;
@@ -40,6 +42,7 @@ public class JotMapFragment extends JotListingFragment {
     private GoogleMap map;
     private CameraPosition cameraPos;
     private Marker selectedMarker = null;
+    private DefaultClusterRenderer<JotMapItem> mapRenderer;
 
     public JotMapFragment() {
         setArguments(new Bundle());
@@ -107,16 +110,23 @@ public class JotMapFragment extends JotListingFragment {
     }
 
     private void setupMap() {
-        clusterManger = new ClusterManager<>(requireContext(), map);
+        clusterManger = new ClusterManager<JotMapItem>(requireContext(), map){
+            @Override
+            public void onCameraIdle() {
+                super.onCameraIdle();
+                cameraPos = map.getCameraPosition();
+            }
+        };
+        mapRenderer = new DefaultClusterRenderer<>(
+            requireContext(),
+            map,
+            clusterManger
+        );
+        mapRenderer.setMinClusterSize(1);
         map.setOnCameraIdleListener(clusterManger);
         map.setOnMarkerClickListener(clusterManger);
         map.setOnInfoWindowClickListener(clusterManger);
-        clusterManger.setRenderer(new MapRenderer(
-            requireContext(),
-            map,
-            clusterManger,
-            db
-        ));
+        clusterManger.setRenderer(mapRenderer);
         clusterManger.setOnClusterClickListener(cluster -> {
             nextPage(JotListFragment.newInstanceByJotIds(
                 cluster.getPosition().latitude + ", " + cluster.getPosition().longitude + "",
@@ -195,12 +205,7 @@ public class JotMapFragment extends JotListingFragment {
 
     private void loadData(List<Jot> jots) {
         clusterManger.clearItems();
-        clusterManger.setRenderer(new MapRenderer(
-            requireContext(),
-            map,
-            clusterManger,
-            db
-        ));
+        clusterManger.setRenderer(mapRenderer); // to update markers
 
         if (jots.size() > 0) {
             LatLngBounds.Builder bounds = LatLngBounds.builder();
@@ -209,20 +214,13 @@ public class JotMapFragment extends JotListingFragment {
                 bounds.include(new LatLng(jot.location()[1], jot.location()[0]));
             }
             if (cameraPos == null) {
-                map.moveCamera(
-                    CameraUpdateFactory.newLatLngBounds(
-                        bounds.build(),
-                        200
-                    )
-                );
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 200));
             } else {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
-                cameraPos = null;
             }
         } else {
             if (cameraPos != null) {
                 map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
-                cameraPos = null;
             }
         }
     }
@@ -299,5 +297,11 @@ public class JotMapFragment extends JotListingFragment {
             ));
             getParentFragmentManager().popBackStack();
         }
+    }
+
+    @Override
+    protected void onPreUpdateFilter(Filter filter) {
+        super.onPreUpdateFilter(filter);
+        cameraPos = null;
     }
 }
