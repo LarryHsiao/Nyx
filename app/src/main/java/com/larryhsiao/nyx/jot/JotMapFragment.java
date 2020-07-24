@@ -230,7 +230,7 @@ public class JotMapFragment extends JotListingFragment {
         super.onPause();
         detachFab();
         final Fragment mapFrag = getChildFragmentManager().findFragmentById(R.id.map_container);
-        if (mapFrag != null) {
+        if (mapFrag != null && map !=null) {
             cameraPos = map.getCameraPosition();
             map = null;
             getChildFragmentManager().beginTransaction()
