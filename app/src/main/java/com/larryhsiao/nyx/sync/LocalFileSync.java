@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.sync;
 import android.content.Context;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
+import com.larryhsiao.nyx.attachments.TempAttachmentFile;
 import com.larryhsiao.nyx.core.attachments.*;
 import com.larryhsiao.nyx.settings.DefaultPreference;
 import com.larryhsiao.nyx.settings.NyxSettings;
@@ -103,10 +104,10 @@ public class LocalFileSync implements Action {
         final File compressTemp = Files.createTempFile("compressedTemp", "").toFile();
         final File temp;
         if (attachment.uri().startsWith(URI_FILE_TEMP_PROVIDER)) {
-            temp = new File(
-                new File(context.getFilesDir(), "attachments_temp"),
+            temp = new TempAttachmentFile(
+                context,
                 attachment.uri().replace(URI_FILE_TEMP_PROVIDER, "")
-            );
+            ).value();
         } else {
             temp = Files.createTempFile("temp", "").toFile();
             new ToFile(
@@ -143,10 +144,10 @@ public class LocalFileSync implements Action {
             new MD5(context.getContentResolver().openInputStream(uri)).value()
         );
         if (uri.toString().startsWith(URI_FILE_TEMP_PROVIDER)) {
-            new File(
-                new File(context.getFilesDir(), "attachments_temp"),
+            new TempAttachmentFile(
+                context,
                 uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
-            ).renameTo(new File(internalRoot, fileName));
+            ).value().renameTo(new File(internalRoot, fileName));
         } else {
             new ToFile(
                 context.getContentResolver().openInputStream(uri),
