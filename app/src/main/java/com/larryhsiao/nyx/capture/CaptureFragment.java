@@ -33,10 +33,9 @@ import java.util.concurrent.Executors;
 
 import static android.Manifest.permission.*;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static android.hardware.camera2.CameraMetadata.LENS_FACING_BACK;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
-import static androidx.camera.core.CameraSelector.LENS_FACING_FRONT;
+import static androidx.camera.core.CameraSelector.*;
 
 /**
  * Fragment to show preview of camera for capturing photo.
@@ -48,6 +47,7 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
     private static final String ARG_REQUEST_CODE = "ARG_REQUEST_CODE";
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private CameraSelector cameraSelector = new CameraSelector.Builder().build();
+    private Integer lenFacing = LENS_FACING_BACK;
     private ImageCapture imgCapture;
     private ExecutorService cameraExecutor;
     private Location currentLocation = null;
@@ -118,6 +118,7 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
                 initCamera(cameraProviderFuture.get());
             } catch (Exception e) {
                 e.printStackTrace();
+                showError();
             }
         }, ContextCompat.getMainExecutor(requireContext()));
         requireView().findViewById(R.id.capture_trigger).setOnClickListener(v -> {
@@ -143,21 +144,25 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
                     @Override
                     public void onError(@NotNull ImageCaptureException exception) {
                         requireView().post(() -> {
-                            sendResult(
-                                requireArguments().getInt(ARG_REQUEST_CODE),
-                                Activity.RESULT_CANCELED,
-                                new Intent()
-                            );
-                            makeText(
-                                getContext(),
-                                R.string.appError_unknown,
-                                LENGTH_SHORT
-                            ).show();
+                            showError();
                         });
                     }
                 }
             );
         });
+    }
+
+    private void showError() {
+        sendResult(
+            requireArguments().getInt(ARG_REQUEST_CODE),
+            Activity.RESULT_CANCELED,
+            new Intent()
+        );
+        makeText(
+            getContext(),
+            R.string.appError_unknown,
+            LENGTH_SHORT
+        ).show();
     }
 
     private Intent data(File file) {
@@ -168,19 +173,23 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
 
     private ImageCapture.Metadata metadata() {
         ImageCapture.Metadata metadata = new ImageCapture.Metadata();
-        Integer facing = cameraSelector.getLensFacing();
-        if (facing != null) {
-            metadata.setReversedHorizontal(facing == LENS_FACING_FRONT);
-        }
+        metadata.setReversedHorizontal(lenFacing == LENS_FACING_FRONT);
         if (currentLocation != null) {
             metadata.setLocation(currentLocation);
         }
         return metadata;
     }
 
-    private void initCamera(ProcessCameraProvider cameraProvider) {
+    private void initCamera(ProcessCameraProvider cameraProvider) throws Exception {
+        if (cameraProvider.hasCamera(DEFAULT_BACK_CAMERA)) {
+            lenFacing = LENS_FACING_BACK;
+        } else if (cameraProvider.hasCamera(DEFAULT_FRONT_CAMERA)) {
+            lenFacing = LENS_FACING_FRONT;
+        } else {
+            throw new RuntimeException("No camera available");
+        }
         cameraSelector = new CameraSelector.Builder()
-            .requireLensFacing(LENS_FACING_BACK)
+            .requireLensFacing(lenFacing)
             .build();
 
         Preview preview = new Preview.Builder().build();

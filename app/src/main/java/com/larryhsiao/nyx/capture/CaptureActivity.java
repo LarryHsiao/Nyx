@@ -15,7 +15,11 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.core.attachments.NewAttachments;
 import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.jots.JotsByTimeSpace;
 import com.larryhsiao.nyx.core.jots.NewJot;
+import com.larryhsiao.nyx.core.jots.QueriedJots;
+import com.larryhsiao.nyx.core.jots.goemetry.CircleByRange;
+import com.larryhsiao.nyx.core.jots.goemetry.MeterDelta;
 import com.larryhsiao.nyx.util.exif.ExifLocation;
 import com.silverhetch.aura.view.activity.Fullscreen;
 import com.silverhetch.aura.view.bitmap.ResizedImage;
@@ -27,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
 import java.util.Calendar;
+import java.util.List;
 
 import static android.provider.MediaStore.EXTRA_OUTPUT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -59,12 +64,11 @@ public class CaptureActivity extends JotActivity {
     public void onFragmentResult(int requestCode, int resultCode, @NotNull Intent data) {
         super.onFragmentResult(requestCode, resultCode, data);
         if (resultCode != Activity.RESULT_OK) {
-            {
-                return;
-            }
+            return;
         }
+        String capturedFileUri = data.getData().toString();
         if (getCallingActivity() != null) {
-            File capturedFile = new File(URI.create(data.getData().toString()));
+            File capturedFile = new File(URI.create(capturedFileUri));
             Uri extraOutput = getIntent().getParcelableExtra(EXTRA_OUTPUT);
             final Intent result;
             if (extraOutput == null || extraOutput.toString().isEmpty()) {
@@ -76,8 +80,44 @@ public class CaptureActivity extends JotActivity {
             setResult(RESULT_OK, result);
             finish();
         } else {
-            newJot(data);
+            Location location = parseLocation(data);
+            List<Jot> exist = new QueriedJots(
+                new JotsByTimeSpace(
+                    db,
+                    System.currentTimeMillis(),
+                    new CircleByRange(
+                        new double[]{location.getLongitude(), location.getLatitude()},
+                        new MeterDelta(15)
+                    )
+                )
+            ).value();
+            final Jot jot;
+            if (exist.size() > 0) {
+                jot = exist.get(0);
+            } else {
+                jot = newJot(location);
+            }
+            new NewAttachments(db, jot.id(), new String[]{capturedFileUri}).value();
         }
+    }
+
+    private Location parseLocation(Intent data) {
+        Location location = new Location("constant");
+        location.setLatitude(MIN_VALUE);
+        location.setLongitude(MIN_VALUE);
+        try {
+            location = new ExifLocation(
+                new ExifInterface(
+                    new FileInputStream(
+                        new File(
+                            URI.create(data.getData().toString())
+                        )
+                    )
+                )
+            ).value();
+        } catch (Exception ignore) {
+        }
+        return location;
     }
 
     private Intent thumbnailResult(File capturedFile) {
@@ -109,33 +149,13 @@ public class CaptureActivity extends JotActivity {
         return new Intent();
     }
 
-    private void newJot(Intent data) {
-        Location location = new Location("constant");
-        location.setLatitude(MIN_VALUE);
-        location.setLongitude(MIN_VALUE);
-        try {
-            location = new ExifLocation(
-                new ExifInterface(
-                    new FileInputStream(
-                        new File(
-                            URI.create(data.getData().toString())
-                        )
-                    )
-                )
-            ).value();
-        } catch (Exception ignore) {
-        }
-        Jot jot = new NewJot(
+    private Jot newJot(Location location) {
+        return new NewJot(
             db,
             "",
             new double[]{location.getLongitude(), location.getLatitude()},
             Calendar.getInstance(),
             ""
-        ).value();
-        new NewAttachments(
-            db,
-            jot.id(),
-            new String[]{data.getData().toString()}
         ).value();
     }
 }
