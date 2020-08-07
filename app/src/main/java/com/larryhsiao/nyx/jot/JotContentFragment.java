@@ -38,9 +38,7 @@ import com.google.gson.Gson;
 import com.larryhsiao.nyx.BuildConfig;
 import com.larryhsiao.nyx.LocationString;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.attachments.AttachmentPickerIntent;
-import com.larryhsiao.nyx.attachments.AttachmentsFragment;
-import com.larryhsiao.nyx.attachments.LaunchAttachment;
+import com.larryhsiao.nyx.attachments.*;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.attachments.*;
 import com.larryhsiao.nyx.core.jots.*;
@@ -52,6 +50,8 @@ import com.larryhsiao.nyx.core.tags.*;
 import com.larryhsiao.nyx.sync.SyncService;
 import com.larryhsiao.nyx.util.EmbedMapFragment;
 import com.larryhsiao.nyx.util.JpegDateComparator;
+import com.larryhsiao.nyx.util.exif.ExifLocation;
+import com.larryhsiao.nyx.util.exif.FirebaseLatLngLocation;
 import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
 import com.schibstedspain.leku.LocationPickerActivity;
@@ -747,11 +747,7 @@ public class JotContentFragment extends JotFragment
                     FileProvider.getUriForFile(
                         requireContext(),
                         FILE_PROVIDER_AUTHORITY,
-                        new File(
-                            new File(requireContext().getFilesDir(),
-                                "attachments_temp"),
-                            TEMP_FILE_NAME
-                        )
+                        new TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
                     )
                 );
             }
@@ -759,11 +755,13 @@ public class JotContentFragment extends JotFragment
     }
 
     private void takeTempPhoto() {
-        File tempDir =
-            new File(requireContext().getFilesDir(), "attachments_temp");
-        File fileNameByTime =
-            new File(tempDir, "" + System.currentTimeMillis() + ".jpg");
-        new File(tempDir, TEMP_FILE_NAME).renameTo(fileNameByTime);
+        File fileNameByTime = new TempAttachmentFile(
+            requireContext(),
+            "" + System.currentTimeMillis() + ".jpg"
+        ).value();
+        new TempAttachmentFile(requireContext(), TEMP_FILE_NAME)
+            .value()
+            .renameTo(fileNameByTime);
         addAttachment(
             FileProvider.getUriForFile(
                 requireContext(),
@@ -827,12 +825,10 @@ public class JotContentFragment extends JotFragment
     private void deleteTempAttachments() {
         for (Uri uri : attachmentOnView) {
             if (uri.toString().startsWith(URI_FILE_TEMP_PROVIDER)) {
-                new File(
-                    new File(
-                        requireContext().getFilesDir(),
-                        "attachments_temp"
-                    ), uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
-                ).delete();
+                new TempAttachmentFile(
+                    requireContext(),
+                    uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
+                ).value().delete();
             }
         }
     }
@@ -875,12 +871,7 @@ public class JotContentFragment extends JotFragment
         popup.getMenu()
             .add(view.getContext().getString(R.string.properties))
             .setOnMenuItemClickListener(item -> {
-                final AlertDialog dialog = new Builder(view.getContext())
-                    .setView(R.layout.dialog_properties)
-                    .show();
-                ((TextView) dialog.findViewById(R.id.properties_text)).setText(
-                    getString(R.string.Uri___, uri.toString())
-                );
+                new AttachmentPropertiesDialog(view.getContext(), uri).fire();
                 return true;
             });
         popup.show();
@@ -922,13 +913,10 @@ public class JotContentFragment extends JotFragment
             Intent intent = new Intent(ACTION_IMAGE_CAPTURE);
             if (intent.resolveActivity(requireContext().getPackageManager()) !=
                 null) {
-                File tempDir = new File(requireContext().getFilesDir(),
-                    "attachments_temp");
-                tempDir.mkdir();
                 intent.putExtra(EXTRA_OUTPUT, FileProvider.getUriForFile(
                     requireContext(),
                     FILE_PROVIDER_AUTHORITY,
-                    new File(tempDir, TEMP_FILE_NAME)
+                    new TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
                 ));
                 startActivityForResult(intent, requestCode);
             }
@@ -1016,10 +1004,10 @@ public class JotContentFragment extends JotFragment
         jot = new WrappedJot(jot) {
             @Override
             public long createdTime() {
-                 /*
-                  * The picture recorded time is at same timezone of current place.
-                  * So minus the current phone timezone offset for the proper GMT time.
-                  */
+                /*
+                 * The picture recorded time is at same timezone of current place.
+                 * So minus the current phone timezone offset for the proper GMT time.
+                 */
                 TimeZone tz = TimeZone.getDefault();
                 return time - tz.getOffset(ZONE_OFFSET);
             }
@@ -1034,30 +1022,28 @@ public class JotContentFragment extends JotFragment
     }
 
     private void updateJotLocation(ExifInterface exif) {
-        final double[] latLong = exif.getLatLong();
-        if (isLocationSetup() || latLong == null) {
+        Location location = new ExifLocation(exif).value();
+        if (isLocationSetup() ||
+            (location.getLongitude() == 0 && location.getLatitude()==0)) {
             return;
         }
-        updateJotLocation(latLong[0], latLong[1]);
+        updateJotLocation(location);
     }
 
     private void updateJotLocation(FirebaseVisionLatLng latLng) {
         if (isLocationSetup()) {
             return;
         }
-        updateJotLocation(latLng.getLatitude(), latLng.getLongitude());
+        updateJotLocation(new FirebaseLatLngLocation(latLng).value());
     }
 
-    private void updateJotLocation(double latitude, double longitude) {
+    private void updateJotLocation(Location location) {
         jot = new WrappedJot(jot) {
             @Override
             public double[] location() {
-                return new double[]{longitude, latitude};
+                return new double[]{location.getLongitude(), location.getLatitude()};
             }
         };
-        Location location = new Location("constant");
-        location.setLatitude(latitude);
-        location.setLongitude(longitude);
         updateAddress(location);
         loadEmbedMapByJot();
     }

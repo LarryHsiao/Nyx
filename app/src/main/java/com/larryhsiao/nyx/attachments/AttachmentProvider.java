@@ -200,12 +200,7 @@ public class AttachmentProvider extends DocumentsProvider {
     }
 
     private File fileByAttachment(Attachment attachment) {
-        return new File(
-            attachmentRoot,
-            attachment
-                .uri()
-                .replace(URI_FILE_PROVIDER, "")
-        );
+        return new AttachmentFileSource(getContext(), Uri.parse(attachment.uri())).value();
     }
 
     @Override

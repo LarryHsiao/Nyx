@@ -54,7 +54,7 @@ abstract class JotListingFragment extends JotFragment {
         }
     };
 
-    protected void setupFilterArgs(Bundle args){
+    protected void setupFilterArgs(Bundle args) {
         setupFilterArgs(args, filter);
     }
 
@@ -76,6 +76,14 @@ abstract class JotListingFragment extends JotFragment {
                 new TypeToken<Filter>() {}.getType()
             )
         );
+    }
+
+    protected void onPreUpdateFilter(Filter filter) { }
+
+    protected void onUpdateFilter(Filter newFilter) {
+        onPreUpdateFilter(filter);
+        this.filter = newFilter;
+        loadJots(filter);
     }
 
     protected abstract void loadJots(List<Jot> jots);
@@ -162,13 +170,12 @@ abstract class JotListingFragment extends JotFragment {
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     new TagSuggestion(db, newText, searchView).fire();
-                    filter = new WrappedFilter(filter) {
+                    onUpdateFilter(new WrappedFilter(filter) {
                         @Override
                         public String keyword() {
                             return newText;
                         }
-                    };
-                    loadJots(filter);
+                    });
                     return true;
                 }
             });
@@ -190,14 +197,10 @@ abstract class JotListingFragment extends JotFragment {
             return false;
         });
         if (filter.dateRange()[0] == 0L && filter.dateRange()[0] == 0L) {
-            menu.findItem(R.id.menuItem_datePicker).setIconTintList(
-                ColorStateList.valueOf(WHITE)
-            );
+            menu.findItem(R.id.menuItem_datePicker).setIconTintList(ColorStateList.valueOf(WHITE));
         } else {
             menu.findItem(R.id.menuItem_datePicker).setIconTintList(
-                ColorStateList.valueOf(getResources().getColor(
-                    R.color.colorActive
-                ))
+                ColorStateList.valueOf(getResources().getColor(R.color.colorActive))
             );
         }
     }
@@ -208,7 +211,7 @@ abstract class JotListingFragment extends JotFragment {
             View root =
                 LayoutInflater.from(getContext()).inflate(R.layout.dialog_date_picker, null, false);
             CalendarView view = root.findViewById(R.id.datePicker_calendar);
-            AlertDialog dialogBuilder = new AlertDialog.Builder(requireContext())
+            new AlertDialog.Builder(requireContext())
                 .setView(root)
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     final long started;
@@ -221,25 +224,23 @@ abstract class JotListingFragment extends JotFragment {
                         started = range.get(0).getTimeInMillis();
                         ended = range.get(range.size() - 1).getTimeInMillis();
                     }
-                    filter = new WrappedFilter(filter) {
+                    onUpdateFilter(new WrappedFilter(filter) {
                         @Override
                         public long[] dateRange() {
                             return new long[]{started, ended};
                         }
-                    };
-                    loadJots(filter);
+                    });
                     item.setIconTintList(ColorStateList.valueOf(
                         getResources().getColor(R.color.colorActive)
                     ));
                 })
                 .setNeutralButton(R.string.Clear, (dialog, which) -> {
-                    filter = new WrappedFilter(filter) {
+                    onUpdateFilter(new WrappedFilter(filter) {
                         @Override
                         public long[] dateRange() {
                             return new long[]{0L, 0L};
                         }
-                    };
-                    loadJots(filter);
+                    });
                     item.setIconTintList(ColorStateList.valueOf(WHITE));
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
@@ -261,34 +262,14 @@ abstract class JotListingFragment extends JotFragment {
 
                 @Override
                 public void onCalendarRangeSelect(Calendar calendar, boolean isEnd) {
-                    final DateFormat formatter = SimpleDateFormat.getDateInstance(SHORT);
-                    final TextView selected = root.findViewById(R.id.datePicker_selected);
-                    if (isEnd) {
-                        List<Calendar> range = view.getSelectCalendarRange();
-                        selected.setText(String.format(
-                            "%s~%s",
-                            formatter.format(new Date(range.get(0).getTimeInMillis())),
-                            formatter.format(
-                                new Date(range.get(range.size() - 1).getTimeInMillis())
-                            )
-                        ));
-                    } else {
-                        selected.setText(
-                            formatter.format(new Date(
-                                view.getSelectedCalendar().getTimeInMillis())
-                            )
-                        );
-                    }
+                    updateCalendarDialog(root, view);
                 }
             });
             TextView yearText = root.findViewById(R.id.datePicker_year);
-            yearText.setText(String.valueOf(view.getCurYear()));
             yearText.setOnClickListener(v ->
-                view.showYearSelectLayout(view.getCurYear())
+                view.showYearSelectLayout(view.getSelectedCalendar().getYear())
             );
-            view.setOnYearChangeListener(year ->
-                yearText.setText(String.valueOf(year))
-            );
+            view.setOnYearChangeListener(year -> yearText.setText(String.valueOf(year)));
             if (filter.dateRange()[0] == 0L && filter.dateRange()[1] == 0L) {
                 view.setSelectCalendarRange(
                     calendarByDatetime(System.currentTimeMillis()),
@@ -299,17 +280,30 @@ abstract class JotListingFragment extends JotFragment {
                     calendarByDatetime(filter.dateRange()[0]),
                     calendarByDatetime(filter.dateRange()[1])
                 );
-                if (filter.dateRange()[0] == filter.dateRange()[1]) {
-                    dialogBuilder.setTitle(
-                        SimpleDateFormat.getDateInstance(SHORT).format(
-                            new Date(filter.dateRange()[0])
-                        )
-                    );
-                }
             }
+            yearText.setText(String.valueOf(view.getSelectedCalendar().getYear()));
+            updateCalendarDialog(root, view);
+            view.scrollToSelectCalendar();
             return true;
         }
         return false;
+    }
+
+    private void updateCalendarDialog(View root, CalendarView view) {
+        final DateFormat formatter = SimpleDateFormat.getDateInstance(SHORT);
+        final TextView selected = root.findViewById(R.id.datePicker_selected);
+        if (view.getSelectCalendarRange() != null && view.getSelectCalendarRange().size() >= 2) {
+            List<Calendar> range = view.getSelectCalendarRange();
+            selected.setText(String.format(
+                "%s~%s",
+                formatter.format(new Date(range.get(0).getTimeInMillis())),
+                formatter.format(new Date(range.get(range.size() - 1).getTimeInMillis()))
+            ));
+        } else {
+            selected.setText(formatter.format(new Date(
+                view.getSelectedCalendar().getTimeInMillis())
+            ));
+        }
     }
 
     private Calendar calendarByDatetime(long dateTime) {

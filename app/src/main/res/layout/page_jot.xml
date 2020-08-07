@@ -22,6 +22,7 @@
             android:layout_height="0dp"
             android:id="@+id/jot_mood"
             android:padding="8dp"
+            android:visibility="gone"
             android:gravity="center"
             android:text="+"
             app:layout_constraintDimensionRatio="1:1"
@@ -31,16 +32,20 @@
             app:layout_constraintTop_toTopOf="@id/jot_date"
             app:layout_constraintBottom_toBottomOf="@id/jot_date"/>
 
-        <TextView android:layout_width="wrap_content"
-                  android:padding="16dp"
-                  android:id="@+id/jot_date"
-                  app:layout_constraintStart_toEndOf="@id/jot_mood"
-                  android:drawablePadding="8dp"
-                  style="@style/TextAppearance.AppCompat.Light.SearchResult.Title"
-                  app:layout_constraintTop_toTopOf="parent"
-                  android:layout_height="wrap_content"
-                  tools:text="2020/01/01"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:padding="16dp"
+            android:id="@+id/jot_date"
+            android:layout_marginStart="16dp"
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintStart_toEndOf="@id/jot_mood"
+            android:drawableStart="@drawable/ic_calendar"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
+            style="@style/TextAppearance.AppCompat.Light.SearchResult.Title"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_height="wrap_content"
+            tools:text="2020/01/01" />
 
         <ImageView
             android:layout_width="40dp"

@@ -154,4 +154,5 @@
     <string name="none">none</string>
     <string name="Attachments_in_Jots">Attachments in Jots</string>
     <string name="Untitled">Untitled</string>
+    <string name="Size___">Size: %s</string>
 </resources>

@@ -12,11 +12,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.attachments.AttachmentPropertiesDialog;
 import com.larryhsiao.nyx.attachments.IsLocalExist;
 import com.larryhsiao.nyx.attachments.JotImageLoading;
 import com.silverhetch.aura.uri.UriMimeType;
@@ -248,12 +248,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
         popup.getMenu()
             .add(context.getString(R.string.properties))
             .setOnMenuItemClickListener(item -> {
-                final AlertDialog dialog = new AlertDialog.Builder(context)
-                    .setView(R.layout.dialog_properties)
-                    .show();
-                ((TextView) dialog.findViewById(R.id.properties_text)).setText(
-                    "Uri: " + uri.toString()
-                );
+                new AttachmentPropertiesDialog(context, uri).fire();
                 return true;
             });
         popup.show();

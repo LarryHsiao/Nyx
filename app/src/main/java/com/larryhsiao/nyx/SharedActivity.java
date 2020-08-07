@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
+import com.larryhsiao.nyx.attachments.TempAttachmentFile;
 import com.larryhsiao.nyx.base.JotActivity;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.Jot;
@@ -68,8 +69,6 @@ public class SharedActivity extends JotActivity {
                 continue;
             }
             final String contentType = new UriMimeType(this, uri.toString()).value();
-            final File tempDir = new File(getFilesDir(), "attachments_temp");
-            tempDir.mkdirs();
             if ("text/plain".equals(contentType)) {
                 // @todo #0 Read file off main thread
                 content = readText(item.getUri());
@@ -83,7 +82,7 @@ public class SharedActivity extends JotActivity {
                     final String fileName = UUID.randomUUID().toString() + "." + ext;
                     new ToFile(
                         getContentResolver().openInputStream(item.getUri()),
-                        new File(tempDir, fileName),
+                        new TempAttachmentFile(this, fileName).value(),
                         integer -> null
                     ).fire();
                     attachmentList.add(URI_FILE_TEMP_PROVIDER + fileName);
