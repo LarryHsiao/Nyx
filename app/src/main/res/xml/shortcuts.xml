@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <shortcut
+        android:shortcutId="compose"
+        android:enabled="true"
+        android:icon="@drawable/ic_camera"
+        app:iconTint="@color/colorPrimaryDark"
+        android:shortcutShortLabel="@string/JCamera"
+        android:shortcutLongLabel="@string/Capture_photos_for_your_journey"
+        android:shortcutDisabledMessage="@string/Camera_disabled">
+        <intent
+            android:action="android.media.action.IMAGE_CAPTURE"
+            android:targetPackage="com.larryhsiao.nyx"
+            android:targetClass="com.larryhsiao.nyx.capture.CaptureActivity" />
+    </shortcut>
+</shortcuts>

@@ -82,8 +82,8 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        cameraExecutor = Executors.newSingleThreadExecutor();
         if (allPermissionsGranted()) {
-            cameraExecutor = Executors.newSingleThreadExecutor();
             requireContext().bindService(
                 new Intent(requireContext(), LocationService.class),
                 this,

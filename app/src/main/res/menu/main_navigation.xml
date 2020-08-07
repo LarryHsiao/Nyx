@@ -30,6 +30,12 @@
     </group>
 
     <item
+        android:title="@string/JCamera"
+        android:id="@+id/menuItem_camera"
+        android:iconTint="@color/colorPrimaryDark"
+        android:icon="@drawable/ic_camera"
+        />
+    <item
         android:title="@string/Version"
         android:id="@+id/menuItem_version"
         app:iconTint="@color/colorPrimaryDark"

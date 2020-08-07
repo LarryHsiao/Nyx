@@ -155,4 +155,7 @@
     <string name="Attachments_in_Jots">Attachments in Jots</string>
     <string name="Untitled">Untitled</string>
     <string name="Size___">Size: %s</string>
+    <string name="JCamera">JCamera</string>
+    <string name="Capture_photos_for_your_journey">Capture photos for your journey.</string>
+    <string name="Camera_disabled">Camera disabled</string>
 </resources>
