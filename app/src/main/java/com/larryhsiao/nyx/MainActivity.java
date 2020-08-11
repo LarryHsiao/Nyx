@@ -28,6 +28,7 @@ import com.larryhsiao.nyx.account.CloudFragment;
 import com.larryhsiao.nyx.account.PlaySubToken;
 import com.larryhsiao.nyx.account.action.SubCheck;
 import com.larryhsiao.nyx.base.JotActivity;
+import com.larryhsiao.nyx.capture.CaptureActivity;
 import com.larryhsiao.nyx.jot.JotListFragment;
 import com.larryhsiao.nyx.settings.SettingFragment;
 import com.larryhsiao.nyx.sync.SyncService;
@@ -110,12 +111,12 @@ public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateL
                 } else if (item.getItemId() == R.id.menuItem_tags) {
                     currentPage = R.id.menuItem_tags;
                     rootPage(new TagListFragment());
+                } else if (item.getItemId() == R.id.menuItem_camera) {
+                    startActivity(new Intent(this, CaptureActivity.class));
                 } else {
                     return true;
                 }
-                navigationView.getMenu()
-                    .findItem(currentPage)
-                    .setChecked(true);
+                navigationView.getMenu().findItem(currentPage).setChecked(true);
                 drawer.closeDrawer(LEFT);
                 return true;
             }
@@ -210,13 +211,8 @@ public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateL
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             userIcon.setImageResource(R.drawable.ic_user);
-            text.setMaxLines(1);
-            text.setLines(1);
             text.setText(new ClickableStr(
-                new ColoredStr(
-                    new ConstSource<>(getString(R.string.Log_in)),
-                    BLUE
-                ),
+                new ColoredStr(new ConstSource<>(getString(R.string.Log_in)), BLUE),
                 () -> startActivityForResult(
                     AuthUI.getInstance()
                         .createSignInIntentBuilder()
@@ -227,8 +223,6 @@ public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateL
                     REQUEST_CODE_LOG_IN
                 )
             ).value());
-            text.setMaxLines(1);
-            text.setLines(1);
             text.setMovementMethod(getInstance());
         } else {
             final CircularProgressDrawable placeholder =
@@ -241,13 +235,9 @@ public class MainActivity extends JotActivity implements FirebaseAuth.AuthStateL
                 .placeholder(placeholder)
                 .apply(circleCropTransform())
                 .into(userIcon);
-            text.setMaxLines(3);
-            text.setLines(3);
             text.setText(user.getDisplayName());
             text.append("\n");
-            text.append(user.getEmail());
             text.setMovementMethod(LinkMovementMethod.getInstance());
-            text.append("\n");
             text.append(new ClickableStr(
                 new ColoredStr(
                     new ConstSource<>(getString(R.string.logout)),
