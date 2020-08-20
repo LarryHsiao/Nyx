@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.larryhsiao.nyx.attachments.TempAttachmentFile;
 import com.larryhsiao.nyx.backup.Backup;
 import com.larryhsiao.nyx.core.attachments.AllAttachments;
 import com.larryhsiao.nyx.core.attachments.Attachment;
@@ -13,7 +14,6 @@ import com.silverhetch.clotho.Source;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -124,10 +124,10 @@ public class DriveBackup implements Backup {
     }
 
     private void restoreDb() throws IOException, SQLException {
-        final java.io.File target = Files.createTempFile(
-            "tempDb",
-            ".sql"
-        ).toFile();
+        final java.io.File target = new TempAttachmentFile(
+            context,
+            "tempDb.sql"
+        ).value();
         driveFiles.download(
             driveFiles.touch(BACKUP_FILE_NAME, "*/*"),
             target

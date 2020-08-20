@@ -24,7 +24,6 @@ import com.silverhetch.clotho.source.ConstSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
@@ -167,7 +166,7 @@ public class SharedActivity extends JotActivity {
 
     private String readText(Uri uri) {
         try {
-            File temp = Files.createTempFile("temp", "txt").toFile();
+            File temp = new TempAttachmentFile(this, "temp.txt").value();
             new ToFile(
                 getContentResolver().openInputStream(uri),
                 temp,

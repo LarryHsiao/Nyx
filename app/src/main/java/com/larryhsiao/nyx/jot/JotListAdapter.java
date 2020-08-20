@@ -88,9 +88,9 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
         final AttachmentSliderAdapter adapter = new AttachmentSliderAdapter(
             image.getContext(),
             (view, uri, longClicked) -> {
-                if (longClicked){
+                if (longClicked) {
                     showAttachmentProperties(view, uri);
-                }else {
+                } else {
                     new LaunchAttachment(view.getContext(), uri).fire();
                 }
             }
@@ -103,7 +103,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
             image.setVisibility(VISIBLE);
             for (int i = 0; i < image.getItemDecorationCount(); i++) {
                 RecyclerView.ItemDecoration decoration = image.getItemDecorationAt(i);
-                if (decoration instanceof DotIndicatorDecoration){
+                if (decoration instanceof DotIndicatorDecoration) {
                     ((DotIndicatorDecoration) decoration).attachTo(image);
                 }
             }
@@ -191,7 +191,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private void showAttachmentProperties(View view, String uri) {
-        final PopupMenu popup = new PopupMenu(view.getContext(),view );
+        final PopupMenu popup = new PopupMenu(view.getContext(), view);
         popup.getMenu()
             .add(view.getContext().getString(R.string.properties))
             .setOnMenuItemClickListener(item -> {
@@ -209,20 +209,11 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
     /**
      * Load data into list
      */
-    public void loadJots(List<Jot> data) {
+    public void loadJots(List<Jot> newData) {
         this.data.clear();
-        this.data.addAll(data);
-        this.data.sort((o1, o2) -> {
-//            if (abs(o1.createdTime() - o2.createdTime()) < 86400000 && dateStr(o1).equals(dateStr(o2))) {
-//                return (int) (
-//                    o1.createdTime() / 1000f - o2.createdTime() / 1000f
-//                );
-//            } else {
-                return (int) (
-                    o2.createdTime() / 1000f - o1.createdTime() / 1000f
-                );
-//            }
-        });
+        data.addAll(newData.stream().sorted((o1, o2) -> (int) (
+            o2.createdTime() / 1000f - o1.createdTime() / 1000f
+        )).collect(toList()));
         notifyDataSetChanged();
     }
 

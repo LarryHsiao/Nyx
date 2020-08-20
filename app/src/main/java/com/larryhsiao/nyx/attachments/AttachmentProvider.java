@@ -23,7 +23,6 @@ import com.silverhetch.aura.uri.UriMimeType;
 import com.silverhetch.clotho.Source;
 import com.silverhetch.clotho.database.SingleConn;
 import com.silverhetch.clotho.database.h2.EmbedH2Conn;
-import com.silverhetch.clotho.file.FileSize;
 import com.silverhetch.clotho.source.ConstSource;
 
 import java.io.File;
@@ -96,7 +95,7 @@ public class AttachmentProvider extends DocumentsProvider {
             row.add(Document.COLUMN_DISPLAY_NAME, getContext().getString(R.string.app_name));
             row.add(Document.COLUMN_LAST_MODIFIED, attachmentRoot.lastModified());
             row.add(Document.COLUMN_FLAGS, FLAG_SUPPORTS_THUMBNAIL);
-            row.add(Document.COLUMN_SIZE, new FileSize(attachmentRoot.toPath()).value());
+            row.add(Document.COLUMN_SIZE, new FileSize(attachmentRoot).value());
             row.add(Document.COLUMN_ICON, R.mipmap.ic_launcher);
             row.add(Document.COLUMN_MIME_TYPE, "vnd.android.document/directory");
         } else if (id.startsWith(ID_PREFIX_JOT)) {

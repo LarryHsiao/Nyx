@@ -238,26 +238,24 @@ public class JotContentFragment extends JotFragment
         billing.startConnection(this);
         dateText = view.findViewById(R.id.jot_date);
         dateText.setOnClickListener(v -> {
-            DatePickerDialog dialog = new DatePickerDialog(view.getContext());
-            Calendar calendar =
-                new DateCalendar(jot.createdTime(), Calendar.getInstance())
-                    .value();
-            dialog.getDatePicker().updateDate(
+            Calendar calendar = new DateCalendar(jot.createdTime(), Calendar.getInstance()).value();
+            DatePickerDialog dialog = new DatePickerDialog(
+                view.getContext(),
+                (view1, year, month, dayOfMonth) -> {
+                    jot = new WrappedJot(jot) {
+                        @Override
+                        public long createdTime() {
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.set(year, month, dayOfMonth);
+                            return calendar.getTimeInMillis();
+                        }
+                    };
+                    updateDateIndicator();
+                },
                 calendar.get(YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
             );
-            dialog.setOnDateSetListener((view1, year, month, dayOfMonth) -> {
-                jot = new WrappedJot(jot) {
-                    @Override
-                    public long createdTime() {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.set(year, month, dayOfMonth);
-                        return calendar.getTimeInMillis();
-                    }
-                };
-                updateDateIndicator();
-            });
             dialog.show();
         });
         updateDateIndicator();
@@ -613,15 +611,14 @@ public class JotContentFragment extends JotFragment
                 dbTags.remove(tagOnView.id());
             }
         }
-        dbTags.forEach(
-            (aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
+        dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
     }
 
     private void saveAttachment() {
         final List<Attachment> dbAttachments = new QueriedAttachments(
             new AttachmentsByJotId(db, jot.id())
         ).value();
-        attachmentOnView.forEach(uri -> {
+        for (Uri uri : attachmentOnView) {
             boolean hasItem = false;
             List<Attachment> existOnView = new ArrayList<>();
             for (Attachment dbAttachment : dbAttachments) {
@@ -634,10 +631,10 @@ public class JotContentFragment extends JotFragment
             if (!hasItem) {
                 new NewAttachment(db, uri.toString(), jot.id()).value();
             }
-        });
-        dbAttachments.forEach((attachment) ->
-            new RemovalAttachment(db, attachment.id()).fire()
-        );
+        }
+        for (Attachment attachment : dbAttachments) {
+            new RemovalAttachment(db, attachment.id()).fire();
+        }
     }
 
     private void deleteFlow() {
@@ -801,13 +798,13 @@ public class JotContentFragment extends JotFragment
                         .getVisionCloudLandmarkDetector()
                         .detectInImage(image)
                         .addOnSuccessListener(it3 -> {
-                            it3.sort((o1, o2) ->
-                                (int) (
-                                    (o1.getConfidence() - o2.getConfidence()) *
-                                        100));
-                            if (it3.size() > 0) {
+                            List<FirebaseVisionCloudLandmark> sorted =
+                                it3.stream().sorted((o1, o2) ->
+                                    (int) ((o1.getConfidence() - o2.getConfidence()) * 100)
+                                ).collect(toList());
+                            if (sorted.size() > 0) {
                                 FirebaseVisionCloudLandmark landmark =
-                                    it3.get(0);
+                                    sorted.get(0);
                                 newChip(landmark.getLandmark());
                                 if (landmark.getLocations().size() > 0) {
                                     updateJotLocation(
@@ -926,7 +923,12 @@ public class JotContentFragment extends JotFragment
     }
 
     private void browseAttachments(String selectedUri) {
-        attachmentOnView.sort(new JpegDateComparator(requireContext()));
+        List<Uri> sorted = attachmentOnView
+            .stream()
+            .sorted(new JpegDateComparator(requireContext()))
+            .collect(toList());
+        attachmentOnView.clear();
+        attachmentOnView.addAll(sorted);
         FullScreenDialogFragment dialog =
             AttachmentsFragment.newInstance(attachmentOnView, selectedUri);
         dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
@@ -1024,7 +1026,7 @@ public class JotContentFragment extends JotFragment
     private void updateJotLocation(ExifInterface exif) {
         Location location = new ExifLocation(exif).value();
         if (isLocationSetup() ||
-            (location.getLongitude() == 0 && location.getLatitude()==0)) {
+            (location.getLongitude() == 0 && location.getLatitude() == 0)) {
             return;
         }
         updateJotLocation(location);

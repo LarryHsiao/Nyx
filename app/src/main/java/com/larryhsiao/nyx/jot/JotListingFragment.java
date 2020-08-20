@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -197,9 +198,13 @@ abstract class JotListingFragment extends JotFragment {
             return false;
         });
         if (filter.dateRange()[0] == 0L && filter.dateRange()[0] == 0L) {
-            menu.findItem(R.id.menuItem_datePicker).setIconTintList(ColorStateList.valueOf(WHITE));
+            MenuItemCompat.setIconTintList(
+                menu.findItem(R.id.menuItem_datePicker),
+                ColorStateList.valueOf(WHITE)
+            );
         } else {
-            menu.findItem(R.id.menuItem_datePicker).setIconTintList(
+            MenuItemCompat.setIconTintList(
+                menu.findItem(R.id.menuItem_datePicker),
                 ColorStateList.valueOf(getResources().getColor(R.color.colorActive))
             );
         }
@@ -230,9 +235,10 @@ abstract class JotListingFragment extends JotFragment {
                             return new long[]{started, ended};
                         }
                     });
-                    item.setIconTintList(ColorStateList.valueOf(
-                        getResources().getColor(R.color.colorActive)
-                    ));
+                    MenuItemCompat.setIconTintList(
+                        item,
+                        ColorStateList.valueOf(getResources().getColor(R.color.colorActive)
+                        ));
                 })
                 .setNeutralButton(R.string.Clear, (dialog, which) -> {
                     onUpdateFilter(new WrappedFilter(filter) {
@@ -241,7 +247,10 @@ abstract class JotListingFragment extends JotFragment {
                             return new long[]{0L, 0L};
                         }
                     });
-                    item.setIconTintList(ColorStateList.valueOf(WHITE));
+                    MenuItemCompat.setIconTintList(
+                        item,
+                        ColorStateList.valueOf(getResources().getColor(R.color.colorActive)
+                        ));
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                     // Leave it not changed
