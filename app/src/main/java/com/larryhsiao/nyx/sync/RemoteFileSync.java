@@ -168,9 +168,6 @@ public class RemoteFileSync implements Action {
     }
 
     private void upload(StorageReference remoteFileRef, File localFile) throws Exception{
-        if (localFile.length() > 1024 * 1024 * 20) { // limit to 20 MB, @todo #1 Config object for limiting attachment file size.
-            return;
-        }
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(ENCRYPT_MODE, key);
         // @todo #0 Handle upload failed.
