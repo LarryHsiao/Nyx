@@ -19,7 +19,6 @@ import com.silverhetch.clotho.source.SingleRefSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
@@ -101,7 +100,7 @@ public class LocalFileSync implements Action {
     }
 
     private void compressToInternal(File internalRoot, Attachment attachment) throws IOException {
-        final File compressTemp = Files.createTempFile("compressedTemp", "").toFile();
+        final File compressTemp = new TempAttachmentFile(context, "compressedTemp").value();
         final File temp;
         if (attachment.uri().startsWith(URI_FILE_TEMP_PROVIDER)) {
             temp = new TempAttachmentFile(
@@ -109,7 +108,7 @@ public class LocalFileSync implements Action {
                 attachment.uri().replace(URI_FILE_TEMP_PROVIDER, "")
             ).value();
         } else {
-            temp = Files.createTempFile("temp", "").toFile();
+            temp = new TempAttachmentFile(context, "temp").value();
             new ToFile(
                 context.getContentResolver().openInputStream(Uri.parse(attachment.uri())),
                 temp,

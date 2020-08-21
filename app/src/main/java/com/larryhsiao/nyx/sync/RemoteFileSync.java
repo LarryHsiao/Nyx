@@ -10,14 +10,14 @@ import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
+import com.silverhetch.clotho.io.ProgressedCopy;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.io.FileOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -167,7 +167,7 @@ public class RemoteFileSync implements Action {
         }
     }
 
-    private void upload(StorageReference remoteFileRef, File localFile) throws Exception{
+    private void upload(StorageReference remoteFileRef, File localFile) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(ENCRYPT_MODE, key);
         // @todo #0 Handle upload failed.
@@ -179,12 +179,15 @@ public class RemoteFileSync implements Action {
     private void download(StorageReference remoteRoot, File dist) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(DECRYPT_MODE, key);
+        if (dist.exists()){
+            dist.delete();
+        }
         StreamDownloadTask task = remoteRoot.getStream((taskSnapshot, inputStream) -> {
-                Files.copy(
+                new ProgressedCopy(
                     new CipherInputStream(inputStream, cipher),
-                    dist.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING
-                );
+                    new FileOutputStream(dist),
+                    (progress) -> null
+                ).value();
                 inputStream.close();
             }
         );

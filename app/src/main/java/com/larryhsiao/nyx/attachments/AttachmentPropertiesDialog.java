@@ -7,7 +7,6 @@ import androidx.appcompat.app.AlertDialog;
 import com.larryhsiao.nyx.JotApplication;
 import com.larryhsiao.nyx.R;
 import com.silverhetch.clotho.Action;
-import com.silverhetch.clotho.file.FileSize;
 import com.silverhetch.clotho.file.SizeText;
 
 /**
@@ -36,7 +35,7 @@ public class AttachmentPropertiesDialog implements Action {
         textView.append(context.getString(
             R.string.Size___,
             new SizeText(
-                new FileSize(new AttachmentFileSource(context, uri).value().toPath())
+                new FileSize(new AttachmentFileSource(context, uri).value())
             ).value()
         ));
     }

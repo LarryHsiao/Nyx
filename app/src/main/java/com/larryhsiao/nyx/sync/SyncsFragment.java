@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.account.action.LogoutAction;
 import com.larryhsiao.nyx.account.action.SubCheck;
+import com.larryhsiao.nyx.attachments.FileSize;
 import com.larryhsiao.nyx.base.JotFragment;
 import com.larryhsiao.nyx.core.jots.AllJots;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
@@ -32,7 +33,6 @@ import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.silverhetch.aura.view.bitmap.CircledDrawable;
 import com.silverhetch.aura.view.span.ClickableStr;
 import com.silverhetch.aura.view.span.ColoredStr;
-import com.silverhetch.clotho.file.FileSize;
 import com.silverhetch.clotho.file.SizeText;
 import com.silverhetch.clotho.source.ConstSource;
 
@@ -125,7 +125,7 @@ public class SyncsFragment extends JotFragment implements FirebaseAuth.AuthState
                         new File(
                             getContext().getFilesDir(),
                             "attachments"
-                        ).toPath()
+                        )
                     )
                 ).value()
             )

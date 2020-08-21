@@ -16,7 +16,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.larryhsiao.nyx.R;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static androidx.core.content.ContextCompat.checkSelfPermission;
 
 /**
  * Fragment for display a place by google map.
@@ -42,9 +46,10 @@ public class EmbedMapFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+        @NonNull LayoutInflater inflater,
+        @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
         final FrameLayout root = new FrameLayout(inflater.getContext());
         root.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         root.setId(viewId = View.generateViewId());
@@ -61,7 +66,10 @@ public class EmbedMapFragment extends Fragment {
         super.onResume();
         SupportMapFragment mapFrag = SupportMapFragment.newInstance();
         mapFrag.getMapAsync(googleMap -> {
-            googleMap.setMyLocationEnabled(false);
+            if (checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION) != PERMISSION_GRANTED &&
+                checkSelfPermission(requireContext(), ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+                googleMap.setMyLocationEnabled(false);
+            }
             UiSettings settings = googleMap.getUiSettings();
             settings.setAllGesturesEnabled(false);
             settings.setMapToolbarEnabled(false);
@@ -70,7 +78,7 @@ public class EmbedMapFragment extends Fragment {
             ), 15);
             googleMap.moveCamera(update);
             MarkerOptions marker = new MarkerOptions();
-            marker.position(new LatLng(location[1],location[0]));
+            marker.position(new LatLng(location[1], location[0]));
             googleMap.addMarker(marker);
         });
         getChildFragmentManager().beginTransaction()
