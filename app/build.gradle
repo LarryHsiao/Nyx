@@ -1,5 +1,8 @@
 buildscript {
-    ext.camerax_version = "1.0.0-beta07"
+    ext{
+        camerax_version = "1.0.0-beta07"
+        kotlinVersion = '1.4.0'
+    }
     repositories {
         google()
         jcenter()
@@ -11,6 +14,7 @@ buildscript {
         classpath "com.github.triplet.gradle:play-publisher:2.7.2"
         classpath 'com.google.gms:google-services:4.3.3'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
 plugins {
@@ -19,6 +23,8 @@ plugins {
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 System.out.println(thea.indicator.apply(""))
 
@@ -91,6 +97,9 @@ configurations.all {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':nyx-core')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0'
+    implementation 'android.arch.navigation:navigation-ui:1.0.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
     implementation 'com.google.guava:guava:27.0.1-android'
     implementation "androidx.camera:camera-core:${camerax_version}"
