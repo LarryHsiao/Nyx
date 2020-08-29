@@ -10,6 +10,6 @@
     app:fastScrollVerticalThumbDrawable="@drawable/selector_fast_scroll_thumb"
     app:fastScrollVerticalTrackDrawable="@drawable/selector_fast_scroll_track"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:listitem="@layout/item_jot"
+    tools:listitem="@layout/item_jot_old"
     android:layout_height="match_parent">
 </androidx.recyclerview.widget.RecyclerView>

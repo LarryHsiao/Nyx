@@ -165,7 +165,7 @@ public class JotMapFragment extends JotListingFragment {
             location.setLatitude(marker.getPosition().latitude);
             ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1);
-            adapter.add(getString(R.string.new_jot));
+            adapter.add(getString(R.string.New_Jot));
             new AlertDialog.Builder(requireContext())
                 .setTitle(
                     marker.getPosition().latitude + ", " + marker.getPosition().longitude

@@ -61,7 +61,7 @@ public class JotListAdapter extends RecyclerView.Adapter<ViewHolder> {
     public ViewHolder onCreateViewHolder(
         @NonNull ViewGroup parent, int viewType) {
         ViewHolder holder = new ViewHolder(from(parent.getContext()).inflate(
-            R.layout.item_jot, parent, false
+            R.layout.item_jot_old, parent, false
         ));
         RecyclerView slider = holder.itemView.findViewById(R.id.itemJot_image);
         new Slider(slider).fire();
