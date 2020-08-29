@@ -13,6 +13,6 @@
         <intent
             android:action="android.media.action.IMAGE_CAPTURE"
             android:targetPackage="com.larryhsiao.nyx"
-            android:targetClass="com.larryhsiao.nyx.capture.CaptureActivity" />
+            android:targetClass="com.larryhsiao.nyx.old.capture.CaptureActivity" />
     </shortcut>
 </shortcuts>

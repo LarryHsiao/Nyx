@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
-import com.larryhsiao.nyx.base.JotActivity;
-import com.larryhsiao.nyx.capture.CaptureActivity;
+import com.larryhsiao.nyx.old.base.JotActivity;
+import com.larryhsiao.nyx.old.capture.CaptureActivity;
 
 /**
  * Debug Panel activity
