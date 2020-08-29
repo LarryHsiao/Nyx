@@ -19,7 +19,7 @@ public abstract class JotFragment extends AuraFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = ((JotApplication) getContext().getApplicationContext()).db;
+        db = ((JotApplication) getContext().getApplicationContext()).dbSrc;
         remoteConfig = ((JotApplication) getContext().getApplicationContext()).remoteConfig;
     }
 }

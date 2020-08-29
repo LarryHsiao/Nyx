@@ -50,7 +50,7 @@ public class DriveBackupService extends JobIntentService implements ServiceIds, 
         }
         Backup backup = new DriveBackup(
             this,
-            ((JotApplication) getApplication()).db,
+            ((JotApplication) getApplication()).dbSrc,
             new DriveFilesImpl(
                 new Drive.Builder(
                     AndroidHttp.newCompatibleTransport(),

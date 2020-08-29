@@ -28,7 +28,7 @@ public abstract class JotActivity extends AuraActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         JotApplication app = ((JotApplication) getApplicationContext());
-        db = app.db;
+        db = app.dbSrc;
         settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
     }
 

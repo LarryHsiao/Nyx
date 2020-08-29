@@ -15,13 +15,14 @@ import java.sql.Connection
  * Application of Jot.
  */
 class JotApplication : Application() {
-    @JvmField var lastAuthed = 0L
-    @JvmField var db: Source<Connection>? = null
-    @JvmField var remoteConfig: FirebaseRemoteConfig? = null
-
     companion object {
+        @Deprecated("Remove it after 4.0 conpleted")
         @JvmField val FILE_PROVIDER_AUTHORITY: String?
+
+        @Deprecated("Remove it after 4.0 conpleted")
         @JvmField val URI_FILE_PROVIDER: String?
+
+        @Deprecated("Remove it after 4.0 conpleted")
         @JvmField val URI_FILE_TEMP_PROVIDER: String?
 
         init {
@@ -31,21 +32,37 @@ class JotApplication : Application() {
         }
     }
 
+    @Deprecated("Remove it after 4.0 conpleted")
+    @JvmField var lastAuthed = 0L
+
+    @Deprecated("Remove it after 4.0 conpleted")
+    @JvmField var dbSrc: Source<Connection>? = null
+
+    @Deprecated("Remove it after 4.0 conpleted")
+    @JvmField var remoteConfig: FirebaseRemoteConfig? = null
+
+    val db: Source<Connection> by lazy { SingleConn(NyxDb(File(filesDir, "jot"))) }
+    val config: Config by lazy {
+        RemoteConfig(
+            FirebaseRemoteConfig.getInstance().apply {
+                setDefaultsAsync(R.xml.remote_config_defaults)
+                setConfigSettingsAsync(
+                    FirebaseRemoteConfigSettings.Builder()
+                        .setFetchTimeoutInSeconds(60)
+                        .build()
+                )
+                fetchAndActivate()
+            }
+        )
+    }
+
     override fun onCreate() {
         super.onCreate()
         ContextHolder.setContext(this)
         val dbFile = File(filesDir, "jot")
-        db = SingleConn(NyxDb(dbFile))
+        dbSrc = SingleConn(NyxDb(dbFile))
         if ("robolectric" == Build.FINGERPRINT) {
             return
         }
-        remoteConfig = FirebaseRemoteConfig.getInstance()
-        remoteConfig!!.setDefaultsAsync(R.xml.remote_config_defaults)
-        remoteConfig!!.setConfigSettingsAsync(
-            FirebaseRemoteConfigSettings.Builder()
-                .setFetchTimeoutInSeconds(60)
-                .build()
-        )
-        remoteConfig!!.fetchAndActivate()
     }
 }
