@@ -31,9 +31,16 @@ class JotsViewModel(private val db: Source<Connection>) : ViewModel() {
 
     fun jots(): LiveData<List<Jot>> = jots
 
-    fun byDate(calendar: Calendar) = viewModelScope.launch {
+    fun initJots(){
+        if (jots.value == null){
+            selectDate(selected.value?:return)
+        }
+    }
+
+    fun selectDate(calendar: Calendar) = viewModelScope.launch {
         withContext(IO) {
             loading.postValue(true)
+            selected.postValue(calendar)
             jots.postValue(
                 QueriedJots(
                     JotsByDate(

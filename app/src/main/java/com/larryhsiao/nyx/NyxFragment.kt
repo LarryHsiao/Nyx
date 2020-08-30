@@ -10,7 +10,7 @@ abstract class NyxFragment : Fragment() {
     val app by lazy {
         requireContext().applicationContext as JotApplication
     }
-    val viewModelProvider by lazy {
+    val modelProvider by lazy {
         ViewModelProviders.of(
             this,
             ViewModelFactory(app)

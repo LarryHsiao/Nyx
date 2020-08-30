@@ -9,11 +9,15 @@
         android:name="com.larryhsiao.nyx.jot.JotsFragment"
         android:label="JotsFragment" >
         <action
-            android:id="@+id/action_jotsFragment_to_newJotFragment"
-            app:destination="@id/newJotFragment" />
+            android:id="@+id/action_jotsFragment_to_jotFragment"
+            app:destination="@id/jotFragment" />
     </fragment>
     <fragment
-        android:id="@+id/newJotFragment"
+        android:id="@+id/jotFragment"
         android:name="com.larryhsiao.nyx.jot.JotFragment"
-        android:label="NewJotFragment" />
+        android:label="JotFragment">
+        <argument
+            android:name="id"
+            app:argType="long" />
+    </fragment>
 </navigation>

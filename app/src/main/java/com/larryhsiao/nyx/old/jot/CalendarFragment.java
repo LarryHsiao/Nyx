@@ -102,6 +102,7 @@ public class CalendarFragment extends JotFragment {
                 Fragment frag = JotContentFragment.newInstance(new ConstJot(
                     -1,
                     "",
+                    "",
                     selectedDate().getTimeInMillis(),
                     new double[]{MIN_VALUE, MIN_VALUE},
                     "",

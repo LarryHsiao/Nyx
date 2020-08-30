@@ -175,6 +175,7 @@ public class JotMapFragment extends JotListingFragment {
                         new ConstJot(
                             -1,
                             "",
+                            "",
                             System.currentTimeMillis(),
                             new double[]{
                                 marker.getPosition().longitude,

@@ -18,8 +18,12 @@ import java.util.Calendar.*
  * Fragment that shows all Jots.
  */
 class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
-    private val model by lazy { viewModelProvider.get(JotsViewModel::class.java) }
-    private val adapter by lazy { JotsAdapter() }
+    private val model by lazy { modelProvider.get(JotsViewModel::class.java) }
+    private val adapter by lazy {
+        JotsAdapter {
+            toJotFragment(it.id())
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,8 +35,8 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         super.onViewCreated(view, savedInstanceState)
         jots_calendarView.setOnCalendarSelectListener(this)
         jots_recyclerView.adapter = adapter
-        jots_newJot_floatingActionButton.setOnClickListener { toNewJotFragment() }
-        jots_newJot_textView.setOnClickListener { toNewJotFragment() }
+        jots_newJot_floatingActionButton.setOnClickListener { toJotFragment(-1L) }
+        jots_newJot_textView.setOnClickListener { toJotFragment(-1L) }
         model.loading().observe(viewLifecycleOwner, {
             if (it) {
                 jots_newJot_textView.visibility = GONE
@@ -60,10 +64,17 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
                 day = it.get(DAY_OF_MONTH)
             }.let { jots_calendarView.setSelectCalendarRange(it, it) }
         })
+        model.initJots()
     }
 
-    private fun toNewJotFragment() {
-        Navigation.findNavController(requireView()).navigate(R.id.newJotFragment)
+    private fun toJotFragment(id: Long) {
+        Navigation.findNavController(requireView())
+            .navigate(
+                R.id.jotFragment,
+                Bundle().apply {
+                    putLong("id", id)
+                }
+            )
     }
 
     override fun onCalendarOutOfRange(calendar: Calendar?) {
@@ -71,10 +82,12 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
 
     override fun onCalendarSelect(calendar: Calendar?, isClick: Boolean) {
         calendar ?: return
-        model.byDate(java.util.Calendar.getInstance().apply {
-            set(YEAR, calendar.year)
-            set(MONTH, calendar.month - 1)
-            set(DAY_OF_MONTH, calendar.day)
-        })
+        if (isClick) {
+            model.selectDate(java.util.Calendar.getInstance().apply {
+                set(YEAR, calendar.year)
+                set(MONTH, calendar.month - 1)
+                set(DAY_OF_MONTH, calendar.day)
+            })
+        }
     }
 }

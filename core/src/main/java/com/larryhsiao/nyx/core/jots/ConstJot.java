@@ -1,5 +1,7 @@
 package com.larryhsiao.nyx.core.jots;
 
+import static java.lang.Double.MIN_VALUE;
+
 /**
  * Const of Jot
  */
@@ -12,6 +14,19 @@ public class ConstJot implements Jot {
     private final String mood;
     private final int version;
     private final boolean deleted;
+
+    public ConstJot(){
+        this(
+            -1,
+            "",
+            "",
+            System.currentTimeMillis(),
+            new double[]{MIN_VALUE, MIN_VALUE},
+            "",
+            1,
+            false
+        );
+    }
 
     public ConstJot(
         long id,

@@ -19,6 +19,8 @@ class JotViewModel(private val db: Source<Connection>) : ViewModel() {
     fun jot(): LiveData<Jot> = jot
 
     fun loadJot(id: Long) = viewModelScope.launch(IO) {
-        jot.postValue(JotById(id, db).value())
+        if (id != -1L){
+            jot.postValue(JotById(id, db).value())
+        }
     }
 }

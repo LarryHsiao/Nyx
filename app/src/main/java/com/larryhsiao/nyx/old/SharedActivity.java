@@ -109,6 +109,7 @@ public class SharedActivity extends JotActivity {
                 return new ConstJot(
                     -1,
                     "",
+                    "",
                     exifTime(exif),
                     exifGeometry(exif),
                     "",
@@ -116,27 +117,11 @@ public class SharedActivity extends JotActivity {
                     false
                 );
             } else {
-                return new ConstJot(
-                    -1,
-                    "",
-                    System.currentTimeMillis(),
-                    new double[]{MIN_VALUE, MIN_VALUE},
-                    "",
-                    1,
-                    false
-                );
+                return new ConstJot();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new ConstJot(
-                -1,
-                "",
-                System.currentTimeMillis(),
-                new double[]{MIN_VALUE, MIN_VALUE},
-                "",
-                1,
-                false
-            );
+            return new ConstJot();
         }
     }
 

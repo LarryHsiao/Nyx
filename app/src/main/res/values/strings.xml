@@ -158,4 +158,7 @@
     <string name="JCamera">JCamera</string>
     <string name="Capture_photos_for_your_journey">Capture photos for your journey.</string>
     <string name="Camera_disabled">Camera disabled</string>
+    <string name="Add_a_title">Add a title</string>
+    <string name="Start_writing___">Start writing...</string>
+    <string name="No_title">No Title</string>
 </resources>

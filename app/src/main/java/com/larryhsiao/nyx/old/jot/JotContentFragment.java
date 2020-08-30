@@ -139,6 +139,7 @@ public class JotContentFragment extends JotFragment
             new ConstJot(
                 -1,
                 "",
+                "",
                 System.currentTimeMillis(),
                 new double[]{MIN_VALUE, MIN_VALUE},
                 "",
@@ -191,6 +192,7 @@ public class JotContentFragment extends JotFragment
         } else {
             jot = new ConstJot(
                 -1,
+                "",
                 "",
                 System.currentTimeMillis(),
                 new double[]{MIN_VALUE, MIN_VALUE},

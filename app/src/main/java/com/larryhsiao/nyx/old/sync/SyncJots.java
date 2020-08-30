@@ -88,6 +88,7 @@ public class SyncJots implements Action {
         new UpdateJot(
             new ConstJot(
                 parseLong(remoteJot.getId()),
+                encryptor.decrypt(remoteJot.getString("title")),
                 encryptor.decrypt(remoteJot.getString("content")),
                 parseLong(
                     encryptor.decrypt(remoteJot.getString("createdTime"))),
@@ -106,6 +107,7 @@ public class SyncJots implements Action {
             db,
             new ConstJot(
                 parseLong(remoteJot.getId()),
+                encryptor.decrypt(remoteJot.getString("title")),
                 encryptor.decrypt(remoteJot.getString("content")),
                 parseLong(
                     encryptor.decrypt(remoteJot.getString("createdTime"))),
