@@ -21,11 +21,11 @@ class RankedMergedMoodsTest {
     @Test
     void simple() {
         Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "content", Calendar.getInstance(), "12").value();
-        new NewJot(db, "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "content", Calendar.getInstance(), "56").value();
-        new NewJot(db, "content", Calendar.getInstance(), "78").value();
-        new NewJot(db, "content", Calendar.getInstance(), "90").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "56").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "78").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
         Assertions.assertEquals(
             5,
             new RankedMoods(db).value().size()
@@ -38,12 +38,12 @@ class RankedMergedMoodsTest {
     @Test
     void rank1() {
         Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "content", Calendar.getInstance(), "56").value();
-        new NewJot(db, "content", Calendar.getInstance(), "78").value();
-        new NewJot(db, "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "content", Calendar.getInstance(), "12").value();
-        new NewJot(db, "content", Calendar.getInstance(), "12").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "56").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "78").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
         Assertions.assertEquals(
             "12",
             new RankedMoods(db).value().get(0).mood()
@@ -56,36 +56,37 @@ class RankedMergedMoodsTest {
     @Test
     void rank3() {
         Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "content", Calendar.getInstance(), "12").value();
-        new NewJot(db, "content", Calendar.getInstance(), "12").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
         Assertions.assertEquals(
             "34",
             new RankedMoods(db).value().get(0).mood()
         );
     }
+
     /**
      * Check the ranked moods that all moods have same used count.
      */
     @Test
     void rankSortingAllSame() {
         Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "content", Calendar.getInstance(), "56").value();
-        new NewJot(db, "content", Calendar.getInstance(), "56").value();
-        new NewJot(db, "content", Calendar.getInstance(), "78").value();
-        new NewJot(db, "content", Calendar.getInstance(), "78").value();
-        new NewJot(db, "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "content", Calendar.getInstance(), "12").value();
-        new NewJot(db, "content", Calendar.getInstance(), "12").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "56").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "56").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "78").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "78").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
         Assertions.assertEquals("12", new RankedMoods(db).value().get(0).mood());
         Assertions.assertEquals("34", new RankedMoods(db).value().get(1).mood());
         Assertions.assertEquals("56", new RankedMoods(db).value().get(2).mood());
@@ -97,9 +98,9 @@ class RankedMergedMoodsTest {
     @Test
     void excludeEmpty() {
         Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "content", Calendar.getInstance(), "  ").value();
-        new NewJot(db, "content", Calendar.getInstance(), "").value();
-        new NewJot(db, "content", Calendar.getInstance(), " ").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "  ").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), "").value();
+        new NewJot(db, "title", "content", Calendar.getInstance(), " ").value();
         Assertions.assertEquals(0, new RankedMoods(db).value().size());
     }
 }

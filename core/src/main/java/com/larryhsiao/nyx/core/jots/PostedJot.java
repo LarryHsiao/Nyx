@@ -29,7 +29,14 @@ public class PostedJot implements Source<Jot> {
         if (jot.id() == -1) {
             final Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date(jot.createdTime()));
-            return new NewJot(db, jot.content(), jot.location(), calendar, jot.mood()).value();
+            return new NewJot(
+                db,
+                jot.title(),
+                jot.content(),
+                jot.location(),
+                calendar,
+                jot.mood()
+            ).value();
         } else {
             new UpdateJot(jot, db, updateVer).fire();
             return jot;

@@ -44,9 +44,10 @@ import com.silverhetch.clotho.Source;
 public class MeterDelta implements Source<Double> {
     private final double meters;
 
-    public MeterDelta(){
+    public MeterDelta() {
         this(1.0);
     }
+
     public MeterDelta(double meters) {this.meters = meters;}
 
     @Override

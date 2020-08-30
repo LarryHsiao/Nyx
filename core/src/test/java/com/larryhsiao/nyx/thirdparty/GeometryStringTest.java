@@ -17,15 +17,15 @@ public class GeometryStringTest {
     @Test
     public void geometryString() {
         Assertions.assertEquals(
-                "POINT (100.5 90.5)",
-                new Point(
-                        new CoordinateArraySequence(
-                                new Coordinate[]{
-                                        new Coordinate(100.5, 90.5)
-                                }
-                        ),
-                        new GeometryFactory()
-                ).toText()
+            "POINT (100.5 90.5)",
+            new Point(
+                new CoordinateArraySequence(
+                    new Coordinate[]{
+                        new Coordinate(100.5, 90.5)
+                    }
+                ),
+                new GeometryFactory()
+            ).toText()
         );
     }
 }

@@ -1,11 +1,11 @@
 package com.larryhsiao.nyx.core.jots;
 
-
 /**
  * Const of Jot
  */
 public class ConstJot implements Jot {
     private final long id;
+    private final String title;
     private final String content;
     private final long createdTime;
     private final double[] location;
@@ -13,8 +13,18 @@ public class ConstJot implements Jot {
     private final int version;
     private final boolean deleted;
 
-    public ConstJot(long id, String content, long createdTime, double[] location, String mood, int version, boolean deleted) {
+    public ConstJot(
+        long id,
+        String title,
+        String content,
+        long createdTime,
+        double[] location,
+        String mood,
+        int version,
+        boolean deleted
+    ) {
         this.id = id;
+        this.title = title;
         this.content = content;
         this.createdTime = createdTime;
         this.location = location;
@@ -25,12 +35,18 @@ public class ConstJot implements Jot {
 
     public ConstJot(Jot jot) {
         this.id = jot.id();
+        this.title = jot.title();
         this.location = jot.location();
         this.createdTime = jot.createdTime();
         this.content = jot.content();
         this.mood = jot.mood();
         this.version = jot.version();
         this.deleted = jot.deleted();
+    }
+
+    @Override
+    public String title() {
+        return title;
     }
 
     @Override

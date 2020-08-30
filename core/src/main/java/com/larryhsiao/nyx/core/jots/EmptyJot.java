@@ -10,6 +10,7 @@ public class EmptyJot extends ConstJot {
         super(
             -1,
             "",
+            "",
             System.currentTimeMillis(),
             new double[]{MIN_VALUE, MIN_VALUE},
             "",

@@ -5,6 +5,11 @@ package com.larryhsiao.nyx.core.jots;
  */
 public class SampleJot implements Jot {
     @Override
+    public String title() {
+        return "Sample title";
+    }
+
+    @Override
     public long id() {
         return -1;
     }

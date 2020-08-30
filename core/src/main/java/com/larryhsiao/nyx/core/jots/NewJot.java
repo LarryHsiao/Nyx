@@ -6,11 +6,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.Calendar;
 
 import static java.lang.Double.MIN_VALUE;
@@ -23,21 +19,49 @@ public class NewJot implements Source<Jot> {
     private final Source<Connection> db;
     private final Jot jot;
 
-    public NewJot(Source<Connection> db, String content) {
-        this(db, content, new double[]{MIN_VALUE, MIN_VALUE}, Calendar.getInstance(), " ");
+    public NewJot(
+        Source<Connection> db,
+        String title,
+        String content) {
+        this(db, title, content, new double[]{MIN_VALUE, MIN_VALUE}, Calendar.getInstance(), " ");
     }
 
-    public NewJot(Source<Connection> db, String content, Calendar calendar, String mood) {
-        this(db, content, new double[]{MIN_VALUE, MIN_VALUE}, calendar, mood);
+    public NewJot(
+        Source<Connection> db,
+        String title,
+        String content,
+        Calendar calendar,
+        String mood) {
+        this(db, title, content, new double[]{MIN_VALUE, MIN_VALUE}, calendar, mood);
     }
 
-    public NewJot(Source<Connection> db, String content, double[] location, String mood) {
-        this(db, content, location, Calendar.getInstance(), mood);
+    public NewJot(
+        Source<Connection> db,
+        String title,
+        String content,
+        double[] location,
+        String mood) {
+        this(db, title, content, location, Calendar.getInstance(), mood);
     }
 
-    public NewJot(Source<Connection> db, String content, double[] location, Calendar calendar, String mood) {
+    public NewJot(
+        Source<Connection> db,
+        String title,
+        String content,
+        double[] location,
+        Calendar calendar,
+        String mood) {
         this.db = db;
-        this.jot = new ConstJot(-1L, content, calendar.getTimeInMillis(), location, mood, 1, false);
+        this.jot = new ConstJot(
+            -1L,
+            title,
+            content,
+            calendar.getTimeInMillis(),
+            location,
+            mood,
+            1,
+            false
+        );
     }
 
     public NewJot(Source<Connection> db, Jot jot) {
