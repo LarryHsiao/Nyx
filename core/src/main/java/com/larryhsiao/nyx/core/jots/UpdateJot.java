@@ -37,7 +37,7 @@ public class UpdateJot implements Action {
         try (PreparedStatement stmt = conn.prepareStatement(
             // language=H2
             "UPDATE jots " +
-                "SET content=?1, location=?2, CREATEDTIME=?3, MOOD=?4, VERSION=?5 , DELETE=?7 " +
+                "SET content=?1, location=?2, CREATEDTIME=?3, MOOD=?4, VERSION=?5 , DELETE=?7, TITLE=?8 " +
                 "WHERE id=?6;"
         )) {
             stmt.setString(1, updated.content());
@@ -61,6 +61,7 @@ public class UpdateJot implements Action {
             stmt.setInt(5, increaseVer ? updated.version() + 1 : updated.version());
             stmt.setLong(6, updated.id());
             stmt.setInt(7, updated.deleted() ? 1 : 0);
+            stmt.setString(8, updated.title());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

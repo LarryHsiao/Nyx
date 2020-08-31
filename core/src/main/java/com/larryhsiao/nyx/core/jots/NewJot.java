@@ -73,8 +73,8 @@ public class NewJot implements Source<Jot> {
     public Jot value() {
         try (PreparedStatement stmt = db.value().prepareStatement(
             // language=H2
-            "INSERT INTO jots(content, createdTime, location, mood, VERSION) " +
-                "VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO jots(content, createdTime, location, mood, VERSION, TITLE) " +
+                "VALUES (?, ?, ?, ?, ?, ?)",
             RETURN_GENERATED_KEYS
         )) {
             stmt.setString(1, jot.content());
@@ -97,6 +97,7 @@ public class NewJot implements Source<Jot> {
                 stmt.setString(4, "");
             }
             stmt.setInt(5, jot.version());
+            stmt.setString(6, jot.title());
             if (stmt.executeUpdate() == 0) {
                 throw new SQLException("Insert failed");
             }

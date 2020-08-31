@@ -2,7 +2,7 @@
     <string name="app_name">Jotted</string>
 
     <string name="what_is_in_your_mind">What is in your mind.</string>
-    <string name="save">Save</string>
+    <string name="Save">Save</string>
     <string name="title_should_not_empty">Title should not empty.</string>
     <string name="add_image">Add image</string>
     <string name="delete">Delete</string>
@@ -161,4 +161,6 @@
     <string name="Add_a_title">Add a title</string>
     <string name="Start_writing___">Start writing...</string>
     <string name="No_title">No Title</string>
+    <string name="Done">Done</string>
+    <string name="Edit">Edit</string>
 </resources>

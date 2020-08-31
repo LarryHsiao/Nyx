@@ -6,11 +6,13 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.haibin.calendarview.Calendar
 import com.haibin.calendarview.CalendarView
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_jots.*
 import java.util.Calendar.*
 
@@ -18,7 +20,9 @@ import java.util.Calendar.*
  * Fragment that shows all Jots.
  */
 class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
-    private val model by lazy { modelProvider.get(JotsViewModel::class.java) }
+    private val model by lazy {
+        ViewModelProvider(requireActivity(), ViewModelFactory(app)).get(JotsViewModel::class.java)
+    }
     private val adapter by lazy {
         JotsAdapter {
             toJotFragment(it.id())
@@ -68,13 +72,12 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
     }
 
     private fun toJotFragment(id: Long) {
-        Navigation.findNavController(requireView())
-            .navigate(
-                R.id.jotFragment,
-                Bundle().apply {
-                    putLong("id", id)
-                }
-            )
+        Navigation.findNavController(requireView()).navigate(
+            R.id.jotFragment,
+            Bundle().apply {
+                putLong("id", id)
+            }
+        )
     }
 
     override fun onCalendarOutOfRange(calendar: Calendar?) {

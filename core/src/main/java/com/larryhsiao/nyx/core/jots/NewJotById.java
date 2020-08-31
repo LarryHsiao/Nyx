@@ -28,8 +28,8 @@ public class NewJotById implements Source<Jot> {
     public Jot value() {
         try (PreparedStatement stmt = db.value().prepareStatement(
             // language=H2
-            "INSERT INTO jots(content, createdTime, location, mood, VERSION, ID, DELETE) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO jots(content, createdTime, location, mood, VERSION, ID, DELETE, TITLE) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         )) {
             stmt.setString(1, jot.content());
             stmt.setTimestamp(2, new Timestamp(jot.createdTime()), Calendar.getInstance());
@@ -53,6 +53,7 @@ public class NewJotById implements Source<Jot> {
             stmt.setInt(5, jot.version());
             stmt.setLong(6, jot.id());
             stmt.setInt(7, jot.deleted() ? 1 : 0);
+            stmt.setString(8, jot.title());
             if (stmt.executeUpdate() == 0) {
                 throw new SQLException("Insert failed");
             }
