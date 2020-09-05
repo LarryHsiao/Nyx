@@ -1,11 +1,14 @@
 package com.larryhsiao.nyx.jot
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import android.widget.TimePicker
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.larryhsiao.nyx.NyxFragment
@@ -21,8 +24,11 @@ import java.util.*
 /**
  * Fragment for representing a Jot.
  */
-class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener {
+class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private lateinit var mainScope: CoroutineScope
+    private val dateFormatter by lazy {
+        SimpleDateFormat("d MMM yyyy | hh:mm a", Locale.getDefault())
+    }
     private val jotViewModel by lazy {
         ViewModelProvider(this, ViewModelFactory(app)).get(JotViewModel::class.java)
     }
@@ -37,6 +43,28 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener {
             current.get(Calendar.YEAR),
             current.get(Calendar.MONTH),
             current.get(Calendar.DAY_OF_MONTH),
+        ).apply {
+            setButton(
+                BUTTON_NEGATIVE,
+                getString(R.string.Today)
+            ) { _, _ ->
+                onDateSet(
+                    this.datePicker,
+                    current.get(Calendar.YEAR),
+                    current.get(Calendar.MONTH),
+                    current.get(Calendar.DAY_OF_MONTH),
+                )
+            }
+        }
+    }
+    private val timePicker by lazy {
+        val current = Calendar.getInstance()
+        TimePickerDialog(
+            requireContext(),
+            this,
+            current.get(Calendar.HOUR_OF_DAY),
+            current.get(Calendar.MINUTE),
+            false
         )
     }
 
@@ -51,6 +79,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener {
         mainScope = MainScope()
         jot_title_right_textView.setOnClickListener { save() }
         jot_calendar_imageView.setOnClickListener { showDatePicker() }
+        jot_clock_imageView.setOnClickListener { showTimePicker() }
         jotViewModel.jot().observe(viewLifecycleOwner, {
             jot_datetime_textView.text = formattedDate(it.createdTime())
             jot_title_editText.setText(it.title())
@@ -67,8 +96,28 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener {
     }
 
     private fun showDatePicker(){
+        val currentDate = Calendar.getInstance().apply {
+            time = dateFormatter.parse(jot_datetime_textView.text.toString()) ?: Date()
+        }
+        datePicker.updateDate(
+            currentDate.get(Calendar.YEAR),
+            currentDate.get(Calendar.MONTH),
+            currentDate.get(Calendar.DAY_OF_MONTH),
+        )
         datePicker.show()
     }
+
+    private fun showTimePicker(){
+        val currentDate = Calendar.getInstance().apply {
+            time = dateFormatter.parse(jot_datetime_textView.text.toString()) ?: Date()
+        }
+        timePicker.updateTime(
+            currentDate.get(Calendar.HOUR_OF_DAY),
+            currentDate.get(Calendar.MINUTE)
+        )
+        timePicker.show()
+    }
+
 
     private fun save() = mainScope.launch {
         withContext(Default) {
@@ -79,6 +128,10 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener {
 
                 override fun title(): String {
                     return jot_title_editText.text.toString()
+                }
+
+                override fun createdTime(): Long {
+                    return dateFormatter.parse(jot_datetime_textView.text.toString())?.time ?: 0L
                 }
             })
             jotsViewModel.reload()
@@ -92,11 +145,25 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener {
     }
 
     private fun formattedDate(time: Long): String {
-        return SimpleDateFormat("d MMM yyyy | hh:mm a", Locale.getDefault()).format(
+        return dateFormatter.format(
             Date(time)
         )
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        jot_datetime_textView.text = formattedDate(Calendar.getInstance().apply {
+            time = dateFormatter.parse(jot_datetime_textView.text.toString()) ?: Date()
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month)
+            set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        }.timeInMillis)
+    }
+
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        jot_datetime_textView.text = formattedDate(Calendar.getInstance().apply {
+            time = dateFormatter.parse(jot_datetime_textView.text.toString()) ?: Date()
+            set(Calendar.HOUR_OF_DAY, hourOfDay)
+            set(Calendar.MINUTE, minute)
+        }.timeInMillis)
     }
 }
