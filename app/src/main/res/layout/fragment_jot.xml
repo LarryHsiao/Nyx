@@ -63,6 +63,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:background="@null"
+        android:imeOptions="actionNext"
+        android:inputType="text"
         android:layout_marginTop="40dp"
         app:layout_constraintTop_toBottomOf="@id/jot_datetime_textView"
         android:id="@+id/jot_title_editText"
@@ -77,12 +79,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="16dp"
         android:background="@null"
+        android:imeOptions="actionDone"
         android:id="@+id/jot_content_editText"
         android:hint="@string/Start_writing___"
         android:textSize="14sp"
+        android:inputType="text"
         android:gravity="top"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/jot_control_panel_linearLayout"
         android:textColorHint="#c8c8c8"
         app:layout_constraintTop_toBottomOf="@id/jot_title_editText"
         android:layout_height="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/jot_control_panel_linearLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:src="@drawable/ic_calendar"
+            android:padding="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:id="@+id/jot_calendar_imageView"
+            android:layout_marginBottom="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
