@@ -1,10 +1,13 @@
 package com.larryhsiao.nyx.jot
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.larryhsiao.nyx.core.attachments.*
 import com.larryhsiao.nyx.core.jots.*
+import com.silverhetch.clotho.Action
 import com.silverhetch.clotho.Source
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -15,7 +18,10 @@ import kotlin.Double.Companion.MIN_VALUE
 /**
  * ViewModel to representing a jot.
  */
-class JotViewModel(private val db: Source<Connection>) : ViewModel() {
+class JotViewModel(
+    private val db: Source<Connection>,
+    private val localFileSync: Action
+) : ViewModel() {
     private val time = MutableLiveData<Long>()
     fun time(): LiveData<Long> = time
 
@@ -33,13 +39,18 @@ class JotViewModel(private val db: Source<Connection>) : ViewModel() {
     private val isNewJotLiveData = MutableLiveData<Boolean>()
     fun isNewJot(): LiveData<Boolean> = isNewJotLiveData
 
+    private val attachments = MutableLiveData<List<String>>()
+    fun attachments(): LiveData<List<String>> = attachments
+
     fun loadJot(id: Long) = viewModelScope.launch(IO) {
-        if (id != -1L) {
-            isNewJotLiveData.postValue(false)
-            loadContent(JotById(id, db).value())
-        } else {
+        if (id == -1L) {
             isNewJotLiveData.postValue(true)
             loadContent(ConstJot())
+        } else {
+            isNewJotLiveData.postValue(false)
+            val jot = JotById(id, db).value()
+            loadContent(jot)
+            loadAttachments(jot)
         }
     }
 
@@ -51,13 +62,36 @@ class JotViewModel(private val db: Source<Connection>) : ViewModel() {
         location.value = newJot.location()
     }
 
-    suspend fun save(): Jot = withContext(IO) {
-        PostedJot(db, object : WrappedJot(jot.value ?: ConstJot()) {
+    private fun loadAttachments(jot: Jot) = viewModelScope.launch(IO) {
+        attachments.postValue(
+            QueriedAttachments(AttachmentsByJotId(db, jot.id())).value().map { it.uri() }
+        )
+    }
+
+    suspend fun save() = withContext(IO) {
+        val value = PostedJot(db, object : WrappedJot(jot.value ?: ConstJot()) {
             override fun content(): String = content.value ?: ""
             override fun title(): String = title.value ?: ""
             override fun createdTime(): Long = time.value ?: 0L
-            override fun location(): DoubleArray = location.value?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
+            override fun location(): DoubleArray = location.value
+                ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
         }).value()
+        saveAttachments(value)
+    }
+
+    private fun saveAttachments(jot: Jot) {
+        val exists = QueriedAttachments(AttachmentsByJotId(db, jot.id())).value()
+        val new = (attachments.value ?: emptyList()).map { it }.toHashSet()
+        val delete = ArrayList<Attachment>()
+        exists.forEach { exist ->
+            if (!new.contains(exist.uri())) {
+                delete.add(exist)
+            }
+            new.remove(exist.uri())
+        }
+        new.forEach { NewAttachment(db, it, jot.id()).value() }
+        delete.forEach { RemovalAttachment(db, it.id()).fire() }
+        localFileSync.fire()
     }
 
     fun preferTitle(newTitle: String) {
@@ -78,7 +112,11 @@ class JotViewModel(private val db: Source<Connection>) : ViewModel() {
         time.value = newTime
     }
 
-    fun preferLocation(newLocation: DoubleArray){
+    fun preferLocation(newLocation: DoubleArray) {
         location.value = newLocation
+    }
+
+    fun preferAttachments(newAttachments: List<Uri>) {
+        attachments.value = newAttachments.map { it.toString() }
     }
 }

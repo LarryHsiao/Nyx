@@ -51,6 +51,16 @@
                 android:value=".MainActivity"/>
         </activity>
 
+        <provider android:authorities="com.larryhsiao.nyx.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            android:name="androidx.core.content.FileProvider">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider"
+                />
+        </provider>
+
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="ocr" />

@@ -7,6 +7,7 @@ import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,8 @@ import androidx.navigation.fragment.findNavController
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
+import com.larryhsiao.nyx.old.attachments.AttachmentsFragment
+import com.larryhsiao.nyx.old.util.JpegDateComparator
 import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
@@ -30,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.stream.Collectors
 import kotlin.Double.Companion.MIN_VALUE
 
 /**
@@ -38,6 +42,7 @@ import kotlin.Double.Companion.MIN_VALUE
 class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     companion object {
         private const val REQUEST_CODE_LOCATION_PICKER: Int = 1000
+        private const val REQUEST_CODE_ATTACHMENT_DIALOG: Int = 1001
     }
 
     private val dateFormatter by lazy {
@@ -95,6 +100,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jot_calendar_imageView.setOnClickListener { showDatePicker() }
         jot_clock_imageView.setOnClickListener { showTimePicker() }
         jot_location_imageView.setOnClickListener { showLocationPicker() }
+        jot_image_imageView.setOnClickListener { showImages() }
         jot_title_editText.doAfterTextChanged { jotViewModel.preferTitle(it?.toString() ?: "") }
         jot_content_editText.doAfterTextChanged { jotViewModel.preferContent(it?.toString() ?: "") }
         jotViewModel.isNewJot().observe(viewLifecycleOwner, {
@@ -107,8 +113,33 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jotViewModel.title().observe(viewLifecycleOwner, { jot_title_editText.setText(it) })
         jotViewModel.content().observe(viewLifecycleOwner, { jot_content_editText.setText(it) })
         jotViewModel.time().observe(viewLifecycleOwner, { jot_datetime_textView.text = formattedDate(it) })
-        jotViewModel.location().observe(viewLifecycleOwner, { loadUpLocation(it) })
+        jotViewModel.location().observe(viewLifecycleOwner, ::loadUpLocation)
+        jotViewModel.attachments().observe(viewLifecycleOwner, ::loadUpAttachments)
         jotViewModel.loadJot(requireArguments().getLong("id"))
+    }
+
+    private fun loadUpAttachments(attachments: List<String>) {
+        ImageViewCompat.setImageTintList(
+            jot_image_imageView,
+            ColorStateList.valueOf(
+                if (attachments.isNotEmpty()) {
+                    resources.getColor(R.color.colorPrimary)
+                } else {
+                    Color.parseColor("#000000")
+                }
+            )
+        )
+    }
+
+    private fun showImages() {
+        val sorted: List<Uri> = (jotViewModel.attachments().value?.map { Uri.parse(it) }
+            ?: emptyList())
+            .stream()
+            .sorted(JpegDateComparator(requireContext()))
+            .collect(Collectors.toList())
+        val dialog = AttachmentsFragment.newInstance(sorted, "")
+        dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG)
+        dialog.show(parentFragmentManager, null)
     }
 
     private fun showDatePicker() {
@@ -147,16 +178,16 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         ImageViewCompat.setImageTintList(
             jot_location_imageView,
             ColorStateList.valueOf(
-                if (isLocationSet(location)){
+                if (isLocationSet(location)) {
                     resources.getColor(R.color.colorPrimary)
-                }else{
+                } else {
                     Color.parseColor("#000000")
                 }
             )
         )
     }
 
-    private fun isLocationSet(location: DoubleArray) :Boolean{
+    private fun isLocationSet(location: DoubleArray): Boolean {
         return !location.contentEquals(doubleArrayOf(MIN_VALUE, MIN_VALUE)) &&
             !location.contentEquals(doubleArrayOf(0.0, 0.0))
     }
@@ -164,7 +195,8 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     private fun showLocationPicker() {
         val location = jotViewModel.location().value ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
         val build = LocationPickerActivity.Builder()
-        if (!isLocationSet(location)) {
+            .withGooglePlacesEnabled()
+        if (isLocationSet(location)) {
             build.withLocation(location[1], location[0])
         }
         startActivityForResult(
@@ -183,6 +215,13 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
                 data.getDoubleExtra(LONGITUDE, 0.0),
                 data.getDoubleExtra(LATITUDE, 0.0)
             ))
+        } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG && resultCode == RESULT_OK) {
+            if (data == null) {
+                return
+            }
+            jotViewModel.preferAttachments(
+                data.getParcelableArrayListExtra<Uri>("ARG_ATTACHMENT_URI") ?: emptyList()
+            )
         }
     }
 

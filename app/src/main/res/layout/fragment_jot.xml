@@ -122,5 +122,12 @@
             android:id="@+id/jot_location_imageView"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_height="40dp" />
+        <ImageView
+            android:layout_width="40dp"
+            android:src="@drawable/ic_image"
+            android:padding="8dp"
+            android:id="@+id/jot_image_imageView"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_height="40dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
