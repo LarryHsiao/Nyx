@@ -26,8 +26,8 @@ class JotsByKeywordTest {
         Source<Connection> db = new NyxDb(
             Files.createTempFile("prefix", "db").toFile()
         );
-        new NewJot(db, "content", new double[]{0.0, 0.0}, "").value();
-        new NewJot(db, "new_jot_", new double[]{0.0, 0.0}, "").value();
+        new NewJot(db, "title", "content", new double[]{0.0, 0.0}, "").value();
+        new NewJot(db, "title", "new_jot_", new double[]{0.0, 0.0}, "").value();
         new NewJotTag(
             db,
             new ConstSource<>(2L),
@@ -46,8 +46,8 @@ class JotsByKeywordTest {
         Source<Connection> db = new NyxDb(
             Files.createTempFile("prefix", "db").toFile()
         );
-        new NewJot(db, "content", new double[]{0.0, 0.0}, "").value();
-        new NewJot(db, "new_jot_", new double[]{0.0, 0.0}, "").value();
+        new NewJot(db, "title", "content", new double[]{0.0, 0.0}, "").value();
+        new NewJot(db, "title", "new_jot_", new double[]{0.0, 0.0}, "").value();
         new NewJotTag(
             db,
             new ConstSource<>(2L),
@@ -69,8 +69,8 @@ class JotsByKeywordTest {
         Source<Connection> db = new NyxDb(
             Files.createTempFile("prefix", "db").toFile()
         );
-        new NewJot(db, "Content", new double[]{0.0, 0.0}, "").value();
-        new NewJot(db, "Tag", new double[]{0.0, 0.0}, "").value();
+        new NewJot(db, "title", "Content", new double[]{0.0, 0.0}, "").value();
+        new NewJot(db, "title", "Tag", new double[]{0.0, 0.0}, "").value();
         new NewJotTag(
             db,
             new ConstSource<>(2L),

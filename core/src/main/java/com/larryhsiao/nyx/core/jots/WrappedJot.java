@@ -16,6 +16,11 @@ public class WrappedJot implements Jot {
     }
 
     @Override
+    public String title() {
+        return jot.title();
+    }
+
+    @Override
     public String content() {
         return jot.content();
     }

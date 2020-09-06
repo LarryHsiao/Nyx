@@ -33,11 +33,6 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
-            <meta-data android:name="android.app.searchable"
-                       android:resource="@xml/searchable"/>
         </activity>
 
         <activity
@@ -50,76 +45,27 @@
                 <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
             <meta-data android:name="android.app.searchable"
-                       android:resource="@xml/leku_searchable"/>
+                android:resource="@xml/leku_searchable"/>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
-        <activity android:name=".base.AuthActivity"
-                  android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-        />
+
         <provider android:authorities="com.larryhsiao.nyx.fileprovider"
-                  android:exported="false"
-                  android:grantUriPermissions="true"
-                  android:name="androidx.core.content.FileProvider">
+            android:exported="false"
+            android:grantUriPermissions="true"
+            android:name="androidx.core.content.FileProvider">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider"
-            />
+                />
         </provider>
+
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="ocr" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key"/>
-        <service android:name=".sync.SyncService"
-                 android:permission="android.permission.BIND_JOB_SERVICE"/>
-        <service android:name=".backup.google.DriveBackupService"
-                 android:permission="android.permission.BIND_JOB_SERVICE"
-        />
-        <activity android:name=".SharedActivity"
-                  android:label="@string/new_jot">
-            <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <action android:name="android.intent.action.SEND_MULTIPLE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/plain"/>
-                <data android:mimeType="image/*"/>
-                <data android:mimeType="video/*"/>
-                <data android:mimeType="audio/*"/>
-            </intent-filter>
-        </activity>
-        <activity android:name=".KeyChangingActivity"
-            android:theme="@style/Theme.AppCompat.Translucent"
-            />
-        <activity
-            android:name="com.larryhsiao.nyx.capture.CaptureActivity"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:label="@string/JCamera"
-            android:configChanges="orientation|screenSize"
-            android:launchMode="singleInstance">
-            <intent-filter>
-                <action android:name="android.media.action.IMAGE_CAPTURE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.media.action.STILL_IMAGE_CAMERA"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
-
-        <provider
-            android:authorities="com.larryhsiao.nyx.attachments.provider"
-            android:exported="true"
-            android:grantUriPermissions="true"
-            android:enabled="true"
-            android:permission="android.permission.MANAGE_DOCUMENTS"
-            android:name=".attachments.AttachmentProvider">
-            <intent-filter>
-                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
-            </intent-filter>
-        </provider>
     </application>
 </manifest>

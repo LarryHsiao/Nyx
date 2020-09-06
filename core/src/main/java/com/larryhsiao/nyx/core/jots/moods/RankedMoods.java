@@ -27,7 +27,7 @@ public class RankedMoods implements Source<List<RankedMood>> {
     public List<RankedMood> value() {
         final Map<String, Integer> result = new HashMap<>();
         for (Jot jot : new QueriedJots(new AllJots(db)).value()) {
-            if (jot.mood().length() < 2 || jot.mood().substring(0,1).contains(" ")){
+            if (jot.mood().length() < 2 || jot.mood().substring(0, 1).contains(" ")) {
                 continue;
             }
             if (result.containsKey(jot.mood())) {

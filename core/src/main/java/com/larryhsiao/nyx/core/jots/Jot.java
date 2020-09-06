@@ -10,6 +10,11 @@ public interface Jot {
     long id();
 
     /**
+     * The title of this jot.
+     */
+    String title();
+
+    /**
      * The content of a jot.
      */
     String content();

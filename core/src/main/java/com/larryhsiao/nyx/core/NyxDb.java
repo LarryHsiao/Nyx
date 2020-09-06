@@ -39,7 +39,7 @@ public class NyxDb implements Source<Connection> {
         ).value();
         Flyway flyway = Flyway.configure()
             .baselineOnMigrate(true)
-            .baselineVersion("3")
+            .baselineVersion("4")
             .dataSource("jdbc:h2:" +
                     dbFile.getAbsolutePath() +
                     ";FILE_LOCK=FS" +

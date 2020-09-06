@@ -22,8 +22,8 @@ class CombineTagsTest {
     @Test
     void simple() {
         Source<Connection> db = new TagDb(new JotsDb(new MemoryH2Conn()));
-        new NewJot(db, "content").value();
-        new NewJot(db, "content2").value();
+        new NewJot(db, "", "content").value();
+        new NewJot(db, "", "content2").value();
         new NewTag(db, "tag1").value();
         new NewTag(db, "tag2").value();
         new NewJotTag(db, new ConstSource<>(1L), new ConstSource<>(1L)).fire();

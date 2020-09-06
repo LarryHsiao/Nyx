@@ -2,7 +2,7 @@
     <string name="app_name">Jotted</string>
 
     <string name="what_is_in_your_mind">What is in your mind.</string>
-    <string name="save">Save</string>
+    <string name="Save">Save</string>
     <string name="title_should_not_empty">Title should not empty.</string>
     <string name="add_image">Add image</string>
     <string name="delete">Delete</string>
@@ -45,7 +45,7 @@
     <string name="preload_location">Preload location</string>
     <string name="internal_file_explorer">Internal File Explorer</string>
     <string name="failed_to_open_file">Failed to open file</string>
-    <string name="new_jot">New Jot</string>
+    <string name="New_Jot">New Jot</string>
     <string name="listing">Listing</string>
     <string name="jots">Jots</string>
     <string name="properties">Properties</string>
@@ -158,4 +158,10 @@
     <string name="JCamera">JCamera</string>
     <string name="Capture_photos_for_your_journey">Capture photos for your journey.</string>
     <string name="Camera_disabled">Camera disabled</string>
+    <string name="Add_a_title">Add a title</string>
+    <string name="Start_writing___">Start writing...</string>
+    <string name="No_title">No Title</string>
+    <string name="Done">Done</string>
+    <string name="Edit">Edit</string>
+    <string name="Today">Today</string>
 </resources>

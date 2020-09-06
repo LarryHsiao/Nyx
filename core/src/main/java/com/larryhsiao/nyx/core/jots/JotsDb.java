@@ -21,7 +21,8 @@ public class JotsDb implements Source<Connection> {
             conn.createStatement().executeUpdate(
                 // language=H2
                 "CREATE TABLE IF NOT EXISTS jots(" +
-                    "id integer not null auto_increment," +
+                    "id integer not null auto_increment, " +
+                    "title text not null default '', " +
                     "content text not null, " +
                     "createdTime timestamp with time zone not null, " +
                     "location geometry, " +

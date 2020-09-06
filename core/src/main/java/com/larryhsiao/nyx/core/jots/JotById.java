@@ -33,6 +33,7 @@ public class JotById implements Source<Jot> {
             }
             return new ConstJot(
                 res.getLong("id"),
+                res.getString("title"),
                 res.getString("content"),
                 res.getTimestamp(
                     "createdTime",

@@ -8,6 +8,7 @@ public interface Filter {
      * @return Specific Ids for filtering the Jots.
      */
     long[] ids();
+
     /**
      * @return Two long to represent date range.
      */
