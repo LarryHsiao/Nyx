@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
+import kotlin.Double.Companion.MIN_VALUE
 
 /**
  * ViewModel to representing a jot.
@@ -23,6 +24,9 @@ class JotViewModel(private val db: Source<Connection>) : ViewModel() {
 
     private val title = MutableLiveData<String>()
     fun title(): LiveData<String> = title
+
+    private val location = MutableLiveData<DoubleArray>()
+    fun location(): LiveData<DoubleArray> = location
 
     private val jot = MutableLiveData<Jot>()
 
@@ -39,11 +43,12 @@ class JotViewModel(private val db: Source<Connection>) : ViewModel() {
         }
     }
 
-    private fun loadContent(constJot: Jot) = viewModelScope.launch {
-        jot.value = constJot
-        time.value = constJot.createdTime()
-        content.value = constJot.content()
-        title.value = constJot.title()
+    private fun loadContent(newJot: Jot) = viewModelScope.launch {
+        jot.value = newJot
+        time.value = newJot.createdTime()
+        content.value = newJot.content()
+        title.value = newJot.title()
+        location.value = newJot.location()
     }
 
     suspend fun save(): Jot = withContext(IO) {
@@ -51,6 +56,7 @@ class JotViewModel(private val db: Source<Connection>) : ViewModel() {
             override fun content(): String = content.value ?: ""
             override fun title(): String = title.value ?: ""
             override fun createdTime(): Long = time.value ?: 0L
+            override fun location(): DoubleArray = location.value?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
         }).value()
     }
 
@@ -70,5 +76,9 @@ class JotViewModel(private val db: Source<Connection>) : ViewModel() {
 
     fun preferTime(newTime: Long) {
         time.value = newTime
+    }
+
+    fun preferLocation(newLocation: DoubleArray){
+        location.value = newLocation
     }
 }

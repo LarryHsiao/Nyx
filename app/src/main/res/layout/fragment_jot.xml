@@ -95,28 +95,32 @@
         android:orientation="horizontal"
         android:id="@+id/jot_control_panel_linearLayout"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingBottom="8dp"
         android:layout_height="wrap_content">
 
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:src="@drawable/ic_calendar"
             android:padding="8dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:id="@+id/jot_calendar_imageView"
-            android:layout_marginBottom="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:layout_height="wrap_content" />
+            android:layout_height="40dp" />
 
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:src="@drawable/ic_clock"
             android:padding="8dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:id="@+id/jot_clock_imageView"
-            android:layout_marginBottom="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:layout_height="wrap_content" />
+            android:layout_height="40dp" />
+
+        <ImageView
+            android:layout_width="40dp"
+            android:src="@drawable/ic_location_3"
+            android:padding="8dp"
+            android:id="@+id/jot_location_imageView"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_height="40dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
