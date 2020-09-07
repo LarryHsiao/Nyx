@@ -8,11 +8,13 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.haibin.calendarview.Calendar
 import com.haibin.calendarview.CalendarView
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
+import com.larryhsiao.nyx.old.sync.SyncService
 import kotlinx.android.synthetic.main.fragment_jots.*
 import java.util.Calendar.*
 
@@ -41,6 +43,11 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         jots_recyclerView.adapter = adapter
         jots_newJot_floatingActionButton.setOnClickListener { toJotFragment(-1L) }
         jots_newJot_textView.setOnClickListener { toJotFragment(-1L) }
+        jots_newJot_textView.setOnLongClickListener {
+            findNavController().navigate(R.id.cloudFragment)
+            SyncService.enqueue(it.context)
+            true
+        }
         model.loading().observe(viewLifecycleOwner, {
             if (it) {
                 jots_newJot_textView.visibility = GONE

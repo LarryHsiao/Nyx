@@ -85,10 +85,14 @@ public class SyncJots implements Action {
     }
 
     private void updateLocalJot(QueryDocumentSnapshot remoteJot) {
+        String title = encryptor.decrypt(remoteJot.getString("title"));
+        if (title == null){
+            title = "";
+        }
         new UpdateJot(
             new ConstJot(
                 parseLong(remoteJot.getId()),
-                encryptor.decrypt(remoteJot.getString("title")),
+                title,
                 encryptor.decrypt(remoteJot.getString("content")),
                 parseLong(
                     encryptor.decrypt(remoteJot.getString("createdTime"))),
@@ -103,11 +107,15 @@ public class SyncJots implements Action {
     }
 
     private void newLocalJot(QueryDocumentSnapshot remoteJot) {
+        String title = encryptor.decrypt(remoteJot.getString("title"));
+        if (title == null){
+            title = "";
+        }
         new NewJotById(
             db,
             new ConstJot(
                 parseLong(remoteJot.getId()),
-                encryptor.decrypt(remoteJot.getString("title")),
+                title,
                 encryptor.decrypt(remoteJot.getString("content")),
                 parseLong(
                     encryptor.decrypt(remoteJot.getString("createdTime"))),
