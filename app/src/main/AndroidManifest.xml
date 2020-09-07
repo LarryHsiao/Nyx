@@ -50,6 +50,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
+        <activity android:name=".old.KeyChangingActivity" />
 
         <provider android:authorities="com.larryhsiao.nyx.fileprovider"
             android:exported="false"
@@ -60,7 +61,8 @@
                 android:resource="@xml/file_provider"
                 />
         </provider>
-
+        <service android:name=".old.sync.SyncService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="ocr" />

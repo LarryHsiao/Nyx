@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_jotsFragment_to_jotFragment"
             app:destination="@id/jotFragment" />
+        <action
+            android:id="@+id/action_jotsFragment_to_cloudFragment"
+            app:destination="@id/cloudFragment" />
     </fragment>
     <fragment
         android:id="@+id/jotFragment"
@@ -20,4 +23,8 @@
             android:name="id"
             app:argType="long" />
     </fragment>
+    <fragment
+        android:id="@+id/cloudFragment"
+        android:name="com.larryhsiao.nyx.old.account.CloudFragment"
+        android:label="CloudFragment" />
 </navigation>
