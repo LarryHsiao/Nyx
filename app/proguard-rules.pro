@@ -32,6 +32,7 @@
 -keep class * extends com.haibin.calendarview.MonthView {*;}
 
 -keep class androidx.exifinterface.media.ExifInterface { *; }
+-keepnames class androidx.navigation.fragment.NavHostFragment
 
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
