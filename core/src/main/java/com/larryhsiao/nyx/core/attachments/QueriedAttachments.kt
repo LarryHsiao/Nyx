@@ -1,37 +1,30 @@
-package com.larryhsiao.nyx.core.attachments;
+package com.larryhsiao.nyx.core.attachments
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import com.silverhetch.clotho.Source
+import java.sql.ResultSet
+import java.util.*
 
 /**
  * Source to build Attachment list from query source.
  */
-public class QueriedAttachments implements Source<List<Attachment>> {
-    private final Source<ResultSet> query;
-
-    public QueriedAttachments(Source<ResultSet> query) {
-        this.query = query;
-    }
-
-    @Override
-    public List<Attachment> value() {
-        try (ResultSet res = query.value()) {
-            List<Attachment> attachments = new ArrayList<>();
-            while (res.next()) {
-                attachments.add(new ConstAttachment(
-                    res.getLong("id"),
-                    res.getLong("jot_id"),
-                    res.getString("uri"),
-                    res.getInt("version"),
-                    res.getInt("delete")
-                ));
+class QueriedAttachments(private val query: Source<ResultSet>) : Source<List<Attachment>> {
+    override fun value(): List<Attachment> {
+        try {
+            query.value().use { res ->
+                val attachments: MutableList<Attachment> = ArrayList()
+                while (res.next()) {
+                    attachments.add(ConstAttachment(
+                        res.getLong("id"),
+                        res.getLong("jot_id"),
+                        res.getString("uri"),
+                        res.getInt("version"),
+                        res.getInt("delete")
+                    ))
+                }
+                return attachments
             }
-            return attachments;
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+        } catch (e: Exception) {
+            throw IllegalArgumentException(e)
         }
     }
 }

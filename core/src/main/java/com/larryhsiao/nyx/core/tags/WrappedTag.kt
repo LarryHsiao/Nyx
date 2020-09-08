@@ -1,32 +1,22 @@
-package com.larryhsiao.nyx.core.tags;
+package com.larryhsiao.nyx.core.tags
 
 /**
  * Wrapper class of Tag
  */
-public class WrappedTag implements Tag {
-    private final Tag origin;
-
-    public WrappedTag(Tag origin) {
-        this.origin = origin;
+open class WrappedTag(private val origin: Tag) : Tag {
+    override fun title(): String? {
+        return origin.title()
     }
 
-    @Override
-    public String title() {
-        return origin.title();
+    override fun id(): Long {
+        return origin.id()
     }
 
-    @Override
-    public long id() {
-        return origin.id();
+    override fun version(): Int {
+        return origin.version()
     }
 
-    @Override
-    public int version() {
-        return origin.version();
-    }
-
-    @Override
-    public boolean deleted() {
-        return origin.deleted();
+    override fun deleted(): Boolean {
+        return origin.deleted()
     }
 }

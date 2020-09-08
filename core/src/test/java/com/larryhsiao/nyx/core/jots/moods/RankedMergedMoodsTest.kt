@@ -1,106 +1,104 @@
-package com.larryhsiao.nyx.core.jots.moods;
+package com.larryhsiao.nyx.core.jots.moods
 
-import com.larryhsiao.nyx.core.jots.JotsDb;
-import com.larryhsiao.nyx.core.jots.NewJot;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.h2.MemoryH2Conn;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
-import java.util.Calendar;
+import com.larryhsiao.nyx.core.jots.JotsDb
+import com.larryhsiao.nyx.core.jots.NewJot
+import com.silverhetch.clotho.Source
+import com.silverhetch.clotho.database.h2.MemoryH2Conn
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.sql.Connection
+import java.util.*
 
 /**
- * Unit-test for the class {@link RankedMoods}
+ * Unit-test for the class [RankedMoods]
  */
-class RankedMergedMoodsTest {
-
+internal class RankedMergedMoodsTest {
     /**
      * Check the ranked moods size.
      */
     @Test
-    void simple() {
-        Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "56").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "78").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
+    fun simple() {
+        val db: Source<Connection> = JotsDb(MemoryH2Conn())
+        NewJot(db, "title", "content", Calendar.getInstance(), "12").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "34").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "56").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "78").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "90").value()
         Assertions.assertEquals(
             5,
-            new RankedMoods(db).value().size()
-        );
+            RankedMoods(db).value().size
+        )
     }
 
     /**
      * Check the 1st ranked moods.
      */
     @Test
-    void rank1() {
-        Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "56").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "78").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
+    fun rank1() {
+        val db: Source<Connection> = JotsDb(MemoryH2Conn())
+        NewJot(db, "title", "content", Calendar.getInstance(), "34").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "56").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "78").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "90").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "12").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "12").value()
         Assertions.assertEquals(
             "12",
-            new RankedMoods(db).value().get(0).mood()
-        );
+            RankedMoods(db).value()[0].mood()
+        )
     }
 
     /**
      * Check the 3rd ranked moods.
      */
     @Test
-    void rank3() {
-        Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
+    fun rank3() {
+        val db: Source<Connection> = JotsDb(MemoryH2Conn())
+        NewJot(db, "title", "content", Calendar.getInstance(), "34").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "34").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "34").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "34").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "90").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "90").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "90").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "12").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "12").value()
         Assertions.assertEquals(
             "34",
-            new RankedMoods(db).value().get(0).mood()
-        );
+            RankedMoods(db).value()[0].mood()
+        )
     }
 
     /**
      * Check the ranked moods that all moods have same used count.
      */
     @Test
-    void rankSortingAllSame() {
-        Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "34").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "56").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "56").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "78").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "78").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "90").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "12").value();
-        Assertions.assertEquals("12", new RankedMoods(db).value().get(0).mood());
-        Assertions.assertEquals("34", new RankedMoods(db).value().get(1).mood());
-        Assertions.assertEquals("56", new RankedMoods(db).value().get(2).mood());
+    fun rankSortingAllSame() {
+        val db: Source<Connection> = JotsDb(MemoryH2Conn())
+        NewJot(db, "title", "content", Calendar.getInstance(), "34").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "34").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "56").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "56").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "78").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "78").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "90").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "90").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "12").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "12").value()
+        Assertions.assertEquals("12", RankedMoods(db).value()[0].mood())
+        Assertions.assertEquals("34", RankedMoods(db).value()[1].mood())
+        Assertions.assertEquals("56", RankedMoods(db).value()[2].mood())
     }
 
     /**
      * Check the ranked moods that actually have character inside.
      */
     @Test
-    void excludeEmpty() {
-        Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "title", "content", Calendar.getInstance(), "  ").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), "").value();
-        new NewJot(db, "title", "content", Calendar.getInstance(), " ").value();
-        Assertions.assertEquals(0, new RankedMoods(db).value().size());
+    fun excludeEmpty() {
+        val db: Source<Connection> = JotsDb(MemoryH2Conn())
+        NewJot(db, "title", "content", Calendar.getInstance(), "  ").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), "").value()
+        NewJot(db, "title", "content", Calendar.getInstance(), " ").value()
+        Assertions.assertEquals(0, RankedMoods(db).value().size)
     }
 }

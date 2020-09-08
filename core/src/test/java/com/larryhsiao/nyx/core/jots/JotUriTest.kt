@@ -1,32 +1,30 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 /**
- * Unit-test for the class {@link JotUri}
+ * Unit-test for the class [JotUri]
  */
-public class JotUriTest {
+class JotUriTest {
     /**
      * Check simple output.
      */
     @Test
-    public void simple() {
-        assertEquals(
+    fun simple() {
+        Assertions.assertEquals(
             "http://localhost.com/jots/1",
-            new JotUri(
+            JotUri(
                 "http://localhost.com/",
-                new ConstJot(
+                ConstJot(
                     1,
                     "",
                     "content",
-                    0,
-                    new double[]{},
+                    0, doubleArrayOf(),
                     "",
                     1,
                     false)
             ).value().toASCIIString()
-        );
+        )
     }
 }

@@ -1,46 +1,32 @@
-package com.larryhsiao.nyx.core.attachments;
+package com.larryhsiao.nyx.core.attachments
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
+import java.sql.ResultSet
 
 /**
  * Source to query attachments by attached Jot id.
  */
-public class AllAttachments implements Source<ResultSet> {
-    private final Source<Connection> dbSource;
-    private final boolean includeDeleted;
-
-    public AllAttachments(Source<Connection> dbSource) {
-        this(dbSource, false);
-    }
-
-    public AllAttachments(Source<Connection> dbSource, boolean includeDeleted) {
-        this.dbSource = dbSource;
-        this.includeDeleted = includeDeleted;
-    }
-
-    @Override
-    public ResultSet value() {
-        try {
+class AllAttachments @JvmOverloads constructor(
+    private val dbSource: Source<Connection>,
+    private val includeDeleted: Boolean = false
+) : Source<ResultSet> {
+    override fun value(): ResultSet {
+        return try {
             if (includeDeleted) {
-                PreparedStatement stmt = dbSource.value().prepareStatement(
-                    // language=H2
+                val stmt = dbSource.value().prepareStatement( // language=H2
                     "SELECT * FROM attachments "
-                );
-                return stmt.executeQuery();
+                )
+                stmt.executeQuery()
             } else {
-                PreparedStatement stmt = dbSource.value().prepareStatement(
-                    // language=H2
+                val stmt = dbSource.value().prepareStatement( // language=H2
                     "SELECT * FROM attachments " +
                         "WHERE DELETE = 0;"
-                );
-                return stmt.executeQuery();
+                )
+                stmt.executeQuery()
             }
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+        } catch (e: Exception) {
+            throw IllegalArgumentException(e)
         }
     }
 }

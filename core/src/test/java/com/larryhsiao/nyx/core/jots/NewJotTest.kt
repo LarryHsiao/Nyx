@@ -1,31 +1,30 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.h2.MemoryH2Conn;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.silverhetch.clotho.Source
+import com.silverhetch.clotho.database.h2.MemoryH2Conn
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.sql.Connection
+import java.sql.SQLException
 
 /**
- * Unit-test for the class {@link NewJot}
+ * Unit-test for the class [NewJot]
  */
-public class NewJotTest {
+class NewJotTest {
     /**
      * Check insert success.
      */
     @Test
-    public void simple() throws SQLException {
-        Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "title", "content").value();
-        try (ResultSet res = new AllJots(db).value()) {
-            int count = 0;
+    @Throws(SQLException::class)
+    fun simple() {
+        val db: Source<Connection> = JotsDb(MemoryH2Conn())
+        NewJot(db, "title", "content").value()
+        AllJots(db).value().use { res ->
+            var count = 0
             while (res.next()) {
-                count++;
+                count++
             }
-            Assertions.assertEquals(1, count);
+            Assertions.assertEquals(1, count)
         }
     }
 }

@@ -1,51 +1,32 @@
-package com.larryhsiao.nyx.core.attachments;
+package com.larryhsiao.nyx.core.attachments
 
 /**
  * Constant of Attachment
  */
-public class ConstAttachment implements Attachment {
-    private final long id;
-    private final long jotId;
-    private final String uri;
-    private final int version;
-    private final int delete;
-
-    public ConstAttachment(
-        long id,
-        long jotId,
-        String uri,
-        int version,
-        int delete
-    ) {
-        this.id = id;
-        this.jotId = jotId;
-        this.uri = uri;
-        this.version = version;
-        this.delete = delete;
+class ConstAttachment(
+    private val id: Long,
+    private val jotId: Long,
+    private val uri: String,
+    private val version: Int,
+    private val delete: Int
+) : Attachment {
+    override fun jotId(): Long {
+        return jotId
     }
 
-    @Override
-    public long jotId() {
-        return jotId;
+    override fun uri(): String {
+        return uri
     }
 
-    @Override
-    public String uri() {
-        return uri;
+    override fun id(): Long {
+        return id
     }
 
-    @Override
-    public long id() {
-        return id;
+    override fun version(): Int {
+        return version
     }
 
-    @Override
-    public int version() {
-        return version;
-    }
-
-    @Override
-    public boolean deleted() {
-        return delete == 1;
+    override fun deleted(): Boolean {
+        return delete == 1
     }
 }

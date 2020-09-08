@@ -1,30 +1,32 @@
-package com.larryhsiao.nyx.core.jots.goemetry;
+package com.larryhsiao.nyx.core.jots.goemetry
 
-import com.larryhsiao.nyx.core.jots.*;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.h2.MemoryH2Conn;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
-import java.util.List;
+import com.larryhsiao.nyx.core.jots.JotsByTimeSpace
+import com.larryhsiao.nyx.core.jots.JotsDb
+import com.larryhsiao.nyx.core.jots.NewJot
+import com.larryhsiao.nyx.core.jots.QueriedJots
+import com.silverhetch.clotho.Source
+import com.silverhetch.clotho.database.h2.MemoryH2Conn
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.sql.Connection
 
 /**
- * Unit-test for the class {@link CircleByRange}
+ * Unit-test for the class [CircleByRange]
  */
-class CircleByRangeTest {
+internal class CircleByRangeTest {
     /**
      * Check search by geometry works.
      */
     @Test
-    public void normalCase() throws Exception {
-        Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "title", "content", new double[]{0.0, 0.0}, "").value();
-        List<Jot> jots = new QueriedJots(new JotsByTimeSpace(
+    @Throws(Exception::class)
+    fun normalCase() {
+        val db: Source<Connection> = JotsDb(MemoryH2Conn())
+        NewJot(db, "title", "content", doubleArrayOf(0.0, 0.0), "").value()
+        val jots = QueriedJots(JotsByTimeSpace(
             db,
             System.currentTimeMillis(),
-            new CircleByRange(new double[]{0, 0}, new MeterDelta())
-        )).value();
-        Assertions.assertNotEquals(0, jots.size());
+            CircleByRange(doubleArrayOf(0.0, 0.0), MeterDelta())
+        )).value()
+        Assertions.assertNotEquals(0, jots.size)
     }
 }

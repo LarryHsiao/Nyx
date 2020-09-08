@@ -1,30 +1,29 @@
-package com.larryhsiao.nyx.old.attachments;
+package com.larryhsiao.nyx.old.attachments
 
-import com.larryhsiao.nyx.core.attachments.AttachmentDb;
-import com.larryhsiao.nyx.core.attachments.NewAttachment;
-import com.larryhsiao.nyx.core.jots.JotsDb;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.h2.MemoryH2Conn;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
+import com.larryhsiao.nyx.core.attachments.AttachmentDb
+import com.larryhsiao.nyx.core.attachments.NewAttachment
+import com.larryhsiao.nyx.core.jots.JotsDb
+import com.silverhetch.clotho.Source
+import com.silverhetch.clotho.database.h2.MemoryH2Conn
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.sql.Connection
 
 /**
- * Test for {@link NewAttachment}
+ * Test for [NewAttachment]
  */
-public class NewAttachmentTest {
+class NewAttachmentTest {
     /**
      * Check new attachment available.
      */
     @Test
-    public void checkInsert() {
-        final Source<Connection> db = new AttachmentDb(new JotsDb(new MemoryH2Conn()));
+    fun checkInsert() {
+        val db: Source<Connection> = AttachmentDb(JotsDb(MemoryH2Conn()))
         Assertions.assertEquals(
             1L,
-            new NewAttachment(
+            NewAttachment(
                 db, "Uri", 1L
             ).value().id()
-        );
+        )
     }
 }

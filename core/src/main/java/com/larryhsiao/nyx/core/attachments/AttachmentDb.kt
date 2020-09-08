@@ -1,25 +1,16 @@
-package com.larryhsiao.nyx.core.attachments;
+package com.larryhsiao.nyx.core.attachments
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
 
 /**
  * Source to Build Attachment db connection
  */
-public class AttachmentDb implements Source<Connection> {
-    private final Source<Connection> source;
-
-    public AttachmentDb(Source<Connection> source) {
-        this.source = source;
-    }
-
-    @Override
-    public Connection value() {
-        try {
-            Connection conn = source.value();
-            conn.createStatement().execute(
-                // language=H2
+class AttachmentDb(private val source: Source<Connection>) : Source<Connection> {
+    override fun value(): Connection {
+        return try {
+            val conn = source.value()
+            conn.createStatement().execute( // language=H2
                 "CREATE TABLE IF NOT EXISTS attachments(" +
                     "id integer not null auto_increment, " +
                     "uri text not null, " +
@@ -27,10 +18,10 @@ public class AttachmentDb implements Source<Connection> {
                     "version integer not null default 1, " +
                     "delete integer not null default 0" +
                     ");"
-            );
-            return conn;
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            )
+            conn
+        } catch (e: Exception) {
+            throw IllegalArgumentException(e)
         }
     }
 }

@@ -1,46 +1,38 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
 /**
  * Sample data of Jot
  */
-public class SampleJot implements Jot {
-    @Override
-    public String title() {
-        return "Sample title";
+class SampleJot : Jot {
+    override fun title(): String {
+        return "Sample title"
     }
 
-    @Override
-    public long id() {
-        return -1;
+    override fun id(): Long {
+        return -1
     }
 
-    @Override
-    public String content() {
-        return "This is sample string of Jot.";
+    override fun content(): String {
+        return "This is sample string of Jot."
     }
 
-    @Override
-    public double[] location() {
-        return new double[]{0.0, 0.0};
+    override fun location(): DoubleArray {
+        return doubleArrayOf(0.0, 0.0)
     }
 
-    @Override
-    public long createdTime() {
-        return System.currentTimeMillis();
+    override fun createdTime(): Long {
+        return System.currentTimeMillis()
     }
 
-    @Override
-    public String mood() {
-        return new String(Character.toChars(0x1F600));
+    override fun mood(): String {
+        return String(Character.toChars(0x1F600))
     }
 
-    @Override
-    public int version() {
-        return 1;
+    override fun version(): Int {
+        return 1
     }
 
-    @Override
-    public boolean deleted() {
-        return false;
+    override fun deleted(): Boolean {
+        return false
     }
 }

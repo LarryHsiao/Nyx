@@ -1,40 +1,38 @@
-package com.larryhsiao.nyx.core.tags;
+package com.larryhsiao.nyx.core.tags
 
-import com.larryhsiao.nyx.core.jots.JotsDb;
-import com.larryhsiao.nyx.core.jots.NewJot;
-import com.larryhsiao.nyx.core.jots.QueriedJots;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.h2.MemoryH2Conn;
-import com.silverhetch.clotho.source.ConstSource;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
+import com.larryhsiao.nyx.core.jots.JotsDb
+import com.larryhsiao.nyx.core.jots.NewJot
+import com.larryhsiao.nyx.core.jots.QueriedJots
+import com.silverhetch.clotho.Source
+import com.silverhetch.clotho.database.h2.MemoryH2Conn
+import com.silverhetch.clotho.source.ConstSource
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.sql.Connection
 
 /**
- * Unit-test for the class {@link CombineTags}.
+ * Unit-test for the class [CombineTags].
  */
-class CombineTagsTest {
-
+internal class CombineTagsTest {
     /**
      * Check the output.
      */
     @Test
-    void simple() {
-        Source<Connection> db = new TagDb(new JotsDb(new MemoryH2Conn()));
-        new NewJot(db, "", "content").value();
-        new NewJot(db, "", "content2").value();
-        new NewTag(db, "tag1").value();
-        new NewTag(db, "tag2").value();
-        new NewJotTag(db, new ConstSource<>(1L), new ConstSource<>(1L)).fire();
-        new NewJotTag(db, new ConstSource<>(2L), new ConstSource<>(2L)).fire();
-        new CombineTags(db, 1, 2).fire();
-        Assertions.assertEquals(1, new QueriedTags(new AllTags(db)).value().size());
+    fun simple() {
+        val db: Source<Connection> = TagDb(JotsDb(MemoryH2Conn()))
+        NewJot(db, "", "content").value()
+        NewJot(db, "", "content2").value()
+        NewTag(db, "tag1").value()
+        NewTag(db, "tag2").value()
+        NewJotTag(db, ConstSource(1L), ConstSource(1L)).fire()
+        NewJotTag(db, ConstSource(2L), ConstSource(2L)).fire()
+        CombineTags(db, 1, 2).fire()
+        Assertions.assertEquals(1, QueriedTags(AllTags(db)).value().size)
         Assertions.assertEquals(2,
-            new QueriedJots(new JotsByTagId(
+            QueriedJots(JotsByTagId(
                 db,
-                new ConstSource<>(1L)
-            )).value().size()
-        );
+                ConstSource(1L)
+            )).value().size
+        )
     }
 }

@@ -1,35 +1,26 @@
-package com.larryhsiao.nyx.core.attachments;
+package com.larryhsiao.nyx.core.attachments
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
+import java.util.*
 
 /**
  * Create multiple attachments
  */
-public class NewAttachments implements Source<List<Attachment>> {
-    private final Source<Connection> connSource;
-    private final long jotId;
-    private final String[] uris;
-
-    public NewAttachments(Source<Connection> connSource, long jotId, String[] uris) {
-        this.connSource = connSource;
-        this.jotId = jotId;
-        this.uris = uris;
-    }
-
-    @Override
-    public List<Attachment> value() {
-        List<Attachment> res = new ArrayList<>();
-        for (String uri : uris) {
-            res.add(new NewAttachment(
+class NewAttachments(
+    private val connSource: Source<Connection>,
+    private val jotId: Long,
+    private val uris: Array<String>
+) : Source<List<Attachment?>?> {
+    override fun value(): List<Attachment?> {
+        val res: MutableList<Attachment?> = ArrayList()
+        for (uri in uris) {
+            res.add(NewAttachment(
                 connSource,
                 uri,
                 jotId
-            ).value());
+            ).value())
         }
-        return res;
+        return res
     }
 }

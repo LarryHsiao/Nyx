@@ -1,37 +1,26 @@
-package com.larryhsiao.nyx.core.attachments;
+package com.larryhsiao.nyx.core.attachments
 
 /**
  * Wrapped class of attachment
  */
-public class WrappedAttachment implements Attachment {
-    private final Attachment origin;
-
-    public WrappedAttachment(Attachment origin) {
-        this.origin = origin;
+open class WrappedAttachment(private val origin: Attachment) : Attachment {
+    override fun id(): Long {
+        return origin.id()
     }
 
-    @Override
-    public long id() {
-        return origin.id();
+    override fun jotId(): Long {
+        return origin.jotId()
     }
 
-    @Override
-    public long jotId() {
-        return origin.jotId();
+    override fun uri(): String {
+        return origin.uri()
     }
 
-    @Override
-    public String uri() {
-        return origin.uri();
+    override fun version(): Int {
+        return origin.version()
     }
 
-    @Override
-    public int version() {
-        return origin.version();
-    }
-
-    @Override
-    public boolean deleted() {
-        return origin.deleted();
+    override fun deleted(): Boolean {
+        return origin.deleted()
     }
 }

@@ -1,29 +1,18 @@
-package com.larryhsiao.nyx.core.jots.moods;
+package com.larryhsiao.nyx.core.jots.moods
 
-import com.silverhetch.clotho.Source;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import com.silverhetch.clotho.Source
 
 /**
  * Source to build moods for user to pick.
  */
-public class MergedMoods implements Source<List<String>> {
-    private final Source<List<String>> ranked;
-    private final Source<List<String>> defaultSrc;
-
-    public MergedMoods(Source<List<String>> ranked, Source<List<String>> defaultSrc) {
-        this.ranked = ranked;
-        this.defaultSrc = defaultSrc;
-    }
-
-    @Override
-    public List<String> value() {
-        Set<String> result = new LinkedHashSet<>(ranked.value());
-        final List<String> defaultMoods = defaultSrc.value();
-        result.addAll(defaultMoods);
-        return new ArrayList<>(result).subList(0, defaultMoods.size() - 1);
+class MergedMoods(
+    private val ranked: Source<List<String>>,
+    private val defaultSrc: Source<List<String>>
+) : Source<List<String?>?> {
+    override fun value(): List<String> {
+        val result: MutableSet<String> = LinkedHashSet(ranked.value())
+        val defaultMoods = defaultSrc.value()
+        result.addAll(defaultMoods)
+        return ArrayList(result).subList(0, defaultMoods.size - 1)
     }
 }

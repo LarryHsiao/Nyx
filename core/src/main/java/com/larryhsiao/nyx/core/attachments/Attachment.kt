@@ -1,31 +1,31 @@
-package com.larryhsiao.nyx.core.attachments;
+package com.larryhsiao.nyx.core.attachments
 
 /**
  * Attachment of a Jot
  */
-public interface Attachment {
+interface Attachment {
     /**
      * Id of this attachment.
      */
-    long id();
+    fun id(): Long
 
     /**
      * The Jot id that this attachment file attached to.
      */
-    long jotId();
+    fun jotId(): Long
 
     /**
      * Uri of this attachment.
      */
-    String uri();
+    fun uri(): String
 
     /**
      * Version of this attachment item.
      */
-    int version();
+    fun version(): Int
 
     /**
      * Indicates if this attachment is deleted or not.
      */
-    boolean deleted();
+    fun deleted(): Boolean
 }

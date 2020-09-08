@@ -1,17 +1,17 @@
-package com.larryhsiao.nyx.core.jots.moods;
+package com.larryhsiao.nyx.core.jots.moods
 
 /**
  * A ranked mood.
  * Ranked by use times.
  */
-public interface RankedMood {
+interface RankedMood {
     /**
      * The mood string, an emoji.
      */
-    String mood();
+    fun mood(): String?
 
     /**
      * Times being used.
      */
-    int usedTimes();
+    fun usedTimes(): Int
 }

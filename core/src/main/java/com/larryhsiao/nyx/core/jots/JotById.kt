@@ -1,51 +1,38 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Calendar;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
+import java.sql.SQLException
+import java.util.*
 
 /**
  * Source to build jot by Id.
  */
-public class JotById implements Source<Jot> {
-    private final Long id;
-    private final Source<Connection> db;
-
-    public JotById(Long id, Source<Connection> db) {
-        this.id = id;
-        this.db = db;
-    }
-
-    @Override
-    public Jot value() {
-        try (PreparedStatement stmt = db.value().prepareStatement(
-            // language=H2
-            "SELECT * FROM jots WHERE id=?;"
-        )) {
-            stmt.setLong(1, id);
-            ResultSet res = stmt.executeQuery();
-            if (!res.next()) {
-                throw new IllegalArgumentException("Jot not found, id: " + id);
+class JotById(private val id: Long, private val db: Source<Connection>) : Source<Jot?> {
+    override fun value(): Jot {
+        try {
+            db.value().prepareStatement( // language=H2
+                "SELECT * FROM jots WHERE id=?;"
+            ).use { stmt ->
+                stmt.setLong(1, id)
+                val res = stmt.executeQuery()
+                require(res.next()) { "Jot not found, id: $id" }
+                return ConstJot(
+                    res.getLong("id"),
+                    res.getString("title"),
+                    res.getString("content"),
+                    res.getTimestamp(
+                        "createdTime",
+                        Calendar.getInstance()
+                    ).time,
+                    PointSource(res.getString("location")).value(),
+                    res.getString("mood"),
+                    res.getInt("version"),
+                    res.getInt("delete") == 1
+                )
             }
-            return new ConstJot(
-                res.getLong("id"),
-                res.getString("title"),
-                res.getString("content"),
-                res.getTimestamp(
-                    "createdTime",
-                    Calendar.getInstance()
-                ).getTime(),
-                new PointSource(res.getString("location")).value(),
-                res.getString("mood"),
-                res.getInt("version"),
-                res.getInt("delete") == 1
-            );
-        } catch (SQLException e) {
-            throw new IllegalArgumentException(e);
+        } catch (e: SQLException) {
+            throw IllegalArgumentException(e)
         }
     }
 }

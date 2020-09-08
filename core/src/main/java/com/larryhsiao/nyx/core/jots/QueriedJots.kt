@@ -1,59 +1,48 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.WKTReader;
-
-import java.sql.ResultSet;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import static java.lang.Double.MIN_VALUE;
+import com.silverhetch.clotho.Source
+import org.locationtech.jts.io.WKTReader
+import java.sql.ResultSet
+import java.util.*
 
 /**
  * Adapter to adapt query result to Jot objects.
  */
-public class QueriedJots implements Source<List<Jot>> {
-    private final Source<ResultSet> query;
-
-    public QueriedJots(Source<ResultSet> query) {
-        this.query = query;
-    }
-
-    @Override
-    public List<Jot> value() {
-        try (ResultSet res = query.value()) {
-            List<Jot> jots = new ArrayList<>();
-            while (res.next()) {
-                toJot(res, jots);
+class QueriedJots(private val query: Source<ResultSet>) : Source<List<Jot?>?> {
+    override fun value(): List<Jot> {
+        try {
+            query.value().use { res ->
+                val jots: MutableList<Jot> = ArrayList()
+                while (res.next()) {
+                    toJot(res, jots)
+                }
+                return jots
             }
-            return jots;
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+        } catch (e: Exception) {
+            throw IllegalArgumentException(e)
         }
     }
 
-    private void toJot(ResultSet res, List<Jot> jots) throws Exception {
-        Timestamp timestamp = res.getTimestamp(
+    @Throws(Exception::class)
+    private fun toJot(res: ResultSet, jots: MutableList<Jot>) {
+        val timestamp = res.getTimestamp(
             res.findColumn("createdTime"),
-            Calendar.getInstance());
-        String locationStr = res.getString("location");
-        double[] location = new double[]{MIN_VALUE, MIN_VALUE};
+            Calendar.getInstance())
+        val locationStr = res.getString("location")
+        var location = doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE)
         if (locationStr != null) {
-            final Point locationGeo = new WKTReader().read(locationStr).getCentroid();
-            location = new double[]{locationGeo.getX(), locationGeo.getY()};
+            val locationGeo = WKTReader().read(locationStr).centroid
+            location = doubleArrayOf(locationGeo.x, locationGeo.y)
         }
-        jots.add(new ConstJot(
+        jots.add(ConstJot(
             res.getLong(res.findColumn("id")),
             res.getString(res.findColumn("title")),
             res.getString(res.findColumn("content")),
-            timestamp.getTime(),
+            timestamp.time,
             location,
             res.getString("mood"),
             res.getInt("version"),
             res.getInt("delete") == 1
-        ));
+        ))
     }
 }

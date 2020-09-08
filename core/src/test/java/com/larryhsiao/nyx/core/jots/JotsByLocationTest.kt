@@ -1,49 +1,45 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.database.h2.MemoryH2Conn;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LinearRing;
-import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.impl.CoordinateArraySequence;
-
-import java.sql.Connection;
-import java.util.List;
+import com.silverhetch.clotho.Source
+import com.silverhetch.clotho.database.h2.MemoryH2Conn
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.LinearRing
+import org.locationtech.jts.geom.Polygon
+import org.locationtech.jts.geom.impl.CoordinateArraySequence
+import java.sql.Connection
 
 /**
- * Unit-test for the class {@link JotsByLocation}
+ * Unit-test for the class [JotsByLocation]
  */
-public class JotsByLocationTest {
+class JotsByLocationTest {
     /**
      * Check search by geometry works.
      */
     @Test
-    public void createdTimeExist() throws Exception {
-        Source<Connection> db = new JotsDb(new MemoryH2Conn());
-        new NewJot(db, "title", "content", new double[]{0.0, 0.0}, "").value();
-        List<Jot> jots = new QueriedJots(
-            new JotsByLocation(
-                db, new Polygon(
-                new LinearRing(
-                    new CoordinateArraySequence(
-                        new Coordinate[]{
-                            new Coordinate(1.0, 1.0),
-                            new Coordinate(1.0, -1.0),
-                            new Coordinate(-1.0, -1.0),
-                            new Coordinate(-1.0, 1.0),
-                            new Coordinate(1.0, 1.0)
-                        }
-                    ), new GeometryFactory()
-                ),
-                new LinearRing[0],
-                new GeometryFactory()
-            ))).value();
+    @Throws(Exception::class)
+    fun createdTimeExist() {
+        val db: Source<Connection> = JotsDb(MemoryH2Conn())
+        NewJot(db, "title", "content", doubleArrayOf(0.0, 0.0), "").value()
+        val jots = QueriedJots(
+            JotsByLocation(
+                db, Polygon(
+                LinearRing(
+                    CoordinateArraySequence(arrayOf(
+                        Coordinate(1.0, 1.0),
+                        Coordinate(1.0, -1.0),
+                        Coordinate(-1.0, -1.0),
+                        Coordinate(-1.0, 1.0),
+                        Coordinate(1.0, 1.0)
+                    )), GeometryFactory()
+                ), arrayOfNulls(0),
+                GeometryFactory()
+            ))).value()
         Assertions.assertNotEquals(
             0,
-            jots.get(0).createdTime()
-        );
+            jots[0].createdTime()
+        )
     }
 }

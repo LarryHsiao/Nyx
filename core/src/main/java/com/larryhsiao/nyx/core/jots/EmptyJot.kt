@@ -1,21 +1,14 @@
-package com.larryhsiao.nyx.core.jots;
-
-import static java.lang.Double.MIN_VALUE;
+package com.larryhsiao.nyx.core.jots
 
 /**
  * Empty jot.
  */
-public class EmptyJot extends ConstJot {
-    public EmptyJot() {
-        super(
-            -1,
-            "",
-            "",
-            System.currentTimeMillis(),
-            new double[]{MIN_VALUE, MIN_VALUE},
-            "",
-            1,
-            false
-        );
-    }
-}
+class EmptyJot : ConstJot(
+    -1,
+    "",
+    "",
+    System.currentTimeMillis(), doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE),
+    "",
+    1,
+    false
+)

@@ -1,35 +1,22 @@
-package com.larryhsiao.nyx.core.jots.filter;
+package com.larryhsiao.nyx.core.jots.filter
 
 /**
- * Constant object of {@link Filter}.
+ * Constant object of [Filter].
  */
-public class ConstFilter implements Filter {
-    private final long[] dateRange;
-    private final String keyword;
-    private final long[] ids;
-
-    public ConstFilter() {
-        this(new long[]{0L, 0L}, "", new long[0]);
+open class ConstFilter @JvmOverloads constructor(
+    private val dateRange: LongArray = longArrayOf(0L, 0L),
+    private val keyword: String = "",
+    private val ids: LongArray = LongArray(0)
+) : Filter {
+    override fun dateRange(): LongArray? {
+        return dateRange
     }
 
-    public ConstFilter(long[] dateRange, String keyword, long[] ids) {
-        this.dateRange = dateRange;
-        this.keyword = keyword;
-        this.ids = ids;
+    override fun keyword(): String? {
+        return keyword
     }
 
-    @Override
-    public long[] dateRange() {
-        return dateRange;
-    }
-
-    @Override
-    public String keyword() {
-        return keyword;
-    }
-
-    @Override
-    public long[] ids() {
-        return ids;
+    override fun ids(): LongArray? {
+        return ids
     }
 }

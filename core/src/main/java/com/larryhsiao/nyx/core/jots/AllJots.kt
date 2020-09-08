@@ -1,43 +1,30 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
+import java.sql.ResultSet
+import java.sql.SQLException
 
 /**
  * All jots in db.
  */
-public class AllJots implements Source<ResultSet> {
-    private final Source<Connection> conn;
-    private final boolean includedDelete;
-
-    public AllJots(Source<Connection> conn, boolean includeDeleted) {
-        this.conn = conn;
-        this.includedDelete = includeDeleted;
-    }
-
-    public AllJots(Source<Connection> conn) {
-        this(conn, false);
-    }
-
-    @Override
-    public ResultSet value() {
-        try {
+class AllJots @JvmOverloads constructor(
+    private val conn: Source<Connection>,
+    private val includedDelete: Boolean = false
+) : Source<ResultSet> {
+    override fun value(): ResultSet {
+        return try {
             if (includedDelete) {
-                return conn.value().createStatement().executeQuery(
-                    // language=H2
+                conn.value().createStatement().executeQuery( // language=H2
                     "SELECT * FROM jots ORDER BY CREATEDTIME DESC;"
-                );
+                )
             } else {
-                return conn.value().createStatement().executeQuery(
-                    // language=H2
+                conn.value().createStatement().executeQuery( // language=H2
                     "SELECT * FROM jots WHERE DELETE = 0 ORDER BY CREATEDTIME DESC;"
-                );
+                )
             }
-        } catch (SQLException e) {
-            throw new IllegalArgumentException(e);
+        } catch (e: SQLException) {
+            throw IllegalArgumentException(e)
         }
     }
 }

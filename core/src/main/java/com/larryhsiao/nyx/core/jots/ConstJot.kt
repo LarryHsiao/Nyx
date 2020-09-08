@@ -1,101 +1,79 @@
-package com.larryhsiao.nyx.core.jots;
-
-import static java.lang.Double.MIN_VALUE;
+package com.larryhsiao.nyx.core.jots
 
 /**
  * Const of Jot
  */
-public class ConstJot implements Jot {
-    private final long id;
-    private final String title;
-    private final String content;
-    private final long createdTime;
-    private final double[] location;
-    private final String mood;
-    private final int version;
-    private final boolean deleted;
+open class ConstJot : Jot {
+    private val id: Long
+    private val title: String
+    private val content: String
+    private val createdTime: Long
+    private val location: DoubleArray
+    private val mood: String
+    private val version: Int
+    private val deleted: Boolean
 
-    public ConstJot(){
-        this(
-            -1,
-            "",
-            "",
-            System.currentTimeMillis(),
-            new double[]{MIN_VALUE, MIN_VALUE},
-            "",
-            1,
-            false
-        );
-    }
-
-    public ConstJot(
-        long id,
-        String title,
-        String content,
-        long createdTime,
-        double[] location,
-        String mood,
-        int version,
-        boolean deleted
+    @JvmOverloads
+    constructor(
+        id: Long = -1,
+        title: String = "",
+        content: String = "",
+        createdTime: Long = System.currentTimeMillis(),
+        location: DoubleArray = doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE),
+        mood: String = "",
+        version: Int = 1,
+        deleted: Boolean = false
     ) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.createdTime = createdTime;
-        this.location = location;
-        this.mood = mood;
-        this.version = version;
-        this.deleted = deleted;
+        this.id = id
+        this.title = title
+        this.content = content
+        this.createdTime = createdTime
+        this.location = location
+        this.mood = mood
+        this.version = version
+        this.deleted = deleted
     }
 
-    public ConstJot(Jot jot) {
-        this.id = jot.id();
-        this.title = jot.title();
-        this.location = jot.location();
-        this.createdTime = jot.createdTime();
-        this.content = jot.content();
-        this.mood = jot.mood();
-        this.version = jot.version();
-        this.deleted = jot.deleted();
+    constructor(jot: Jot) {
+        id = jot.id()
+        title = jot.title()
+        location = jot.location()
+        createdTime = jot.createdTime()
+        content = jot.content()
+        mood = jot.mood()
+        version = jot.version()
+        deleted = jot.deleted()
     }
 
-    @Override
-    public String title() {
-        return title;
+    override fun title(): String {
+        return title
     }
 
-    @Override
-    public long id() {
-        return id;
+    override fun id(): Long {
+        return id
     }
 
-    @Override
-    public String content() {
-        return content;
+    override fun content(): String {
+        return content
     }
 
-    @Override
-    public long createdTime() {
-        return createdTime;
+    override fun createdTime(): Long {
+        return createdTime
     }
 
-    @Override
-    public double[] location() {
-        return location;
+    override fun location(): DoubleArray {
+        return location
     }
 
-    @Override
-    public String mood() {
-        return mood;
+    override fun mood(): String {
+        return mood
     }
 
-    @Override
-    public int version() {
-        return version;
+    override fun version(): Int {
+        return version
     }
 
-    @Override
-    public boolean deleted() {
-        return deleted;
+    override fun deleted(): Boolean {
+        return deleted
     }
 }

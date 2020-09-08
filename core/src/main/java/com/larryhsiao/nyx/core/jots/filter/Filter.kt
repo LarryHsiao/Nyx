@@ -1,21 +1,21 @@
-package com.larryhsiao.nyx.core.jots.filter;
+package com.larryhsiao.nyx.core.jots.filter
 
 /**
  * Filter object
  */
-public interface Filter {
+interface Filter {
     /**
      * @return Specific Ids for filtering the Jots.
      */
-    long[] ids();
+    fun ids(): LongArray?
 
     /**
      * @return Two long to represent date range.
      */
-    long[] dateRange();
+    fun dateRange(): LongArray?
 
     /**
      * @return The keyword to search.
      */
-    String keyword();
+    fun keyword(): String?
 }

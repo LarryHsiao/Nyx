@@ -1,25 +1,16 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
 
 /**
  * Db connection source with initial sql.
  */
-public class JotsDb implements Source<Connection> {
-    private final Source<Connection> connSource;
-
-    public JotsDb(Source<Connection> connSource) {
-        this.connSource = connSource;
-    }
-
-    @Override
-    public Connection value() {
-        try {
-            final Connection conn = connSource.value();
-            conn.createStatement().executeUpdate(
-                // language=H2
+class JotsDb(private val connSource: Source<Connection>) : Source<Connection> {
+    override fun value(): Connection {
+        return try {
+            val conn = connSource.value()
+            conn.createStatement().executeUpdate( // language=H2
                 "CREATE TABLE IF NOT EXISTS jots(" +
                     "id integer not null auto_increment, " +
                     "title text not null default '', " +
@@ -30,10 +21,10 @@ public class JotsDb implements Source<Connection> {
                     "version integer not null default 1, " +
                     "delete integer not null default 0" +
                     ");"
-            );
-            return conn;
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            )
+            conn
+        } catch (e: Exception) {
+            throw IllegalArgumentException(e)
         }
     }
 }

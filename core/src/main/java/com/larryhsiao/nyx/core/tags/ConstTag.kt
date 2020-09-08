@@ -1,38 +1,27 @@
-package com.larryhsiao.nyx.core.tags;
+package com.larryhsiao.nyx.core.tags
 
 /**
  * Constant of Tag
  */
-public class ConstTag implements Tag {
-    private final long id;
-    private final String title;
-    private final int version;
-    private final boolean deleted;
-
-    public ConstTag(long id, String title, int version, boolean deleted) {
-        this.id = id;
-        this.title = title;
-        this.version = version;
-        this.deleted = deleted;
+class ConstTag(
+    private val id: Long,
+    private val title: String?,
+    private val version: Int,
+    private val deleted: Boolean
+) : Tag {
+    override fun title(): String? {
+        return title
     }
 
-    @Override
-    public String title() {
-        return title;
+    override fun id(): Long {
+        return id
     }
 
-    @Override
-    public long id() {
-        return id;
+    override fun version(): Int {
+        return version
     }
 
-    @Override
-    public int version() {
-        return version;
-    }
-
-    @Override
-    public boolean deleted() {
-        return deleted;
+    override fun deleted(): Boolean {
+        return deleted
     }
 }

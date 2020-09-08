@@ -1,1118 +1,1002 @@
-package com.larryhsiao.nyx.old.jot;
+package com.larryhsiao.nyx.old.jot
 
-import android.app.DatePickerDialog;
-import android.content.ClipData;
-import android.content.Intent;
-import android.location.Address;
-import android.location.Location;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.view.*;
-import android.widget.*;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.core.content.FileProvider;
-import androidx.exifinterface.media.ExifInterface;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-import com.google.firebase.ml.vision.FirebaseVision;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
-import com.google.firebase.ml.vision.cloud.landmark.FirebaseVisionCloudLandmark;
-import com.google.firebase.ml.vision.common.FirebaseVisionImage;
-import com.google.firebase.ml.vision.common.FirebaseVisionLatLng;
-import com.google.gson.Gson;
-import com.larryhsiao.nyx.BuildConfig;
-import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.core.attachments.*;
-import com.larryhsiao.nyx.core.jots.*;
-import com.larryhsiao.nyx.core.jots.moods.DefaultMoods;
-import com.larryhsiao.nyx.core.jots.moods.MergedMoods;
-import com.larryhsiao.nyx.core.jots.moods.RankedMood;
-import com.larryhsiao.nyx.core.jots.moods.RankedMoods;
-import com.larryhsiao.nyx.core.tags.*;
-import com.larryhsiao.nyx.old.LocationString;
-import com.larryhsiao.nyx.old.attachments.*;
-import com.larryhsiao.nyx.old.base.JotFragment;
-import com.larryhsiao.nyx.old.sync.SyncService;
-import com.larryhsiao.nyx.old.util.EmbedMapFragment;
-import com.larryhsiao.nyx.old.util.JpegDateComparator;
-import com.larryhsiao.nyx.old.util.exif.ExifLocation;
-import com.larryhsiao.nyx.old.util.exif.FirebaseLatLngLocation;
-import com.linkedin.urls.Url;
-import com.linkedin.urls.detection.UrlDetector;
-import com.schibstedspain.leku.LocationPickerActivity;
-import com.silverhetch.aura.BackControl;
-import com.silverhetch.aura.images.exif.ExifAttribute;
-import com.silverhetch.aura.images.exif.ExifUnixTimeStamp;
-import com.silverhetch.aura.location.LocationAddress;
-import com.silverhetch.aura.uri.UriMimeType;
-import com.silverhetch.aura.view.alert.Alert;
-import com.silverhetch.aura.view.dialog.FullScreenDialogFragment;
-import com.silverhetch.aura.view.dialog.InputDialog;
-import com.silverhetch.aura.view.fab.FabBehavior;
-import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration;
-import com.silverhetch.aura.view.recyclerview.slider.Slider;
-import com.silverhetch.clotho.date.DateCalendar;
-import com.silverhetch.clotho.source.ConstSource;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-import java.io.File;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static android.app.Activity.RESULT_OK;
-import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
-import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
-import static android.provider.MediaStore.EXTRA_OUTPUT;
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static androidx.appcompat.app.AlertDialog.Builder;
-import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
-import static androidx.recyclerview.widget.RecyclerView.ItemDecoration;
-import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
-import static com.android.billingclient.api.Purchase.PurchaseState.PURCHASED;
-import static com.larryhsiao.nyx.JotApplication.FILE_PROVIDER_AUTHORITY;
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
-import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
-import static com.schibstedspain.leku.LocationPickerActivityKt.*;
-import static java.lang.Double.MIN_VALUE;
-import static java.util.Calendar.YEAR;
-import static java.util.Calendar.ZONE_OFFSET;
-import static java.util.stream.Collectors.toList;
+import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.DatePickerDialog.OnDateSetListener
+import android.content.DialogInterface
+import android.content.Intent
+import android.location.Address
+import android.location.Location
+import android.net.Uri
+import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
+import android.provider.MediaStore
+import android.text.Editable
+import android.text.InputType
+import android.text.TextWatcher
+import android.view.*
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClient.SkuType
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.Purchase.PurchaseState
+import com.google.android.gms.tasks.Task
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.firebase.ml.vision.cloud.landmark.FirebaseVisionCloudLandmark
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.common.FirebaseVisionLatLng
+import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText
+import com.google.gson.Gson
+import com.larryhsiao.nyx.BuildConfig
+import com.larryhsiao.nyx.JotApplication
+import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.core.attachments.*
+import com.larryhsiao.nyx.core.jots.*
+import com.larryhsiao.nyx.core.jots.moods.DefaultMoods
+import com.larryhsiao.nyx.core.jots.moods.MergedMoods
+import com.larryhsiao.nyx.core.jots.moods.RankedMood
+import com.larryhsiao.nyx.core.jots.moods.RankedMoods
+import com.larryhsiao.nyx.core.tags.*
+import com.larryhsiao.nyx.old.LocationString
+import com.larryhsiao.nyx.old.attachments.*
+import com.larryhsiao.nyx.old.base.JotFragment
+import com.larryhsiao.nyx.old.sync.SyncService
+import com.larryhsiao.nyx.old.util.EmbedMapFragment
+import com.larryhsiao.nyx.old.util.JpegDateComparator
+import com.larryhsiao.nyx.old.util.exif.ExifLocation
+import com.larryhsiao.nyx.old.util.exif.FirebaseLatLngLocation
+import com.linkedin.urls.detection.UrlDetector
+import com.linkedin.urls.detection.UrlDetectorOptions
+import com.schibstedspain.leku.ADDRESS
+import com.schibstedspain.leku.LATITUDE
+import com.schibstedspain.leku.LONGITUDE
+import com.schibstedspain.leku.LocationPickerActivity
+import com.silverhetch.aura.BackControl
+import com.silverhetch.aura.images.exif.ExifAttribute
+import com.silverhetch.aura.images.exif.ExifUnixTimeStamp
+import com.silverhetch.aura.location.LocationAddress
+import com.silverhetch.aura.uri.UriMimeType
+import com.silverhetch.aura.view.alert.Alert.Companion.newInstance
+import com.silverhetch.aura.view.dialog.InputDialog.Companion.newInstance
+import com.silverhetch.aura.view.fab.FabBehavior
+import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration
+import com.silverhetch.aura.view.recyclerview.slider.Slider
+import com.silverhetch.clotho.date.DateCalendar
+import com.silverhetch.clotho.source.ConstSource
+import kotlinx.android.synthetic.main.page_jot.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.stream.Collectors
 
 /**
  * Fragment that shows the Jot content.
  *
  * @todo #0 One click touch template jot with geometry, and some pictures.
  */
-public class JotContentFragment extends JotFragment
-    implements BackControl, BillingClientStateListener {
-    private static final int REQUEST_CODE_LOCATION_PICKER = 1000;
-    private static final int REQUEST_CODE_PICK_FILE = 1001;
-    private static final int REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002;
-    private static final int REQUEST_CODE_ALERT = 1003;
-    private static final int REQUEST_CODE_ATTACHMENT_DIALOG = 1004;
-    private static final int REQUEST_CODE_TAKE_PICTURE = 1005;
-    private static final int REQUEST_CODE_AI_MAGIC_CAPTURE = 1006;
-
-    private static final String ARG_JOT_JSON = "ARG_JOT";
-    private static final String ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI";
-    private static final String ARG_REQUEST_CODE = "ARG_REQUEST_CODE";
-    /**
-     * We use fixed file name for taking picture, make sure to move the previous taken file
-     * before taking new one.
-     */
-    private static final String TEMP_FILE_NAME = "JotContentTakePicture.jpg";
-    private final List<Uri> attachmentOnView = new ArrayList<>();
-    private final Handler mainHandler = new Handler();
-    private HandlerThread backgroundThread;
-    private Handler backgroundHandler;
-    private ChipGroup chipGroup;
-    private TextView dateText;
-    private TextView locationText;
-    private TextView moodText;
-    private AttachmentSliderAdapter adapter;
-    private Jot jot;
-    private BillingClient billing;
-    private RecyclerView slider;
-
-    public static Fragment newInstance() {
-        return newInstance(
-            new ConstJot(
-                -1,
-                "",
-                "",
-                System.currentTimeMillis(),
-                new double[]{MIN_VALUE, MIN_VALUE},
-                "",
-                1,
-                false
-            ),
-            new ArrayList<>(),
-            0
-        );
+class JotContentFragment : JotFragment(), BackControl, BillingClientStateListener {
+    private val attachmentOnView: MutableList<Uri?> = ArrayList()
+    private val mainHandler = Handler()
+    private var backgroundThread: HandlerThread? = null
+    private var backgroundHandler: Handler? = null
+    private var adapter: AttachmentSliderAdapter? = null
+    private var jot: Jot? = null
+    private lateinit var billing: BillingClient
+    override fun onDestroy() {
+        super.onDestroy()
+        backgroundThread!!.quitSafely()
+        backgroundThread!!.interrupt()
     }
 
-    public static Fragment newInstance(Jot jot) {
-        return newInstance(jot, new ArrayList<>(), 0);
-    }
-
-    public static Fragment newInstance(Jot jot, int requestCode) {
-        return newInstance(jot, new ArrayList<>(), requestCode);
-    }
-
-    public static Fragment newInstance(
-        Jot jot, ArrayList<String> uris, int requestCode) {
-        final Fragment frag = new JotContentFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_JOT_JSON, new Gson().toJson(jot));
-        args.putStringArrayList(ARG_ATTACHMENT_URI, uris);
-        args.putInt(ARG_REQUEST_CODE, requestCode);
-        frag.setArguments(args);
-        return frag;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        backgroundThread.quitSafely();
-        backgroundThread.interrupt();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        backgroundThread = new HandlerThread("ContentBackground");
-        backgroundThread.start();
-        backgroundHandler = new Handler(backgroundThread.getLooper());
-        setHasOptionsMenu(true);
-        if (getArguments() != null) {
-            jot = new Gson().fromJson(
-                getArguments().getString(ARG_JOT_JSON, "{}"),
-                ConstJot.class
-            );
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        backgroundThread = HandlerThread("ContentBackground")
+        backgroundThread!!.start()
+        backgroundHandler = Handler(backgroundThread!!.looper)
+        setHasOptionsMenu(true)
+        jot = if (arguments != null) {
+            Gson().fromJson(
+                arguments?.getString(ARG_JOT_JSON, "{}") ?: "{}",
+                ConstJot::class.java
+            )
         } else {
-            jot = new ConstJot(
+            ConstJot(
                 -1,
                 "",
                 "",
-                System.currentTimeMillis(),
-                new double[]{MIN_VALUE, MIN_VALUE},
+                System.currentTimeMillis(), doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE),
                 "",
                 1,
                 false
-            );
+            )
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(
-        @NonNull LayoutInflater inflater,
-        @Nullable ViewGroup container,
-        @Nullable Bundle savedInstanceState
-    ) {
-        setTitle(getString(R.string.jots));
-        View view = inflater.inflate(R.layout.page_jot, container, false);
-        slider = view.findViewById(R.id.jot_attachment_container);
-        adapter = new AttachmentSliderAdapter(
-            slider.getContext(),
-            (clickedView, uri, longClicked) -> {
-                if (longClicked) {
-                    showProperties(clickedView, Uri.parse(uri));
-                } else {
-                    showContent(clickedView, uri);
-                }
-            });
-        slider.setAdapter(adapter);
-        new Slider(slider).fire();
-        return view;
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setTitle(getString(R.string.jots))
+        val view = inflater.inflate(R.layout.page_jot, container, false)
+        adapter = AttachmentSliderAdapter(requireContext()) { clickedView: View, uri: String, longClicked: Boolean ->
+            if (longClicked) {
+                showProperties(clickedView, Uri.parse(uri))
+            } else {
+                showContent(clickedView, uri)
+            }
+        }
+        jot_attachment_container.setAdapter(adapter)
+        Slider(jot_attachment_container).fire()
+        return view
     }
 
-    @Override
-    public void onViewCreated(
-        @NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    override fun onViewCreated(
+        view: View, savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
         billing = BillingClient.newBuilder(requireContext())
-            .setListener((res, list) -> {
-
-            })
+            .setListener { res: BillingResult?, list: List<Purchase?>? -> }
             .enablePendingPurchases()
-            .build();
-        billing.startConnection(this);
-        dateText = view.findViewById(R.id.jot_date);
-        dateText.setOnClickListener(v -> {
-            Calendar calendar = new DateCalendar(jot.createdTime(), Calendar.getInstance()).value();
-            DatePickerDialog dialog = new DatePickerDialog(
-                view.getContext(),
-                (view1, year, month, dayOfMonth) -> {
-                    jot = new WrappedJot(jot) {
-                        @Override
-                        public long createdTime() {
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.set(year, month, dayOfMonth);
-                            return calendar.getTimeInMillis();
-                        }
-                    };
-                    updateDateIndicator();
-                },
-                calendar.get(YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            );
-            dialog.show();
-        });
-        updateDateIndicator();
-        chipGroup = view.findViewById(R.id.jot_tagGroup);
-        EditText contentEditText = view.findViewById(R.id.jot_content);
-        contentEditText.setText(jot.content());
-        contentEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(
-                CharSequence s, int start, int count, int after) {
-                // Leave it empty
-            }
-
-            @Override
-            public void onTextChanged(
-                CharSequence s, int start, int before, int count) {
-                // Leave it empty
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                jot = new WrappedJot(jot) {
-                    @Override
-                    public String content() {
-                        return s.toString();
+            .build()
+        billing.startConnection(this)
+        jot_date.setOnClickListener(View.OnClickListener { v: View? ->
+            val calendar = DateCalendar(jot!!.createdTime(), Calendar.getInstance()).value()
+            val dialog = DatePickerDialog(
+                view.context, label@
+            OnDateSetListener { view1: DatePicker?, year: Int, month: Int, dayOfMonth: Int ->
+                jot = object : WrappedJot(jot!!) {
+                    override fun createdTime(): Long {
+                        val calendar = Calendar.getInstance()
+                        calendar[year, month] = dayOfMonth
+                        return calendar.timeInMillis
                     }
-                };
-                mainHandler.removeCallbacks(handler);
-                if (contentEditText.getText().toString().endsWith("\n")) {
-                    mainHandler.postDelayed(handler, 1000);
+                }
+                updateDateIndicator()
+            },
+                calendar[Calendar.YEAR],
+                calendar[Calendar.MONTH],
+                calendar[Calendar.DAY_OF_MONTH]
+            )
+            dialog.show()
+        })
+        updateDateIndicator()
+        val contentEditText = view.findViewById<EditText>(R.id.jot_content)
+        contentEditText.setText(jot!!.content())
+        contentEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence, start: Int, count: Int, after: Int
+            ) {
+                // Leave it empty
+            }
+
+            override fun onTextChanged(
+                s: CharSequence, start: Int, before: Int, count: Int
+            ) {
+                // Leave it empty
+            }
+
+            override fun afterTextChanged(s: Editable) {
+                jot = object : WrappedJot(jot!!) {
+                    override fun content(): String {
+                        return s.toString()
+                    }
+                }
+                mainHandler.removeCallbacks(handler)
+                if (contentEditText.text.toString().endsWith("\n")) {
+                    mainHandler.postDelayed(handler, 1000)
                 }
             }
 
-            private final Runnable handler = () -> {
+            private val handler = Runnable {
+
                 // @todo #10 Detects too many unusable uri.I
-                List<Url> detect = new UrlDetector(
-                    contentEditText.getText().toString(),
-                    Default
-                ).detect();
-                if (detect.size() > 0) {
-                    preferEnterUrl(detect.get(detect.size() - 1).toString());
+                val detect = UrlDetector(
+                    contentEditText.text.toString(), UrlDetectorOptions.Default).detect()
+                if (detect.size > 0) {
+                    preferEnterUrl(detect[detect.size - 1].toString())
                 }
-            };
-        });
-        locationText = view.findViewById(R.id.jot_location);
-        locationText.setOnClickListener(v -> pickLocation());
-        Location location = new Location("Constant");
-        location.setLongitude(jot.location()[0]);
-        location.setLatitude(jot.location()[1]);
-        updateAddress(location);
-        loadEmbedMapByJot();
-        attachmentOnView.clear();
+            }
+        })
+        jot_location.setOnClickListener(View.OnClickListener { v: View? -> pickLocation() })
+        val location = Location("Constant")
+        location.longitude = jot!!.location()[0]
+        location.latitude = jot!!.location()[1]
+        updateAddress(location)
+        loadEmbedMapByJot()
+        attachmentOnView.clear()
         attachmentOnView.addAll(
-            new QueriedAttachments(new AttachmentsByJotId(db, jot.id()))
+            QueriedAttachments(AttachmentsByJotId(db, jot!!.id()))
                 .value()
                 .stream()
-                .map(it -> Uri.parse(it.uri()))
-                .collect(toList())
-        );
-
-        if (getArguments() != null) {
-            final List<String> attachments =
-                getArguments().getStringArrayList(ARG_ATTACHMENT_URI);
+                .map { it: Attachment -> Uri.parse(it.uri()) }
+                .collect(Collectors.toList())
+        )
+        if (arguments != null) {
+            val attachments: List<String>? = arguments!!.getStringArrayList(ARG_ATTACHMENT_URI)
             if (attachments != null) {
-                for (String uri : attachments) {
-                    addAttachmentGrantPermission(Uri.parse(uri));
+                for (uri in attachments) {
+                    addAttachmentGrantPermission(Uri.parse(uri))
                 }
-                updateAttachmentView();
+                updateAttachmentView()
             }
         }
-
-        ImageView tagIcon = view.findViewById(R.id.jot_tagIcon);
-        tagIcon.setOnClickListener(v -> {
-            final AutoCompleteTextView editText =
-                new AutoCompleteTextView(v.getContext());
-            editText.setLines(1);
-            editText.setMaxLines(1);
-            editText.setInputType(InputType.TYPE_CLASS_TEXT);
-            editText.setAdapter(new ArrayAdapter<>(
-                    v.getContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    new QueriedTags(
-                        new AllTags(db)
-                    ).value().stream().map(Tag::title).collect(toList())
-                )
-            );
-            new AlertDialog.Builder(v.getContext())
+        val tagIcon = view.findViewById<ImageView>(R.id.jot_tagIcon)
+        tagIcon.setOnClickListener { v: View ->
+            val editText = AutoCompleteTextView(v.context)
+            editText.setLines(1)
+            editText.maxLines = 1
+            editText.inputType = InputType.TYPE_CLASS_TEXT
+            editText.setAdapter(ArrayAdapter(
+                v.context,
+                android.R.layout.simple_dropdown_item_1line,
+                QueriedTags(
+                    AllTags(db)
+                ).value().stream().map { obj: Tag -> obj.title() }.collect(Collectors.toList())
+            )
+            )
+            AlertDialog.Builder(v.context)
                 .setTitle(getString(R.string.new_tag))
                 .setMessage(getString(R.string.enter_tag_name))
                 .setView(editText)
-                .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                    final String preferTagName = editText.getText().toString();
-                    newChip(preferTagName);
-                })
+                .setPositiveButton(R.string.confirm) { dialog: DialogInterface?, which: Int ->
+                    val preferTagName = editText.text.toString()
+                    newChip(preferTagName)
+                }
                 .setNegativeButton(R.string.cancel, null)
-                .create().show();
-        });
-
-        for (Tag tag : new QueriedTags(new TagsByJotId(db, jot.id())).value()) {
-            Chip chip = new Chip(view.getContext());
-            chip.setTag(tag);
-            chip.setText(tag.title());
-            chip.setOnClickListener(v -> new AlertDialog.Builder(v.getContext())
-                .setTitle(tag.title())
-                .setMessage(R.string.delete)
-                .setPositiveButton(R.string.confirm, (dialog, which) ->
-                    chipGroup.removeView(v)
-                )
-                .setNegativeButton(R.string.cancel, null)
-                .show());
-            chipGroup.addView(chip);
+                .create().show()
         }
-        moodText = view.findViewById(R.id.jot_mood);
-
-        String mood = String.valueOf(jot.mood());
+        for (tag in QueriedTags(TagsByJotId(db, jot!!.id())).value()) {
+            val chip = Chip(view.context)
+            chip.tag = tag
+            chip.text = tag.title()
+            chip.setOnClickListener { v: View ->
+                AlertDialog.Builder(v.context)
+                    .setTitle(tag.title())
+                    .setMessage(R.string.delete)
+                    .setPositiveButton(R.string.confirm
+                    ) { dialog: DialogInterface?, which: Int -> jot_tagGroup.removeView(v) }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+            }
+            jot_tagGroup.addView(chip)
+        }
+        var mood = jot!!.mood()
         if (mood.isEmpty()) {
-            mood = "+";
+            mood = "+"
         }
-        moodText.setText(mood);
-        moodText.setOnClickListener(v -> {
-            final GridView gridView = new GridView(v.getContext());
-            gridView.setNumColumns(4);
-            gridView.setAdapter(
-                new MoodAdapter(
-                    v.getContext(),
-                    new MergedMoods(
-                        new ConstSource<>(
-                            new RankedMoods(db).value()
-                                .stream()
-                                .map(RankedMood::mood)
-                                .collect(toList())
-                        ),
-                        new DefaultMoods()
-                    ).value()
-                )
-            );
-            AlertDialog moodDialog = new AlertDialog.Builder(v.getContext())
+        jot_mood.text = mood
+        jot_mood.setOnClickListener(View.OnClickListener { v: View ->
+            val gridView = GridView(v.context)
+            gridView.numColumns = 4
+            gridView.adapter = MoodAdapter(
+                v.context,
+                MergedMoods(
+                    ConstSource(
+                        RankedMoods(db).value()
+                            .stream()
+                            .map { obj: RankedMood -> obj.mood() }
+                            .collect(Collectors.toList<String>())
+                    ),
+                    DefaultMoods()
+                ).value()
+            )
+            val moodDialog = AlertDialog.Builder(v.context)
                 .setTitle(getString(R.string.moods))
-                .setNegativeButton(R.string.cancel, (dialog, which) -> {
-                })
+                .setNegativeButton(R.string.cancel) { dialog: DialogInterface?, which: Int -> }
                 .setView(gridView)
-                .show();
-            gridView.setOnItemClickListener((parent, view12, position, id) -> {
-                if (position == gridView.getAdapter().getCount() -
-                    1) { // last custom dialog
-                    moodDialog.dismiss();
-                    InputDialog dialog = InputDialog.Companion.newInstance(
+                .show()
+            gridView.onItemClickListener = AdapterView.OnItemClickListener { parent: AdapterView<*>?, view12: View, position: Int, id: Long ->
+                if (position == gridView.adapter.count - 1) { // last custom dialog
+                    moodDialog.dismiss()
+                    val dialog = newInstance(
                         getString(R.string.moods),
                         REQUEST_CODE_INPUT_CUSTOM_MOOD
-                    );
+                    )
                     dialog.setTargetFragment(this,
-                        REQUEST_CODE_INPUT_CUSTOM_MOOD);
-                    dialog.show(getParentFragmentManager(), null);
-                    return;
+                        REQUEST_CODE_INPUT_CUSTOM_MOOD)
+                    dialog.show(parentFragmentManager, null)
+                    return@OnItemClickListener
                 }
-                final String newMood;
-                if (position == 0) {
-                    newMood = "+";
+                val newMood: String
+                newMood = if (position == 0) {
+                    "+"
                 } else {
-                    newMood = ((TextView) view12).getText().toString();
+                    (view12 as TextView).text.toString()
                 }
-                jot = new WrappedJot(jot) {
-                    @Override
-                    public String mood() {
-                        return newMood;
+                jot = object : WrappedJot(jot!!) {
+                    override fun mood(): String {
+                        return newMood
                     }
-                };
-                moodText.setText(newMood);
-                moodDialog.dismiss();
-            });
-        });
-        view.findViewById(R.id.jot_ai_magic).setOnClickListener(v ->
-            takePicture(REQUEST_CODE_AI_MAGIC_CAPTURE)
-        );
+                }
+                jot_mood.setText(newMood)
+                moodDialog.dismiss()
+            }
+        })
+        view.findViewById<View>(R.id.jot_ai_magic).setOnClickListener { v: View? -> takePicture(REQUEST_CODE_AI_MAGIC_CAPTURE) }
     }
 
-    private void preferEnterUrl(String url) {
-        new Thread(() -> {
+    private fun preferEnterUrl(url: String) {
+        Thread {
             try {
-                OkHttpClient client = new OkHttpClient();
-                Response res = client.newCall(
-                    new Request.Builder()
+                val client = OkHttpClient()
+                val res = client.newCall(
+                    Request.Builder()
                         .method("HEAD", null)
                         .url(url)
                         .build()
-                ).execute();
+                ).execute()
                 if (res.code() >= 200 && res.code() <= 299) {
-                    postAddAttachment(url);
+                    postAddAttachment(url)
                 }
-            } catch (Exception ignore) {
+            } catch (ignore: Exception) {
             }
-        }).start();
+        }.start()
     }
 
-    private void postAddAttachment(String url) {
-        getView().post(() -> {
+    private fun postAddAttachment(url: String) {
+        view!!.post {
             addAttachment(
                 Uri.parse(url)
-            );
-            updateAttachmentView();
-        });
+            )
+            updateAttachmentView()
+        }
     }
 
-    private void newChip(String preferTagName) {
-        Tag tag = null;
-        for (Tag searched : new QueriedTags(
-            new TagsByKeyword(db, preferTagName)).value()) {
-            if (searched.title().equals(preferTagName)) {
-                tag = searched;
-                break;
+    private fun newChip(preferTagName: String) {
+        var tag: Tag? = null
+        for (searched in QueriedTags(
+            TagsByKeyword(db, preferTagName)).value()) {
+            if (searched.title() == preferTagName) {
+                tag = searched
+                break
             }
         }
         if (tag == null) {
-            tag = new NewTag(db, preferTagName).value();
+            tag = NewTag(db, preferTagName).value()
         }
-        final Chip tagChip = new Chip(requireContext());
-        tagChip.setText(tag.title());
-        tagChip.setLines(1);
-        tagChip.setMaxLines(1);
-        tagChip.setTag(tag);
-        tagChip.setOnClickListener(v1 -> tagChipClicked(tagChip));
-        chipGroup.addView(tagChip);
+        val tagChip = Chip(requireContext())
+        tagChip.text = tag.title()
+        tagChip.setLines(1)
+        tagChip.maxLines = 1
+        tagChip.tag = tag
+        tagChip.setOnClickListener { v1: View? -> tagChipClicked(tagChip) }
+        jot_tagGroup.addView(tagChip)
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        attachFab(new FabBehavior() {
-            @Override
-            public int icon() {
-                return R.drawable.ic_save;
+    override fun onResume() {
+        super.onResume()
+        attachFab(object : FabBehavior {
+            override fun icon(): Int {
+                return R.drawable.ic_save
             }
 
-            @Override
-            public void onClick() {
-                save();
+            override fun onClick() {
+                save()
             }
-        });
+        })
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        detachFab();
+    override fun onPause() {
+        super.onPause()
+        detachFab()
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        billing.endConnection();
+    override fun onDestroyView() {
+        super.onDestroyView()
+        billing!!.endConnection()
     }
 
-    private void updateAddress(Location location) {
-        backgroundHandler.post(() -> {
-            final String value = new LocationString(
-                new LocationAddress(locationText.getContext(), location).value()
-            ).value();
-            locationText.post(() -> locationText.setText(value));
-        });
+    private fun updateAddress(location: Location) {
+        backgroundHandler!!.post {
+            val value = LocationString(
+                LocationAddress(jot_location.context, location).value()
+            ).value()
+            jot_location.post { jot_location.text = value }
+        }
     }
 
-    private void pickLocation() {
-        LocationPickerActivity.Builder build =
-            new LocationPickerActivity.Builder();
-        if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-            && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
-            build.withLocation(jot.location()[1], jot.location()[0]);
+    private fun pickLocation() {
+        val build = LocationPickerActivity.Builder()
+        if (!Arrays.equals(jot!!.location(), doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE))
+            && !Arrays.equals(jot!!.location(), doubleArrayOf(0.0, 0.0))) {
+            build.withLocation(jot!!.location()[1], jot!!.location()[0])
         }
         startActivityForResult(
             build.build(requireContext()),
             REQUEST_CODE_LOCATION_PICKER
-        );
+        )
     }
 
-    private void tagChipClicked(Chip tagChip) {
-        new AlertDialog.Builder(requireContext())
-            .setTitle(tagChip.getText().toString())
-            .setAdapter(new ArrayAdapter<>(
+    private fun tagChipClicked(tagChip: Chip) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(tagChip.text.toString())
+            .setAdapter(ArrayAdapter(
                 requireContext(),
-                android.R.layout.simple_list_item_1,
-                new String[]{
-                    getString(R.string.delete)
-                }
-            ), (dialog1, which1) -> onTagOptionClicked(tagChip, which1))
-            .show();
+                android.R.layout.simple_list_item_1, arrayOf(
+                getString(R.string.delete)
+            ))) { dialog1: DialogInterface?, which1: Int -> onTagOptionClicked(tagChip, which1) }
+            .show()
     }
 
-    private void onTagOptionClicked(Chip tagChip, int which1) {
+    private fun onTagOptionClicked(tagChip: Chip, which1: Int) {
         if (which1 == 0) {
-            new Builder(requireContext())
-                .setTitle(tagChip.getText().toString())
+            AlertDialog.Builder(requireContext())
+                .setTitle(tagChip.text.toString())
                 .setMessage(getString(R.string.delete))
-                .setPositiveButton(R.string.confirm, (dialog2, which2) ->
-                    chipGroup.removeView(tagChip)
-                ).setNegativeButton(R.string.cancel, null)
-                .show();
+                .setPositiveButton(R.string.confirm
+                ) { dialog2: DialogInterface?, which2: Int -> jot_tagGroup.removeView(tagChip) }.setNegativeButton(R.string.cancel, null)
+                .show()
         }
     }
 
-    private void updateDateIndicator() {
-        dateText.setText(SimpleDateFormat.getDateInstance()
-            .format(new Date(jot.createdTime())));
+    private fun updateDateIndicator() {
+        jot_date.text = SimpleDateFormat.getDateInstance()
+            .format(Date(jot!!.createdTime()))
     }
 
-    @Override
-    public void onCreateOptionsMenu(
-        @NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.jot_edit, menu);
+    override fun onCreateOptionsMenu(
+        menu: Menu, inflater: MenuInflater
+    ) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.jot_edit, menu)
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menuItem_delete) {
-            preferDelete();
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menuItem_delete) {
+            preferDelete()
         }
-        return false;
+        return false
     }
 
-    private void save() {
-        jot = new PostedJot(db, jot).value();
-        saveAttachment();
-        saveTag();
-        SyncService.enqueue(requireContext());
-        final Intent intent = new Intent();
-        intent.setData(
-            Uri.parse(
-                new JotUri(BuildConfig.URI_HOST, jot).value().toASCIIString())
-        );
+    private fun save() {
+        jot = PostedJot(db, jot!!).value()
+        saveAttachment()
+        saveTag()
+        SyncService.enqueue(requireContext())
+        val intent = Intent()
+        intent.data = Uri.parse(
+            JotUri(BuildConfig.URI_HOST, jot!!).value().toASCIIString())
         sendResult(
             requireArguments().getInt(ARG_REQUEST_CODE, 0),
-            RESULT_OK,
+            Activity.RESULT_OK,
             intent
-        );
+        )
     }
 
-    private void saveTag() {
-        final Map<Long, Tag> dbTags =
-            new QueriedTags(new TagsByJotId(db, jot.id()))
-                .value()
-                .stream()
-                .collect(Collectors.toMap(Tag::id, tag -> tag));
-        for (int i = 0; i < chipGroup.getChildCount(); i++) {
-            Tag tagOnView = ((Tag) chipGroup.getChildAt(i).getTag());
+    private fun saveTag() {
+        val dbTags: MutableMap<Long, Tag> = QueriedTags(TagsByJotId(db, jot!!.id()))
+            .value()
+            .stream()
+            .collect(Collectors.toMap({ obj: Tag -> obj.id() }) { tag: Tag? -> tag })
+        for (i in 0 until jot_tagGroup.childCount) {
+            val tagOnView = jot_tagGroup.getChildAt(i).tag as Tag
             if (!dbTags.containsKey(tagOnView.id())) {
                 // update JOT TAG
-                new NewJotTag(
+                NewJotTag(
                     db,
-                    new ConstSource<>(jot.id()),
-                    new ConstSource<>(tagOnView.id())
-                ).fire();
+                    ConstSource(jot!!.id()),
+                    ConstSource(tagOnView.id())
+                ).fire()
             } else {
-                dbTags.remove(tagOnView.id());
+                dbTags.remove(tagOnView.id())
             }
         }
-        dbTags.forEach((aLong, tag) -> new JotTagRemoval(db, jot.id(), tag.id()).fire());
+        dbTags.forEach { (aLong: Long?, tag: Tag) -> JotTagRemoval(db, jot!!.id(), tag.id()).fire() }
     }
 
-    private void saveAttachment() {
-        final List<Attachment> dbAttachments = new QueriedAttachments(
-            new AttachmentsByJotId(db, jot.id())
-        ).value();
-        for (Uri uri : attachmentOnView) {
-            boolean hasItem = false;
-            List<Attachment> existOnView = new ArrayList<>();
-            for (Attachment dbAttachment : dbAttachments) {
-                if (dbAttachment.uri().equals(uri.toString())) {
-                    hasItem = true;
-                    existOnView.add(dbAttachment);
+    private fun saveAttachment() {
+        val dbAttachments = QueriedAttachments(
+            AttachmentsByJotId(db, jot!!.id())
+        ).value().toMutableList()
+        for (uri in attachmentOnView) {
+            var hasItem = false
+            val existOnView: MutableList<Attachment> = ArrayList()
+            for (dbAttachment in dbAttachments) {
+                if (dbAttachment.uri() == uri.toString()) {
+                    hasItem = true
+                    existOnView.add(dbAttachment)
                 }
             }
-            dbAttachments.removeAll(existOnView);
+            dbAttachments.removeAll(existOnView)
             if (!hasItem) {
-                new NewAttachment(db, uri.toString(), jot.id()).value();
+                NewAttachment(db, uri.toString(), jot!!.id()).value()
             }
         }
-        for (Attachment attachment : dbAttachments) {
-            new RemovalAttachment(db, attachment.id()).fire();
+        for (attachment in dbAttachments) {
+            RemovalAttachment(db, attachment.id()).fire()
         }
     }
 
-    private void deleteFlow() {
-        new AlertDialog.Builder(requireContext())
+    private fun deleteFlow() {
+        AlertDialog.Builder(requireContext())
             .setTitle(R.string.delete)
-            .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                deleteTempAttachments();
-                new RemovalAttachmentByJotId(db, jot.id()).fire();
-                new JotRemoval(db, jot.id()).fire();
-                getParentFragmentManager().popBackStack();
-            })
+            .setPositiveButton(R.string.confirm) { dialog: DialogInterface?, which: Int ->
+                deleteTempAttachments()
+                RemovalAttachmentByJotId(db, jot!!.id()).fire()
+                JotRemoval(db, jot!!.id()).fire()
+                parentFragmentManager.popBackStack()
+            }
             .setNegativeButton(R.string.cancel, null)
-            .show();
+            .show()
     }
 
-    private void discardFlow() {
-        if (jot.id() <= 0) {
+    private fun discardFlow() {
+        if (jot!!.id() <= 0) {
             try {
-                new JotRemoval(db, jot.id()).fire();
-            } catch (Exception e) {
+                JotRemoval(db, jot!!.id()).fire()
+            } catch (e: Exception) {
                 // make sure not have actually inserted into db
-                e.printStackTrace();
+                e.printStackTrace()
             }
         }
-        if (jot instanceof WrappedJot) { // modified
-            new AlertDialog.Builder(requireContext())
+        if (jot is WrappedJot) { // modified
+            AlertDialog.Builder(requireContext())
                 .setTitle(R.string.discard)
-                .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                    deleteTempAttachments();
-                    getParentFragmentManager().popBackStack();
-                })
+                .setPositiveButton(R.string.confirm) { dialog: DialogInterface?, which: Int ->
+                    deleteTempAttachments()
+                    parentFragmentManager.popBackStack()
+                }
                 .setNegativeButton(R.string.cancel, null)
-                .show();
+                .show()
         } else {
-            getParentFragmentManager().popBackStack();
+            parentFragmentManager.popBackStack()
         }
     }
 
-    @Override
-    public void onActivityResult(
-        int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_LOCATION_PICKER &&
-            resultCode == RESULT_OK && data != null) {
-            jot = new WrappedJot(jot) {
-                @Override
-                public double[] location() {
-                    return new double[]{
+    override fun onActivityResult(
+        requestCode: Int, resultCode: Int, data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_LOCATION_PICKER && resultCode == Activity.RESULT_OK && data != null) {
+            jot = object : WrappedJot(jot!!) {
+                override fun location(): DoubleArray {
+                    return doubleArrayOf(
                         data.getDoubleExtra(LONGITUDE, 0.0),
                         data.getDoubleExtra(LATITUDE, 0.0)
-                    };
+                    )
                 }
-            };
-            Address address = data.getParcelableExtra(ADDRESS);
-            locationText.setText(
-                address == null ? "" : new LocationString(address).value());
-            loadEmbedMapByJot();
-        } else if (requestCode == REQUEST_CODE_PICK_FILE &&
-            resultCode == RESULT_OK && data != null) {
-            if (data.getData() != null) {
-                addAttachmentGrantPermission(data.getData());
+            }
+            val address = data.getParcelableExtra<Address>(ADDRESS)
+            jot_location.text = if (address == null) "" else LocationString(address).value()
+            loadEmbedMapByJot()
+        } else if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == Activity.RESULT_OK && data != null) {
+            if (data.data != null) {
+                addAttachmentGrantPermission(data.data)
             } else {
-                ClipData clip = data.getClipData();
+                val clip = data.clipData
                 if (clip != null) {
-                    for (int i = 0; i < clip.getItemCount(); i++) {
+                    for (i in 0 until clip.itemCount) {
                         addAttachmentGrantPermission(
-                            clip.getItemAt(i).getUri());
+                            clip.getItemAt(i).uri)
                     }
                 }
             }
-            updateAttachmentView();
-        } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD &&
-            resultCode == RESULT_OK && data != null) {
-            final String newMoodRaw = data.getStringExtra("INPUT_FIELD");
-            final String newMood;
-            if (newMoodRaw != null && newMoodRaw.length() > 1) {
-                newMood = newMoodRaw.substring(0, 2);
+            updateAttachmentView()
+        } else if (requestCode == REQUEST_CODE_INPUT_CUSTOM_MOOD && resultCode == Activity.RESULT_OK && data != null) {
+            val newMoodRaw = data.getStringExtra("INPUT_FIELD")
+            val newMood: String
+            newMood = if (newMoodRaw != null && newMoodRaw.length > 1) {
+                newMoodRaw.substring(0, 2)
             } else {
-                newMood = "+";
+                "+"
             }
-            moodText.setText(newMood);
-            jot = new WrappedJot(jot) {
-                @Override
-                public String mood() {
-                    return newMood;
+            jot_mood.text = newMood
+            jot = object : WrappedJot(jot!!) {
+                override fun mood(): String {
+                    return newMood
                 }
-            };
+            }
         } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG &&
             data != null) {
-            List<Uri> uris =
-                data.getParcelableArrayListExtra("ARG_ATTACHMENT_URI");
-            if (uris == null) {
-                return;
+            val uris = data.getParcelableArrayListExtra<Uri>("ARG_ATTACHMENT_URI")
+                ?: return
+            attachmentOnView.clear()
+            for (uri in uris) {
+                addAttachment(uri)
             }
-            attachmentOnView.clear();
-            for (Uri uri : uris) {
-                addAttachment(uri);
-            }
-            updateAttachmentView();
+            updateAttachmentView()
         } else if (requestCode == REQUEST_CODE_TAKE_PICTURE) {
-            if (resultCode == RESULT_OK) {
-                takeTempPhoto();
+            if (resultCode == Activity.RESULT_OK) {
+                takeTempPhoto()
             }
         } else if (requestCode == REQUEST_CODE_AI_MAGIC_CAPTURE) {
-            if (resultCode == RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
                 premiumAiMagic(
                     FileProvider.getUriForFile(
                         requireContext(),
-                        FILE_PROVIDER_AUTHORITY,
-                        new TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
+                        JotApplication.FILE_PROVIDER_AUTHORITY!!,
+                        TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
                     )
-                );
+                )
             }
         }
     }
 
-    private void takeTempPhoto() {
-        File fileNameByTime = new TempAttachmentFile(
+    private fun takeTempPhoto() {
+        val fileNameByTime = TempAttachmentFile(
             requireContext(),
             "" + System.currentTimeMillis() + ".jpg"
-        ).value();
-        new TempAttachmentFile(requireContext(), TEMP_FILE_NAME)
+        ).value()
+        TempAttachmentFile(requireContext(), TEMP_FILE_NAME)
             .value()
-            .renameTo(fileNameByTime);
+            .renameTo(fileNameByTime)
         addAttachment(
             FileProvider.getUriForFile(
                 requireContext(),
-                FILE_PROVIDER_AUTHORITY,
+                JotApplication.FILE_PROVIDER_AUTHORITY!!,
                 fileNameByTime
             )
-        );
-        updateAttachmentView();
+        )
+        updateAttachmentView()
     }
 
-    private void premiumAiMagic(Uri fileUri) {
+    private fun premiumAiMagic(fileUri: Uri) {
         try {
-            FirebaseVisionImage image =
-                FirebaseVisionImage.fromFilePath(requireContext(), fileUri);
-            final EditText contentEditText =
-                requireView().findViewById(R.id.jot_content);
+            val image = FirebaseVisionImage.fromFilePath(requireContext(), fileUri)
+            val contentEditText = requireView().findViewById<EditText>(R.id.jot_content)
             FirebaseVision.getInstance()
-                .getCloudDocumentTextRecognizer()
+                .cloudDocumentTextRecognizer
                 .processImage(image)
-                .addOnSuccessListener(text -> {
-                        if (getView() == null) {
-                            return;
-                        }
-                        contentEditText.append(text.getText());
+                .addOnSuccessListener { text: FirebaseVisionDocumentText ->
+                    if (view == null) {
+                        return@addOnSuccessListener
                     }
-                )
-                .addOnCompleteListener(task -> FirebaseVision.getInstance()
-                    .getVisionBarcodeDetector()
-                    .detectInImage(image)
-                    .addOnSuccessListener(it -> {
-                            for (FirebaseVisionBarcode barcode : it) {
-                                contentEditText.append("\n");
-                                contentEditText.append(barcode.getDisplayValue());
-                            }
-                        }
-                    ).addOnCompleteListener(it2 -> FirebaseVision.getInstance()
-                        .getVisionCloudLandmarkDetector()
-                        .detectInImage(image)
-                        .addOnSuccessListener(it3 -> {
-                            List<FirebaseVisionCloudLandmark> sorted =
-                                it3.stream().sorted((o1, o2) ->
-                                    (int) ((o1.getConfidence() - o2.getConfidence()) * 100)
-                                ).collect(toList());
-                            if (sorted.size() > 0) {
-                                FirebaseVisionCloudLandmark landmark =
-                                    sorted.get(0);
-                                newChip(landmark.getLandmark());
-                                if (landmark.getLocations().size() > 0) {
-                                    updateJotLocation(
-                                        landmark.getLocations().get(0));
-                                }
-                            }
-                        }).addOnCompleteListener(it -> takeTempPhoto())
-                    )
-                );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void deleteTempAttachments() {
-        for (Uri uri : attachmentOnView) {
-            if (uri.toString().startsWith(URI_FILE_TEMP_PROVIDER)) {
-                new TempAttachmentFile(
-                    requireContext(),
-                    uri.toString().replace(URI_FILE_TEMP_PROVIDER, "")
-                ).value().delete();
-            }
-        }
-    }
-
-    private void updateAttachmentView() {
-        final TextView newAttachment =
-            requireView().findViewById(R.id.jot_attachment_new);
-        newAttachment.setVisibility(VISIBLE);
-        newAttachment.setOnClickListener(v -> startPicker());
-
-        final TextView countText =
-            requireView().findViewById(R.id.jot_attachment_count);
-        countText.setVisibility(VISIBLE);
-        countText.setText(attachmentOnView.size() + "");
-
-        updateAttachmentViewByMimeType();
-    }
-
-    private void updateAttachmentViewByMimeType() {
-        adapter.renewItems(attachmentOnView.stream()
-            .map(Uri::toString)
-            .collect(toList()));
-        for (int i = 0; i < slider.getItemDecorationCount(); i++) {
-            ItemDecoration decoration = slider.getItemDecorationAt(i);
-            if (decoration instanceof DotIndicatorDecoration) {
-                ((DotIndicatorDecoration) decoration).attachTo(slider);
-            }
-        }
-    }
-
-    private void showProperties(View view, Uri uri) {
-        final androidx.appcompat.widget.PopupMenu popup =
-            new PopupMenu(view.getContext(), view);
-        popup.getMenu().add(R.string.delete)
-            .setOnMenuItemClickListener(item -> {
-                attachmentOnView.remove(uri);
-                updateAttachmentView();
-                return true;
-            });
-        popup.getMenu()
-            .add(view.getContext().getString(R.string.properties))
-            .setOnMenuItemClickListener(item -> {
-                new AttachmentPropertiesDialog(view.getContext(), uri).fire();
-                return true;
-            });
-        popup.show();
-    }
-
-    private void showContent(View view, String uri) {
-        if (attachmentOnView.size() > 1) {
-            browseAttachments(uri);
-        } else {
-            new LaunchAttachment(view.getContext(), uri).fire();
-        }
-    }
-
-    private void startPicker() {
-        new AlertDialog.Builder(requireContext())
-            .setTitle(R.string.new_attachment)
-            .setItems(R.array.newAttachmentMethods, (dialog, which) -> {
-                switch (which) {
-                    case 0:
-                        takePicture();
-                        break;
-                    default:
-                    case 1:
-                        startActivityForResult(
-                            new AttachmentPickerIntent().value(),
-                            REQUEST_CODE_PICK_FILE
-                        );
+                    contentEditText.append(text.text)
                 }
-            })
-            .show();
+                .addOnCompleteListener { task: Task<FirebaseVisionDocumentText?>? ->
+                    FirebaseVision.getInstance()
+                        .visionBarcodeDetector
+                        .detectInImage(image)
+                        .addOnSuccessListener { it: List<FirebaseVisionBarcode> ->
+                            for (barcode in it) {
+                                contentEditText.append("\n")
+                                contentEditText.append(barcode.displayValue)
+                            }
+                        }.addOnCompleteListener { it2: Task<List<FirebaseVisionBarcode?>?>? ->
+                            FirebaseVision.getInstance()
+                                .visionCloudLandmarkDetector
+                                .detectInImage(image)
+                                .addOnSuccessListener { it3: List<FirebaseVisionCloudLandmark> ->
+                                    val sorted = it3.stream().sorted { o1: FirebaseVisionCloudLandmark, o2: FirebaseVisionCloudLandmark -> ((o1.confidence - o2.confidence) * 100).toInt() }.collect(Collectors.toList())
+                                    if (sorted.size > 0) {
+                                        val landmark = sorted[0]
+                                        newChip(landmark.landmark)
+                                        if (landmark.locations.size > 0) {
+                                            updateJotLocation(
+                                                landmark.locations[0])
+                                        }
+                                    }
+                                }.addOnCompleteListener { it: Task<List<FirebaseVisionCloudLandmark?>?>? -> takeTempPhoto() }
+                        }
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
-    private void takePicture() {
-        takePicture(REQUEST_CODE_TAKE_PICTURE);
-    }
-
-    private void takePicture(int requestCode) {
-        try {
-            Intent intent = new Intent(ACTION_IMAGE_CAPTURE);
-            if (intent.resolveActivity(requireContext().getPackageManager()) !=
-                null) {
-                intent.putExtra(EXTRA_OUTPUT, FileProvider.getUriForFile(
+    private fun deleteTempAttachments() {
+        for (uri in attachmentOnView) {
+            if (uri.toString().startsWith(JotApplication.URI_FILE_TEMP_PROVIDER!!)) {
+                TempAttachmentFile(
                     requireContext(),
-                    FILE_PROVIDER_AUTHORITY,
-                    new TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
-                ));
-                startActivityForResult(intent, requestCode);
+                    uri.toString().replace(JotApplication.URI_FILE_TEMP_PROVIDER, "")
+                ).value().delete()
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
-    private void browseAttachments(String selectedUri) {
-        List<Uri> sorted = attachmentOnView
-            .stream()
-            .sorted(new JpegDateComparator(requireContext()))
-            .collect(toList());
-        attachmentOnView.clear();
-        attachmentOnView.addAll(sorted);
-        FullScreenDialogFragment dialog =
-            AttachmentsFragment.newInstance(attachmentOnView, selectedUri);
-        dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG);
-        dialog.show(getParentFragmentManager(), null);
+    private fun updateAttachmentView() {
+        val newAttachment = requireView().findViewById<TextView>(R.id.jot_attachment_new)
+        newAttachment.visibility = View.VISIBLE
+        newAttachment.setOnClickListener { v: View? -> startPicker() }
+        val countText = requireView().findViewById<TextView>(R.id.jot_attachment_count)
+        countText.visibility = View.VISIBLE
+        countText.text = attachmentOnView.size.toString() + ""
+        updateAttachmentViewByMimeType()
     }
 
-    private void addAttachmentGrantPermission(Uri uri) {
+    private fun updateAttachmentViewByMimeType() {
+        adapter!!.renewItems(attachmentOnView.stream()
+            .map { obj: Uri? -> obj.toString() }
+            .collect(Collectors.toList()))
+        for (i in 0 until jot_attachment_container!!.itemDecorationCount) {
+            val decoration = jot_attachment_container!!.getItemDecorationAt(i)
+            if (decoration is DotIndicatorDecoration) {
+                decoration.attachTo(jot_attachment_container!!)
+            }
+        }
+    }
+
+    private fun showProperties(view: View, uri: Uri) {
+        val popup = PopupMenu(view.context, view)
+        popup.menu.add(R.string.delete)
+            .setOnMenuItemClickListener { item: MenuItem? ->
+                attachmentOnView.remove(uri)
+                updateAttachmentView()
+                true
+            }
+        popup.menu
+            .add(view.context.getString(R.string.properties))
+            .setOnMenuItemClickListener { item: MenuItem? ->
+                AttachmentPropertiesDialog(view.context, uri).fire()
+                true
+            }
+        popup.show()
+    }
+
+    private fun showContent(view: View, uri: String) {
+        if (attachmentOnView.size > 1) {
+            browseAttachments(uri)
+        } else {
+            LaunchAttachment(view.context, uri).fire()
+        }
+    }
+
+    private fun startPicker() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.new_attachment)
+            .setItems(R.array.newAttachmentMethods) { dialog: DialogInterface?, which: Int ->
+                when (which) {
+                    0 -> takePicture()
+                    1 -> startActivityForResult(
+                        AttachmentPickerIntent().value(),
+                        REQUEST_CODE_PICK_FILE
+                    )
+                    else -> startActivityForResult(
+                        AttachmentPickerIntent().value(),
+                        REQUEST_CODE_PICK_FILE
+                    )
+                }
+            }
+            .show()
+    }
+
+    private fun takePicture(requestCode: Int = REQUEST_CODE_TAKE_PICTURE) {
         try {
-            requireContext().getContentResolver().takePersistableUriPermission(
-                uri,
-                FLAG_GRANT_READ_URI_PERMISSION
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (intent.resolveActivity(requireContext().packageManager) !=
+                null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
+                    requireContext(),
+                    JotApplication.FILE_PROVIDER_AUTHORITY!!,
+                    TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
+                ))
+                startActivityForResult(intent, requestCode)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        addAttachment(uri);
     }
 
-    private void unsupportedDialog() {
-        Alert.Companion.newInstance(
+    private fun browseAttachments(selectedUri: String) {
+        val sorted = attachmentOnView
+            .stream()
+            .sorted(JpegDateComparator(requireContext()))
+            .collect(Collectors.toList())
+        attachmentOnView.clear()
+        attachmentOnView.addAll(sorted)
+        val dialog = AttachmentsFragment.newInstance(attachmentOnView, selectedUri)
+        dialog.setTargetFragment(this, REQUEST_CODE_ATTACHMENT_DIALOG)
+        dialog.show(parentFragmentManager, null)
+    }
+
+    private fun addAttachmentGrantPermission(uri: Uri?) {
+        try {
+            requireContext().contentResolver.takePersistableUriPermission(
+                uri!!,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        addAttachment(uri)
+    }
+
+    private fun unsupportedDialog() {
+        newInstance(
             REQUEST_CODE_ALERT,
             getString(R.string.not_supported_file)
-        ).show(getChildFragmentManager(), null);
+        ).show(childFragmentManager, null)
     }
 
-    private void addAttachment(Uri uri) {
+    private fun addAttachment(uri: Uri?) {
         if (attachmentOnView.contains(uri)) {
-            return;
+            return
         }
-        final String mimeType = new UriMimeType(requireContext(), uri.toString()).value();
+        val mimeType = UriMimeType(requireContext(), uri.toString()).value()
         if (mimeType.startsWith("image")) {
-            updateJotWithExif(uri);
-            attachmentOnView.add(uri);
+            updateJotWithExif(uri)
+            attachmentOnView.add(uri)
         } else if (mimeType.startsWith("video")) {
-            attachmentOnView.add(uri);
+            attachmentOnView.add(uri)
         } else if (mimeType.startsWith("audio")) {
-            attachmentOnView.add(uri);
+            attachmentOnView.add(uri)
         } else {
             if (uri.toString().startsWith("http")) {
-                attachmentOnView.add(uri);
+                attachmentOnView.add(uri)
             } else {
-                unsupportedDialog();
+                unsupportedDialog()
             }
         }
     }
 
-    private void updateJotWithExif(Uri data) {
+    private fun updateJotWithExif(data: Uri?) {
         try {
-            InputStream inputStream =
-                requireContext().getContentResolver().openInputStream(data);
-            if (inputStream == null) {
-                return;
-            }
-            final ExifInterface exif = new ExifInterface(inputStream);
-            updateJotLocation(exif);
-            updateJotDateByExif(exif);
-        } catch (Exception e) {
-            e.printStackTrace();
+            val inputStream = requireContext().contentResolver.openInputStream(data!!) ?: return
+            val exif = ExifInterface(inputStream)
+            updateJotLocation(exif)
+            updateJotDateByExif(exif)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    private void updateJotDateByExif(ExifInterface exif) {
-        final Long time = new ExifUnixTimeStamp(
-            new ExifAttribute(
-                new ConstSource<>(exif),
-                TAG_DATETIME_ORIGINAL
+    private fun updateJotDateByExif(exif: ExifInterface) {
+        val time = ExifUnixTimeStamp(
+            ExifAttribute(
+                ConstSource(exif),
+                ExifInterface.TAG_DATETIME_ORIGINAL
             )
-        ).value();
+        ).value()
 
         // invalid time or is a created jot or there are already have attachment there,
         // remains unchanged.
-        if (time == -1L || jot.id() != -1L || attachmentOnView.size() > 0) {
-            return;
+        if (time == -1L || jot!!.id() != -1L || attachmentOnView.size > 0) {
+            return
         }
-        jot = new WrappedJot(jot) {
-            @Override
-            public long createdTime() {
+        jot = object : WrappedJot(jot!!) {
+            override fun createdTime(): Long {
                 /*
                  * The picture recorded time is at same timezone of current place.
                  * So minus the current phone timezone offset for the proper GMT time.
                  */
-                TimeZone tz = TimeZone.getDefault();
-                return time - tz.getOffset(ZONE_OFFSET);
+                val tz = TimeZone.getDefault()
+                return time - tz.getOffset(Calendar.ZONE_OFFSET.toLong())
             }
-        };
-        updateDateIndicator();
-    }
-
-    private boolean isLocationSetup() {
-        return
-            !Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-                && !Arrays.equals(jot.location(), new double[]{0.0, 0.0});
-    }
-
-    private void updateJotLocation(ExifInterface exif) {
-        Location location = new ExifLocation(exif).value();
-        if (isLocationSetup() ||
-            (location.getLongitude() == 0 && location.getLatitude() == 0)) {
-            return;
         }
-        updateJotLocation(location);
+        updateDateIndicator()
     }
 
-    private void updateJotLocation(FirebaseVisionLatLng latLng) {
-        if (isLocationSetup()) {
-            return;
+    private val isLocationSetup: Boolean
+        private get() = (!Arrays.equals(jot!!.location(), doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE))
+            && !Arrays.equals(jot!!.location(), doubleArrayOf(0.0, 0.0)))
+
+    private fun updateJotLocation(exif: ExifInterface) {
+        val location = ExifLocation(exif).value()
+        if (isLocationSetup ||
+            location.longitude == 0.0 && location.latitude == 0.0) {
+            return
         }
-        updateJotLocation(new FirebaseLatLngLocation(latLng).value());
+        updateJotLocation(location)
     }
 
-    private void updateJotLocation(Location location) {
-        jot = new WrappedJot(jot) {
-            @Override
-            public double[] location() {
-                return new double[]{location.getLongitude(), location.getLatitude()};
+    private fun updateJotLocation(latLng: FirebaseVisionLatLng) {
+        if (isLocationSetup) {
+            return
+        }
+        updateJotLocation(FirebaseLatLngLocation(latLng).value())
+    }
+
+    private fun updateJotLocation(location: Location) {
+        jot = object : WrappedJot(jot!!) {
+            override fun location(): DoubleArray {
+                return doubleArrayOf(location.longitude, location.latitude)
             }
-        };
-        updateAddress(location);
-        loadEmbedMapByJot();
+        }
+        updateAddress(location)
+        loadEmbedMapByJot()
     }
 
-    private void loadEmbedMapByJot() {
-        FragmentManager mgr = getChildFragmentManager();
-        if (!Arrays.equals(jot.location(), new double[]{MIN_VALUE, MIN_VALUE})
-            && !Arrays.equals(jot.location(), new double[]{0.0, 0.0})) {
+    private fun loadEmbedMapByJot() {
+        val mgr = childFragmentManager
+        if (!Arrays.equals(jot!!.location(), doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE))
+            && !Arrays.equals(jot!!.location(), doubleArrayOf(0.0, 0.0))) {
             mgr.beginTransaction().replace(
                 R.id.jot_embedMapContainer,
                 EmbedMapFragment
-                    .newInstance(jot.location()[0], jot.location()[1])
-            ).commit();
-            requireView().findViewById(R.id.jot_embedMapContainer)
-                .setVisibility(VISIBLE);
+                    .newInstance(jot!!.location()[0], jot!!.location()[1])
+            ).commit()
+            requireView().findViewById<View>(R.id.jot_embedMapContainer).visibility = View.VISIBLE
         } else {
-            Fragment map = mgr.findFragmentById(R.id.jot_embedMapContainer);
+            val map = mgr.findFragmentById(R.id.jot_embedMapContainer)
             if (map != null) {
-                mgr.beginTransaction().remove(map).commit();
+                mgr.beginTransaction().remove(map).commit()
             }
-            requireView().findViewById(R.id.jot_embedMapContainer)
-                .setVisibility(GONE);
+            requireView().findViewById<View>(R.id.jot_embedMapContainer).visibility = View.GONE
         }
     }
 
-    @Override
-    public boolean onBackPress() {
-        if (jot instanceof WrappedJot) {
-            discardFlow();
-            return true;
+    override fun onBackPress(): Boolean {
+        return if (jot is WrappedJot) {
+            discardFlow()
+            true
         } else {
-            deleteTempAttachments();
-            return false;
+            deleteTempAttachments()
+            false
         }
     }
 
-    private void preferDelete() {
-        if (jot.id() < 0) {
-            discardFlow();
+    private fun preferDelete() {
+        if (jot!!.id() < 0) {
+            discardFlow()
         } else {
-            deleteFlow();
+            deleteFlow()
         }
     }
 
-    @Override
-    public void onBillingSetupFinished(BillingResult billingResult) {
-        List<Purchase> purchasesList =
-            billing.queryPurchases(SUBS).getPurchasesList();
+    override fun onBillingSetupFinished(billingResult: BillingResult) {
+        val purchasesList = billing!!.queryPurchases(SkuType.SUBS).purchasesList
         if (purchasesList != null) {
-            for (Purchase purchase : purchasesList) {
-                if ("premium".equals(purchase.getSku())
-                    && purchase.getPurchaseState() == PURCHASED) {
-                    View view = getView();
+            for (purchase in purchasesList) {
+                if ("premium" == purchase.sku && purchase.purchaseState == PurchaseState.PURCHASED) {
+                    val view = view
                     if (view != null) {
-                        view.findViewById(R.id.jot_ai_magic)
-                            .setVisibility(VISIBLE);
+                        view.findViewById<View>(R.id.jot_ai_magic).visibility = View.VISIBLE
                     }
-                    return;
+                    return
                 }
             }
         }
     }
 
-    @Override
-    public void onBillingServiceDisconnected() {
+    override fun onBillingServiceDisconnected() {}
 
+    companion object {
+        private const val REQUEST_CODE_LOCATION_PICKER = 1000
+        private const val REQUEST_CODE_PICK_FILE = 1001
+        private const val REQUEST_CODE_INPUT_CUSTOM_MOOD = 1002
+        private const val REQUEST_CODE_ALERT = 1003
+        private const val REQUEST_CODE_ATTACHMENT_DIALOG = 1004
+        private const val REQUEST_CODE_TAKE_PICTURE = 1005
+        private const val REQUEST_CODE_AI_MAGIC_CAPTURE = 1006
+        private const val ARG_JOT_JSON = "ARG_JOT"
+        private const val ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI"
+        private const val ARG_REQUEST_CODE = "ARG_REQUEST_CODE"
+
+        /**
+         * We use fixed file name for taking picture, make sure to move the previous taken file
+         * before taking new one.
+         */
+        private const val TEMP_FILE_NAME = "JotContentTakePicture.jpg"
+        fun newInstance(jot: Jot?, requestCode: Int): Fragment {
+            return newInstance(jot, ArrayList(), requestCode)
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun newInstance(
+            jot: Jot? =
+                ConstJot(
+                    -1,
+                    "",
+                    "",
+                    System.currentTimeMillis(), doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE),
+                    "",
+                    1,
+                    false
+                ), uris: ArrayList<String?>? = ArrayList(), requestCode: Int = 0
+        ): Fragment {
+            val frag: Fragment = JotContentFragment()
+            val args = Bundle()
+            args.putString(ARG_JOT_JSON, Gson().toJson(jot))
+            args.putStringArrayList(ARG_ATTACHMENT_URI, uris)
+            args.putInt(ARG_REQUEST_CODE, requestCode)
+            frag.arguments = args
+            return frag
+        }
     }
 }

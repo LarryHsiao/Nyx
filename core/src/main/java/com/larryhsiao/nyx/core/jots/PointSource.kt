@@ -1,28 +1,18 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.WKTReader;
-
-import static java.lang.Double.MIN_VALUE;
+import com.silverhetch.clotho.Source
+import org.locationtech.jts.io.WKTReader
 
 /**
  * Source to build a Point from given geometry string.
  */
-public class PointSource implements Source<double[]> {
-    private final String value;
-
-    public PointSource(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public double[] value() {
-        try {
-            Point point = new WKTReader().read(value).getCentroid();
-            return new double[]{point.getX(), point.getY()};
-        } catch (Exception e) {
-            return new double[]{MIN_VALUE, MIN_VALUE};
+class PointSource(private val value: String) : Source<DoubleArray?> {
+    override fun value(): DoubleArray {
+        return try {
+            val point = WKTReader().read(value).centroid
+            doubleArrayOf(point.x, point.y)
+        } catch (e: Exception) {
+            doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE)
         }
     }
 }

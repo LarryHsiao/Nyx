@@ -1,36 +1,35 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 /**
- * Unit-test for the class {@link JotUriId}
+ * Unit-test for the class [JotUriId]
  */
-public class JotUriIdTest {
-
+class JotUriIdTest {
     /**
      * Check the output
      */
     @Test
-    public void simple() {
+    fun simple() {
         Assertions.assertEquals(
             1L,
-            new JotUriId(
+            JotUriId(
                 "http://localhost.com/jots/1"
-            ).value().longValue()
-        );
+            ).value()
+        )
     }
 
     /**
      * Not Jot path
      */
     @Test
-    public void notJotPath() {
+    fun notJotPath() {
         try {
-            new JotUriId("http://localhost.com/abc/1").value();
-            Assertions.fail("Should throw exception");
-        } catch (Exception e) {
-            Assertions.assertTrue(true);
+            JotUriId("http://localhost.com/abc/1").value()
+            Assertions.fail<Any>("Should throw exception")
+        } catch (e: Exception) {
+            Assertions.assertTrue(true)
         }
     }
 
@@ -38,12 +37,12 @@ public class JotUriIdTest {
      * URI id not a long
      */
     @Test
-    public void notId() {
+    fun notId() {
         try {
-            new JotUriId("http://localhost.com/jots/number").value();
-            Assertions.fail("Should throw exception");
-        } catch (Exception e) {
-            Assertions.assertTrue(true);
+            JotUriId("http://localhost.com/jots/number").value()
+            Assertions.fail<Any>("Should throw exception")
+        } catch (e: Exception) {
+            Assertions.assertTrue(true)
         }
     }
 }

@@ -1,43 +1,34 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
+import java.sql.ResultSet
 
 /**
  * Source to query jots by given ids.
  */
-public class JotsByIds implements Source<ResultSet> {
-    private final Source<Connection> dbSource;
-    private final long[] ids;
-
-    public JotsByIds(Source<Connection> dbSource, long[] ids) {
-        this.dbSource = dbSource;
-        this.ids = ids;
-    }
-
-    @Override
-    public ResultSet value() {
-        try {
-            Statement stmt = dbSource.value().createStatement();
-            final StringBuilder idStr = new StringBuilder();
-            for (int i = 0; i < ids.length; i++) {
+class JotsByIds(
+    private val dbSource: Source<Connection>,
+    private val ids: LongArray
+) : Source<ResultSet> {
+    override fun value(): ResultSet {
+        return try {
+            val stmt = dbSource.value().createStatement()
+            val idStr = StringBuilder()
+            for (i in ids.indices) {
                 if (i > 0) {
-                    idStr.append(", ");
+                    idStr.append(", ")
                 }
-                idStr.append(ids[i]);
+                idStr.append(ids[i])
             }
-            return stmt.executeQuery(
-                // language=H2
+            stmt.executeQuery( // language=H2
                 "SELECT * FROM jots " +
                     "WHERE ID IN (" + idStr.toString() + ") " +
                     "AND DELETE = 0 " +
                     "ORDER BY CREATEDTIME DESC;"
-            );
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            )
+        } catch (e: Exception) {
+            throw IllegalArgumentException(e)
         }
     }
 }

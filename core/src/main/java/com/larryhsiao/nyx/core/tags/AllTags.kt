@@ -1,43 +1,30 @@
-package com.larryhsiao.nyx.core.tags;
+package com.larryhsiao.nyx.core.tags
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
+import java.sql.ResultSet
+import java.sql.SQLException
 
 /**
  * All jots in db.
  */
-public class AllTags implements Source<ResultSet> {
-    private final Source<Connection> conn;
-    private final boolean icnludeDeleted;
-
-    public AllTags(Source<Connection> conn, boolean icnludeDeleted) {
-        this.conn = conn;
-        this.icnludeDeleted = icnludeDeleted;
-    }
-
-    public AllTags(Source<Connection> conn) {
-        this(conn, false);
-    }
-
-    @Override
-    public ResultSet value() {
-        try {
+class AllTags @JvmOverloads constructor(
+    private val conn: Source<Connection>,
+    private val icnludeDeleted: Boolean = false
+) : Source<ResultSet> {
+    override fun value(): ResultSet {
+        return try {
             if (icnludeDeleted) {
-                return conn.value().createStatement().executeQuery(
-                    // language=H2
+                conn.value().createStatement().executeQuery( // language=H2
                     "SELECT * FROM TAGS;"
-                );
+                )
             } else {
-                return conn.value().createStatement().executeQuery(
-                    // language=H2
+                conn.value().createStatement().executeQuery( // language=H2
                     "SELECT * FROM TAGS WHERE DELETE = 0;"
-                );
+                )
             }
-        } catch (SQLException e) {
-            throw new IllegalArgumentException(e);
+        } catch (e: SQLException) {
+            throw IllegalArgumentException(e)
         }
     }
 }

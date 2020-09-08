@@ -1,53 +1,38 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
 /**
  * Wrap object of Jot
  */
-public class WrappedJot implements Jot {
-    private final Jot jot;
-
-    public WrappedJot(Jot jot) {
-        this.jot = jot;
+open class WrappedJot(private val jot: Jot) : Jot {
+    override fun id(): Long {
+        return jot.id()
     }
 
-    @Override
-    public long id() {
-        return jot.id();
+    override fun title(): String {
+        return jot.title()
     }
 
-    @Override
-    public String title() {
-        return jot.title();
+    override fun content(): String {
+        return jot.content()
     }
 
-    @Override
-    public String content() {
-        return jot.content();
+    override fun createdTime(): Long {
+        return jot.createdTime()
     }
 
-    @Override
-    public long createdTime() {
-        return jot.createdTime();
+    override fun mood(): String {
+        return jot.mood()
     }
 
-    @Override
-    public String mood() {
-        return jot.mood();
+    override fun location(): DoubleArray {
+        return jot.location()
     }
 
-    @Override
-    public double[] location() {
-        return jot.location();
+    override fun version(): Int {
+        return jot.version()
     }
 
-    @Override
-    public int version() {
-        return jot.version();
-    }
-
-    @Override
-    public boolean deleted() {
-        return jot.deleted();
+    override fun deleted(): Boolean {
+        return jot.deleted()
     }
 }
-

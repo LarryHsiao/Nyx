@@ -1,26 +1,26 @@
-package com.larryhsiao.nyx.core.tags;
+package com.larryhsiao.nyx.core.tags
 
 /**
  * Tag of Jot
  */
-public interface Tag {
+interface Tag {
     /**
      * The title of this tag
      */
-    String title();
+    fun title(): String?
 
     /**
      * The id of this Tag
      */
-    long id();
+    fun id(): Long
 
     /**
      * The version of this tag
      */
-    int version();
+    fun version(): Int
 
     /**
      * This tag is marked as deleted
      */
-    boolean deleted();
+    fun deleted(): Boolean
 }

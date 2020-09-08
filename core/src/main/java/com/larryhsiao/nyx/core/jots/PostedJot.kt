@@ -1,45 +1,32 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Source;
-
-import java.sql.Connection;
-import java.util.Calendar;
-import java.util.Date;
+import com.silverhetch.clotho.Source
+import java.sql.Connection
+import java.util.*
 
 /**
  * Source to build a Jot that just updated or created.
  */
-public class PostedJot implements Source<Jot> {
-    private final Source<Connection> db;
-    private final Jot jot;
-    private final boolean updateVer;
-
-    public PostedJot(Source<Connection> db, Jot jot, boolean updateVer) {
-        this.db = db;
-        this.jot = jot;
-        this.updateVer = updateVer;
-    }
-
-    public PostedJot(Source<Connection> db, Jot jot) {
-        this(db, jot, true);
-    }
-
-    @Override
-    public Jot value() {
-        if (jot.id() == -1) {
-            final Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date(jot.createdTime()));
-            return new NewJot(
+class PostedJot @JvmOverloads constructor(
+    private val db: Source<Connection>,
+    private val jot: Jot,
+    private val updateVer: Boolean = true
+) : Source<Jot?> {
+    override fun value(): Jot {
+        return if (jot.id() == -1L) {
+            val calendar = Calendar.getInstance()
+            calendar.time = Date(jot.createdTime())
+            NewJot(
                 db,
                 jot.title(),
                 jot.content(),
                 jot.location(),
                 calendar,
                 jot.mood()
-            ).value();
+            ).value()
         } else {
-            new UpdateJot(jot, db, updateVer).fire();
-            return jot;
+            UpdateJot(jot, db, updateVer).fire()
+            jot
         }
     }
 }

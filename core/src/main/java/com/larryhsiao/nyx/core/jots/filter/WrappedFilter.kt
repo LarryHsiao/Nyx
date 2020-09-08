@@ -1,27 +1,18 @@
-package com.larryhsiao.nyx.core.jots.filter;
+package com.larryhsiao.nyx.core.jots.filter
 
 /**
- * Wrapped object of {@link Filter}
+ * Wrapped object of [Filter]
  */
-public class WrappedFilter implements Filter {
-    private final Filter filter;
-
-    public WrappedFilter(Filter filter) {
-        this.filter = filter;
+open class WrappedFilter(private val filter: Filter) : Filter {
+    override fun keyword(): String? {
+        return filter.keyword()
     }
 
-    @Override
-    public String keyword() {
-        return filter.keyword();
+    override fun dateRange(): LongArray? {
+        return filter.dateRange()
     }
 
-    @Override
-    public long[] dateRange() {
-        return filter.dateRange();
-    }
-
-    @Override
-    public long[] ids() {
-        return filter.ids();
+    override fun ids(): LongArray? {
+        return filter.ids()
     }
 }

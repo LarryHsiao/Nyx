@@ -1,48 +1,48 @@
-package com.larryhsiao.nyx.core.jots;
+package com.larryhsiao.nyx.core.jots
 
 /**
  * A note
  */
-public interface Jot {
+interface Jot {
     /**
      * id of a jot.
      */
-    long id();
+    fun id(): Long
 
     /**
      * The title of this jot.
      */
-    String title();
+    fun title(): String
 
     /**
      * The content of a jot.
      */
-    String content();
+    fun content(): String
 
     /**
      * Created time
      */
-    long createdTime();
+    fun createdTime(): Long
 
     /**
      * The display location of this Jot
      *
      * @return length = 2, longitude and latitude.
      */
-    double[] location();
+    fun location(): DoubleArray
 
     /**
      * A mood emoji for this jot.
      */
-    String mood();
+    fun mood(): String
 
     /**
      * Version of this Jot. For syncing to replace from.
      */
-    int version();
+    fun version(): Int
 
     /**
      * Determine this Jot is deleted.
      */
-    boolean deleted();
+    fun deleted(): Boolean
 }
