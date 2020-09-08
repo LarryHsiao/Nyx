@@ -110,8 +110,16 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
                 getString(R.string.Edit)
             }
         })
-        jotViewModel.title().observe(viewLifecycleOwner, { jot_title_editText.setText(it) })
-        jotViewModel.content().observe(viewLifecycleOwner, { jot_content_editText.setText(it) })
+        jotViewModel.title().observe(viewLifecycleOwner, {
+            if (it!=jot_title_editText.text.toString()) {
+                jot_title_editText.setText(it)
+            }
+        })
+        jotViewModel.content().observe(viewLifecycleOwner, {
+            if(it!=jot_content_editText.text.toString()){
+                jot_content_editText.setText(it)
+            }
+        })
         jotViewModel.time().observe(viewLifecycleOwner, { jot_datetime_textView.text = formattedDate(it) })
         jotViewModel.location().observe(viewLifecycleOwner, ::loadUpLocation)
         jotViewModel.attachments().observe(viewLifecycleOwner, ::loadUpAttachments)
