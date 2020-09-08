@@ -226,7 +226,7 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
                 .collect(Collectors.toList())
         )
         if (arguments != null) {
-            val attachments: List<String>? = arguments!!.getStringArrayList(ARG_ATTACHMENT_URI)
+            val attachments: List<String>? = arguments?.getStringArrayList(ARG_ATTACHMENT_URI)
             if (attachments != null) {
                 for (uri in attachments) {
                     addAttachmentGrantPermission(Uri.parse(uri))
@@ -348,7 +348,7 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
     }
 
     private fun postAddAttachment(url: String) {
-        view!!.post {
+        view?.post {
             addAttachment(
                 Uri.parse(url)
             )
@@ -855,7 +855,7 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
 
         // invalid time or is a created jot or there are already have attachment there,
         // remains unchanged.
-        if (time == -1L || jot!!.id() != -1L || attachmentOnView.size > 0) {
+        if (time == -1L || jot?.id() != -1L || attachmentOnView.size > 0) {
             return
         }
         jot = object : WrappedJot(jot!!) {
