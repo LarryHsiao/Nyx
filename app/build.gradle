@@ -1,7 +1,7 @@
 buildscript {
     ext{
         camerax_version = "1.0.0-beta08"
-        kotlinVersion = '1.4.0'
+        kotlinVersion = '1.4.10'
         lifecycle_version = "2.2.0"
         nav_version = "2.3.0"
     }
@@ -45,12 +45,19 @@ android {
         versionName nyxVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        def AUTHORITY = "com.larryhsiao.nyx.fileprovider"
+        def ATTACHMENT_FOLDER_NAME = "attachments"
         buildConfigField("String", "URI_HOST", "\"https://larryhsiao.com\"")
+        buildConfigField("String", "ATTACHMENT_FOLDER_NAME", "\"$ATTACHMENT_FOLDER_NAME\"")
+        buildConfigField("String", "FILE_PROVIDER_AUTHORITY", "\"$AUTHORITY\"")
+        buildConfigField("String", "URI_FILE_PROVIDER", "\"content://$AUTHORITY/$ATTACHMENT_FOLDER_NAME/\"")
     }
     buildTypes {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ext.enableCrashlytics = false
+            ext.alwaysUpdateBuildId = false
         }
         release {
             minifyEnabled true
@@ -106,14 +113,17 @@ dependencies {
     implementation project(':nyx-core')
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
     implementation 'com.google.guava:guava:27.0.1-android'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "androidx.palette:palette-ktx:1.0.0"
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
+    implementation "androidx.navigation:navigation-runtime-ktx:$nav_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    implementation "androidx.core:core:1.3.1"
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "androidx.appcompat:appcompat:1.2.0"
     implementation "androidx.constraintlayout:constraintlayout:2.0.1"
@@ -134,7 +144,7 @@ dependencies {
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.1'
-    implementation 'com.silverhetch:aura:1.22.8'
+    implementation 'com.silverhetch:aura:1.22.9'
     implementation 'com.google.firebase:firebase-ml-vision:23.0.0'
     implementation 'com.google.firebase:firebase-iid:20.2.4'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
@@ -146,7 +156,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.github.stfalcon:stfalcon-imageviewer:1.0.0'
-    implementation 'com.google.maps.android:android-maps-utils:0.5'
+    implementation 'com.google.maps.android:maps-utils-ktx:1.8.0'
     implementation 'com.google.android.material:material:1.3.0-alpha02'
     implementation 'com.schibstedspain.android:leku:6.4.0'
     implementation 'com.google.http-client:google-http-client-gson:1.26.0'

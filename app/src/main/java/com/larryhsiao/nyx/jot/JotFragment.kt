@@ -14,6 +14,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
@@ -75,6 +77,33 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         }
     }
 
+    private val deleteConfirmationDialog by lazy {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.delete)
+            .setMessage(R.string.delete_this_diary)
+            .setNegativeButton(R.string.No) { _, _ -> }
+            .setPositiveButton(R.string.delete) { _, _ ->
+                lifecycleScope.launch {
+                    // TODO: Screen locking
+                    jotViewModel.delete()
+                    jotsViewModel.reload()
+                    findNavController().popBackStack()
+                }
+            }
+            .create()
+    }
+
+    private val discardConfirmationDialog by lazy {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.discard)
+            .setMessage(R.string.Are_you_sure_to_discard_)
+            .setNegativeButton(R.string.No) { _, _ -> }
+            .setPositiveButton(R.string.discard) { _, _ ->
+                findNavController().popBackStack()
+            }
+            .create()
+    }
+
     private val timePicker by lazy {
         val current = Calendar.getInstance()
         TimePickerDialog(
@@ -86,6 +115,18 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         )
     }
 
+    private val onBackCallback by lazy {
+        object:OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                if (jotViewModel.isModified().value == true) {
+                    discardConfirmationDialog.show()
+                }else{
+                    findNavController().popBackStack()
+                }
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -95,12 +136,14 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         jot_title_right_textView.setOnClickListener { save() }
+        jot_title_left_textView.setOnClickListener { delete() }
         jot_calendar_imageView.setOnClickListener { showDatePicker() }
         jot_clock_imageView.setOnClickListener { showTimePicker() }
         jot_location_imageView.setOnClickListener { showLocationPicker() }
         jot_image_imageView.setOnClickListener { showImages() }
         jot_title_editText.doAfterTextChanged { jotViewModel.preferTitle(it?.toString() ?: "") }
         jot_content_editText.doAfterTextChanged { jotViewModel.preferContent(it?.toString() ?: "") }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackCallback);
         jotViewModel.isNewJot().observe(viewLifecycleOwner, {
             jot_title_bar_title_textView.text = if (it) {
                 getString(R.string.New_Jot)
@@ -109,19 +152,38 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             }
         })
         jotViewModel.title().observe(viewLifecycleOwner, {
-            if (it!=jot_title_editText.text.toString()) {
+            if (it != jot_title_editText.text.toString()) {
                 jot_title_editText.setText(it)
             }
         })
         jotViewModel.content().observe(viewLifecycleOwner, {
-            if(it!=jot_content_editText.text.toString()){
+            if (it != jot_content_editText.text.toString()) {
                 jot_content_editText.setText(it)
             }
+        })
+        jotViewModel.isNewJot().observe(viewLifecycleOwner, {
+            jot_title_left_textView.text = if(it == true){
+                getString(R.string.discard)
+           }else{
+               getString(R.string.delete)
+           }
         })
         jotViewModel.time().observe(viewLifecycleOwner, { jot_datetime_textView.text = formattedDate(it) })
         jotViewModel.location().observe(viewLifecycleOwner, ::loadUpLocation)
         jotViewModel.attachments().observe(viewLifecycleOwner, ::loadUpAttachments)
         jotViewModel.loadJot(requireArguments().getLong("id"))
+    }
+
+    private fun delete() {
+        if (jotViewModel.isNewJot().value == true) {
+            if (jotViewModel.isModified().value == true) {
+                discardConfirmationDialog.show()
+            }else{
+                findNavController().popBackStack()
+            }
+        } else {
+            deleteConfirmationDialog.show()
+        }
     }
 
     private fun loadUpAttachments(attachments: List<String>) {
@@ -173,10 +235,10 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
 
 
     private fun save() = lifecycleScope.launch {
-            jot_title_right_textView.isEnabled = false
-            jotViewModel.save()
-            jotsViewModel.reload()
-            jot_title_right_textView.isEnabled = true
+        jot_title_right_textView.isEnabled = false
+        jotViewModel.save()
+        jotsViewModel.reload()
+        jot_title_right_textView.isEnabled = true
         findNavController().popBackStack()
     }
 

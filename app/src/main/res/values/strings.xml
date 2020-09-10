@@ -164,4 +164,5 @@
     <string name="Done">Done</string>
     <string name="Edit">Edit</string>
     <string name="Today">Today</string>
+    <string name="Are_you_sure_to_discard_">Are you sure to discard?</string>
 </resources>
