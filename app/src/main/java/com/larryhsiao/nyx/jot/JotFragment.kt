@@ -28,9 +28,7 @@ import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
 import kotlinx.android.synthetic.main.fragment_jot.*
-import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.stream.Collectors
@@ -175,10 +173,10 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
 
 
     private fun save() = lifecycleScope.launch {
-        withContext(Default) {
+            jot_title_right_textView.isEnabled = false
             jotViewModel.save()
             jotsViewModel.reload()
-        }
+            jot_title_right_textView.isEnabled = true
         findNavController().popBackStack()
     }
 
