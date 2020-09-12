@@ -31,10 +31,6 @@ class JotsViewModel(private val db: Source<Connection>) : ViewModel() {
 
     fun jots(): LiveData<List<Jot>> = jots
 
-    fun reload(){
-        selectDate(selected.value ?: Calendar.getInstance())
-    }
-
     fun initJots(){
         if (jots.value == null){
             selectDate(selected.value?:return)

@@ -86,7 +86,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
                 lifecycleScope.launch {
                     // TODO: Screen locking
                     jotViewModel.delete()
-                    jotsViewModel.reload()
+                    reloadJotsByJotTime()
                     findNavController().popBackStack()
                 }
             }
@@ -116,11 +116,11 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     }
 
     private val onBackCallback by lazy {
-        object:OnBackPressedCallback(true){
+        object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (jotViewModel.isModified().value == true) {
                     discardConfirmationDialog.show()
-                }else{
+                } else {
                     findNavController().popBackStack()
                 }
             }
@@ -162,20 +162,20 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             }
         })
         jotViewModel.isNewJot().observe(viewLifecycleOwner, {
-            jot_title_left_textView.text = if(it == true){
+            jot_title_left_textView.text = if (it == true) {
                 getString(R.string.discard)
-           }else{
-               getString(R.string.delete)
-           }
+            } else {
+                getString(R.string.delete)
+            }
         })
         jotViewModel.time().observe(viewLifecycleOwner, { jot_datetime_textView.text = formattedDate(it) })
         jotViewModel.location().observe(viewLifecycleOwner, ::loadUpLocation)
         jotViewModel.attachments().observe(viewLifecycleOwner, ::loadUpAttachments)
-        if(requireArguments().containsKey("id")) {
+        if (requireArguments().containsKey("id")) {
             jotViewModel.loadJot(requireArguments().getLong("id"))
-        }else{
+        } else {
             jotViewModel.newJot(
-                (requireArguments().getSerializable("date") as? Calendar)?: Calendar.getInstance()
+                (requireArguments().getSerializable("date") as? Calendar) ?: Calendar.getInstance()
             )
         }
     }
@@ -184,7 +184,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         if (jotViewModel.isNewJot().value == true) {
             if (jotViewModel.isModified().value == true) {
                 discardConfirmationDialog.show()
-            }else{
+            } else {
                 findNavController().popBackStack()
             }
         } else {
@@ -243,9 +243,15 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     private fun save() = lifecycleScope.launch {
         jot_title_right_textView.isEnabled = false
         jotViewModel.save()
-        jotsViewModel.reload()
+        reloadJotsByJotTime()
         jot_title_right_textView.isEnabled = true
         findNavController().popBackStack()
+    }
+
+    private fun reloadJotsByJotTime(){
+        jotsViewModel.selectDate(Calendar.getInstance().apply {
+            time = Date(jotViewModel.time().value ?: Date().time)
+        })
     }
 
     private fun loadUpLocation(location: DoubleArray) {
