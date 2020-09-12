@@ -16,14 +16,28 @@ import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.old.sync.SyncService
 import kotlinx.android.synthetic.main.fragment_jots.*
-import java.util.Calendar.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Fragment that shows all Jots.
  */
 class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
+    private val dateFormat by lazy {
+        SimpleDateFormat(
+            "yyyy MM", Locale.getDefault()
+        )
+    }
+    private val dayFormat by lazy {
+        SimpleDateFormat(
+            "MM/dd", Locale.getDefault()
+        )
+    }
     private val model by lazy {
-        ViewModelProvider(requireActivity(), ViewModelFactory(app)).get(JotsViewModel::class.java)
+        ViewModelProvider(
+            requireActivity(),
+            ViewModelFactory(app)
+        ).get(JotsViewModel::class.java)
     }
     private val adapter by lazy {
         JotsAdapter {
@@ -40,6 +54,7 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         jots_calendarView.setOnCalendarSelectListener(this)
+        jots_calendarView.setOnMonthChangeListener(::onMonthChanged)
         jots_recyclerView.adapter = adapter
         jots_newJot_floatingActionButton.setOnClickListener { toJotFragment(-1L) }
         jots_newJot_textView.setOnClickListener { toJotFragment(-1L) }
@@ -70,10 +85,14 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         model.selected().observe(viewLifecycleOwner, {
             jots_calendarView.setSelectRangeMode()
             Calendar().apply {
-                year = it.get(YEAR)
-                month = it.get(MONTH) + 1
-                day = it.get(DAY_OF_MONTH)
-            }.let { jots_calendarView.setSelectCalendarRange(it, it) }
+                year = it.get(java.util.Calendar.YEAR)
+                month = it.get(java.util.Calendar.MONTH) + 1
+                day = it.get(java.util.Calendar.DAY_OF_MONTH)
+            }.let {
+                jots_month_textView.text = dateFormat.format(Date(it.timeInMillis))
+                jots_calendarView.setSelectCalendarRange(it, it)
+                jots_day_textView.text = dayFormat.format(Date(it.timeInMillis))
+            }
         })
         model.initJots()
     }
@@ -93,11 +112,20 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
     override fun onCalendarSelect(calendar: Calendar?, isClick: Boolean) {
         calendar ?: return
         if (isClick) {
-            model.selectDate(java.util.Calendar.getInstance().apply {
-                set(YEAR, calendar.year)
-                set(MONTH, calendar.month - 1)
-                set(DAY_OF_MONTH, calendar.day)
-            })
+            java.util.Calendar.getInstance().apply {
+                set(java.util.Calendar.YEAR, calendar.year)
+                set(java.util.Calendar.MONTH, calendar.month - 1)
+                set(java.util.Calendar.DAY_OF_MONTH, calendar.day)
+            }.let { model.selectDate(it) }
+        }
+    }
+
+    private fun onMonthChanged(year: Int, month: Int) {
+        java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.YEAR, year)
+            set(java.util.Calendar.MONTH, month - 1)
+        }.let {
+            jots_month_textView.text = dateFormat.format(it.time)
         }
     }
 }
