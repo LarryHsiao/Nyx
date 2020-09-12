@@ -1,11 +1,15 @@
 package com.larryhsiao.nyx.jot
 
+import android.app.DatePickerDialog
+import android.app.DatePickerDialog.BUTTON_NEGATIVE
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.DatePicker
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -23,25 +27,22 @@ import java.util.*
  * Fragment that shows all Jots.
  */
 class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
-    private val dateFormat by lazy {
-        SimpleDateFormat(
-            "yyyy MM", Locale.getDefault()
-        )
-    }
-    private val dayFormat by lazy {
-        SimpleDateFormat(
-            "MM/dd", Locale.getDefault()
-        )
-    }
+    private val dateFormat by lazy { SimpleDateFormat("yyyy MM", Locale.getDefault()) }
+    private val dayFormat by lazy { SimpleDateFormat("MM/dd", Locale.getDefault()) }
     private val model by lazy {
-        ViewModelProvider(
-            requireActivity(),
-            ViewModelFactory(app)
-        ).get(JotsViewModel::class.java)
+        ViewModelProvider(requireActivity(), ViewModelFactory(app)).get(JotsViewModel::class.java)
     }
-    private val adapter by lazy {
-        JotsAdapter {
-            toJotFragment(it.id())
+    private val adapter by lazy { JotsAdapter { toJotFragment(it.id()) } }
+    private val datePicker by lazy {
+        DatePickerDialog(
+            requireContext(),
+            0,
+            ::onDatePickerSelected,
+            java.util.Calendar.getInstance().get(java.util.Calendar.YEAR),
+            java.util.Calendar.getInstance().get(java.util.Calendar.MONTH),
+            java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH),
+        ).apply {
+            setButton(BUTTON_NEGATIVE, getString(R.string.Today), ::onTodaySelected)
         }
     }
 
@@ -58,6 +59,7 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         jots_recyclerView.adapter = adapter
         jots_newJot_floatingActionButton.setOnClickListener { toNewJotFragment() }
         jots_newJot_textView.setOnClickListener { toNewJotFragment() }
+        jots_month_textView.setOnClickListener(::onMonthIndicatorClicked)
         jots_newJot_textView.setOnLongClickListener {
             findNavController().navigate(R.id.cloudFragment)
             SyncService.enqueue(it.context)
@@ -97,10 +99,10 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         model.initJots()
     }
 
-    private fun toNewJotFragment(){
+    private fun toNewJotFragment() {
         Navigation.findNavController(requireView()).navigate(
             R.id.newJotFragment,
-            Bundle().apply{
+            Bundle().apply {
                 putSerializable(
                     "date",
                     model.selected().value ?: java.util.Calendar.getInstance()
@@ -139,5 +141,30 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         }.let {
             jots_month_textView.text = dateFormat.format(it.time)
         }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun onMonthIndicatorClicked(view: View?) {
+        val selected =model.selected().value?:java.util.Calendar.getInstance()
+        datePicker.updateDate(
+            selected.get(java.util.Calendar.YEAR),
+            selected.get(java.util.Calendar.MONTH),
+            selected.get(java.util.Calendar.DAY_OF_MONTH),
+        )
+        datePicker.show()
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun onDatePickerSelected(view : DatePicker,  year:Int, month:Int,  dayOfMonth:Int){
+        model.selectDate(java.util.Calendar.getInstance().apply{
+            set(java.util.Calendar.YEAR, year)
+            set(java.util.Calendar.MONTH, month)
+            set(java.util.Calendar.DAY_OF_MONTH, dayOfMonth)
+        })
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun onTodaySelected(dialog: DialogInterface, which:Int){
+        model.selectDate(java.util.Calendar.getInstance())
     }
 }
