@@ -56,8 +56,8 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         jots_calendarView.setOnCalendarSelectListener(this)
         jots_calendarView.setOnMonthChangeListener(::onMonthChanged)
         jots_recyclerView.adapter = adapter
-        jots_newJot_floatingActionButton.setOnClickListener { toJotFragment(-1L) }
-        jots_newJot_textView.setOnClickListener { toJotFragment(-1L) }
+        jots_newJot_floatingActionButton.setOnClickListener { toNewJotFragment() }
+        jots_newJot_textView.setOnClickListener { toNewJotFragment() }
         jots_newJot_textView.setOnLongClickListener {
             findNavController().navigate(R.id.cloudFragment)
             SyncService.enqueue(it.context)
@@ -95,6 +95,18 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
             }
         })
         model.initJots()
+    }
+
+    private fun toNewJotFragment(){
+        Navigation.findNavController(requireView()).navigate(
+            R.id.newJotFragment,
+            Bundle().apply{
+                putSerializable(
+                    "date",
+                    model.selected().value ?: java.util.Calendar.getInstance()
+                )
+            }
+        )
     }
 
     private fun toJotFragment(id: Long) {

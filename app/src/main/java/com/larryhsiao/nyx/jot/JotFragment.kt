@@ -171,7 +171,13 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jotViewModel.time().observe(viewLifecycleOwner, { jot_datetime_textView.text = formattedDate(it) })
         jotViewModel.location().observe(viewLifecycleOwner, ::loadUpLocation)
         jotViewModel.attachments().observe(viewLifecycleOwner, ::loadUpAttachments)
-        jotViewModel.loadJot(requireArguments().getLong("id"))
+        if(requireArguments().containsKey("id")) {
+            jotViewModel.loadJot(requireArguments().getLong("id"))
+        }else{
+            jotViewModel.newJot(
+                (requireArguments().getSerializable("date") as? Calendar)?: Calendar.getInstance()
+            )
+        }
     }
 
     private fun delete() {

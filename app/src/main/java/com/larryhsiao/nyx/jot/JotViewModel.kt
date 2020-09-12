@@ -13,7 +13,9 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
+import java.util.*
 import kotlin.Double.Companion.MIN_VALUE
+import kotlin.collections.ArrayList
 
 /**
  * ViewModel to representing a jot.
@@ -47,14 +49,22 @@ class JotViewModel(
 
     fun loadJot(id: Long) = viewModelScope.launch(IO) {
         if (id == -1L) {
-            isNewJotLiveData.postValue(true)
-            loadContent(ConstJot())
+            newJot(Calendar.getInstance())
         } else {
             isNewJotLiveData.postValue(false)
             val jot = JotById(id, db).value()
             loadContent(jot)
             loadAttachments(jot)
         }
+    }
+
+    fun newJot(date:Calendar) = viewModelScope.launch(IO){
+        isNewJotLiveData.postValue(true)
+        loadContent(object:WrappedJot(ConstJot()){
+            override fun createdTime(): Long {
+                return date.timeInMillis
+            }
+        })
     }
 
     private fun loadContent(newJot: Jot) = viewModelScope.launch {
