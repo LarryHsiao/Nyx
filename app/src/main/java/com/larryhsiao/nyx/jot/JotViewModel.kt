@@ -13,7 +13,9 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
+import java.util.*
 import kotlin.Double.Companion.MIN_VALUE
+import kotlin.collections.ArrayList
 
 /**
  * ViewModel to representing a jot.
@@ -42,16 +44,27 @@ class JotViewModel(
     private val attachments = MutableLiveData<List<String>>()
     fun attachments(): LiveData<List<String>> = attachments
 
+    private val isModified = MutableLiveData<Boolean>()
+    fun isModified(): LiveData<Boolean> = isModified
+
     fun loadJot(id: Long) = viewModelScope.launch(IO) {
         if (id == -1L) {
-            isNewJotLiveData.postValue(true)
-            loadContent(ConstJot())
+            newJot(Calendar.getInstance())
         } else {
             isNewJotLiveData.postValue(false)
             val jot = JotById(id, db).value()
             loadContent(jot)
             loadAttachments(jot)
         }
+    }
+
+    fun newJot(date:Calendar) = viewModelScope.launch(IO){
+        isNewJotLiveData.postValue(true)
+        loadContent(object:WrappedJot(ConstJot()){
+            override fun createdTime(): Long {
+                return date.timeInMillis
+            }
+        })
     }
 
     private fun loadContent(newJot: Jot) = viewModelScope.launch {
@@ -99,6 +112,7 @@ class JotViewModel(
             return
         }
         title.value = newTitle
+        markModified()
     }
 
     fun preferContent(newContent: String) {
@@ -106,17 +120,32 @@ class JotViewModel(
             return
         }
         content.value = newContent
+        markModified()
     }
 
     fun preferTime(newTime: Long) {
         time.value = newTime
+        markModified()
     }
 
     fun preferLocation(newLocation: DoubleArray) {
         location.value = newLocation
+        markModified()
     }
 
     fun preferAttachments(newAttachments: List<Uri>) {
         attachments.value = newAttachments.map { it.toString() }
+        markModified()
+    }
+
+    suspend fun delete() = withContext(IO) {
+        RemovalAttachmentByJotId(db, jot.value?.id() ?: -1).fire()
+        JotRemoval(db, jot.value?.id() ?: -1).fire()
+    }
+
+    private fun markModified() {
+        if (isModified.value != true) {
+            isModified.value = true
+        }
     }
 }
