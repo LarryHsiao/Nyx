@@ -1,8 +1,11 @@
 package com.larryhsiao.nyx.jot
 
+import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.BUTTON_NEGATIVE
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +21,7 @@ import com.haibin.calendarview.CalendarView
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
+import com.larryhsiao.nyx.old.attachments.AttachmentPickerIntent
 import com.larryhsiao.nyx.old.sync.SyncService
 import kotlinx.android.synthetic.main.fragment_jots.*
 import java.text.SimpleDateFormat
@@ -27,6 +31,10 @@ import java.util.*
  * Fragment that shows all Jots.
  */
 class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
+    companion object {
+        private const val REQUEST_CODE_NEW_JOT_BY_IMAGES = 1000
+    }
+
     private val dateFormat by lazy { SimpleDateFormat("yyyy MM", Locale.getDefault()) }
     private val dayFormat by lazy { SimpleDateFormat("MM/dd", Locale.getDefault()) }
     private val model by lazy {
@@ -57,8 +65,9 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         jots_calendarView.setOnCalendarSelectListener(this)
         jots_calendarView.setOnMonthChangeListener(::onMonthChanged)
         jots_recyclerView.adapter = adapter
-        jots_newJot_floatingActionButton.setOnClickListener { toNewJotFragment() }
+        jots_newJot_imageView.setOnClickListener { toNewJotFragment() }
         jots_newJot_textView.setOnClickListener { toNewJotFragment() }
+        jots_newJotByImage_imageView.setOnClickListener(::newJotByImages)
         jots_month_textView.setOnClickListener(::onMonthIndicatorClicked)
         jots_newJot_textView.setOnLongClickListener {
             findNavController().navigate(R.id.cloudFragment)
@@ -68,7 +77,7 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         model.loading().observe(viewLifecycleOwner, {
             if (it) {
                 jots_newJot_textView.visibility = GONE
-                jots_newJot_floatingActionButton.visibility = GONE
+                jots_newJot_imageView.visibility = GONE
                 jots_loadingBar.visibility = VISIBLE
             } else {
                 jots_loadingBar.visibility = GONE
@@ -78,10 +87,10 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
             adapter.load(it)
             if (it.isEmpty()) {
                 jots_newJot_textView.visibility = VISIBLE
-                jots_newJot_floatingActionButton.visibility = GONE
+                jots_newJot_imageView.visibility = GONE
             } else {
                 jots_newJot_textView.visibility = GONE
-                jots_newJot_floatingActionButton.visibility = VISIBLE
+                jots_newJot_imageView.visibility = VISIBLE
             }
         })
         model.selected().observe(viewLifecycleOwner, {
@@ -97,6 +106,45 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
             }
         })
         model.initJots()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_NEW_JOT_BY_IMAGES && resultCode == RESULT_OK) {
+            data ?: return
+            val pickedUris = ArrayList<Uri>()
+            val pickedUri = data.data
+            if (pickedUri != null) {
+                requestFilePermission(pickedUri)
+                pickedUris.add(pickedUri)
+            } else {
+                val clip = data.clipData ?: return
+                for (i in 0 until clip.itemCount) {
+                    requestFilePermission((clip.getItemAt(i).uri))
+                    pickedUris.add(clip.getItemAt(i).uri)
+                }
+            }
+            model.newJotsByImage(*pickedUris.toTypedArray())
+        }
+    }
+
+    private fun requestFilePermission(uri: Uri) {
+        try {
+            requireContext().contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun newJotByImages(it: View) {
+        startActivityForResult(
+            AttachmentPickerIntent().value(),
+            REQUEST_CODE_NEW_JOT_BY_IMAGES
+        )
     }
 
     private fun toNewJotFragment() {
@@ -145,7 +193,7 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
 
     @Suppress("UNUSED_PARAMETER")
     private fun onMonthIndicatorClicked(view: View?) {
-        val selected =model.selected().value?:java.util.Calendar.getInstance()
+        val selected = model.selected().value ?: java.util.Calendar.getInstance()
         datePicker.updateDate(
             selected.get(java.util.Calendar.YEAR),
             selected.get(java.util.Calendar.MONTH),
@@ -155,8 +203,8 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun onDatePickerSelected(view : DatePicker,  year:Int, month:Int,  dayOfMonth:Int){
-        model.selectDate(java.util.Calendar.getInstance().apply{
+    private fun onDatePickerSelected(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
+        model.selectDate(java.util.Calendar.getInstance().apply {
             set(java.util.Calendar.YEAR, year)
             set(java.util.Calendar.MONTH, month)
             set(java.util.Calendar.DAY_OF_MONTH, dayOfMonth)
@@ -164,7 +212,7 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun onTodaySelected(dialog: DialogInterface, which:Int){
+    private fun onTodaySelected(dialog: DialogInterface, which: Int) {
         model.selectDate(java.util.Calendar.getInstance())
     }
 }

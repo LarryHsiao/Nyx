@@ -31,9 +31,9 @@ class NewJot : Source<Jot?> {
         db: Source<Connection>,
         title: String,
         content: String,
-        location: DoubleArray,
+        longLat: DoubleArray,
         mood: String
-    ) : this(db, title, content, location, Calendar.getInstance(), mood) {
+    ) : this(db, title, content, longLat, Calendar.getInstance(), mood) {
     }
 
     @JvmOverloads
@@ -41,7 +41,7 @@ class NewJot : Source<Jot?> {
         db: Source<Connection>,
         title: String,
         content: String,
-        location: DoubleArray = doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE),
+        longLat: DoubleArray = doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE),
         calendar: Calendar = Calendar.getInstance(),
         mood: String = " "
     ) {
@@ -51,7 +51,7 @@ class NewJot : Source<Jot?> {
             title,
             content,
             calendar.timeInMillis,
-            location,
+            longLat,
             mood,
             1,
             false
@@ -73,17 +73,13 @@ class NewJot : Source<Jot?> {
                 stmt.setString(1, jot.content())
                 stmt.setTimestamp(2, Timestamp(jot.createdTime()), Calendar.getInstance())
                 val location = jot.location()
-                if (location == null) {
-                    stmt.setString(3, null)
-                } else {
-                    stmt.setString(3, Point(
-                        CoordinateArraySequence(arrayOf(
-                            Coordinate(location[0], location[1])
-                        )), GeometryFactory()
-                    ).toText())
-                }
-                if (jot.mood()!!.length > 1) {
-                    stmt.setString(4, jot.mood()!!.substring(0, 2))
+                stmt.setString(3, Point(
+                    CoordinateArraySequence(arrayOf(
+                        Coordinate(location[0], location[1])
+                    )), GeometryFactory()
+                ).toText())
+                if (jot.mood().length > 1) {
+                    stmt.setString(4, jot.mood().substring(0, 2))
                 } else {
                     stmt.setString(4, "")
                 }

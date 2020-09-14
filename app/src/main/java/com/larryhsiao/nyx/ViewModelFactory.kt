@@ -13,7 +13,7 @@ class ViewModelFactory(private val app: JotApplication) : ViewModelProvider.Fact
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(JotsViewModel::class.java) -> {
-                JotsViewModel(app.db) as T
+                JotsViewModel(app) as T
             }
             modelClass.isAssignableFrom(JotViewModel::class.java) -> {
                 JotViewModel(app.db, LocalFileSync(app, app.db)) as T

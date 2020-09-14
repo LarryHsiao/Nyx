@@ -13,7 +13,7 @@ public class AttachmentPickerIntent implements Source<Intent> {
     public Intent value() {
         final Intent intent = new Intent(ACTION_OPEN_DOCUMENT);
         intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*"});
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         return intent;
     }
