@@ -12,13 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
 import com.larryhsiao.nyx.R;
-import com.larryhsiao.nyx.core.attachments.NewAttachments;
 import com.larryhsiao.nyx.core.jots.Jot;
-import com.larryhsiao.nyx.core.jots.JotsByTimeSpace;
 import com.larryhsiao.nyx.core.jots.NewJot;
-import com.larryhsiao.nyx.core.jots.QueriedJots;
-import com.larryhsiao.nyx.core.jots.goemetry.CircleByRange;
-import com.larryhsiao.nyx.core.jots.goemetry.MeterDelta;
 import com.larryhsiao.nyx.old.base.JotActivity;
 import com.larryhsiao.nyx.old.util.exif.ExifLocation;
 import com.silverhetch.aura.view.activity.Fullscreen;
@@ -31,7 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
 import java.util.Calendar;
-import java.util.List;
 
 import static android.provider.MediaStore.EXTRA_OUTPUT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -81,23 +75,23 @@ public class CaptureActivity extends JotActivity {
             finish();
         } else {
             Location location = parseLocation(data);
-            List<Jot> exist = new QueriedJots(
-                new JotsByTimeSpace(
-                    db,
-                    System.currentTimeMillis(),
-                    new CircleByRange(
-                        new double[]{location.getLongitude(), location.getLatitude()},
-                        new MeterDelta(15)
-                    )
-                )
-            ).value();
-            final Jot jot;
-            if (exist.size() > 0) {
-                jot = exist.get(0);
-            } else {
-                jot = newJot(location);
-            }
-            new NewAttachments(db, jot.id(), new String[]{capturedFileUri}).value();
+//            List<Jot> exist = new QueriedJots(
+//                new JotsByTimeSpace(
+//                    db,
+//                    System.currentTimeMillis(),
+//                    new CircleByRange(
+//                        new double[]{location.getLongitude(), location.getLatitude()},
+//                        new MeterDelta(15)
+//                    )
+//                )
+//            ).value();
+//            final Jot jot;
+//            if (exist.size() > 0) {
+//                jot = exist.get(0);
+//            } else {
+//                jot = newJot(location);
+//            }
+//            new NewAttachments(db, jot.id(), new String[]{capturedFileUri}).value();
         }
     }
 

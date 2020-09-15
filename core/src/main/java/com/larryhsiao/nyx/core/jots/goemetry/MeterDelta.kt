@@ -48,6 +48,6 @@ import com.silverhetch.clotho.Source
  */
 class MeterDelta @JvmOverloads constructor(private val meters: Double = 1.0) : Source<Double> {
     override fun value(): Double {
-        return 0.0001
+        return 0.00001 * meters
     }
 }

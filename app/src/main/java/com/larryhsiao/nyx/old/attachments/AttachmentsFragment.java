@@ -149,7 +149,7 @@ public class AttachmentsFragment extends FullScreenDialogFragment {
             e.printStackTrace();
         }
         final String mimeType = new UriMimeType(
-            getContext(),
+            requireContext(),
             uri.toString()
         ).value();
         if (mimeType.startsWith("image")) {

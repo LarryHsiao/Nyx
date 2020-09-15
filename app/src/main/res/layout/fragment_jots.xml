@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/jots_month_textView"
+        android:padding="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="YYYY-MM-DD"
@@ -41,19 +42,32 @@
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                 android:layout_height="wrap_content"/>
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 app:layout_constraintStart_toEndOf="@id/jots_day_textView"
-                android:id="@+id/jots_newJot_floatingActionButton"
-                android:layout_marginStart="16dp"
+                android:id="@+id/jots_newJot_imageView"
+                android:layout_marginStart="8dp"
+                android:padding="8dp"
                 app:layout_constraintTop_toTopOf="@id/jots_day_textView"
                 app:layout_constraintBottom_toBottomOf="@id/jots_day_textView"
-                android:text="@string/New"
                 android:gravity="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
-                app:drawableStartCompat="@drawable/ic_plus" />
+                android:src="@drawable/ic_plus" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/jots_newJot_imageView"
+                android:id="@+id/jots_newJotByImage_imageView"
+                android:padding="8dp"
+                app:layout_constraintTop_toTopOf="@id/jots_day_textView"
+                app:layout_constraintBottom_toBottomOf="@id/jots_day_textView"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_image_plus" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
@@ -76,10 +90,13 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 tools:visibility="visible"
                 android:id="@+id/jots_newJot_textView"
-                app:drawableStartCompat="@drawable/ic_plus"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:text="@string/New_Jot"
-                android:layout_height="wrap_content"/>
+                android:gravity="center"
+                android:drawablePadding="8dp"
+                android:textSize="12sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:text="@string/Black_hole_destroys_everything_nearby"
+                android:layout_height="wrap_content"
+                app:drawableTopCompat="@drawable/ic_black_hole" />
             <ProgressBar
                 android:layout_width="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"

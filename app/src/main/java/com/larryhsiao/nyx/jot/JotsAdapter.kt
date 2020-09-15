@@ -15,9 +15,9 @@ import kotlin.collections.ArrayList
  * Adapter to show jots.
  */
 class JotsAdapter(
-    private val itemClicked:(item:Jot)->Unit
+    private val itemClicked: (item: Jot) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val timeFormat by lazy { SimpleDateFormat("kk:mm", Locale.US) }
+    private val timeFormat by lazy { SimpleDateFormat("HH:mm", Locale.US) }
     private val jots = ArrayList<Jot>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return object : RecyclerView.ViewHolder(
@@ -40,7 +40,7 @@ class JotsAdapter(
         if (jot.title().isNotEmpty()) {
             return jot.title()
         }
-        if (jot.content().isNotEmpty()){
+        if (jot.content().isNotEmpty()) {
             return jot.content()
         }
         return context.getString(R.string.No_title)
@@ -50,9 +50,10 @@ class JotsAdapter(
         return jots.size
     }
 
-    fun load(newJots:List<Jot>){
+    fun load(newJots: List<Jot>) {
         jots.clear()
         jots.addAll(newJots)
+        jots.sortBy { -it.createdTime() }
         notifyDataSetChanged()
     }
 }
