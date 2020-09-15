@@ -101,7 +101,6 @@
         android:imeOptions="actionDone"
         android:id="@+id/jot_content_editText"
         android:hint="@string/Start_writing___"
-        android:textSize="14sp"
         android:inputType="textMultiLine"
         tools:text="@string/debug_long_string"
         android:gravity="top"

@@ -166,4 +166,6 @@
     <string name="Today">Today</string>
     <string name="Are_you_sure_to_discard_">Are you sure to discard?</string>
     <string name="New">New</string>
+    <string name="No_Jots">No Jot</string>
+    <string name="Black_hole_destroys_everything_nearby">Black hole destroys everything nearby.</string>
 </resources>

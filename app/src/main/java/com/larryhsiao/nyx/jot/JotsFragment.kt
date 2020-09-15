@@ -66,7 +66,6 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         jots_calendarView.setOnMonthChangeListener(::onMonthChanged)
         jots_recyclerView.adapter = adapter
         jots_newJot_imageView.setOnClickListener { toNewJotFragment() }
-        jots_newJot_textView.setOnClickListener { toNewJotFragment() }
         jots_newJotByImage_imageView.setOnClickListener(::newJotByImages)
         jots_month_textView.setOnClickListener(::onMonthIndicatorClicked)
         jots_newJot_textView.setOnLongClickListener {
@@ -77,7 +76,6 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
         model.loading().observe(viewLifecycleOwner, {
             if (it) {
                 jots_newJot_textView.visibility = GONE
-                jots_newJot_imageView.visibility = GONE
                 jots_loadingBar.visibility = VISIBLE
             } else {
                 jots_loadingBar.visibility = GONE
@@ -87,10 +85,8 @@ class JotsFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
             adapter.load(it)
             if (it.isEmpty()) {
                 jots_newJot_textView.visibility = VISIBLE
-                jots_newJot_imageView.visibility = GONE
             } else {
                 jots_newJot_textView.visibility = GONE
-                jots_newJot_imageView.visibility = VISIBLE
             }
         })
         model.selected().observe(viewLifecycleOwner, {
