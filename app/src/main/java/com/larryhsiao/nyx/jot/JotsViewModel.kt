@@ -73,15 +73,19 @@ class JotsViewModel(private val app: JotApplication) : ViewModel() {
             val uriLatLong = uriExif.latLong ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
             val uriTime = exifTime(uriExif)
             jots.keys.forEach existForEach@{ existExif ->
-                val existLatLong = existExif.latLong
-                    ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
+                val existLatLong = existExif.latLong ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
                 // @todo #1 Accurate distance determination
                 // @todo #2 Configurable distance range and time range
                 val distance = sqrt(
                     (existLatLong[0] - uriLatLong[0]).pow(2.0) +
                         (existLatLong[1] - uriLatLong[1]).pow(2.0)
                 )
-                if (distance < MeterDelta(30.0).value() &&
+                val isLocationAllSet = existLatLong[0] != MIN_VALUE &&
+                    existLatLong[1] != MIN_VALUE &&
+                    uriLatLong[0] != MIN_VALUE &&
+                    uriLatLong[1] != MIN_VALUE
+                val isSameLocation = (!isLocationAllSet || distance < MeterDelta(30.0).value())
+                if (isSameLocation &&
                     abs(uriTime - exifTime(existExif)) < 30 * 60 * 1000 // 30 min
                 ) {
                     jots[existExif] = jots[existExif]?.apply { add(uri) } ?: arrayListOf(uri)
@@ -103,7 +107,8 @@ class JotsViewModel(private val app: JotApplication) : ViewModel() {
         if (jots.size > 0) {
             selectDate(Calendar.getInstance().apply {
                 timeInMillis = exifTime(jots.keys.first())
-            })}
+            })
+        }
         loading.value = false
     }
 
