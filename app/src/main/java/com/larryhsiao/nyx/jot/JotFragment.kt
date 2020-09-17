@@ -52,7 +52,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         ViewModelProvider(this, ViewModelFactory(app)).get(JotViewModel::class.java)
     }
     private val jotsViewModel by lazy {
-        ViewModelProvider(requireActivity(), ViewModelFactory(app)).get(JotsViewModel::class.java)
+        ViewModelProvider(requireActivity(), ViewModelFactory(app)).get(JotsCalendarViewModel::class.java)
     }
     private val datePicker by lazy {
         val current = Calendar.getInstance()
