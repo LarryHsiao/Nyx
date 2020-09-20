@@ -53,7 +53,7 @@ class JotsAdapter(
     fun load(newJots: List<Jot>) {
         jots.clear()
         jots.addAll(newJots)
-        jots.sortBy { -it.createdTime() }
+        jots.sortBy { it.createdTime() }
         notifyDataSetChanged()
     }
 }

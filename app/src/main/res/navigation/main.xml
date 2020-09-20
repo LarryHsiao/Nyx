@@ -2,21 +2,24 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_main"
-    app:startDestination="@id/jotsFragment">
+    app:startDestination="@id/jotsCalendarFragment">
 
     <fragment
-        android:id="@+id/jotsFragment"
-        android:name="com.larryhsiao.nyx.jot.JotsFragment"
+        android:id="@+id/jotsCalendarFragment"
+        android:name="com.larryhsiao.nyx.jot.JotsCalendarFragment"
         android:label="JotsFragment" >
         <action
-            android:id="@+id/action_jotsFragment_to_jotFragment"
+            android:id="@+id/action_jotsCalendarFragment_to_jotFragment"
             app:destination="@id/jotFragment" />
         <action
-            android:id="@+id/action_jotsFragment_to_cloudFragment"
+            android:id="@+id/action_jotsCalendarFragment_to_cloudFragment"
             app:destination="@id/cloudFragment" />
         <action
-            android:id="@+id/action_jotsFragment_to_newJotFragment"
+            android:id="@+id/action_jotsCalendarFragment_to_newJotFragment"
             app:destination="@id/newJotFragment" />
+        <action
+            android:id="@+id/action_jotsCalendarFragment_to_jotsFragment"
+            app:destination="@id/jotsFragment" />
     </fragment>
     <fragment
         android:id="@+id/jotFragment"
@@ -37,5 +40,16 @@
         <argument
             android:name="date"
             app:argType="java.util.Calendar" />
+    </fragment>
+    <fragment
+        android:id="@+id/jotsFragment"
+        android:name="com.larryhsiao.nyx.jot.JotsFragment"
+        android:label="JotsFragment" >
+        <argument
+            android:name="ids"
+            app:argType="long[]" />
+        <action
+            android:id="@+id/action_jotsFragment_to_jotFragment"
+            app:destination="@id/jotFragment" />
     </fragment>
 </navigation>
