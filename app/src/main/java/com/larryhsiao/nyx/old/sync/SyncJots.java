@@ -132,6 +132,7 @@ public class SyncJots implements Action {
     private void updateRemoteJot(CollectionReference jotsRef, Jot jot) {
         try {
             Map<String, Object> data = new HashMap<>();
+            data.put("title", encryptor.encrypt(jot.title()));
             data.put("content", encryptor.encrypt(jot.content()));
             data.put("mood", encryptor.encrypt(jot.mood()));
             data.put("createdTime", encryptor.encrypt(jot.createdTime() + ""));

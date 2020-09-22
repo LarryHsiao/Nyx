@@ -8,10 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.larryhsiao.nyx.JotApplication
 import com.larryhsiao.nyx.core.attachments.NewAttachments
-import com.larryhsiao.nyx.core.jots.Jot
-import com.larryhsiao.nyx.core.jots.JotsByDate
-import com.larryhsiao.nyx.core.jots.NewJot
-import com.larryhsiao.nyx.core.jots.QueriedJots
+import com.larryhsiao.nyx.core.jots.*
 import com.larryhsiao.nyx.core.jots.goemetry.MeterDelta
 import com.larryhsiao.nyx.jot.JotsCalendarViewModel.ListType.LIST
 import com.silverhetch.aura.images.exif.ExifAttribute
@@ -62,12 +59,7 @@ class JotsCalendarViewModel(private val app: JotApplication) : ViewModel() {
             loading.postValue(true)
             selected.postValue(calendar)
             jots.postValue(
-                QueriedJots(
-                    JotsByDate(
-                        Date(calendar.timeInMillis),
-                        app.db
-                    )
-                ).value()
+                QueriedJots(JotsByDateRange(app.db, calendar, calendar)).value()
             )
             loading.postValue(false)
         }
