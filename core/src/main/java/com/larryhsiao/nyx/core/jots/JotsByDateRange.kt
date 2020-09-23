@@ -18,13 +18,15 @@ class JotsByDateRange(
     override fun value(): ResultSet {
         return JotsByTimestampRange(
             db,
-            started.apply {
+            Calendar.getInstance().apply {
+                timeInMillis = started.timeInMillis
                 set(Calendar.HOUR_OF_DAY, 0)
                 set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }.timeInMillis,
-            ended.apply {
+            Calendar.getInstance().apply {
+                timeInMillis = ended.timeInMillis
                 set(Calendar.HOUR_OF_DAY, 23)
                 set(Calendar.MINUTE, 59)
                 set(Calendar.SECOND, 59)
