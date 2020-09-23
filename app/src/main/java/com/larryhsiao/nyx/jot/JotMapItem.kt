@@ -4,6 +4,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 import com.larryhsiao.nyx.core.jots.Jot
 import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Item on Cluster grouping map.
@@ -21,6 +23,8 @@ class JotMapItem(val jot: Jot) : ClusterItem {
     }
 
     override fun getSnippet(): String {
-        return DateFormat.getDateInstance().format(jot.createdTime()) ?: ""
+        return SimpleDateFormat(
+            "HH:mm", Locale.US
+        ).format(jot.createdTime()) ?: ""
     }
 }
