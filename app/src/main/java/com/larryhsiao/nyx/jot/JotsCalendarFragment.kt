@@ -170,7 +170,10 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
             map,
             clusterManager
         ).apply { minClusterSize = 2 }
-        map.setOnCameraIdleListener(clusterManager)
+        map.setOnCameraIdleListener{
+            clusterManager.onCameraIdle()
+            map.resetMinMaxZoomPreference()
+        }
         map.setOnMarkerClickListener(clusterManager)
         map.setOnInfoWindowClickListener(clusterManager)
         clusterManager.setOnClusterItemInfoWindowClickListener { toJotFragment(it.jot.id()) }
@@ -204,9 +207,10 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
             haveLocation = true
         }
         if (haveLocation) {
+            map.setMaxZoomPreference(15f)
             map.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 200))
         } else {
-            map.animateCamera(CameraUpdateFactory.zoomTo(0f))
+            map.animateCamera(CameraUpdateFactory.zoomTo(10f))
         }
     }
 
