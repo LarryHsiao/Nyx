@@ -8,13 +8,14 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence
 import java.sql.Connection
 import java.sql.SQLException
 import java.sql.Statement
+import java.sql.Statement.RETURN_GENERATED_KEYS
 import java.sql.Timestamp
 import java.util.*
 
 /**
  * Source to build a Jot which just created by user.
  */
-class NewJot : Source<Jot?> {
+class NewJot : Source<Jot> {
     private val db: Source<Connection>
     private val jot: Jot
 
@@ -66,9 +67,10 @@ class NewJot : Source<Jot?> {
     override fun value(): Jot {
         try {
             db.value().prepareStatement( // language=H2
-                "INSERT INTO jots(content, createdTime, location, mood, VERSION, TITLE) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS
+                """// 
+INSERT INTO jots(content, createdTime, location, mood, VERSION, TITLE)
+VALUES (?, ?, ?, ?, ?, ?)""",
+                RETURN_GENERATED_KEYS
             ).use { stmt ->
                 stmt.setString(1, jot.content())
                 stmt.setTimestamp(2, Timestamp(jot.createdTime()), Calendar.getInstance())

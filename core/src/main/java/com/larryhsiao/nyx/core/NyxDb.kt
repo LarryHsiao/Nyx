@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.core
 
 import com.larryhsiao.nyx.core.attachments.AttachmentDb
 import com.larryhsiao.nyx.core.jots.JotsDb
+import com.larryhsiao.nyx.core.metadata.MetadataDb
 import com.larryhsiao.nyx.core.tags.TagDb
 import com.silverhetch.clotho.Source
 import com.silverhetch.clotho.database.h2.EmbedH2Conn
@@ -20,11 +21,13 @@ class NyxDb(private val dbFile: File) : Source<Connection> {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         }
-        val conn = AttachmentDb(
-            TagDb(
-                JotsDb(
-                    EmbedH2Conn(
-                        ConstSource(dbFile)
+        val conn = MetadataDb(
+            AttachmentDb(
+                TagDb(
+                    JotsDb(
+                        EmbedH2Conn(
+                            ConstSource(dbFile)
+                        )
                     )
                 )
             )

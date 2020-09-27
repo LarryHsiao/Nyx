@@ -16,16 +16,13 @@ class AttachmentsByJotId @JvmOverloads constructor(
         return try {
             if (includeDeleted) {
                 val stmt = dbSource.value().prepareStatement( // language=H2
-                    "SELECT * FROM attachments " +
-                        "WHERE jot_id = ?"
+                    """SELECT * FROM attachments WHERE jot_id = ?"""
                 )
                 stmt.setLong(1, jotId)
                 stmt.executeQuery()
             } else {
                 val stmt = dbSource.value().prepareStatement( // language=H2
-                    "SELECT * FROM attachments " +
-                        "WHERE jot_id = ? " +
-                        "AND DELETE = 0;"
+                    """SELECT * FROM attachments WHERE jot_id = ? AND DELETE = 0;"""
                 )
                 stmt.setLong(1, jotId)
                 stmt.executeQuery()
