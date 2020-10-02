@@ -15,20 +15,21 @@ class CreatedMetadata(
     override fun value(): Metadata {
         db.value().prepareStatement(
             """//
-INSERT INTO METADATA(TYPE, TITLE, CONTENT, JOT_ID, VERSION)
-values (?, ?, ?, ?, ?)""",
+INSERT INTO METADATA(TYPE, TITLE, VALUE, JOT_ID, VALUE_DECIMAL, COMMENT)
+values (?, ?, ?, ?, ?, ?)""",
             RETURN_GENERATED_KEYS
         ).use {
             it.setString(1, metadata.type().name)
             it.setString(2, metadata.title())
-            it.setString(3, metadata.content())
+            it.setString(3, metadata.value())
             it.setLong(4, metadata.jotId())
-            it.setLong(5, metadata.version())
+            it.setBigDecimal(5, metadata.valueBigDecimal())
+            it.setString(6, metadata.comment())
             if (it.executeUpdate() == 0) {
                 throw SQLException("Insert metadata failed")
             }
             val res = it.generatedKeys
-            require(res.next()) { "Create jot failed: " + metadata.content() }
+            require(res.next()) { "Create jot failed: " + metadata.value() }
             val newId = res.getLong(1)
             return object : WrappedMetadata(metadata) {
                 override fun id(): Long {

@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.core.metadata
 
 import com.larryhsiao.nyx.core.metadata.Metadata.*
+import java.math.BigDecimal
 
 /**
  * Constant metadata
@@ -8,36 +9,21 @@ import com.larryhsiao.nyx.core.metadata.Metadata.*
 class ConstMetadata(
     private val id: Long,
     private val jotId: Long,
-    private val type: String,
-    private val title: String,
-    private val content: String,
-    private val version: Long = 1
+    private val type: Type,
+    private val value: String,
+    private val title: String = "",
+    private val valueBigDecimal: BigDecimal = BigDecimal.ZERO,
+    private val comment: String = "",
+    private val version: Long = 1,
+    private val deleted: Boolean = false
 ) : Metadata {
-    override fun id(): Long {
-        return id;
-    }
-
-    override fun version(): Long {
-        return version
-    }
-
-    override fun type(): Type {
-        return try {
-            Type.valueOf(type)
-        } catch (e: Exception) {
-            Type.RAW
-        }
-    }
-
-    override fun title(): String {
-        return title
-    }
-
-    override fun content(): String {
-        return content
-    }
-
-    override fun jotId(): Long {
-        return jotId
-    }
+    override fun id(): Long = id
+    override fun version(): Long = version
+    override fun type(): Type = type
+    override fun title(): String = title
+    override fun value(): String = value
+    override fun valueBigDecimal(): BigDecimal = valueBigDecimal
+    override fun comment(): String = comment
+    override fun jotId(): Long = jotId
+    override fun deleted(): Boolean = deleted
 }

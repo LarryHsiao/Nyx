@@ -24,7 +24,7 @@ internal class CreatedMetadataTest {
         CreatedMetadata(db, ConstMetadata(
             -1,
             1,
-            "type",
+            Metadata.Type.TEXT,
             "title",
             "content"
         )).value()

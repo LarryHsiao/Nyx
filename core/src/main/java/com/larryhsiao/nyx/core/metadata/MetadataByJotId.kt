@@ -23,7 +23,7 @@ class MetadataByJotId(
         } else {
             val stmt = connSrc.value().prepareStatement(
                 // language=H2
-                """SELECT * FROM METADATA WHERE JOT_ID=? AND DELETE = 0;"""
+                """SELECT * FROM METADATA WHERE JOT_ID=? AND DELETED = 0;"""
             )
             stmt.setLong(1, jotId)
             stmt.executeQuery()

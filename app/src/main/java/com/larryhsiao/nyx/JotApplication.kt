@@ -36,9 +36,6 @@ class JotApplication : Application() {
     @JvmField var lastAuthed = 0L
 
     @Deprecated("Remove it after 4.0 conpleted")
-    @JvmField var dbSrc: Source<Connection>? = null
-
-    @Deprecated("Remove it after 4.0 conpleted")
     @JvmField var remoteConfig: FirebaseRemoteConfig? = null
 
     val db: Source<Connection> by lazy { SingleConn(NyxDb(File(filesDir, "jot"))) }
@@ -59,8 +56,6 @@ class JotApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         ContextHolder.setContext(this)
-        val dbFile = File(filesDir, "jot")
-        dbSrc = SingleConn(NyxDb(dbFile))
         if ("robolectric" == Build.FINGERPRINT) {
             return
         }

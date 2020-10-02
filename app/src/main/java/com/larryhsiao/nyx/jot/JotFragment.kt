@@ -21,6 +21,9 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.larryhsiao.clotho.openweather.Weather
+import com.larryhsiao.clotho.openweather.Weather.Type
+import com.larryhsiao.clotho.openweather.Weather.Type.*
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
@@ -29,6 +32,7 @@ import com.larryhsiao.nyx.old.util.JpegDateComparator
 import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
+import com.silverhetch.aura.view.alert.Alert
 import kotlinx.android.synthetic.main.fragment_jot.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -140,6 +144,17 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jot_calendar_imageView.setOnClickListener { showDatePicker() }
         jot_clock_imageView.setOnClickListener { showTimePicker() }
         jot_location_imageView.setOnClickListener { showLocationPicker() }
+        jot_location_imageView.setOnLongClickListener {
+            val currentLocation = jotViewModel.location().value
+            if (currentLocation != null && !currentLocation.contentEquals(
+                    doubleArrayOf(MIN_VALUE, MIN_VALUE)
+                )) {
+                promoteRemoveLocation()
+            } else {
+                showLocationPicker()
+            }
+            true
+        }
         jot_image_imageView.setOnClickListener { showImages() }
         jot_title_editText.doAfterTextChanged { jotViewModel.preferTitle(it?.toString() ?: "") }
         jot_content_editText.doAfterTextChanged { jotViewModel.preferContent(it?.toString() ?: "") }
@@ -171,11 +186,41 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jotViewModel.time().observe(viewLifecycleOwner, { jot_datetime_textView.text = formattedDate(it) })
         jotViewModel.location().observe(viewLifecycleOwner, ::loadUpLocation)
         jotViewModel.attachments().observe(viewLifecycleOwner, ::loadUpAttachments)
+        jotViewModel.weather().observe(viewLifecycleOwner, ::loadUpWeather)
         if (requireArguments().containsKey("id")) {
             jotViewModel.loadJot(requireArguments().getLong("id"))
         } else {
             jotViewModel.newJot(
                 (requireArguments().getSerializable("date") as? Calendar) ?: Calendar.getInstance()
+            )
+        }
+    }
+
+    private fun promoteRemoveLocation() {
+        AlertDialog.Builder(requireContext())
+            .setMessage(getString(R.string.Remove_location_))
+            .setPositiveButton(R.string.confirm) { _, _ ->
+                jotViewModel.preferLocation(doubleArrayOf(MIN_VALUE, MIN_VALUE))
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun loadUpWeather(weather: Weather?) {
+        if (weather == null) {
+            jot_weather_imageView.visibility = View.GONE
+        } else {
+            jot_weather_imageView.visibility = View.VISIBLE
+            jot_weather_imageView.setImageResource(
+                when (weather.type()) {
+                    CLEAR -> R.drawable.ic_clear_day
+                    CLOUDS -> R.drawable.ic_clouds
+                    DRIZZLE -> R.drawable.ic_drizzle
+                    RAIN -> R.drawable.ic_rain
+                    THUNDERSTORM -> R.drawable.ic_thunderstorm
+                    ATMOSPHERE -> R.drawable.ic_atmosphere
+                    SNOW -> R.drawable.ic_snow
+                }
             )
         }
     }
@@ -206,9 +251,9 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     }
 
     private fun showImages() {
-        val sorted: List<Uri> = (jotViewModel.attachments().value?.map { Uri.parse(it) }
-            ?: emptyList())
-            .stream()
+        val sorted: List<Uri> = (
+            jotViewModel.attachments().value?.map { Uri.parse(it) } ?: emptyList()
+            ).stream()
             .sorted(JpegDateComparator(requireContext()))
             .collect(Collectors.toList())
         val dialog = AttachmentsFragment.newInstance(sorted, "")
@@ -248,7 +293,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         findNavController().popBackStack()
     }
 
-    private fun reloadJotsByJotTime(){
+    private fun reloadJotsByJotTime() {
         jotsViewModel.selectDate(Calendar.getInstance().apply {
             time = Date(jotViewModel.time().value ?: Date().time)
         })

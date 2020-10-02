@@ -16,18 +16,18 @@ internal class QueriedMetadataTest {
         CreatedMetadata(db, ConstMetadata(
             -1,
             1,
-            "type",
-            "title",
-            "content"
+           Metadata.Type.TEXT,
+            "content",
+            "title"
         )).value()
         val inserted = QueriedMetadata(
             MetadataByJotId(db, 1)
         ).value()
 
         assertEquals(1, inserted.size)
-        assertEquals("RAW", inserted[0].type().name)
+        assertEquals("TEXT", inserted[0].type().name)
         assertEquals("title", inserted[0].title())
-        assertEquals("content", inserted[0].content())
+        assertEquals("content", inserted[0].value())
         assertEquals(1L, inserted[0].version())
     }
 }
