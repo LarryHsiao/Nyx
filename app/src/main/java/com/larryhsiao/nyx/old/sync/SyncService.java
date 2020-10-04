@@ -74,7 +74,7 @@ public class SyncService extends JobIntentService
         try {
             notifySyncing(0, 0);
             settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
-            db = ((JotApplication) getApplication()).dbSrc;
+            db = ((JotApplication) getApplication()).getDb();
             new LocalFileSync(this, db).fire();
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user == null) {

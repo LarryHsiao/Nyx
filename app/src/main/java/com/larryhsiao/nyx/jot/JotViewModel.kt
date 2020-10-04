@@ -5,8 +5,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.larryhsiao.clotho.openweather.JsonWeather
+import com.larryhsiao.clotho.openweather.OpenWeatherSource
+import com.larryhsiao.clotho.openweather.Weather
+import com.larryhsiao.nyx.BuildConfig.OPEN_WEATHER_API_KEY
 import com.larryhsiao.nyx.core.attachments.*
 import com.larryhsiao.nyx.core.jots.*
+import com.larryhsiao.nyx.core.metadata.*
+import com.larryhsiao.nyx.core.metadata.Metadata.Type.OPEN_WEATHER
+import com.larryhsiao.nyx.core.metadata.openweather.PostedWeatherMeta
+import com.larryhsiao.nyx.core.metadata.openweather.WeatherRemovalByJotId
 import com.silverhetch.clotho.Action
 import com.silverhetch.clotho.Source
 import kotlinx.coroutines.Dispatchers.IO
@@ -47,6 +55,9 @@ class JotViewModel(
     private val isModified = MutableLiveData<Boolean>()
     fun isModified(): LiveData<Boolean> = isModified
 
+    private val weather = MutableLiveData<Weather>()
+    fun weather(): LiveData<Weather> = weather
+
     fun loadJot(id: Long) = viewModelScope.launch(IO) {
         if (id == -1L) {
             newJot(Calendar.getInstance())
@@ -55,12 +66,25 @@ class JotViewModel(
             val jot = JotById(id, db).value()
             loadContent(jot)
             loadAttachments(jot)
+            loadWeather(jot)
         }
     }
 
-    fun newJot(date:Calendar) = viewModelScope.launch(IO){
+    private fun loadWeather(jot: Jot) {
+        val filter = QueriedMetadata(
+            MetadataByJotId(db, jot.id())
+        ).value().filter { it.type() == OPEN_WEATHER }
+
+        if (filter.isNotEmpty()) {
+            weather.postValue(JsonWeather(
+                filter[0].value()
+            ))
+        }
+    }
+
+    fun newJot(date: Calendar) = viewModelScope.launch(IO) {
         isNewJotLiveData.postValue(true)
-        loadContent(object:WrappedJot(ConstJot()){
+        loadContent(object : WrappedJot(ConstJot()) {
             override fun createdTime(): Long {
                 return date.timeInMillis
             }
@@ -82,14 +106,25 @@ class JotViewModel(
     }
 
     suspend fun save() = withContext(IO) {
-        val value = PostedJot(db, object : WrappedJot(jot.value ?: ConstJot()) {
+        val savedJot = PostedJot(db, object : WrappedJot(jot.value ?: ConstJot()) {
             override fun content(): String = content.value ?: ""
             override fun title(): String = title.value ?: ""
             override fun createdTime(): Long = time.value ?: 0L
             override fun location(): DoubleArray = location.value
                 ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
         }).value()
-        saveAttachments(value)
+        saveAttachments(savedJot)
+        saveWeather(savedJot)
+    }
+
+    private fun saveWeather(savedJot: Jot) {
+        if (weather.value == null) {
+            WeatherRemovalByJotId(db, savedJot.id()).fire()
+        } else {
+            weather.value?.let {
+                PostedWeatherMeta(db, it, savedJot.id()).value()
+            }
+        }
     }
 
     private fun saveAttachments(jot: Jot) {
@@ -125,12 +160,36 @@ class JotViewModel(
 
     fun preferTime(newTime: Long) {
         time.value = newTime
+        updateWeather()
         markModified()
     }
 
     fun preferLocation(newLocation: DoubleArray) {
         location.value = newLocation
+        updateWeather()
         markModified()
+    }
+
+    private fun updateWeather() {
+        val selectLocation = location.value
+        if (selectLocation != null && weather.value == null &&
+            !selectLocation.contentEquals(doubleArrayOf(MIN_VALUE, MIN_VALUE)) &&
+            dayCalendar(time.value ?: System.currentTimeMillis()).timeInMillis ==
+            dayCalendar(System.currentTimeMillis()).timeInMillis) {
+            loadWeather(selectLocation[0], selectLocation[1])
+        } else {
+            weather.value = null
+        }
+    }
+
+    private fun loadWeather(longitude: Double, latitude: Double) = viewModelScope.launch {
+        weather.value = withContext(IO) {
+            OpenWeatherSource(
+                OPEN_WEATHER_API_KEY,
+                latitude,
+                longitude
+            ).value()
+        }
     }
 
     fun preferAttachments(newAttachments: List<Uri>) {
@@ -146,6 +205,16 @@ class JotViewModel(
     private fun markModified() {
         if (isModified.value != true) {
             isModified.value = true
+        }
+    }
+
+    private fun dayCalendar(time: Long): Calendar {
+        return Calendar.getInstance().apply {
+            timeInMillis = time
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
     }
 }

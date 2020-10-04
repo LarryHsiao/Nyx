@@ -168,4 +168,7 @@
     <string name="New">New</string>
     <string name="No_Jots">No Jot</string>
     <string name="Black_hole_destroys_everything_nearby">Black hole destroys everything nearby.</string>
+    <string name="Remove_location_">Remove location?</string>
+    <string name="Temperature___">Temperature: %s</string>
+    <string name="Humidity_____">Humidity: </string>
 </resources>

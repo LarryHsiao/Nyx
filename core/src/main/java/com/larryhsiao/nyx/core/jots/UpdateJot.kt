@@ -31,14 +31,14 @@ class UpdateJot @JvmOverloads constructor(
                 stmt.setString(2, Point(
                     CoordinateArraySequence(arrayOf(
                         Coordinate(
-                            updated.location()!![0],
-                            updated.location()!![1]
+                            updated.location()[0],
+                            updated.location()[1]
                         )
                     )), GeometryFactory()
                 ).toText())
                 stmt.setTimestamp(3, Timestamp(updated.createdTime()), Calendar.getInstance())
                 val mood = updated.mood()
-                if (mood!!.length > 1) {
+                if (mood.length > 1) {
                     stmt.setString(4, mood.substring(0, 2))
                 } else {
                     stmt.setString(4, "")
