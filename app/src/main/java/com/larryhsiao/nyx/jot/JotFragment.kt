@@ -7,17 +7,21 @@ import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Color.CYAN
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
+import android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import android.widget.TextView
 import android.widget.TimePicker
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
@@ -34,7 +38,6 @@ import com.larryhsiao.nyx.old.util.JpegDateComparator
 import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
-import com.silverhetch.aura.view.alert.Alert
 import com.silverhetch.clotho.temperature.FahrenheitCelsius
 import kotlinx.android.synthetic.main.dialog_weather.*
 import kotlinx.android.synthetic.main.fragment_jot.*
@@ -176,9 +179,14 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
                 jot_title_editText.setText(it)
             }
         })
-        jotViewModel.content().observe(viewLifecycleOwner, {
-            if (it != jot_content_editText.text.toString()) {
-                jot_content_editText.setText(it)
+        jotViewModel.content().observe(viewLifecycleOwner, { content ->
+            if (content != jot_content_editText.text.toString()) {
+                updateContent()
+            }
+        })
+        jotViewModel.tags().observe(viewLifecycleOwner, {
+            if (!jotViewModel.content().value.isNullOrBlank() && it.isNotEmpty()){
+                updateContent()
             }
         })
         jotViewModel.isNewJot().observe(viewLifecycleOwner, {
@@ -199,6 +207,35 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
                 (requireArguments().getSerializable("date") as? Calendar) ?: Calendar.getInstance()
             )
         }
+    }
+
+    private fun updateContent() {
+        val cursorPosition = jot_content_editText.getSelectionStart()
+        val content = jotViewModel.content().value ?: ""
+        val tags = jotViewModel.tags().value ?: emptyMap()
+        val spannable = SpannableString(content)
+        tags.keys.forEach { tagName ->
+            try {
+                val tagStr = "#$tagName\n"
+                val started = content.indexOf(tagStr)
+                spannable.setSpan(
+                    BackgroundColorSpan(resources.getColor(R.color.colorPrimary)),
+                    started,
+                    started + tagStr.length,
+                    SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                spannable.setSpan(
+                    ForegroundColorSpan(Color.WHITE),
+                    started,
+                    started + tagStr.length,
+                    SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        jot_content_editText.setText(spannable, TextView.BufferType.SPANNABLE)
+        jot_content_editText.setSelection(cursorPosition)
     }
 
     private fun showWeatherInfo(view: View) {

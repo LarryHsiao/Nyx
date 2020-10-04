@@ -157,5 +157,6 @@
             tools:visibility="visible"
             android:id="@+id/jot_weather_imageView"
             tools:src="@drawable/ic_clear_day" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

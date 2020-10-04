@@ -10,7 +10,7 @@ import java.sql.Statement
 class NewTag(private val connSource: Source<Connection>, private val tag: Tag) : Source<Tag?> {
     constructor(
         connSource: Source<Connection>,
-        title: String?
+        title: String
     ) : this(connSource, ConstTag(-1L, title, 1, false)) {
     }
 

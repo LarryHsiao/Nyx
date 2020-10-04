@@ -5,11 +5,11 @@ package com.larryhsiao.nyx.core.tags
  */
 class ConstTag(
     private val id: Long,
-    private val title: String?,
-    private val version: Int,
-    private val deleted: Boolean
+    private val title: String,
+    private val version: Int = 1,
+    private val deleted: Boolean = false
 ) : Tag {
-    override fun title(): String? {
+    override fun title(): String {
         return title
     }
 

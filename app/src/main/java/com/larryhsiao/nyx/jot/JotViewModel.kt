@@ -9,15 +9,20 @@ import com.larryhsiao.clotho.openweather.JsonWeather
 import com.larryhsiao.clotho.openweather.OpenWeatherSource
 import com.larryhsiao.clotho.openweather.Weather
 import com.larryhsiao.nyx.BuildConfig.OPEN_WEATHER_API_KEY
+import com.larryhsiao.nyx.core.StringHashTags
 import com.larryhsiao.nyx.core.attachments.*
 import com.larryhsiao.nyx.core.jots.*
 import com.larryhsiao.nyx.core.metadata.*
 import com.larryhsiao.nyx.core.metadata.Metadata.Type.OPEN_WEATHER
 import com.larryhsiao.nyx.core.metadata.openweather.PostedWeatherMeta
 import com.larryhsiao.nyx.core.metadata.openweather.WeatherRemovalByJotId
+import com.larryhsiao.nyx.core.tags.*
 import com.silverhetch.clotho.Action
 import com.silverhetch.clotho.Source
+import com.silverhetch.clotho.source.ConstSource
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
@@ -32,6 +37,23 @@ class JotViewModel(
     private val db: Source<Connection>,
     private val localFileSync: Action
 ) : ViewModel() {
+    companion object{
+        private const val TAG_DETECTION_DELAY_SEC = 1
+    }
+    private var secondsAfterContentChanged = Int.MAX_VALUE
+
+    init {
+        viewModelScope.launch(IO) {
+            while (isActive) {
+                if (secondsAfterContentChanged == TAG_DETECTION_DELAY_SEC) {
+                    preferTags()
+                }
+                secondsAfterContentChanged ++
+                delay(1000)
+            }
+        }
+    }
+
     private val time = MutableLiveData<Long>()
     fun time(): LiveData<Long> = time
 
@@ -58,6 +80,13 @@ class JotViewModel(
     private val weather = MutableLiveData<Weather>()
     fun weather(): LiveData<Weather> = weather
 
+    private val tags: MutableMap<String, Tag> = HashMap<String, Tag>()
+    private val tagsLiveData = MutableLiveData<Map<String, Tag>>().apply {
+        value = tags
+    }
+
+    fun tags(): LiveData<Map<String, Tag>> = tagsLiveData
+
     fun loadJot(id: Long) = viewModelScope.launch(IO) {
         if (id == -1L) {
             newJot(Calendar.getInstance())
@@ -67,7 +96,18 @@ class JotViewModel(
             loadContent(jot)
             loadAttachments(jot)
             loadWeather(jot)
+            loadTags(jot)
         }
+    }
+
+    private fun loadTags(jot: Jot) {
+        tagsLiveData.postValue(
+            QueriedTags(
+                TagsByJotId(db, jot.id())
+            ).value()
+                .map { it.title() to it }
+                .toMap()
+        )
     }
 
     private fun loadWeather(jot: Jot) {
@@ -106,6 +146,7 @@ class JotViewModel(
     }
 
     suspend fun save() = withContext(IO) {
+        preferTags()
         val savedJot = PostedJot(db, object : WrappedJot(jot.value ?: ConstJot()) {
             override fun content(): String = content.value ?: ""
             override fun title(): String = title.value ?: ""
@@ -115,6 +156,19 @@ class JotViewModel(
         }).value()
         saveAttachments(savedJot)
         saveWeather(savedJot)
+        saveTags(savedJot)
+    }
+
+    private fun saveTags(jot: Jot) {
+        JotTagsRemoval(db, jot.id()).fire()
+        tags.values.forEach { selected ->
+            val tag = CreatedTagByName(db, selected.title()).value()
+            NewJotTag(
+                db,
+                ConstSource(jot.id()),
+                ConstSource(tag.id())
+            ).fire()
+        }
     }
 
     private fun saveWeather(savedJot: Jot) {
@@ -155,7 +209,23 @@ class JotViewModel(
             return
         }
         content.value = newContent
+        secondsAfterContentChanged = 0
         markModified()
+    }
+
+    private fun preferTags() {
+        val newTagsMap = StringHashTags(
+            content.value ?: ""
+        ).value().map {
+            // In-memory tag object, we actually create tag when we saving it.
+            it to ConstTag(-1, it)
+        }.toMap()
+        if (newTagsMap.keys.toTypedArray().contentEquals(tags.keys.toTypedArray())) {
+            return
+        }
+        tags.filter { newTagsMap.containsKey(it.key).not() }.forEach { deleted -> tags.remove(deleted.key) }
+        tags.putAll(newTagsMap)
+        tagsLiveData.postValue(tags)
     }
 
     fun preferTime(newTime: Long) {
