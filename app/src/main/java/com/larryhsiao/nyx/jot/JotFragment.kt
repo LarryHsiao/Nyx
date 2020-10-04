@@ -9,6 +9,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
@@ -33,6 +35,8 @@ import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
 import com.silverhetch.aura.view.alert.Alert
+import com.silverhetch.clotho.temperature.FahrenheitCelsius
+import kotlinx.android.synthetic.main.dialog_weather.*
 import kotlinx.android.synthetic.main.fragment_jot.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -143,6 +147,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jot_title_left_textView.setOnClickListener { delete() }
         jot_calendar_imageView.setOnClickListener { showDatePicker() }
         jot_clock_imageView.setOnClickListener { showTimePicker() }
+        jot_weather_imageView.setOnClickListener(::showWeatherInfo)
         jot_location_imageView.setOnClickListener { showLocationPicker() }
         jot_location_imageView.setOnLongClickListener {
             val currentLocation = jotViewModel.location().value
@@ -196,6 +201,24 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         }
     }
 
+    private fun showWeatherInfo(view: View) {
+        AlertDialog.Builder(view.context)
+            .setView(R.layout.dialog_weather)
+            .show().apply {
+                val weather = jotViewModel.weather().value ?: return
+                this.dialogWeather_weather_imageView.setImageResource(
+                    weatherIconByType(weather.type())
+                )
+                this.dialogWeather_info.text = getString(
+                    R.string.Temperature___,
+                    FahrenheitCelsius(weather.temperature().toFloat()).value().toInt().toString()
+                )
+                this.dialogWeather_info.append("\n")
+                this.dialogWeather_info.append(getString(R.string.Humidity_____) + " ")
+                this.dialogWeather_info.append(weather.humidity().toInt().toString() + "%")
+            }
+    }
+
     private fun promoteRemoveLocation() {
         AlertDialog.Builder(requireContext())
             .setMessage(getString(R.string.Remove_location_))
@@ -211,17 +234,19 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             jot_weather_imageView.visibility = View.GONE
         } else {
             jot_weather_imageView.visibility = View.VISIBLE
-            jot_weather_imageView.setImageResource(
-                when (weather.type()) {
-                    CLEAR -> R.drawable.ic_clear_day
-                    CLOUDS -> R.drawable.ic_clouds
-                    DRIZZLE -> R.drawable.ic_drizzle
-                    RAIN -> R.drawable.ic_rain
-                    THUNDERSTORM -> R.drawable.ic_thunderstorm
-                    ATMOSPHERE -> R.drawable.ic_atmosphere
-                    SNOW -> R.drawable.ic_snow
-                }
-            )
+            jot_weather_imageView.setImageResource(weatherIconByType(weather.type()))
+        }
+    }
+
+    private fun weatherIconByType(type: Type): Int {
+        return when (type) {
+            CLEAR -> R.drawable.ic_clear_day
+            CLOUDS -> R.drawable.ic_clouds
+            DRIZZLE -> R.drawable.ic_drizzle
+            RAIN -> R.drawable.ic_rain
+            THUNDERSTORM -> R.drawable.ic_thunderstorm
+            ATMOSPHERE -> R.drawable.ic_atmosphere
+            SNOW -> R.drawable.ic_snow
         }
     }
 
@@ -252,7 +277,9 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
 
     private fun showImages() {
         val sorted: List<Uri> = (
-            jotViewModel.attachments().value?.map { Uri.parse(it) } ?: emptyList()
+            jotViewModel.attachments().value?.map {
+                Uri.parse(it)
+            } ?: emptyList()
             ).stream()
             .sorted(JpegDateComparator(requireContext()))
             .collect(Collectors.toList())
