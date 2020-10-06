@@ -14,6 +14,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -52,7 +53,13 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
             ViewModelFactory(app)
         ).get(JotsCalendarViewModel::class.java)
     }
-    private val adapter by lazy { JotsAdapter { toJotFragment(it.id()) } }
+    private val adapter by lazy {
+        JotsAdapter(
+            app.db,
+            lifecycleScope) {
+            toJotFragment(it.id())
+        }
+    }
     private val datePicker by lazy {
         DatePickerDialog(
             requireContext(),
@@ -118,7 +125,7 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
 
     override fun onPause() {
         super.onPause()
-        childFragmentManager.findFragmentById(R.id.jots_map)?.let { mapFrag->
+        childFragmentManager.findFragmentById(R.id.jots_map)?.let { mapFrag ->
             childFragmentManager.beginTransaction().remove(mapFrag).commit()
         }
     }
@@ -170,7 +177,7 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
             map,
             clusterManager
         ).apply { minClusterSize = 2 }
-        map.setOnCameraIdleListener{
+        map.setOnCameraIdleListener {
             clusterManager.onCameraIdle()
             map.resetMinMaxZoomPreference()
         }

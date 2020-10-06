@@ -10,9 +10,12 @@ class StringHashTags(
 ) : Source<Set<String>> {
     override fun value(): Set<String> {
         return hashSetOf<String>().apply {
-            val matcher = "\n#(\\S+)\n".toPattern().matcher(original)
-            while (matcher.find()) {
-                add(matcher.group(1) ?: continue)
+            val pattern = "^#(\\S+)".toPattern()
+            original.lines().forEach {
+                val matcher = pattern.matcher(it)
+                while (matcher.find()) {
+                    add(matcher.group(1) ?: continue)
+                }
             }
         }
     }

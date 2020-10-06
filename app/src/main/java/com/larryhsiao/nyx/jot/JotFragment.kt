@@ -35,6 +35,7 @@ import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.old.attachments.AttachmentsFragment
 import com.larryhsiao.nyx.old.util.JpegDateComparator
+import com.larryhsiao.nyx.utils.HashTagEnlightenAction
 import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
@@ -185,7 +186,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             }
         })
         jotViewModel.tags().observe(viewLifecycleOwner, {
-            if (!jotViewModel.content().value.isNullOrBlank() && it.isNotEmpty()){
+            if (!jotViewModel.content().value.isNullOrBlank() && it.isNotEmpty()) {
                 updateContent()
             }
         })
@@ -210,32 +211,11 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     }
 
     private fun updateContent() {
-        val cursorPosition = jot_content_editText.getSelectionStart()
-        val content = jotViewModel.content().value ?: ""
-        val tags = jotViewModel.tags().value ?: emptyMap()
-        val spannable = SpannableString(content)
-        tags.keys.forEach { tagName ->
-            try {
-                val tagStr = "#$tagName\n"
-                val started = content.indexOf(tagStr)
-                spannable.setSpan(
-                    BackgroundColorSpan(resources.getColor(R.color.colorPrimary)),
-                    started,
-                    started + tagStr.length,
-                    SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                spannable.setSpan(
-                    ForegroundColorSpan(Color.WHITE),
-                    started,
-                    started + tagStr.length,
-                    SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        jot_content_editText.setText(spannable, TextView.BufferType.SPANNABLE)
-        jot_content_editText.setSelection(cursorPosition)
+        HashTagEnlightenAction(
+            jot_content_editText,
+            jotViewModel.content().value ?: "",
+            jotViewModel.tags().value ?: emptyMap()
+        ).fire()
     }
 
     private fun showWeatherInfo(view: View) {
