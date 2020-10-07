@@ -1,12 +1,22 @@
 package com.larryhsiao.nyx.jot
 
 import android.content.Context
+import android.text.SpannableString
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.core.jots.Jot
+import com.larryhsiao.nyx.core.tags.QueriedTags
+import com.larryhsiao.nyx.core.tags.TagsByJotId
+import com.larryhsiao.nyx.utils.HashTagEnlightenAction
+import com.silverhetch.clotho.Source
 import kotlinx.android.synthetic.main.item_jot.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.sql.Connection
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -15,6 +25,8 @@ import kotlin.collections.ArrayList
  * Adapter to show jots.
  */
 class JotsAdapter(
+    private val db: Source<Connection>,
+    private val lifeCoroutineScope: CoroutineScope,
     private val itemClicked: (item: Jot) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val dateFormat by lazy { SimpleDateFormat("MM/dd", Locale.US) }
@@ -35,12 +47,23 @@ class JotsAdapter(
         val jot = jots[position]
         holder.itemView.itemJot_textView.text = buildTitle(holder.itemView.context, jot)
         holder.itemView.itemJot_time_textView.text = if (showDate) {
-            dateFormat.format(jotCalendar(jot).time) +" "
+            dateFormat.format(jotCalendar(jot).time) + " "
         } else {
             ""
         } + timeFormat.format(Date(jot.createdTime()))
         holder.itemView.setOnClickListener { itemClicked(jots[position]) }
-
+        lifeCoroutineScope.launch {
+            val tags = withContext(IO) {
+                QueriedTags(TagsByJotId(db, jot.id())).value()
+            }.map { it.title() to it }.toMap()
+            if (holder.adapterPosition == position) {
+                HashTagEnlightenAction(
+                    holder.itemView.itemJot_textView,
+                    buildTitle(holder.itemView.context, jot),
+                    tags
+                ).fire()
+            }
+        }
     }
 
     private fun buildTitle(context: Context, jot: Jot): String {

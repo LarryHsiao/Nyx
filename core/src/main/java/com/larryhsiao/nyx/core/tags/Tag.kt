@@ -7,7 +7,7 @@ interface Tag {
     /**
      * The title of this tag
      */
-    fun title(): String?
+    fun title(): String
 
     /**
      * The id of this Tag

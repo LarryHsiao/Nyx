@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
@@ -31,7 +32,7 @@ class JotsFragment : NyxFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = JotsAdapter {
+        val adapter = JotsAdapter(app.db, lifecycleScope) {
             findNavController().navigate(
                 JotsFragmentDirections.actionJotsFragmentToJotFragment(
                     it.id()

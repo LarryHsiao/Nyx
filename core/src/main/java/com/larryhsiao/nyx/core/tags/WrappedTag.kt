@@ -4,7 +4,7 @@ package com.larryhsiao.nyx.core.tags
  * Wrapper class of Tag
  */
 open class WrappedTag(private val origin: Tag) : Tag {
-    override fun title(): String? {
+    override fun title(): String {
         return origin.title()
     }
 
