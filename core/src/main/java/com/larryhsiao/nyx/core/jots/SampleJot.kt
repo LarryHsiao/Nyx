@@ -35,4 +35,8 @@ class SampleJot : Jot {
     override fun deleted(): Boolean {
         return false
     }
+
+    override fun privateLock(): Boolean {
+        return false
+    }
 }

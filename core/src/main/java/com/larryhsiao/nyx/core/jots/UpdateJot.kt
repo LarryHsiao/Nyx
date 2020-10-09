@@ -23,9 +23,17 @@ class UpdateJot @JvmOverloads constructor(
         val conn = connSource.value()
         try {
             conn.prepareStatement( // language=H2
-                "UPDATE jots " +
-                    "SET content=?1, location=?2, CREATEDTIME=?3, MOOD=?4, VERSION=?5 , DELETE=?7, TITLE=?8 " +
-                    "WHERE id=?6;"
+                """// --
+UPDATE jots
+SET content=?1,
+    location=?2,
+    CREATEDTIME=?3,
+    MOOD=?4,
+    VERSION=?5,
+    DELETE=?7,
+    TITLE=?8,
+    PRIVATE=?9
+WHERE id = ?6;"""
             ).use { stmt ->
                 stmt.setString(1, updated.content())
                 stmt.setString(2, Point(
@@ -47,6 +55,7 @@ class UpdateJot @JvmOverloads constructor(
                 stmt.setLong(6, updated.id())
                 stmt.setInt(7, if (updated.deleted()) 1 else 0)
                 stmt.setString(8, updated.title())
+                stmt.setBoolean(9, updated.privateLock())
                 stmt.executeUpdate()
             }
         } catch (e: SQLException) {

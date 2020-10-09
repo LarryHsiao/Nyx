@@ -37,9 +37,10 @@ class JotViewModel(
     private val db: Source<Connection>,
     private val localFileSync: Action
 ) : ViewModel() {
-    companion object{
+    companion object {
         private const val TAG_DETECTION_DELAY_SEC = 1
     }
+
     private var secondsAfterContentChanged = Int.MAX_VALUE
 
     init {
@@ -48,7 +49,7 @@ class JotViewModel(
                 if (secondsAfterContentChanged == TAG_DETECTION_DELAY_SEC) {
                     preferTags()
                 }
-                secondsAfterContentChanged ++
+                secondsAfterContentChanged++
                 delay(1000)
             }
         }
@@ -84,6 +85,9 @@ class JotViewModel(
     private val tagsLiveData = MutableLiveData<Map<String, Tag>>().apply {
         value = tags
     }
+
+    private val privateLock = MutableLiveData<Boolean>()
+    fun privateLock(): LiveData<Boolean> = privateLock
 
     fun tags(): LiveData<Map<String, Tag>> = tagsLiveData
 
@@ -137,6 +141,7 @@ class JotViewModel(
         content.value = newJot.content()
         title.value = newJot.title()
         location.value = newJot.location()
+        privateLock.value = newJot.privateLock()
     }
 
     private fun loadAttachments(jot: Jot) = viewModelScope.launch(IO) {
@@ -148,11 +153,11 @@ class JotViewModel(
     suspend fun save() = withContext(IO) {
         preferTags()
         val savedJot = PostedJot(db, object : WrappedJot(jot.value ?: ConstJot()) {
-            override fun content(): String = content.value ?: ""
-            override fun title(): String = title.value ?: ""
-            override fun createdTime(): Long = time.value ?: 0L
-            override fun location(): DoubleArray = location.value
-                ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
+            override fun content() = content.value ?: ""
+            override fun title() = title.value ?: ""
+            override fun createdTime() = time.value ?: 0L
+            override fun location() = location.value ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
+            override fun privateLock() = privateLock.value ?: false
         }).value()
         saveAttachments(savedJot)
         saveWeather(savedJot)
@@ -237,6 +242,11 @@ class JotViewModel(
     fun preferLocation(newLocation: DoubleArray) {
         location.value = newLocation
         updateWeather()
+        markModified()
+    }
+
+    fun togglePrivateContent() {
+        privateLock.value = !(privateLock.value ?: false)
         markModified()
     }
 

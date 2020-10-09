@@ -158,5 +158,11 @@
             android:id="@+id/jot_weather_imageView"
             tools:src="@drawable/ic_clear_day" />
 
+        <ImageView
+            android:layout_width="40dp"
+            android:id="@+id/jot_private_lock_imageView"
+            android:padding="8dp"
+            android:src="@drawable/ic_lock_open"
+            android:layout_height="40dp"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

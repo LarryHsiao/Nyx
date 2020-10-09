@@ -35,4 +35,8 @@ open class WrappedJot(private val jot: Jot) : Jot {
     override fun deleted(): Boolean {
         return jot.deleted()
     }
+
+    override fun privateLock(): Boolean {
+        return jot.privateLock()
+    }
 }

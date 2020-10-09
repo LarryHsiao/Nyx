@@ -100,7 +100,9 @@ class JotsCalendarViewModel(private val app: JotApplication) : ViewModel() {
                 "",
                 "",
                 it.key.latLong?.reversedArray() ?: doubleArrayOf(MIN_VALUE, MIN_VALUE),
-                Calendar.getInstance().apply { timeInMillis = exifTime(it.key) }
+                Calendar.getInstance().apply { timeInMillis = exifTime(it.key) },
+                "",
+                false
             ).value()
             NewAttachments(app.db, newJot.id(), it.value.map { it.toString() }.toTypedArray()).value()
         }

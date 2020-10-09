@@ -12,8 +12,7 @@ class JotsDb(private val connSource: Source<Connection>) : Source<Connection> {
             val conn = connSource.value()
             conn.createStatement().executeUpdate(
                 // language=H2
-                """
-CREATE TABLE IF NOT EXISTS jots
+                """CREATE TABLE IF NOT EXISTS jots
 (
     id          integer                  not null auto_increment,
     title       text                     not null default '',
@@ -22,7 +21,8 @@ CREATE TABLE IF NOT EXISTS jots
     location    geometry,
     mood        varchar                  not null default '',
     version     integer                  not null default 1,
-    delete      integer                  not null default 0
+    delete      integer                  not null default 0,
+    private     boolean                  not null default false
 );""")
             conn
         } catch (e: Exception) {

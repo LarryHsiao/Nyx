@@ -34,7 +34,7 @@ class NyxDb(private val dbFile: File) : Source<Connection> {
         ).value()
         val flyway = Flyway.configure()
             .baselineOnMigrate(true)
-            .baselineVersion("4")
+            .baselineVersion("5")
             .dataSource("jdbc:h2:" +
                 dbFile.absolutePath +
                 ";FILE_LOCK=FS" +

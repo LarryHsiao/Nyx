@@ -7,18 +7,12 @@ import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.Color.CYAN
 import android.net.Uri
 import android.os.Bundle
-import android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-import android.text.SpannableString
-import android.text.style.BackgroundColorSpan
-import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
-import android.widget.TextView
 import android.widget.TimePicker
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
@@ -167,6 +161,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jot_image_imageView.setOnClickListener { showImages() }
         jot_title_editText.doAfterTextChanged { jotViewModel.preferTitle(it?.toString() ?: "") }
         jot_content_editText.doAfterTextChanged { jotViewModel.preferContent(it?.toString() ?: "") }
+        jot_private_lock_imageView.setOnClickListener { jotViewModel.togglePrivateContent() }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackCallback);
         jotViewModel.isNewJot().observe(viewLifecycleOwner, {
             jot_title_bar_title_textView.text = if (it) {
@@ -201,6 +196,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jotViewModel.location().observe(viewLifecycleOwner, ::loadUpLocation)
         jotViewModel.attachments().observe(viewLifecycleOwner, ::loadUpAttachments)
         jotViewModel.weather().observe(viewLifecycleOwner, ::loadUpWeather)
+        jotViewModel.privateLock().observe(viewLifecycleOwner, ::loadPrivateLockState)
         if (requireArguments().containsKey("id")) {
             jotViewModel.loadJot(requireArguments().getLong("id"))
         } else {
@@ -208,6 +204,16 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
                 (requireArguments().getSerializable("date") as? Calendar) ?: Calendar.getInstance()
             )
         }
+    }
+
+    private fun loadPrivateLockState(lock: Boolean) {
+        jot_private_lock_imageView.setImageResource(
+            if (lock) {
+                R.drawable.ic_lock
+            } else {
+                R.drawable.ic_lock_open
+            }
+        )
     }
 
     private fun updateContent() {
