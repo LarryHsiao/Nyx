@@ -22,7 +22,8 @@ class PostedJot @JvmOverloads constructor(
                 jot.content(),
                 jot.location(),
                 calendar,
-                jot.mood()
+                jot.mood(),
+                jot.privateLock()
             ).value()
         } else {
             UpdateJot(jot, db, updateVer).fire()

@@ -42,7 +42,8 @@ class QueriedJots(private val query: Source<ResultSet>) : Source<List<Jot?>?> {
             location,
             res.getString("mood"),
             res.getInt("version"),
-            res.getInt("delete") == 1
+            res.getInt("delete") == 1,
+            res.getBoolean("private")
         ))
     }
 }

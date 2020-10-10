@@ -7,7 +7,6 @@ import org.locationtech.jts.geom.Point
 import org.locationtech.jts.geom.impl.CoordinateArraySequence
 import java.sql.Connection
 import java.sql.SQLException
-import java.sql.Statement
 import java.sql.Statement.RETURN_GENERATED_KEYS
 import java.sql.Timestamp
 import java.util.*
@@ -24,18 +23,18 @@ class NewJot : Source<Jot> {
         title: String,
         content: String,
         calendar: Calendar,
-        mood: String
-    ) : this(db, title, content, doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE), calendar, mood) {
-    }
+        mood: String,
+        privateLock: Boolean = false
+    ) : this(db, title, content, doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE), calendar, mood, privateLock)
 
     constructor(
         db: Source<Connection>,
         title: String,
         content: String,
         longLat: DoubleArray,
-        mood: String
-    ) : this(db, title, content, longLat, Calendar.getInstance(), mood) {
-    }
+        mood: String,
+        privateLock: Boolean = false
+    ) : this(db, title, content, longLat, Calendar.getInstance(), mood, privateLock)
 
     @JvmOverloads
     constructor(
@@ -44,7 +43,8 @@ class NewJot : Source<Jot> {
         content: String,
         longLat: DoubleArray = doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE),
         calendar: Calendar = Calendar.getInstance(),
-        mood: String = " "
+        mood: String = " ",
+        privateLock: Boolean = false
     ) {
         this.db = db
         jot = ConstJot(
@@ -55,7 +55,8 @@ class NewJot : Source<Jot> {
             longLat,
             mood,
             1,
-            false
+            false,
+            privateLock
         )
     }
 
@@ -68,8 +69,8 @@ class NewJot : Source<Jot> {
         try {
             db.value().prepareStatement( // language=H2
                 """// 
-INSERT INTO jots(content, createdTime, location, mood, VERSION, TITLE)
-VALUES (?, ?, ?, ?, ?, ?)""",
+INSERT INTO jots(content, createdTime, location, mood, VERSION, TITLE, PRIVATE)
+VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 RETURN_GENERATED_KEYS
             ).use { stmt ->
                 stmt.setString(1, jot.content())
@@ -87,6 +88,7 @@ VALUES (?, ?, ?, ?, ?, ?)""",
                 }
                 stmt.setInt(5, jot.version())
                 stmt.setString(6, jot.title())
+                stmt.setBoolean(7, jot.privateLock())
                 if (stmt.executeUpdate() == 0) {
                     throw SQLException("Insert failed")
                 }

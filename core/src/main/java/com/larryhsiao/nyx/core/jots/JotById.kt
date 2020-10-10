@@ -28,7 +28,8 @@ class JotById(private val id: Long, private val db: Source<Connection>) : Source
                     PointSource(res.getString("location")).value(),
                     res.getString("mood"),
                     res.getInt("version"),
-                    res.getInt("delete") == 1
+                    res.getInt("delete") == 1,
+                    res.getBoolean("private")
                 )
             }
         } catch (e: SQLException) {

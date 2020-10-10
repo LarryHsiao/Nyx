@@ -49,7 +49,7 @@ public class SyncJots implements Action {
             if (task.isSuccessful()) {
                 sync(remoteJots, snapshot);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -86,7 +86,7 @@ public class SyncJots implements Action {
 
     private void updateLocalJot(QueryDocumentSnapshot remoteJot) {
         String title = encryptor.decrypt(remoteJot.getString("title"));
-        if (title == null){
+        if (title == null) {
             title = "";
         }
         new UpdateJot(
@@ -101,14 +101,15 @@ public class SyncJots implements Action {
                 ).value(),
                 encryptor.decrypt(remoteJot.getString("mood")),
                 parseInt(encryptor.decrypt(remoteJot.getString("version"))),
-                parseInt(encryptor.decrypt(remoteJot.getString("delete"))) == 1
+                parseInt(encryptor.decrypt(remoteJot.getString("delete"))) == 1,
+                parseInt(encryptor.decrypt(remoteJot.getString("private"))) == 1
             ), db, false
         ).fire();
     }
 
     private void newLocalJot(QueryDocumentSnapshot remoteJot) {
         String title = encryptor.decrypt(remoteJot.getString("title"));
-        if (title == null){
+        if (title == null) {
             title = "";
         }
         new NewJotById(
@@ -124,7 +125,8 @@ public class SyncJots implements Action {
                 ).value(),
                 encryptor.decrypt(remoteJot.getString("mood")),
                 parseInt(encryptor.decrypt(remoteJot.getString("version"))),
-                parseInt(encryptor.decrypt(remoteJot.getString("delete"))) == 1
+                parseInt(encryptor.decrypt(remoteJot.getString("delete"))) == 1,
+                parseInt(encryptor.decrypt(remoteJot.getString("private"))) == 1
             )
         ).value();
     }
@@ -147,6 +149,7 @@ public class SyncJots implements Action {
             ));
             data.put("version", encryptor.encrypt(jot.version() + ""));
             data.put("delete", encryptor.encrypt((jot.deleted() ? 1 : 0) + ""));
+            data.put("private", encryptor.encrypt((jot.privateLock() ? 1 : 0) + ""));
             await(jotsRef.document(jot.id() + "").set(data));
         } catch (Exception e) {
             e.printStackTrace();

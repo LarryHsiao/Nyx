@@ -42,6 +42,11 @@ interface Jot {
     fun version(): Int
 
     /**
+     * Indicates this is a private content.
+     */
+    fun privateLock(): Boolean
+
+    /**
      * Determine this Jot is deleted.
      */
     fun deleted(): Boolean

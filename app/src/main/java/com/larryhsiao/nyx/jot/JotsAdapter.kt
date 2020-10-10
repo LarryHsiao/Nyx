@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.jot
 
 import android.content.Context
-import android.text.SpannableString
+import android.graphics.BlurMaskFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +46,14 @@ class JotsAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val jot = jots[position]
         holder.itemView.itemJot_textView.text = buildTitle(holder.itemView.context, jot)
+        holder.itemView.itemJot_textView.paint.maskFilter = if (jot.privateLock()) {
+            BlurMaskFilter(
+                holder.itemView.itemJot_textView.textSize / 3,
+                BlurMaskFilter.Blur.NORMAL
+            )
+        } else {
+            null
+        }
         holder.itemView.itemJot_time_textView.text = if (showDate) {
             dateFormat.format(jotCalendar(jot).time) + " "
         } else {

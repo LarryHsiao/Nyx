@@ -12,6 +12,7 @@ open class ConstJot : Jot {
     private val mood: String
     private val version: Int
     private val deleted: Boolean
+    private val private:Boolean
 
     @JvmOverloads
     constructor(
@@ -22,7 +23,8 @@ open class ConstJot : Jot {
         location: DoubleArray = doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE),
         mood: String = "",
         version: Int = 1,
-        deleted: Boolean = false
+        deleted: Boolean = false,
+        private: Boolean = false
     ) {
         this.id = id
         this.title = title
@@ -32,6 +34,7 @@ open class ConstJot : Jot {
         this.mood = mood
         this.version = version
         this.deleted = deleted
+        this.private = private
     }
 
     constructor(jot: Jot) {
@@ -43,6 +46,7 @@ open class ConstJot : Jot {
         mood = jot.mood()
         version = jot.version()
         deleted = jot.deleted()
+        private = jot.privateLock()
     }
 
     override fun title(): String {
@@ -75,5 +79,9 @@ open class ConstJot : Jot {
 
     override fun deleted(): Boolean {
         return deleted
+    }
+
+    override fun privateLock(): Boolean {
+        return private
     }
 }

@@ -150,7 +150,8 @@ public class CaptureActivity extends JotActivity {
             "",
             new double[]{location.getLongitude(), location.getLatitude()},
             Calendar.getInstance(),
-            ""
+            "",
+            false
         ).value();
     }
 }

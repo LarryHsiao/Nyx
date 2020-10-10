@@ -3,9 +3,12 @@ package com.larryhsiao.nyx.jot
 import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.BUTTON_NEGATIVE
+import android.app.KeyguardManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +16,9 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.DatePicker
+import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -35,6 +38,7 @@ import com.larryhsiao.nyx.old.sync.SyncService
 import kotlinx.android.synthetic.main.fragment_jots_calendar.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.Executors
 import kotlin.Double.Companion.MIN_VALUE
 
 /**
@@ -56,8 +60,47 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
     private val adapter by lazy {
         JotsAdapter(
             app.db,
-            lifecycleScope) {
-            toJotFragment(it.id())
+            lifecycleScope
+        ) {
+            if (it.privateLock()) {
+                BiometricPrompt(
+                    this,
+                    Executors.newSingleThreadExecutor(),
+                    object : BiometricPrompt.AuthenticationCallback() {
+                        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                            super.onAuthenticationSucceeded(result)
+                            toJotFragment(it.id())
+                        }
+
+                        override fun onAuthenticationError(
+                            errorCode: Int,
+                            errString: CharSequence
+                        ) {
+                            super.onAuthenticationError(errorCode, errString)
+                            val keyguardManager: KeyguardManager = requireContext().getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager //api 16+
+
+                            val isSecured = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                keyguardManager.isDeviceSecure
+                            } else {
+                                keyguardManager.isKeyguardSecure
+                            }
+
+                            if (!isSecured) {
+                                toJotFragment(it.id()) //
+                            }
+                        }
+                    }
+                ).authenticate(
+                    BiometricPrompt.PromptInfo.Builder()
+                        .setTitle(getString(R.string.Private_content))
+                        .setSubtitle(getString(R.string.Unlock_for_the_private_content))
+                        .setDeviceCredentialAllowed(true)
+                        .setConfirmationRequired(true)
+                        .build()
+                )
+            } else {
+                toJotFragment(it.id())
+            }
         }
     }
     private val datePicker by lazy {

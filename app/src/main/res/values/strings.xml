@@ -171,4 +171,6 @@
     <string name="Remove_location_">Remove location?</string>
     <string name="Temperature___">Temperature: %s</string>
     <string name="Humidity_____">Humidity: </string>
+    <string name="Private_content">Private Content</string>
+    <string name="Unlock_for_the_private_content">Unlock for the private content</string>
 </resources>
