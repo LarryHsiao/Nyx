@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.jot
 
+import android.Manifest.permission.CAMERA
 import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.BUTTON_NEGATIVE
@@ -7,16 +8,21 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -29,11 +35,10 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.haibin.calendarview.Calendar
 import com.haibin.calendarview.CalendarView
-import com.larryhsiao.nyx.NyxFragment
-import com.larryhsiao.nyx.R
-import com.larryhsiao.nyx.ViewModelFactory
+import com.larryhsiao.nyx.*
 import com.larryhsiao.nyx.core.jots.Jot
 import com.larryhsiao.nyx.old.attachments.AttachmentPickerIntent
+import com.larryhsiao.nyx.old.attachments.TempAttachmentFile
 import com.larryhsiao.nyx.old.sync.SyncService
 import kotlinx.android.synthetic.main.fragment_jots_calendar.*
 import java.text.SimpleDateFormat
@@ -47,8 +52,16 @@ import kotlin.Double.Companion.MIN_VALUE
 class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListener {
     companion object {
         private const val REQUEST_CODE_NEW_JOT_BY_IMAGES = 1000
+        private const val REQUEST_CODE_CAPTURE_PHOTO = 1001
+        private const val REQUEST_CODE_PERMISSION_CAMERA_FOR_NEW_JOT = 1002
+
+        /**
+         *  Use fixed file path as camera output.
+         */
+        private const val TEMP_FILE_PHOTO_CAPTURE = "TEMP_FILE_PHOTO_CAPTURE"
     }
 
+    private val photoTempFile by lazy { TempAttachmentFile(requireContext(), TEMP_FILE_PHOTO_CAPTURE).value() }
     private val dateFormat by lazy { SimpleDateFormat("yyyy MM", Locale.getDefault()) }
     private val dayFormat by lazy { SimpleDateFormat("MM/dd", Locale.getDefault()) }
     private val model by lazy {
@@ -129,6 +142,7 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         jots_recyclerView.adapter = adapter
         jots_newJot_imageView.setOnClickListener { toNewJotFragment() }
         jots_newJotByImage_imageView.setOnClickListener(::newJotByImages)
+        jots_newJotByCamera_imageView.setOnClickListener(::newJotByCamera)
         jots_month_textView.setOnClickListener(::onMonthIndicatorClicked)
         jot_list_map_switcher_imageView.setOnClickListener(::onSwitchListMap)
         jots_blackhole_textView.setOnLongClickListener {
@@ -281,6 +295,21 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
                 }
             }
             model.newJotsByImage(*pickedUris.toTypedArray())
+        } else if (requestCode == REQUEST_CODE_CAPTURE_PHOTO && resultCode == RESULT_OK) {
+            if (photoTempFile.exists()) {
+                val tempFile = TempAttachmentFile(
+                    requireContext(),
+                    "" + System.currentTimeMillis() + ".jpg"
+                ).value()
+                photoTempFile.renameTo(tempFile)
+                model.newJotsByImage(
+                    FileProvider.getUriForFile(
+                        requireContext(),
+                        BuildConfig.FILE_PROVIDER_AUTHORITY,
+                        tempFile
+                    )
+                )
+            }
         }
     }
 
@@ -294,6 +323,33 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
             e.printStackTrace()
         }
     }
+
+    private fun newJotByCamera(view: View) {
+        try {
+            if (ContextCompat.checkSelfPermission(view.context, CAMERA) != PERMISSION_GRANTED) {
+                requestPermissions(
+                    arrayOf(CAMERA),
+                    REQUEST_CODE_PERMISSION_CAMERA_FOR_NEW_JOT
+                )
+                return
+            }
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (
+                intent.resolveActivity(requireContext().packageManager) !=
+                null
+            ) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
+                    requireContext(),
+                    BuildConfig.FILE_PROVIDER_AUTHORITY,
+                    photoTempFile
+                ))
+                startActivityForResult(intent, REQUEST_CODE_CAPTURE_PHOTO)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
     @Suppress("UNUSED_PARAMETER")
     private fun newJotByImages(it: View) {
