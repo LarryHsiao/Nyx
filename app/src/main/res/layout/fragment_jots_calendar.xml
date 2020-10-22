@@ -76,11 +76,20 @@
                 android:padding="8dp"
                 app:layout_constraintTop_toTopOf="@id/jots_day_textView"
                 app:layout_constraintBottom_toBottomOf="@id/jots_day_textView"
-                android:gravity="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_image_plus" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:padding="8dp"
+                android:src="@drawable/ic_camera"
+                android:id="@+id/jots_newJotByCamera_imageView"
+                app:layout_constraintStart_toEndOf="@id/jots_newJotByImage_imageView"
+                app:layout_constraintTop_toTopOf="@id/jots_day_textView"
+                app:layout_constraintBottom_toBottomOf="@id/jots_day_textView"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_height="wrap_content"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
