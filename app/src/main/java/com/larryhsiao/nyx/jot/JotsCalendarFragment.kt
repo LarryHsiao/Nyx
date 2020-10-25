@@ -8,6 +8,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Build
@@ -19,7 +20,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.DatePicker
-import android.widget.Toast
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -35,7 +35,10 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.haibin.calendarview.Calendar
 import com.haibin.calendarview.CalendarView
-import com.larryhsiao.nyx.*
+import com.larryhsiao.nyx.BuildConfig
+import com.larryhsiao.nyx.NyxFragment
+import com.larryhsiao.nyx.R
+import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.core.jots.Jot
 import com.larryhsiao.nyx.old.attachments.AttachmentPickerIntent
 import com.larryhsiao.nyx.old.attachments.TempAttachmentFile
@@ -313,6 +316,19 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSION_CAMERA_FOR_NEW_JOT &&
+            grantResults[0] == PERMISSION_GRANTED
+        ) {
+            newJotByCamera(requireContext())
+        }
+    }
+
     private fun requestFilePermission(uri: Uri) {
         try {
             requireContext().contentResolver.takePersistableUriPermission(
@@ -325,8 +341,12 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
     }
 
     private fun newJotByCamera(view: View) {
+        newJotByCamera(view.context)
+    }
+
+    private fun newJotByCamera(context: Context) {
         try {
-            if (ContextCompat.checkSelfPermission(view.context, CAMERA) != PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(context, CAMERA) != PERMISSION_GRANTED) {
                 requestPermissions(
                     arrayOf(CAMERA),
                     REQUEST_CODE_PERMISSION_CAMERA_FOR_NEW_JOT

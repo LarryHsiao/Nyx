@@ -51,6 +51,7 @@
                 android:value=".MainActivity"/>
         </activity>
         <activity android:name=".old.KeyChangingActivity" />
+        <activity android:name=".jot.InstantJotActivity" />
 
         <provider android:authorities="com.larryhsiao.nyx.fileprovider"
             android:exported="false"
