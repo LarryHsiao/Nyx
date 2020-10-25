@@ -7,11 +7,11 @@ import java.util.*
 /**
  * Source to build a Jot that just updated or created.
  */
-class PostedJot @JvmOverloads constructor(
+class PostedJot constructor(
     private val db: Source<Connection>,
     private val jot: Jot,
     private val updateVer: Boolean = true
-) : Source<Jot?> {
+) : Source<Jot> {
     override fun value(): Jot {
         return if (jot.id() == -1L) {
             val calendar = Calendar.getInstance()

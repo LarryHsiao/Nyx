@@ -17,7 +17,6 @@ import com.silverhetch.clotho.source.ConstSource
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.sql.Date
 import java.util.*
 import kotlin.Double.Companion.MIN_VALUE
 import kotlin.collections.HashMap
@@ -29,6 +28,10 @@ import kotlin.math.sqrt
  * ViewModel to represent Jot list.
  */
 class JotsCalendarViewModel(private val app: JotApplication) : ViewModel() {
+    companion object {
+        private const val SAME_JOT_RANGE_MILLIS = 15 * 60 * 1000 // 15min
+    }
+
     enum class ListType {
         LIST, MAP
     }
@@ -86,7 +89,7 @@ class JotsCalendarViewModel(private val app: JotApplication) : ViewModel() {
                     uriLatLong[1] != MIN_VALUE
                 val isSameLocation = (!isLocationAllSet || distance < MeterDelta(30.0).value())
                 if (isSameLocation &&
-                    abs(uriTime - exifTime(existExif)) < 30 * 60 * 1000 // 30 min
+                    abs(uriTime - exifTime(existExif)) < SAME_JOT_RANGE_MILLIS // 30 min
                 ) {
                     jots[existExif] = jots[existExif]?.apply { add(uri) } ?: arrayListOf(uri)
                     return@forEach
@@ -95,16 +98,16 @@ class JotsCalendarViewModel(private val app: JotApplication) : ViewModel() {
             jots[uriExif] = arrayListOf(uri)
         }
         jots.forEach { it ->
-            val newJot = NewJot(
+            NewAttachments(
                 app.db,
-                "",
-                "",
-                it.key.latLong?.reversedArray() ?: doubleArrayOf(MIN_VALUE, MIN_VALUE),
-                Calendar.getInstance().apply { timeInMillis = exifTime(it.key) },
-                "",
-                false
+                PostedJotByTimeRange(
+                    app.db,
+                    Calendar.getInstance().apply { timeInMillis = exifTime(it.key) },
+                    it.key.latLong?.reversedArray() ?: doubleArrayOf(MIN_VALUE, MIN_VALUE),
+                    SAME_JOT_RANGE_MILLIS
+                ).value().id(),
+                it.value.map { it.toString() }.toTypedArray()
             ).value()
-            NewAttachments(app.db, newJot.id(), it.value.map { it.toString() }.toTypedArray()).value()
         }
         if (jots.size > 0) {
             selectDate(Calendar.getInstance().apply {
@@ -133,7 +136,7 @@ class JotsCalendarViewModel(private val app: JotApplication) : ViewModel() {
     fun preferSwitchListType() {
         if (listType.value == LIST) {
             listType.value = ListType.MAP
-        }else{
+        } else {
             listType.value = LIST
         }
     }
