@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="com.larryhsiao.nyx">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.larryhsiao.nyx">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -11,12 +11,15 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
-    <uses-feature android:name="android.hardware.location.network"
-                  android:required="false"/>
-    <uses-feature android:name="android.hardware.location.gps"
-                  android:required="false"/>
-    <uses-feature android:name="android.hardware.camera"
-                  android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.location.network"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:name=".NyxApplication"
@@ -29,9 +32,10 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -42,33 +46,49 @@
             android:windowSoftInputMode="adjustPan"
             android:parentActivityName=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
+                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/leku_searchable"/>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/leku_searchable" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".MainActivity" />
         </activity>
         <activity android:name=".old.KeyChangingActivity" />
-        <activity android:name=".jot.InstantJotActivity" />
+        <activity
+            android:name=".jot.InstantJotActivity"
+            android:launchMode="singleInstance" />
 
-        <provider android:authorities="com.larryhsiao.nyx.fileprovider"
+        <provider
+            android:authorities="com.larryhsiao.nyx.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true"
             android:name="androidx.core.content.FileProvider">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider"
-                />
+                android:resource="@xml/file_provider" />
         </provider>
-        <service android:name=".old.sync.SyncService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <receiver android:name=".NyxWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nyx_widget_provider" />
+        </receiver>
+
+        <service
+            android:name=".old.sync.SyncService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="ocr" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_api_key"/>
+            android:value="@string/google_api_key" />
     </application>
 </manifest>
