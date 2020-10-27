@@ -14,7 +14,7 @@ import java.sql.Connection
 /**
  * Application of Jot.
  */
-class JotApplication : Application() {
+class NyxApplication : Application() {
     companion object {
         @Deprecated("Remove it after 4.0 conpleted")
         @JvmField val FILE_PROVIDER_AUTHORITY: String?

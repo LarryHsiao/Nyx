@@ -23,8 +23,8 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_TEMP_PROVIDER;
 import static java.util.stream.Collectors.toList;
 
 /**

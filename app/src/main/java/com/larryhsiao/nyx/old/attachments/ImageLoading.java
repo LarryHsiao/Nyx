@@ -11,7 +11,7 @@ import com.silverhetch.clotho.Action;
 
 import static android.graphics.Color.BLACK;
 import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_PROVIDER;
 
 /**
  * Action to load up image by given uri.

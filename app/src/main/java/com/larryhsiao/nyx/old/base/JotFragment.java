@@ -3,7 +3,7 @@ package com.larryhsiao.nyx.old.base;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.NyxApplication;
 import com.silverhetch.aura.AuraFragment;
 import com.silverhetch.clotho.Source;
 
@@ -19,7 +19,7 @@ public abstract class JotFragment extends AuraFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = ((JotApplication) getContext().getApplicationContext()).getDb();
-        remoteConfig = ((JotApplication) getContext().getApplicationContext()).remoteConfig;
+        db = ((NyxApplication) getContext().getApplicationContext()).getDb();
+        remoteConfig = ((NyxApplication) getContext().getApplicationContext()).remoteConfig;
     }
 }

@@ -19,7 +19,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.KeyChangingActivity;
 import com.larryhsiao.nyx.old.ServiceIds;
@@ -74,7 +74,7 @@ public class SyncService extends JobIntentService
         try {
             notifySyncing(0, 0);
             settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
-            db = ((JotApplication) getApplication()).getDb();
+            db = ((NyxApplication) getApplication()).getDb();
             new LocalFileSync(this, db).fire();
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user == null) {

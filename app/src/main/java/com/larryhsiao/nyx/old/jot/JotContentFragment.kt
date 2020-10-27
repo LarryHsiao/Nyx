@@ -22,7 +22,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.SkuType
 import com.android.billingclient.api.BillingClientStateListener
@@ -31,7 +30,6 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.Purchase.PurchaseState
 import com.google.android.gms.tasks.Task
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.cloud.landmark.FirebaseVisionCloudLandmark
@@ -40,7 +38,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionLatLng
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText
 import com.google.gson.Gson
 import com.larryhsiao.nyx.BuildConfig
-import com.larryhsiao.nyx.JotApplication
+import com.larryhsiao.nyx.NyxApplication
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.core.attachments.*
 import com.larryhsiao.nyx.core.jots.*
@@ -618,7 +616,7 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
                 premiumAiMagic(
                     FileProvider.getUriForFile(
                         requireContext(),
-                        JotApplication.FILE_PROVIDER_AUTHORITY!!,
+                        NyxApplication.FILE_PROVIDER_AUTHORITY!!,
                         TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
                     )
                 )
@@ -637,7 +635,7 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
         addAttachment(
             FileProvider.getUriForFile(
                 requireContext(),
-                JotApplication.FILE_PROVIDER_AUTHORITY!!,
+                NyxApplication.FILE_PROVIDER_AUTHORITY!!,
                 fileNameByTime
             )
         )
@@ -690,10 +688,10 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
 
     private fun deleteTempAttachments() {
         for (uri in attachmentOnView) {
-            if (uri.toString().startsWith(JotApplication.URI_FILE_TEMP_PROVIDER!!)) {
+            if (uri.toString().startsWith(NyxApplication.URI_FILE_TEMP_PROVIDER!!)) {
                 TempAttachmentFile(
                     requireContext(),
-                    uri.toString().replace(JotApplication.URI_FILE_TEMP_PROVIDER, "")
+                    uri.toString().replace(NyxApplication.URI_FILE_TEMP_PROVIDER, "")
                 ).value().delete()
             }
         }
@@ -772,7 +770,7 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
                 null) {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
                     requireContext(),
-                    JotApplication.FILE_PROVIDER_AUTHORITY!!,
+                    NyxApplication.FILE_PROVIDER_AUTHORITY!!,
                     TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
                 ))
                 startActivityForResult(intent, requestCode)

@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.larryhsiao.nyx.JotApplication
+import com.larryhsiao.nyx.NyxApplication
 import com.larryhsiao.nyx.core.attachments.NewAttachments
 import com.larryhsiao.nyx.core.jots.*
 import com.larryhsiao.nyx.core.jots.goemetry.MeterDelta
@@ -27,7 +27,7 @@ import kotlin.math.sqrt
 /**
  * ViewModel to represent Jot list.
  */
-class JotsCalendarViewModel(private val app: JotApplication) : ViewModel() {
+class JotsCalendarViewModel(private val app: NyxApplication) : ViewModel() {
     companion object {
         private const val SAME_JOT_RANGE_MILLIS = 15 * 60 * 1000 // 15min
     }

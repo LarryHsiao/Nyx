@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import com.larryhsiao.nyx.R;
 import com.silverhetch.clotho.Action;
 
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_PROVIDER;
 
 /**
  * Action to load given video uri's preview.

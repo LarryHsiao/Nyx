@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
-import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.old.settings.DefaultPreference;
 import com.larryhsiao.nyx.old.settings.NyxSettings;
 import com.larryhsiao.nyx.old.settings.NyxSettingsImpl;
@@ -27,7 +27,7 @@ public abstract class JotActivity extends AuraActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        JotApplication app = ((JotApplication) getApplicationContext());
+        NyxApplication app = ((NyxApplication) getApplicationContext());
         db = app.getDb();
         settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
     }
@@ -39,7 +39,7 @@ public abstract class JotActivity extends AuraActivity {
             FingerprintManagerCompat.from(this), new MemoryCeres()
         );
         fingerprint.enable(settings.bioAuthEnabled());
-        JotApplication app = (JotApplication) getApplicationContext();
+        NyxApplication app = (NyxApplication) getApplicationContext();
         if (fingerprint.isEnabled() && 300000 < System.currentTimeMillis() - app.lastAuthed) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);

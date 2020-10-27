@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
-import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.R;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.file.SizeText;
@@ -29,7 +29,7 @@ public class AttachmentPropertiesDialog implements Action {
         TextView textView = dialog.findViewById(R.id.properties_text);
         textView.setText(context.getString(R.string.Uri___, uri.toString()));
         textView.append("\n");
-        if (!uri.toString().startsWith(JotApplication.URI_FILE_PROVIDER)){
+        if (!uri.toString().startsWith(NyxApplication.URI_FILE_PROVIDER)){
             return;
         }
         textView.append(context.getString(

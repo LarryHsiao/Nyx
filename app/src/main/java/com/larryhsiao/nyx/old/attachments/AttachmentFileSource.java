@@ -6,7 +6,7 @@ import com.silverhetch.clotho.Source;
 
 import java.io.File;
 
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_PROVIDER;
 
 /**
  * Source to build File from given attachment uri.
