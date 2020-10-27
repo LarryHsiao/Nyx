@@ -9,7 +9,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.core.attachments.*;
 import com.silverhetch.clotho.Action;
 import com.silverhetch.clotho.Source;
@@ -109,7 +109,7 @@ public class SyncAttachments implements Action {
 
     private void updateRemoteItem(CollectionReference remoteDb, Attachment attachment) {
         try {
-            if (attachment.uri().startsWith(JotApplication.URI_FILE_PROVIDER)) {
+            if (attachment.uri().startsWith(NyxApplication.URI_FILE_PROVIDER)) {
                 ParcelFileDescriptor descriptor = context.getContentResolver().openFileDescriptor(
                     Uri.parse(attachment.uri()),
                     "r"

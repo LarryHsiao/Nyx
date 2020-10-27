@@ -26,7 +26,7 @@ import static android.graphics.Bitmap.Config.ARGB_8888;
 import static android.graphics.Color.WHITE;
 import static android.graphics.PorterDuff.Mode.SRC_OVER;
 import static com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap;
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_PROVIDER;
 import static java.util.stream.Collectors.toList;
 
 /**

@@ -32,7 +32,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL;
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_TEMP_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_TEMP_PROVIDER;
 import static com.linkedin.urls.detection.UrlDetectorOptions.Default;
 import static java.lang.Double.MIN_VALUE;
 import static java.util.Calendar.ZONE_OFFSET;

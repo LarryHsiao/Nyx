@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.larryhsiao.nyx.BuildConfig
-import com.larryhsiao.nyx.JotApplication
+import com.larryhsiao.nyx.NyxApplication
 import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.old.attachments.TempAttachmentFile
 import com.larryhsiao.nyx.old.base.JotActivity
@@ -22,7 +22,7 @@ class InstantJotActivity : JotActivity() {
     private val model by lazy {
         ViewModelProvider(
             this,
-            ViewModelFactory(application as JotApplication)
+            ViewModelFactory(application as NyxApplication)
         ).get(JotsCalendarViewModel::class.java)
     }
     private val photoTempFile by lazy {

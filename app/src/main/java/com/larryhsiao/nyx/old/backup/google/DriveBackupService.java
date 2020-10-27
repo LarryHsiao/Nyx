@@ -13,7 +13,7 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
-import com.larryhsiao.nyx.JotApplication;
+import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.NotificationIds;
 import com.larryhsiao.nyx.old.ServiceIds;
@@ -50,7 +50,7 @@ public class DriveBackupService extends JobIntentService implements ServiceIds, 
         }
         Backup backup = new DriveBackup(
             this,
-            ((JotApplication) getApplication()).getDb(),
+            ((NyxApplication) getApplication()).getDb(),
             new DriveFilesImpl(
                 new Drive.Builder(
                     AndroidHttp.newCompatibleTransport(),

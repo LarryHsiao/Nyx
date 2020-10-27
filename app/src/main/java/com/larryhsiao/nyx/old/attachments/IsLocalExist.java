@@ -7,7 +7,7 @@ import com.silverhetch.clotho.Source;
 import java.io.File;
 import java.util.Objects;
 
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_PROVIDER;
 
 /**
  * Source to determine if the given Attachment uri exist.

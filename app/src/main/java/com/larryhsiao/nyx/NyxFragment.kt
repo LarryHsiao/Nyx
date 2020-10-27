@@ -7,6 +7,6 @@ import androidx.fragment.app.Fragment
  */
 abstract class NyxFragment : Fragment() {
     val app by lazy {
-        requireContext().applicationContext as JotApplication
+        requireContext().applicationContext as NyxApplication
     }
 }

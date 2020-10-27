@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 import static android.graphics.Bitmap.CompressFormat.JPEG;
 import static android.os.ParcelFileDescriptor.MODE_READ_ONLY;
 import static android.provider.DocumentsContract.Document.FLAG_SUPPORTS_THUMBNAIL;
-import static com.larryhsiao.nyx.JotApplication.URI_FILE_PROVIDER;
+import static com.larryhsiao.nyx.NyxApplication.URI_FILE_PROVIDER;
 
 /**
  * Document provider for exposing attachments.

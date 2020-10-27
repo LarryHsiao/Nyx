@@ -10,7 +10,7 @@ import com.larryhsiao.nyx.old.sync.LocalFileSync
 /**
  * Factory to build ViewModel for Nyx.
  */
-class ViewModelFactory(private val app: JotApplication) : ViewModelProvider.Factory {
+class ViewModelFactory(private val app: NyxApplication) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(JotsCalendarViewModel::class.java) -> {

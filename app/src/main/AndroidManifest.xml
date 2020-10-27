@@ -19,7 +19,7 @@
                   android:required="false"/>
 
     <application
-        android:name=".JotApplication"
+        android:name=".NyxApplication"
         android:allowBackup="false"
         tools:replace="android:allowBackup"
         android:icon="@mipmap/ic_launcher"
