@@ -1,14 +1,19 @@
 package com.larryhsiao.nyx.jot
 
+import android.Manifest
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +21,13 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.location.*
 import com.larryhsiao.clotho.openweather.Weather
 import com.larryhsiao.clotho.openweather.Weather.Type
 import com.larryhsiao.clotho.openweather.Weather.Type.*
@@ -203,6 +210,31 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             jotViewModel.newJot(
                 (requireArguments().getSerializable("date") as? Calendar) ?: Calendar.getInstance()
             )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateLocationSilently()
+    }
+
+    private fun updateLocationSilently() {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                ACCESS_FINE_LOCATION
+            ) == PERMISSION_GRANTED) {
+            LocationServices.getFusedLocationProviderClient(requireContext()).let {
+                it.requestLocationUpdates(
+                    LocationRequest.create().setNumUpdates(1),
+                    object : LocationCallback() {
+                        override fun onLocationResult(p0: LocationResult?) {
+                            super.onLocationResult(p0)
+                            it.removeLocationUpdates(this)
+                        }
+                    },
+                    Looper.getMainLooper()
+                )
+            }
         }
     }
 
