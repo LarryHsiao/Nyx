@@ -52,4 +52,8 @@
             android:id="@+id/action_jotsFragment_to_jotFragment"
             app:destination="@id/jotFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/jotsDiscoverFragment"
+        android:name="com.larryhsiao.nyx.jot.JotsDiscoverFragment"
+        android:label="JotsDiscoverFragment" />
 </navigation>
