@@ -71,8 +71,8 @@ import com.silverhetch.aura.view.dialog.InputDialog.Companion.newInstance
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration
 import com.silverhetch.aura.view.recyclerview.slider.Slider
-import com.silverhetch.clotho.date.DateCalendar
-import com.silverhetch.clotho.source.ConstSource
+import com.larryhsiao.clotho.date.DateCalendar
+import com.larryhsiao.clotho.source.ConstSource
 import kotlinx.android.synthetic.main.page_jot.*
 import okhttp3.OkHttpClient
 import okhttp3.Request

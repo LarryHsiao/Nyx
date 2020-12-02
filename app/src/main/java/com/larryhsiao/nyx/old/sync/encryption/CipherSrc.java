@@ -1,6 +1,6 @@
 package com.larryhsiao.nyx.old.sync.encryption;
 
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Source;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

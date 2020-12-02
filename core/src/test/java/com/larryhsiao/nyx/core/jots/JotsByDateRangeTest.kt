@@ -3,8 +3,8 @@ package com.larryhsiao.nyx.core.jots
 import com.larryhsiao.nyx.core.NyxDb
 import com.larryhsiao.nyx.core.tags.NewJotTag
 import com.larryhsiao.nyx.core.tags.NewTag
-import com.silverhetch.clotho.Source
-import com.silverhetch.clotho.source.ConstSource
+import com.larryhsiao.clotho.Source
+import com.larryhsiao.clotho.source.ConstSource
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

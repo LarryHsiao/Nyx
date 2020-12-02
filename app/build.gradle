@@ -145,7 +145,7 @@ dependencies {
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.1'
-    implementation 'com.silverhetch:aura:1.22.9'
+    implementation 'com.silverhetch:aura:1.23.0'
     implementation 'com.google.firebase:firebase-ml-vision:23.0.0'
     implementation 'com.google.firebase:firebase-iid:20.2.4'
     implementation 'com.google.firebase:firebase-storage:19.1.1'

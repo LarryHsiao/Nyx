@@ -19,9 +19,9 @@ import com.linkedin.urls.detection.UrlDetector;
 import com.silverhetch.aura.images.exif.ExifAttribute;
 import com.silverhetch.aura.images.exif.ExifUnixTimeStamp;
 import com.silverhetch.aura.uri.UriMimeType;
-import com.silverhetch.clotho.file.FileText;
-import com.silverhetch.clotho.file.ToFile;
-import com.silverhetch.clotho.source.ConstSource;
+import com.larryhsiao.clotho.file.FileText;
+import com.larryhsiao.clotho.file.ToFile;
+import com.larryhsiao.clotho.source.ConstSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.larryhsiao.clotho.openweather.JsonWeather
-import com.larryhsiao.clotho.openweather.OpenWeatherSource
+import com.larryhsiao.clotho.openweather.CurrentWeather
 import com.larryhsiao.clotho.openweather.Weather
 import com.larryhsiao.nyx.BuildConfig.OPEN_WEATHER_API_KEY
 import com.larryhsiao.nyx.core.StringHashTags
@@ -17,9 +17,9 @@ import com.larryhsiao.nyx.core.metadata.Metadata.Type.OPEN_WEATHER
 import com.larryhsiao.nyx.core.metadata.openweather.PostedWeatherMeta
 import com.larryhsiao.nyx.core.metadata.openweather.WeatherRemovalByJotId
 import com.larryhsiao.nyx.core.tags.*
-import com.silverhetch.clotho.Action
-import com.silverhetch.clotho.Source
-import com.silverhetch.clotho.source.ConstSource
+import com.larryhsiao.clotho.Action
+import com.larryhsiao.clotho.Source
+import com.larryhsiao.clotho.source.ConstSource
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -120,9 +120,11 @@ class JotViewModel(
         ).value().filter { it.type() == OPEN_WEATHER }
 
         if (filter.isNotEmpty()) {
-            weather.postValue(JsonWeather(
-                filter[0].value()
-            ))
+            weather.postValue(
+                JsonWeather(
+                    filter[0].value()
+                )
+            )
         }
     }
 
@@ -228,7 +230,8 @@ class JotViewModel(
         if (newTagsMap.keys.toTypedArray().contentEquals(tags.keys.toTypedArray())) {
             return
         }
-        tags.filter { newTagsMap.containsKey(it.key).not() }.forEach { deleted -> tags.remove(deleted.key) }
+        tags.filter { newTagsMap.containsKey(it.key).not() }
+            .forEach { deleted -> tags.remove(deleted.key) }
         tags.putAll(newTagsMap)
         tagsLiveData.postValue(tags)
     }
@@ -255,7 +258,8 @@ class JotViewModel(
         if (selectLocation != null && weather.value == null &&
             !selectLocation.contentEquals(doubleArrayOf(MIN_VALUE, MIN_VALUE)) &&
             dayCalendar(time.value ?: System.currentTimeMillis()).timeInMillis ==
-            dayCalendar(System.currentTimeMillis()).timeInMillis) {
+            dayCalendar(System.currentTimeMillis()).timeInMillis
+        ) {
             loadWeather(selectLocation[0], selectLocation[1])
         } else {
             weather.value = null
@@ -264,7 +268,7 @@ class JotViewModel(
 
     private fun loadWeather(longitude: Double, latitude: Double) = viewModelScope.launch {
         weather.value = withContext(IO) {
-            OpenWeatherSource(
+            CurrentWeather(
                 OPEN_WEATHER_API_KEY,
                 latitude,
                 longitude

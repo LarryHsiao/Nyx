@@ -31,9 +31,9 @@ import com.larryhsiao.nyx.old.settings.NyxSettings;
 import com.larryhsiao.nyx.old.settings.NyxSettingsImpl;
 import com.larryhsiao.nyx.old.sync.encryption.Encryptor;
 import com.larryhsiao.nyx.old.sync.encryption.JasyptStringEncryptor;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.encryption.MD5;
-import com.silverhetch.clotho.source.SingleRefSource;
+import com.larryhsiao.clotho.Source;
+import com.larryhsiao.clotho.encryption.MD5;
+import com.larryhsiao.clotho.source.SingleRefSource;
 import retrofit2.Response;
 
 import java.io.ByteArrayInputStream;

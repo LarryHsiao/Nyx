@@ -22,8 +22,8 @@ import com.larryhsiao.nyx.old.util.EmptyView;
 import com.silverhetch.aura.view.dialog.InputDialog;
 import com.silverhetch.aura.view.fab.FabBehavior;
 import com.silverhetch.aura.view.recyclerview.EmptyListAdapter;
-import com.silverhetch.clotho.source.ConstSource;
-import com.silverhetch.clotho.utility.comparator.StringComparator;
+import com.larryhsiao.clotho.source.ConstSource;
+import com.larryhsiao.clotho.utility.comparator.StringComparator;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -1,6 +1,6 @@
 package com.larryhsiao.nyx.core.jots.goemetry
 
-import com.silverhetch.clotho.Source
+import com.larryhsiao.clotho.Source
 
 /**
  * Source to build a longitude/latitude value from given amount of meter.

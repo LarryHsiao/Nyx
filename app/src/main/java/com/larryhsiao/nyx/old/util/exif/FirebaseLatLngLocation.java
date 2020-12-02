@@ -2,7 +2,7 @@ package com.larryhsiao.nyx.old.util.exif;
 
 import android.location.Location;
 import com.google.firebase.ml.vision.common.FirebaseVisionLatLng;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Source;
 
 /**
  * Source to build Location obj from firebase version's Location obj.
