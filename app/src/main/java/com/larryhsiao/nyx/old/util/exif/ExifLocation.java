@@ -2,7 +2,7 @@ package com.larryhsiao.nyx.old.util.exif;
 
 import android.location.Location;
 import androidx.exifinterface.media.ExifInterface;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Source;
 
 import static java.lang.Double.MIN_VALUE;
 

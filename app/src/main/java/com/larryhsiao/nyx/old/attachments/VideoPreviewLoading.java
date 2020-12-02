@@ -4,7 +4,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.widget.ImageView;
 import com.larryhsiao.nyx.R;
-import com.silverhetch.clotho.Action;
+import com.larryhsiao.clotho.Action;
 
 import static com.larryhsiao.nyx.NyxApplication.URI_FILE_PROVIDER;
 

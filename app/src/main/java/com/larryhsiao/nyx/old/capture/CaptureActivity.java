@@ -18,8 +18,8 @@ import com.larryhsiao.nyx.old.base.JotActivity;
 import com.larryhsiao.nyx.old.util.exif.ExifLocation;
 import com.silverhetch.aura.view.activity.Fullscreen;
 import com.silverhetch.aura.view.bitmap.ResizedImage;
-import com.silverhetch.clotho.io.ProgressedCopy;
-import com.silverhetch.clotho.source.ConstSource;
+import com.larryhsiao.clotho.io.ProgressedCopy;
+import com.larryhsiao.clotho.source.ConstSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

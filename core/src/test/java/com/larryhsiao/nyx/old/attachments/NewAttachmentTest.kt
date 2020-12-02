@@ -3,8 +3,8 @@ package com.larryhsiao.nyx.old.attachments
 import com.larryhsiao.nyx.core.attachments.AttachmentDb
 import com.larryhsiao.nyx.core.attachments.NewAttachment
 import com.larryhsiao.nyx.core.jots.JotsDb
-import com.silverhetch.clotho.Source
-import com.silverhetch.clotho.database.h2.MemoryH2Conn
+import com.larryhsiao.clotho.Source
+import com.larryhsiao.clotho.database.h2.MemoryH2Conn
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.sql.Connection

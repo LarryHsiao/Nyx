@@ -10,7 +10,7 @@ import com.larryhsiao.nyx.core.jots.Jot
 import com.larryhsiao.nyx.core.tags.QueriedTags
 import com.larryhsiao.nyx.core.tags.TagsByJotId
 import com.larryhsiao.nyx.utils.HashTagEnlightenAction
-import com.silverhetch.clotho.Source
+import com.larryhsiao.clotho.Source
 import kotlinx.android.synthetic.main.item_jot.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

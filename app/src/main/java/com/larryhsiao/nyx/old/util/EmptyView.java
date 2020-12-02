@@ -5,7 +5,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import com.larryhsiao.nyx.R;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Source;
 
 /**
  * Source to build empty view.

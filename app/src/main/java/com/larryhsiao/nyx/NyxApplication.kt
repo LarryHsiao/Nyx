@@ -5,8 +5,8 @@ import android.os.Build
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.larryhsiao.nyx.core.NyxDb
-import com.silverhetch.clotho.Source
-import com.silverhetch.clotho.database.SingleConn
+import com.larryhsiao.clotho.Source
+import com.larryhsiao.clotho.database.SingleConn
 import org.flywaydb.core.api.android.ContextHolder
 import java.io.File
 import java.sql.Connection

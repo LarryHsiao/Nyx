@@ -2,7 +2,7 @@ package com.larryhsiao.nyx.old.attachments;
 
 import android.widget.ImageView;
 import com.larryhsiao.nyx.R;
-import com.silverhetch.clotho.Action;
+import com.larryhsiao.clotho.Action;
 
 import static android.widget.ImageView.ScaleType.CENTER_INSIDE;
 

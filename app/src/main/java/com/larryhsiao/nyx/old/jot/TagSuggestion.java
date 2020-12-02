@@ -6,8 +6,8 @@ import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import com.larryhsiao.nyx.core.tags.QueriedTags;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagsByKeyword;
-import com.silverhetch.clotho.Action;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Action;
+import com.larryhsiao.clotho.Source;
 
 import java.sql.Connection;
 import java.util.List;

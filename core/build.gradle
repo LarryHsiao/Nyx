@@ -20,12 +20,13 @@ test {
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
-    api 'com.silverhetch:clotho:1.17.5'
+    api 'com.larryhsiao:clotho:1.18.1'
     implementation 'com.h2database:h2:1.4.197'
-    api 'com.larryhsiao:clotho-openweather:1.0.1'
+    api 'com.larryhsiao:clotho-openweather:1.0.2'
     api "org.flywaydb:flyway-core:6.2.4"
     api group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'

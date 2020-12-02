@@ -10,7 +10,7 @@ import android.widget.TextView
 import android.widget.TextView.BufferType.SPANNABLE
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.core.tags.Tag
-import com.silverhetch.clotho.Action
+import com.larryhsiao.clotho.Action
 
 /**
  * Action to do enlighten hash tag in textView.

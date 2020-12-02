@@ -9,7 +9,7 @@ import androidx.preference.PreferenceManager;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.sync.SyncService;
 import com.silverhetch.aura.fingerprint.FingerprintImpl;
-import com.silverhetch.clotho.storage.MemoryCeres;
+import com.larryhsiao.clotho.storage.MemoryCeres;
 
 /**
  * Setting page.

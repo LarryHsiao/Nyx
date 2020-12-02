@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.larryhsiao.nyx.R;
-import com.silverhetch.clotho.Action;
+import com.larryhsiao.clotho.Action;
 
 import static android.graphics.Color.BLACK;
 import static androidx.swiperefreshlayout.widget.CircularProgressDrawable.LARGE;

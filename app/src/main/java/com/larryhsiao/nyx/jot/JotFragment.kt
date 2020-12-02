@@ -40,7 +40,7 @@ import com.larryhsiao.nyx.utils.HashTagEnlightenAction
 import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
-import com.silverhetch.clotho.temperature.FahrenheitCelsius
+import com.larryhsiao.clotho.temperature.FahrenheitCelsius
 import kotlinx.android.synthetic.main.dialog_weather.*
 import kotlinx.android.synthetic.main.fragment_jot.*
 import kotlinx.coroutines.launch

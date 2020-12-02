@@ -18,8 +18,8 @@ import com.silverhetch.aura.view.measures.DP;
 import com.silverhetch.aura.view.recyclerview.ViewHolder;
 import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration;
 import com.silverhetch.aura.view.recyclerview.slider.Slider;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.date.DateCalendar;
+import com.larryhsiao.clotho.Source;
+import com.larryhsiao.clotho.date.DateCalendar;
 
 import java.sql.Connection;
 import java.text.DateFormat;

@@ -5,7 +5,7 @@ import android.content.Intent;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.larryhsiao.nyx.old.sync.SyncService;
-import com.silverhetch.clotho.Action;
+import com.larryhsiao.clotho.Action;
 
 /**
  * Action to logout.

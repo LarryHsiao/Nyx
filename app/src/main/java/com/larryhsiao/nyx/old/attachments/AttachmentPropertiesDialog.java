@@ -6,8 +6,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.R;
-import com.silverhetch.clotho.Action;
-import com.silverhetch.clotho.file.SizeText;
+import com.larryhsiao.clotho.Action;
+import com.larryhsiao.clotho.file.SizeText;
 
 /**
  * Action to show a attachment dialog for showing properties of attachment.
