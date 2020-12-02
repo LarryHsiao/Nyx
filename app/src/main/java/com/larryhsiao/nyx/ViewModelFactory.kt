@@ -16,6 +16,7 @@ class ViewModelFactory(private val app: NyxApplication) : ViewModelProvider.Fact
             modelClass.isAssignableFrom(JotsCalendarViewModel::class.java) -> {
                 JotsCalendarViewModel(app) as T
             }
+
             modelClass.isAssignableFrom(JotViewModel::class.java) -> {
                 JotViewModel(app.db, LocalFileSync(app, app.db)) as T
             }

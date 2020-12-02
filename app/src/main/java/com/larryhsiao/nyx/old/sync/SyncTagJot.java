@@ -7,8 +7,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.larryhsiao.nyx.core.tags.NewJotTagById;
-import com.silverhetch.clotho.Action;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Action;
+import com.larryhsiao.clotho.Source;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

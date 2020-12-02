@@ -4,9 +4,9 @@ import com.larryhsiao.nyx.core.attachments.AttachmentDb
 import com.larryhsiao.nyx.core.jots.JotsDb
 import com.larryhsiao.nyx.core.metadata.MetadataDb
 import com.larryhsiao.nyx.core.tags.TagDb
-import com.silverhetch.clotho.Source
-import com.silverhetch.clotho.database.h2.EmbedH2Conn
-import com.silverhetch.clotho.source.ConstSource
+import com.larryhsiao.clotho.Source
+import com.larryhsiao.clotho.database.h2.EmbedH2Conn
+import com.larryhsiao.clotho.source.ConstSource
 import org.flywaydb.core.Flyway
 import java.io.File
 import java.sql.Connection

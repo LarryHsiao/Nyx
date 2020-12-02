@@ -2,3 +2,5 @@ include ':app'
 include 'core'
 findProject(':core')?.name = 'nyx-core'
 
+include ':clotho-drive'
+project(":clotho-drive").projectDir = new File("/home/larryhsiao/phantom/clotho-drive")

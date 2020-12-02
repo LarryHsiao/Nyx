@@ -11,9 +11,9 @@ import com.larryhsiao.nyx.old.settings.NyxSettingsImpl;
 import com.silverhetch.aura.AuraActivity;
 import com.silverhetch.aura.fingerprint.Fingerprint;
 import com.silverhetch.aura.fingerprint.FingerprintImpl;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.source.SingleRefSource;
-import com.silverhetch.clotho.storage.MemoryCeres;
+import com.larryhsiao.clotho.Source;
+import com.larryhsiao.clotho.source.SingleRefSource;
+import com.larryhsiao.clotho.storage.MemoryCeres;
 
 import java.sql.Connection;
 

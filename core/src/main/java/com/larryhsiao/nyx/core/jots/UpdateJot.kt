@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.core.jots
 
-import com.silverhetch.clotho.Action
-import com.silverhetch.clotho.Source
+import com.larryhsiao.clotho.Action
+import com.larryhsiao.clotho.Source
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Point

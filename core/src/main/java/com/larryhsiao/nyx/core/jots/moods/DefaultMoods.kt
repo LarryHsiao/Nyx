@@ -1,6 +1,6 @@
 package com.larryhsiao.nyx.core.jots.moods
 
-import com.silverhetch.clotho.Source
+import com.larryhsiao.clotho.Source
 
 /**
  * Default moods.

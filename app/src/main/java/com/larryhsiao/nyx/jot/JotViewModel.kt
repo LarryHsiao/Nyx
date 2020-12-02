@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.larryhsiao.clotho.openweather.JsonWeather
-import com.larryhsiao.clotho.openweather.OpenWeatherSource
+import com.larryhsiao.clotho.openweather.CurrentWeather
 import com.larryhsiao.clotho.openweather.Weather
 import com.larryhsiao.nyx.BuildConfig.OPEN_WEATHER_API_KEY
 import com.larryhsiao.nyx.core.StringHashTags
@@ -17,9 +17,9 @@ import com.larryhsiao.nyx.core.metadata.Metadata.Type.OPEN_WEATHER
 import com.larryhsiao.nyx.core.metadata.openweather.PostedWeatherMeta
 import com.larryhsiao.nyx.core.metadata.openweather.WeatherRemovalByJotId
 import com.larryhsiao.nyx.core.tags.*
-import com.silverhetch.clotho.Action
-import com.silverhetch.clotho.Source
-import com.silverhetch.clotho.source.ConstSource
+import com.larryhsiao.clotho.Action
+import com.larryhsiao.clotho.Source
+import com.larryhsiao.clotho.source.ConstSource
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -264,7 +264,7 @@ class JotViewModel(
 
     private fun loadWeather(longitude: Double, latitude: Double) = viewModelScope.launch {
         weather.value = withContext(IO) {
-            OpenWeatherSource(
+            CurrentWeather(
                 OPEN_WEATHER_API_KEY,
                 latitude,
                 longitude

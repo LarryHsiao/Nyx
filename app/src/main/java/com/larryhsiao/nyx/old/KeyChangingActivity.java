@@ -15,7 +15,7 @@ import com.larryhsiao.nyx.old.account.api.NyxApi;
 import com.larryhsiao.nyx.old.base.JotActivity;
 import com.larryhsiao.nyx.old.sync.SyncService;
 import com.silverhetch.aura.view.dialog.InputDialog;
-import com.silverhetch.clotho.encryption.MD5;
+import com.larryhsiao.clotho.encryption.MD5;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Call;
 import retrofit2.Callback;

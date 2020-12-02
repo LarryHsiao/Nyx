@@ -24,7 +24,7 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.base.JotFragment;
 import com.silverhetch.aura.view.span.ClickableStr;
 import com.silverhetch.aura.view.span.ColoredStr;
-import com.silverhetch.clotho.source.ConstSource;
+import com.larryhsiao.clotho.source.ConstSource;
 
 import static android.app.Activity.RESULT_OK;
 import static android.graphics.Color.BLUE;

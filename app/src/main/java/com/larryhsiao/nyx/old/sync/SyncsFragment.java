@@ -33,8 +33,8 @@ import com.larryhsiao.nyx.old.base.JotFragment;
 import com.silverhetch.aura.view.bitmap.CircledDrawable;
 import com.silverhetch.aura.view.span.ClickableStr;
 import com.silverhetch.aura.view.span.ColoredStr;
-import com.silverhetch.clotho.file.SizeText;
-import com.silverhetch.clotho.source.ConstSource;
+import com.larryhsiao.clotho.file.SizeText;
+import com.larryhsiao.clotho.source.ConstSource;
 
 import java.io.File;
 import java.util.Collections;

@@ -1,8 +1,8 @@
 package com.larryhsiao.nyx.core.metadata.openweather
 
 import com.larryhsiao.nyx.core.metadata.Metadata
-import com.silverhetch.clotho.Action
-import com.silverhetch.clotho.Source
+import com.larryhsiao.clotho.Action
+import com.larryhsiao.clotho.Source
 import java.sql.Connection
 
 /**

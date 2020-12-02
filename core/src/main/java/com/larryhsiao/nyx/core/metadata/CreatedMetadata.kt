@@ -1,6 +1,6 @@
 package com.larryhsiao.nyx.core.metadata
 
-import com.silverhetch.clotho.Source
+import com.larryhsiao.clotho.Source
 import java.sql.Connection
 import java.sql.SQLException
 import java.sql.Statement.RETURN_GENERATED_KEYS

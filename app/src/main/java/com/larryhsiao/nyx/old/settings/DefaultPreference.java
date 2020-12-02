@@ -3,7 +3,7 @@ package com.larryhsiao.nyx.old.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Source;
 
 /**
  * Default SharedPreference which also set up at setting page.
