@@ -2,3 +2,7 @@ include ':app'
 include 'core'
 findProject(':core')?.name = 'nyx-core'
 
+include 'desktop'
+findProject(':desktop')?.name = 'nyx-desktop'
+
+

@@ -10,11 +10,11 @@ import com.larryhsiao.nyx.old.settings.NyxSettings;
 import com.larryhsiao.nyx.old.settings.NyxSettingsImpl;
 import com.silverhetch.aura.images.JpegCompress;
 import com.silverhetch.aura.uri.UriMimeType;
-import com.silverhetch.clotho.Action;
-import com.silverhetch.clotho.Source;
-import com.silverhetch.clotho.encryption.MD5;
-import com.silverhetch.clotho.file.ToFile;
-import com.silverhetch.clotho.source.SingleRefSource;
+import com.larryhsiao.clotho.Action;
+import com.larryhsiao.clotho.Source;
+import com.larryhsiao.clotho.encryption.MD5;
+import com.larryhsiao.clotho.file.ToFile;
+import com.larryhsiao.clotho.source.SingleRefSource;
 
 import java.io.File;
 import java.io.FileInputStream;

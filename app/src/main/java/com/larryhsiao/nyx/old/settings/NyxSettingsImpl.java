@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.old.settings;
 
 import android.content.SharedPreferences;
-import com.silverhetch.clotho.Source;
+import com.larryhsiao.clotho.Source;
 
 import java.util.UUID;
 

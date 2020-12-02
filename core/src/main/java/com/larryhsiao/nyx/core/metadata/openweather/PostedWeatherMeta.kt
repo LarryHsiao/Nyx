@@ -3,7 +3,7 @@ package com.larryhsiao.nyx.core.metadata.openweather
 import com.larryhsiao.clotho.openweather.Weather
 import com.larryhsiao.nyx.core.metadata.*
 import com.larryhsiao.nyx.core.metadata.Metadata.Type.OPEN_WEATHER
-import com.silverhetch.clotho.Source
+import com.larryhsiao.clotho.Source
 import java.sql.Connection
 
 /**

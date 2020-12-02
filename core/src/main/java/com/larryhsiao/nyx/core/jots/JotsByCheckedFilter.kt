@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.core.jots
 
 import com.larryhsiao.nyx.core.jots.filter.Filter
-import com.silverhetch.clotho.Source
+import com.larryhsiao.clotho.Source
 import java.sql.Connection
 import java.sql.ResultSet
 
