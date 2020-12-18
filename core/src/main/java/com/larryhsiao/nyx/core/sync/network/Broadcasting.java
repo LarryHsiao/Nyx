@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core.sync;
+package com.larryhsiao.nyx.core.sync.network;
 
 import com.larryhsiao.clotho.Action;
 
@@ -9,17 +9,19 @@ import java.net.InetAddress;
 /**
  * Action to send a broadcast message
  */
-public class NetworkBroadcasting implements Action {
+public class Broadcasting implements Action {
     private final String broadcastMessage;
     private final InetAddress address;
+    private final int port;
 
-    public NetworkBroadcasting(
+    public Broadcasting(
         String broadcastMessage,
         InetAddress address,
         int port
     ) {
         this.broadcastMessage = broadcastMessage;
         this.address = address;
+        this.port = port;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class NetworkBroadcasting implements Action {
             socket.send(packet);
             socket.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

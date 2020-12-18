@@ -23,4 +23,6 @@ public interface NyxServer {
      * Shutdown the server.
      */
     void shutdown();
+
+    boolean isRunning();
 }

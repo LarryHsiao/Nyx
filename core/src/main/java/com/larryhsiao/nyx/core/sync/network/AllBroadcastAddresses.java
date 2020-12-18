@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core.sync;
+package com.larryhsiao.nyx.core.sync.network;
 
 import com.larryhsiao.clotho.Source;
 
