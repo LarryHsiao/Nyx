@@ -1,21 +1,23 @@
-package com.larryhsiao.nyx.core.sync;
+package com.larryhsiao.nyx.core.sync.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.util.function.Function;
 
 /**
  * The actual server for handling data receiving,
  */
-class Server {
+public class UdpReceiving {
     private final int port;
     private final int bufferSize;
+    private final Function<Packet, Void> onReceived;
     private boolean running = false;
 
-    Server(int port, int bufferSize) {
+    public UdpReceiving(int port, int bufferSize, Function<Packet, Void> onReceived) {
         this.port = port;
         this.bufferSize = bufferSize;
+        this.onReceived = onReceived;
     }
 
     public boolean isRunning() {
@@ -23,23 +25,22 @@ class Server {
     }
 
     public void launch() {
+        if (running) {
+            return;
+        }
         running = true;
         new Thread(() -> {
             try {
                 byte[] buf = new byte[bufferSize];
-                DatagramSocket socket = new DatagramSocket(port);
+                final DatagramSocket socket = new DatagramSocket(port);
+                final DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 while (running) {
-                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     socket.receive(packet);
-                    InetAddress address = packet.getAddress();
-                    packet = new DatagramPacket(buf, buf.length, address, packet.getPort());
-                    String received = new String(
-                        packet.getData(),
-                        0,
-                        packet.getLength()
-                    );
-                    System.out.println("received: " + received);
-                    socket.send(packet);
+                    onReceived.apply(new Packet(
+                        new String(packet.getData(), packet.getOffset(), packet.getLength()),
+                        packet.getAddress(),
+                        packet.getPort()
+                    ));
                 }
                 socket.close();
             } catch (IOException e) {

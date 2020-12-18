@@ -10,7 +10,7 @@ import java.io.IOException;
  * Test for {@link NyxServer}.
  */
 //@Disabled
-class NyxServerImplTest {
+class NyxUdpReceivingImplTest {
 
     @Test
     void searching() throws InterruptedException{

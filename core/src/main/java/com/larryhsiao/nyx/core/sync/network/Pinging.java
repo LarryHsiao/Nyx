@@ -1,19 +1,16 @@
-package com.larryhsiao.nyx.core.sync;
-
-import com.larryhsiao.nyx.core.sync.network.AllBroadcastAddresses;
-import com.larryhsiao.nyx.core.sync.network.Broadcasting;
+package com.larryhsiao.nyx.core.sync.network;
 
 import java.net.InetAddress;
 
 /**
  * Pining in a fixed interval.
  */
-class Pinging {
+public class Pinging {
     private final long interval;
     private final int port;
     private boolean running = false;
 
-    Pinging(long interval, int port) {
+    public Pinging(long interval, int port) {
         this.interval = interval;
         this.port = port;
     }
@@ -34,10 +31,8 @@ class Pinging {
             while (running) {
                 try {
                     for (InetAddress inetAddress : new AllBroadcastAddresses().value()) {
-                        new Broadcasting(
-                            "ping",
-                            inetAddress,
-                            port
+                        new UdpSending(
+                            new Packet("ping", inetAddress, port), true
                         ).fire();
                     }
                     try {
