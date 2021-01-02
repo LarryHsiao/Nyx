@@ -24,7 +24,8 @@ repositories {
 }
 
 dependencies {
-    api 'com.larryhsiao:clotho:1.18.1'
+    api 'com.larryhsiao:clotho:1.18.2'
+    compileOnly 'com.google.code.gson:gson:2.8.6'
     implementation 'com.h2database:h2:1.4.197'
     api 'com.larryhsiao:clotho-openweather:1.0.2'
     api "org.flywaydb:flyway-core:6.2.4"

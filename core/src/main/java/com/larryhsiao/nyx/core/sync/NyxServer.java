@@ -3,7 +3,9 @@ package com.larryhsiao.nyx.core.sync;
 import com.larryhsiao.clotho.observable.Observable;
 import com.larryhsiao.clotho.observable.ObservableImpl;
 
+import java.net.InetAddress;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A Nyx server for doing device authorization, searching and syncing.
@@ -17,7 +19,7 @@ public interface NyxServer {
     /**
      * @return The detected Nyx devices.
      */
-    Observable<List<NyxRemote>> remotes();
+    Observable<Map<InetAddress,NyxRemote>> remotes();
 
     /**
      * Shutdown the server.
