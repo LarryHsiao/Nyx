@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_jotsCalendarFragment_to_jotsFragment"
             app:destination="@id/jotsFragment" />
+        <action
+            android:id="@+id/action_jotsCalendarFragment_to_jotSearchingFragment"
+            app:destination="@id/jotSearchingFragment" />
     </fragment>
     <fragment
         android:id="@+id/jotFragment"
@@ -50,6 +53,14 @@
             app:argType="long[]" />
         <action
             android:id="@+id/action_jotsFragment_to_jotFragment"
+            app:destination="@id/jotFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/jotSearchingFragment"
+        android:name="com.larryhsiao.nyx.jot.JotSearchingFragment"
+        android:label="JotSearchingFragment" >
+        <action
+            android:id="@+id/action_jotSearchingFragment_to_jotFragment"
             app:destination="@id/jotFragment" />
     </fragment>
 </navigation>
