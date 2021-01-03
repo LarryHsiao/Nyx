@@ -17,6 +17,17 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:layout_height="wrap_content" />
 
+    <ImageView
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/jots_month_textView"
+        app:layout_constraintBottom_toBottomOf="@id/jots_month_textView"
+        android:layout_width="40dp"
+        android:id="@+id/jots_searchButton"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:src="@drawable/ic_search"
+        android:layout_height="40dp" />
+
     <com.haibin.calendarview.CalendarLayout
         android:layout_width="match_parent"
         app:default_status="shrink"

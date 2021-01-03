@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.larryhsiao.nyx.NyxApplication
 import com.larryhsiao.nyx.core.jots.Jot
-import com.larryhsiao.nyx.core.jots.JotsByIds
 import com.larryhsiao.nyx.core.jots.JotsByKeyword
 import com.larryhsiao.nyx.core.jots.QueriedJots
 import kotlinx.coroutines.Dispatchers.IO
@@ -14,22 +13,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * ViewModels for jot list.
+ * ViewModels for jots searching.
  */
-class JotsViewModel(private val app: NyxApplication) : ViewModel() {
+class JotsSearchingViewModel(private val app: NyxApplication) : ViewModel() {
+    private val keyword = MutableLiveData("_")
     private val jots = MutableLiveData<List<Jot>>()
 
     fun jots(): LiveData<List<Jot>> = jots
 
-    fun preferAllJots() = preferJots("")
+    fun keyword(): LiveData<String> = keyword
 
-    fun preferJots(ids: LongArray) = viewModelScope.launch {
-        jots.value = withContext(IO) { QueriedJots(JotsByIds(app.db, ids)).value() }
+    fun preferJots(newKeyword: String) = viewModelScope.launch {
+        if (keyword.value == newKeyword) {
+            return@launch
+        }
+        keyword.value = newKeyword
+        loadByKeyword()
     }
 
-    fun preferJots(keyword: String) = viewModelScope.launch {
+    fun reload() = viewModelScope.launch {
+        loadByKeyword()
+    }
+
+    private suspend fun loadByKeyword(){
         jots.value = withContext(IO) {
-            QueriedJots(JotsByKeyword(app.db, keyword)).value()
+            QueriedJots(JotsByKeyword(app.db, keyword.value ?: "")).value()
         }
     }
 }

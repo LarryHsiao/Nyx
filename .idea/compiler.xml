@@ -5,6 +5,9 @@
       <module name="app" target="11" />
       <module name="Nyx.app" target="11" />
       <module name="Nyx.main" target="11" />
+      <module name="Nyx.nyx-desktop" target="11" />
+      <module name="Nyx.nyx-desktop.main" target="11" />
+      <module name="Nyx.nyx-desktop.test" target="11" />
       <module name="Nyx.test" target="11" />
     </bytecodeTargetLevel>
   </component>

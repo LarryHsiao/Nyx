@@ -69,73 +69,33 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
     private val dayFormat by lazy { SimpleDateFormat("MM/dd", Locale.getDefault()) }
     private val model by lazy {
         ViewModelProvider(
-            requireActivity(),
-            ViewModelFactory(app)
+                requireActivity(),
+                ViewModelFactory(app)
         ).get(JotsCalendarViewModel::class.java)
     }
     private val adapter by lazy {
         JotsAdapter(
-            app.db,
-            lifecycleScope
-        ) {
-            if (it.privateLock()) {
-                BiometricPrompt(
-                    this,
-                    Executors.newSingleThreadExecutor(),
-                    object : BiometricPrompt.AuthenticationCallback() {
-                        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                            super.onAuthenticationSucceeded(result)
-                            toJotFragment(it.id())
-                        }
-
-                        override fun onAuthenticationError(
-                            errorCode: Int,
-                            errString: CharSequence
-                        ) {
-                            super.onAuthenticationError(errorCode, errString)
-                            val keyguardManager: KeyguardManager = requireContext().getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager //api 16+
-
-                            val isSecured = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                keyguardManager.isDeviceSecure
-                            } else {
-                                keyguardManager.isKeyguardSecure
-                            }
-
-                            if (!isSecured) {
-                                toJotFragment(it.id()) //
-                            }
-                        }
-                    }
-                ).authenticate(
-                    BiometricPrompt.PromptInfo.Builder()
-                        .setTitle(getString(R.string.Private_content))
-                        .setSubtitle(getString(R.string.Unlock_for_the_private_content))
-                        .setDeviceCredentialAllowed(true)
-                        .setConfirmationRequired(true)
-                        .build()
-                )
-            } else {
-                toJotFragment(it.id())
-            }
-        }
+                app.db,
+                lifecycleScope
+        ) { PreferJotAction(this, it, ::toJotFragment).fire() }
     }
     private val datePicker by lazy {
         DatePickerDialog(
-            requireContext(),
-            0,
-            ::onDatePickerSelected,
-            java.util.Calendar.getInstance().get(java.util.Calendar.YEAR),
-            java.util.Calendar.getInstance().get(java.util.Calendar.MONTH),
-            java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH),
+                requireContext(),
+                0,
+                ::onDatePickerSelected,
+                java.util.Calendar.getInstance().get(java.util.Calendar.YEAR),
+                java.util.Calendar.getInstance().get(java.util.Calendar.MONTH),
+                java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH),
         ).apply {
             setButton(BUTTON_NEGATIVE, getString(R.string.Today), ::onTodaySelected)
         }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.fragment_jots_calendar, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -148,6 +108,7 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         jots_newJotByCamera_imageView.setOnClickListener(::newJotByCamera)
         jots_month_textView.setOnClickListener(::onMonthIndicatorClicked)
         jot_list_map_switcher_imageView.setOnClickListener(::onSwitchListMap)
+        jots_searchButton.setOnClickListener(::searchJots)
         jots_blackhole_textView.setOnLongClickListener {
             findNavController().navigate(R.id.cloudFragment)
             SyncService.enqueue(it.context)
@@ -181,6 +142,12 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
             }
         })
         model.initJots()
+    }
+
+    private fun searchJots(view: View) {
+        findNavController().navigate(
+                JotsCalendarFragmentDirections.actionJotsCalendarFragmentToJotSearchingFragment()
+        )
     }
 
     override fun onPause() {
@@ -224,18 +191,18 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         jot_list_map_switcher_imageView.setImageResource(R.drawable.ic_agenda)
         val manager = childFragmentManager
         val mapFrag = manager.findFragmentById(R.id.jots_map) as? SupportMapFragment
-            ?: SupportMapFragment.newInstance().apply {
-                manager.beginTransaction().replace(R.id.jots_map, this).commit()
-            }
+                ?: SupportMapFragment.newInstance().apply {
+                    manager.beginTransaction().replace(R.id.jots_map, this).commit()
+                }
         mapFrag.getMapAsync(::loadUpMap)
     }
 
     private fun loadUpMap(map: GoogleMap) {
         val clusterManager = ClusterManager<JotMapItem>(requireContext(), map)
         clusterManager.renderer = DefaultClusterRenderer(
-            requireContext(),
-            map,
-            clusterManager
+                requireContext(),
+                map,
+                clusterManager
         ).apply { minClusterSize = 2 }
         map.setOnCameraIdleListener {
             clusterManager.onCameraIdle()
@@ -243,7 +210,7 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         }
         map.setOnMarkerClickListener(clusterManager)
         map.setOnInfoWindowClickListener(clusterManager)
-        clusterManager.setOnClusterItemInfoWindowClickListener { toJotFragment(it.jot.id()) }
+        clusterManager.setOnClusterItemInfoWindowClickListener { toJotFragment(it.jot) }
         clusterManager.setOnClusterClickListener {
             toJotsFragment(it.items.map { it.jot.id() })
             true
@@ -253,9 +220,9 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
 
     private fun toJotsFragment(jotIds: List<Long>) {
         findNavController().navigate(
-            JotsCalendarFragmentDirections.actionJotsCalendarFragmentToJotsFragment(
-                jotIds.toLongArray()
-            )
+                JotsCalendarFragmentDirections.actionJotsCalendarFragmentToJotsFragment(
+                        jotIds.toLongArray()
+                )
         )
     }
 
@@ -266,7 +233,7 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         clusterManager.clearItems()
         model.jots().value?.filter {
             !it.location().contentEquals(doubleArrayOf(MIN_VALUE, MIN_VALUE)) &&
-                !it.location().contentEquals(doubleArrayOf(0.0, 0.0))
+                    !it.location().contentEquals(doubleArrayOf(0.0, 0.0))
         }?.forEach { jot ->
             val position = LatLng(jot.location()[1], jot.location()[0])
             clusterManager.addItem(JotMapItem(jot))
@@ -301,29 +268,29 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         } else if (requestCode == REQUEST_CODE_CAPTURE_PHOTO && resultCode == RESULT_OK) {
             if (photoTempFile.exists()) {
                 val tempFile = TempAttachmentFile(
-                    requireContext(),
-                    "" + System.currentTimeMillis() + ".jpg"
+                        requireContext(),
+                        "" + System.currentTimeMillis() + ".jpg"
                 ).value()
                 photoTempFile.renameTo(tempFile)
                 model.newJotsByImage(
-                    FileProvider.getUriForFile(
-                        requireContext(),
-                        BuildConfig.FILE_PROVIDER_AUTHORITY,
-                        tempFile
-                    )
+                        FileProvider.getUriForFile(
+                                requireContext(),
+                                BuildConfig.FILE_PROVIDER_AUTHORITY,
+                                tempFile
+                        )
                 )
             }
         }
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSION_CAMERA_FOR_NEW_JOT &&
-            grantResults[0] == PERMISSION_GRANTED
+                grantResults[0] == PERMISSION_GRANTED
         ) {
             newJotByCamera(requireContext())
         }
@@ -332,8 +299,8 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
     private fun requestFilePermission(uri: Uri) {
         try {
             requireContext().contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -348,20 +315,20 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         try {
             if (ContextCompat.checkSelfPermission(context, CAMERA) != PERMISSION_GRANTED) {
                 requestPermissions(
-                    arrayOf(CAMERA),
-                    REQUEST_CODE_PERMISSION_CAMERA_FOR_NEW_JOT
+                        arrayOf(CAMERA),
+                        REQUEST_CODE_PERMISSION_CAMERA_FOR_NEW_JOT
                 )
                 return
             }
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             if (
-                intent.resolveActivity(requireContext().packageManager) !=
-                null
+                    intent.resolveActivity(requireContext().packageManager) !=
+                    null
             ) {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
-                    requireContext(),
-                    BuildConfig.FILE_PROVIDER_AUTHORITY,
-                    photoTempFile
+                        requireContext(),
+                        BuildConfig.FILE_PROVIDER_AUTHORITY,
+                        photoTempFile
                 ))
                 startActivityForResult(intent, REQUEST_CODE_CAPTURE_PHOTO)
             }
@@ -374,22 +341,22 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
     @Suppress("UNUSED_PARAMETER")
     private fun newJotByImages(it: View) {
         startActivityForResult(
-            AttachmentPickerIntent().value(),
-            REQUEST_CODE_NEW_JOT_BY_IMAGES
+                AttachmentPickerIntent().value(),
+                REQUEST_CODE_NEW_JOT_BY_IMAGES
         )
     }
 
     private fun toNewJotFragment() {
         findNavController().navigate(
-            JotsCalendarFragmentDirections.actionJotsCalendarFragmentToNewJotFragment(
-                model.selected().value ?: java.util.Calendar.getInstance()
-            )
+                JotsCalendarFragmentDirections.actionJotsCalendarFragmentToNewJotFragment(
+                        model.selected().value ?: java.util.Calendar.getInstance()
+                )
         )
     }
 
-    private fun toJotFragment(id: Long) {
+    private fun toJotFragment(jot: Jot) {
         findNavController().navigate(
-            JotsCalendarFragmentDirections.actionJotsCalendarFragmentToJotFragment(id)
+                JotsCalendarFragmentDirections.actionJotsCalendarFragmentToJotFragment(jot.id())
         )
     }
 
@@ -420,9 +387,9 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
     private fun onMonthIndicatorClicked(view: View?) {
         val selected = model.selected().value ?: java.util.Calendar.getInstance()
         datePicker.updateDate(
-            selected.get(java.util.Calendar.YEAR),
-            selected.get(java.util.Calendar.MONTH),
-            selected.get(java.util.Calendar.DAY_OF_MONTH),
+                selected.get(java.util.Calendar.YEAR),
+                selected.get(java.util.Calendar.MONTH),
+                selected.get(java.util.Calendar.DAY_OF_MONTH),
         )
         datePicker.show()
     }
