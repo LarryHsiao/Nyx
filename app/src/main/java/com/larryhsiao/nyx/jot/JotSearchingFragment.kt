@@ -5,7 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.core.widget.addTextChangedListener
+import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -23,9 +24,7 @@ class JotSearchingFragment : NyxFragment() {
         ViewModelProvider(
                 this,
                 ViewModelFactory(app)
-        ).get(JotsViewModel::class.java).apply {
-            preferJots("")
-        }
+        ).get(JotsSearchingViewModel::class.java)
     }
 
     private val adapter by lazy {
@@ -38,7 +37,7 @@ class JotSearchingFragment : NyxFragment() {
     private fun toJotFragment(jot: Jot) {
         findNavController().navigate(
                 JotSearchingFragmentDirections.actionJotSearchingFragmentToJotFragment(
-                    jot.id()
+                        jot.id()
                 )
         )
     }
@@ -58,9 +57,19 @@ class JotSearchingFragment : NyxFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<RecyclerView>(R.id.jotsSearching_jotsRecyclerView).adapter = adapter
-        view.findViewById<EditText>(R.id.jotsSearching_searchKeyword).addTextChangedListener {
+        view.findViewById<EditText>(R.id.jotsSearching_searchKeyword).doAfterTextChanged {
             viewModel.preferJots(it?.toString() ?: "")
         }
-        viewModel.jots().observe(viewLifecycleOwner, adapter::load)
+        viewModel.jots().observe(viewLifecycleOwner, ::loadJots)
+    }
+
+    private fun loadJots(jots: List<Jot>) {
+        requireView().findViewById<View>(R.id.jotsSearching_emptyIcon).isVisible = jots.isEmpty()
+        adapter.load(jots)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.reload()
     }
 }

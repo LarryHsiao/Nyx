@@ -26,4 +26,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_height="0dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/jotsSearching_jotsRecyclerView"
+        app:layout_constraintBottom_toBottomOf="@id/jotsSearching_jotsRecyclerView"
+        app:layout_constraintStart_toStartOf="@id/jotsSearching_jotsRecyclerView"
+        android:text="@string/Nothing_found"
+        android:gravity="center"
+        android:id="@+id/jotsSearching_emptyIcon"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintEnd_toEndOf="@id/jotsSearching_jotsRecyclerView"
+        app:drawableTopCompat="@drawable/ic_black_hole" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
