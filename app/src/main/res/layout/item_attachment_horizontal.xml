@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="45dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:src="@tools:sample/avatars"
+    android:layout_height="45dp" />

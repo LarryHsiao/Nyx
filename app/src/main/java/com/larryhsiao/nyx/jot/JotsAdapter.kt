@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.BlurMaskFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.core.jots.Jot
@@ -11,9 +12,14 @@ import com.larryhsiao.nyx.core.tags.QueriedTags
 import com.larryhsiao.nyx.core.tags.TagsByJotId
 import com.larryhsiao.nyx.utils.HashTagEnlightenAction
 import com.larryhsiao.clotho.Source
+import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId
+import com.larryhsiao.nyx.core.attachments.QueriedAttachments
+import com.larryhsiao.nyx.utils.AttachmentPagerAdapter
+import com.silverhetch.aura.view.images.pager.PagerImageAdapter
 import kotlinx.android.synthetic.main.item_jot.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
@@ -25,9 +31,9 @@ import kotlin.collections.ArrayList
  * Adapter to show jots.
  */
 class JotsAdapter(
-    private val db: Source<Connection>,
-    private val lifeCoroutineScope: CoroutineScope,
-    private val itemClicked: (item: Jot) -> Unit
+        private val db: Source<Connection>,
+        private val lifeCoroutineScope: CoroutineScope,
+        private val itemClicked: (item: Jot) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val dateFormat by lazy { SimpleDateFormat("MM/dd", Locale.US) }
     private val timeFormat by lazy { SimpleDateFormat("HH:mm", Locale.US) }
@@ -35,11 +41,11 @@ class JotsAdapter(
     private var showDate = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return object : RecyclerView.ViewHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.item_jot,
-                parent,
-                false
-            )
+                LayoutInflater.from(parent.context).inflate(
+                        R.layout.item_jot,
+                        parent,
+                        false
+                )
         ) {}
     }
 
@@ -48,8 +54,8 @@ class JotsAdapter(
         holder.itemView.itemJot_textView.text = buildTitle(holder.itemView.context, jot)
         holder.itemView.itemJot_textView.paint.maskFilter = if (jot.privateLock()) {
             BlurMaskFilter(
-                holder.itemView.itemJot_textView.textSize / 3,
-                BlurMaskFilter.Blur.NORMAL
+                    holder.itemView.itemJot_textView.textSize / 3,
+                    BlurMaskFilter.Blur.NORMAL
             )
         } else {
             null
@@ -61,14 +67,25 @@ class JotsAdapter(
         } + timeFormat.format(Date(jot.createdTime()))
         holder.itemView.setOnClickListener { itemClicked(jots[position]) }
         lifeCoroutineScope.launch {
-            val tags = withContext(IO) {
+            val tagsAsync = async(IO) {
                 QueriedTags(TagsByJotId(db, jot.id())).value()
-            }.map { it.title() to it }.toMap()
+            }
+            val attachmentAsync = async(IO) {
+                QueriedAttachments(AttachmentsByJotId(db, jot.id())).value()
+            }
+            val tags = tagsAsync.await()
+            val attachments = attachmentAsync.await()
             if (holder.adapterPosition == position) {
+                holder.itemView.itemJot_attachments.apply {
+                    isVisible = attachments.isNotEmpty()
+                    adapter = AttachmentPagerAdapter(ArrayList(attachments.toList())) {
+                        itemClicked(jots[position])
+                    }
+                }
                 HashTagEnlightenAction(
-                    holder.itemView.itemJot_textView,
-                    buildTitle(holder.itemView.context, jot),
-                    tags
+                        holder.itemView.itemJot_textView,
+                        buildTitle(holder.itemView.context, jot),
+                        tags.map { it.title() to it }.toMap()
                 ).fire()
             }
         }
