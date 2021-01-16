@@ -1,12 +1,11 @@
 package com.larryhsiao.nyx.utils
 
-import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import androidx.viewpager.widget.PagerAdapter
 import com.larryhsiao.nyx.core.attachments.Attachment
+import com.silverhetch.aura.view.measures.DP
 import com.squareup.picasso.Picasso
 
 /**
@@ -15,28 +14,27 @@ import com.squareup.picasso.Picasso
 class AttachmentPagerAdapter(
         private val uris: ArrayList<Attachment>,
         private val itemClicked: (attachment: Attachment) -> Unit
-) : PagerAdapter() {
-    override fun isViewFromObject(view: View, `object`: Any): Boolean {
-        return view == `object`
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return object : RecyclerView.ViewHolder(
+                ImageView(parent.context).apply {
+                    val size = DP(parent.context, 150f).px()
+                    layoutParams = ViewGroup.LayoutParams(size.toInt(), size.toInt())
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                }
+        ) {}
     }
 
-    override fun getCount(): Int {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        (holder.itemView as ImageView).apply {
+            setOnClickListener { itemClicked(uris[position]) }
+            val placeHolder = CircularProgressDrawable(context)
+            placeHolder.setStyle(CircularProgressDrawable.DEFAULT)
+            Picasso.get().load(uris[position].uri()).placeholder(placeHolder).into(this)
+        }
+    }
+
+    override fun getItemCount(): Int {
         return uris.size
-    }
-
-    override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val image = ImageView(container.context)
-        image.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        image.scaleType = ImageView.ScaleType.CENTER_CROP
-        image.setOnClickListener { itemClicked(uris[position]) }
-        val placeHolder = CircularProgressDrawable(container.context)
-        placeHolder.setStyle(CircularProgressDrawable.DEFAULT)
-        Picasso.get().load(uris[position].uri()).placeholder(placeHolder).into(image)
-        container.addView(image)
-        return image
-    }
-
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        container.removeView(`object` as View?)
     }
 }
