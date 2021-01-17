@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.core.server;
 
 import com.larryhsiao.clotho.Source;
+import com.larryhsiao.nyx.core.attachments.file.AttachmentFiles;
 import org.takes.facets.auth.PsEmpty;
 import org.takes.facets.auth.TkAuth;
 import org.takes.facets.fork.FkRegex;
@@ -15,10 +16,12 @@ import java.sql.Connection;
  */
 public class NyxServer {
     private final Source<Connection> db;
+    private final AttachmentFiles files;
     private boolean isRunning = false;
 
-    public NyxServer(Source<Connection> db) {
+    public NyxServer(Source<Connection> db, AttachmentFiles files) {
         this.db = db;
+        this.files = files;
     }
 
     public void launch() throws IOException {
@@ -30,7 +33,8 @@ public class NyxServer {
             new TkAuth(
                 new TkFork(
                     new FkRegex("/jots", new TkJots(db)),
-                    new FkRegex("/attachments", new TkAttachments(db))
+                    new FkRegex("/attachments", new TkAttachments(db)),
+                    new FkRegex("/attachments/download/(?<id>[^/]+)", new TkAttachmentDownloading(db, files))
                 ),
                 new PsEmpty()
             ),

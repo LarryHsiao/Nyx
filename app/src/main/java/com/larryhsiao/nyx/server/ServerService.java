@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import androidx.annotation.Nullable;
 import com.larryhsiao.nyx.NyxApplication;
+import com.larryhsiao.nyx.attachment.AttachmentFilesImpl;
 import com.larryhsiao.nyx.core.server.NyxServer;
 
 /**
@@ -12,7 +13,8 @@ import com.larryhsiao.nyx.core.server.NyxServer;
  */
 public class ServerService extends Service {
     private final NyxServer server = new NyxServer(() ->
-        ((NyxApplication) getApplicationContext()).getDb().value()
+        ((NyxApplication) getApplicationContext()).getDb().value(),
+        new AttachmentFilesImpl(this)
     );
 
     @Override
