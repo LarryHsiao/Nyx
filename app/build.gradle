@@ -20,7 +20,7 @@ buildscript {
     }
 }
 plugins {
-    id "com.larryhsiao.thea" version "1.4.7"
+    id "com.larryhsiao.thea" version "1.5.0"
 }
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
@@ -29,10 +29,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
-System.out.println(thea.indicator.apply(""))
+System.out.println(thea.versionIndicator(""))
 
-def nyxVersionName = thea.version.version().versionName()
-def nyxVersionCode = thea.version.version().versionCode()
+def nyxVersionName = thea.version().versionName()
+def nyxVersionCode = thea.version().versionCode()
 
 android {
     compileSdkVersion 29
