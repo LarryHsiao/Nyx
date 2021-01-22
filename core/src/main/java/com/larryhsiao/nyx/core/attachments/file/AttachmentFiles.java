@@ -7,6 +7,8 @@ import java.io.File;
  */
 public interface AttachmentFiles {
     /**
+     * Build {@link File} by uri.
+     *
      * @param uri The attachment uri.
      * @return The {@link File} of the attachment.
      */

@@ -34,7 +34,10 @@ public class NyxServer {
                 new TkFork(
                     new FkRegex("/jots", new TkJots(db)),
                     new FkRegex("/attachments", new TkAttachments(db)),
-                    new FkRegex("/attachments/download/(?<id>[^/]+)", new TkAttachmentDownloading(db, files))
+                    new FkRegex(
+                        "/attachments/download/(?<id>[^/]+)",
+                        new TkAttachmentDownloading(db, files)
+                    )
                 ),
                 new PsEmpty()
             ),

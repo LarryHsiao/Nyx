@@ -32,9 +32,7 @@ public class TkAttachmentDownloading implements TkRegex {
         final File file = files.fileByUri(
             new AttachmentById(
                 db,
-                Long.parseLong(
-                    req.matcher().group(1)
-                )
+                Long.parseLong(req.matcher().group(1))
             ).value().uri()
         );
         return new RsWithType(
