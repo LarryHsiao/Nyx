@@ -3,6 +3,8 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
       <module name="app" target="11" />
+      <module name="com.larryhsiao.Nyx.nyx-desktop.main" target="11" />
+      <module name="com.larryhsiao.Nyx.nyx-desktop.test" target="11" />
       <module name="Nyx.app" target="11" />
       <module name="Nyx.main" target="11" />
       <module name="Nyx.nyx-desktop" target="11" />

@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.larryhsiao'
-version '1.0.0'
+version nyxVersionName
 
 sourceCompatibility = 1.8
 

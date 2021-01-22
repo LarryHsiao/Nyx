@@ -19,20 +19,12 @@ buildscript {
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
     }
 }
-plugins {
-    id "com.larryhsiao.thea" version "1.5.0"
-}
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
-
-System.out.println(thea.versionIndicator(""))
-
-def nyxVersionName = thea.version().versionName()
-def nyxVersionCode = thea.version().versionCode()
 
 android {
     compileSdkVersion 29
