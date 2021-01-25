@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+group 'com.larryhsiao'
+version nyxVersionName
+mainClassName = "com.larryhsiao.nyx.desktop.Main"
+
+test {
+    useJUnitPlatform {
+    }
+}
+
+javafx {
+    version = "11.0.2"
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.media']
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":nyx-core")
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+}

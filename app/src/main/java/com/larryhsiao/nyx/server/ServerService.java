@@ -6,7 +6,7 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.attachment.AttachmentFilesImpl;
-import com.larryhsiao.nyx.core.server.NyxServer;
+import com.larryhsiao.nyx.core.sync.server.NyxServer;
 
 /**
  * Server for serving Jots.

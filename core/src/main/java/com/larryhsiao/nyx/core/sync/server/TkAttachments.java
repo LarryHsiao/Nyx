@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core.server;
+package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.nyx.core.attachments.AllAttachments;
@@ -27,6 +27,7 @@ public class TkAttachments implements Take {
 
     @Override
     public Response act(Request req) throws IOException {
+        // @todo #105 Pull the json building process to object.
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (Attachment attachment : new QueriedAttachments(new AllAttachments(db)).value()) {
             JsonObjectBuilder objBuilder = Json.createObjectBuilder();

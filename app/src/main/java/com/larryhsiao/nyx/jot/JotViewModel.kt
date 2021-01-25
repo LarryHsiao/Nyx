@@ -9,7 +9,7 @@ import com.larryhsiao.clotho.openweather.JsonWeather
 import com.larryhsiao.clotho.openweather.CurrentWeather
 import com.larryhsiao.clotho.openweather.Weather
 import com.larryhsiao.nyx.BuildConfig.OPEN_WEATHER_API_KEY
-import com.larryhsiao.nyx.core.StringHashTags
+import com.larryhsiao.nyx.core.util.StringHashTags
 import com.larryhsiao.nyx.core.attachments.*
 import com.larryhsiao.nyx.core.jots.*
 import com.larryhsiao.nyx.core.metadata.*

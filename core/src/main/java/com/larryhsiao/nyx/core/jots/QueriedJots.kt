@@ -8,7 +8,7 @@ import java.util.*
 /**
  * Adapter to adapt query result to Jot objects.
  */
-class QueriedJots(private val query: Source<ResultSet>) : Source<List<Jot?>?> {
+class QueriedJots(private val query: Source<ResultSet>) : Source<List<Jot>> {
     override fun value(): List<Jot> {
         try {
             query.value().use { res ->

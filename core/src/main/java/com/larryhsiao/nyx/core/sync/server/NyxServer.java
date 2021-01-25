@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core.server;
+package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.nyx.core.attachments.file.AttachmentFiles;
@@ -15,6 +15,7 @@ import java.sql.Connection;
  * Nyx server for open the jot datas.
  */
 public class NyxServer {
+    public static final String ENDPOINT_JOTS = "/jots";
     private final Source<Connection> db;
     private final AttachmentFiles files;
     private boolean isRunning = false;
@@ -29,10 +30,11 @@ public class NyxServer {
             return;
         }
         isRunning = true;
+        // @todo #106 Nyx Server
         new FtBasic(
             new TkAuth(
                 new TkFork(
-                    new FkRegex("/jots", new TkJots(db)),
+                    new FkRegex(ENDPOINT_JOTS, new TkJots(db)),
                     new FkRegex("/attachments", new TkAttachments(db)),
                     new FkRegex(
                         "/attachments/download/(?<id>[^/]+)",

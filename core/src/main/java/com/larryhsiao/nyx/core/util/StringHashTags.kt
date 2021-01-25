@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core
+package com.larryhsiao.nyx.core.util
 
 import com.larryhsiao.clotho.Source
 
