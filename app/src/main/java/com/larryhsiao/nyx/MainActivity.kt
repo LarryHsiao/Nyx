@@ -7,7 +7,6 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
-import com.larryhsiao.nyx.core.server.NyxServer
 import com.larryhsiao.nyx.server.ServerService
 
 

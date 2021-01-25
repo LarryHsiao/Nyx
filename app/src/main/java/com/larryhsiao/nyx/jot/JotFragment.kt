@@ -97,7 +97,6 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             .setNegativeButton(R.string.No) { _, _ -> }
             .setPositiveButton(R.string.delete) { _, _ ->
                 lifecycleScope.launch {
-                    // TODO: Screen locking
                     jotViewModel.delete()
                     reloadJotsByJotTime()
                     findNavController().popBackStack()

@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core.server;
+package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.database.h2.MemoryH2Conn;
