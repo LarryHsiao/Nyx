@@ -1,10 +1,10 @@
 package com.larryhsiao.nyx.desktop.attachments;
 
-import com.larryhsiao.nyx.core.attachments.file.AttachmentFiles;
+import com.larryhsiao.nyx.core.attachments.file.NyxFiles;
 
 import java.io.File;
 
-public class DesktopAttachments implements AttachmentFiles {
+public class DesktopAttachments implements NyxFiles {
     private final File attachmentRoot;
 
     public DesktopAttachments(File attachmentRoot) {

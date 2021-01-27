@@ -19,6 +19,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.larryhsiao.clotho.dgist.MD5;
 import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.KeyChangingActivity;
@@ -32,7 +33,6 @@ import com.larryhsiao.nyx.old.settings.NyxSettingsImpl;
 import com.larryhsiao.nyx.old.sync.encryption.Encryptor;
 import com.larryhsiao.nyx.old.sync.encryption.JasyptStringEncryptor;
 import com.larryhsiao.clotho.Source;
-import com.larryhsiao.clotho.encryption.MD5;
 import com.larryhsiao.clotho.source.SingleRefSource;
 import retrofit2.Response;
 

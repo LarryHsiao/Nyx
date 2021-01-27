@@ -10,4 +10,9 @@ public interface Jots {
      * All Jots.
      */
     List<Jot> all();
+
+    /**
+     * Create new jot.
+     */
+    Jot newJot(Jot jot);
 }

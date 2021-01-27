@@ -17,6 +17,11 @@ public class LocalJots implements Jots {
 
     @Override
     public List<Jot> all() {
-        return new QueriedJots(new AllJots(db)).value();
+        return new QueriedJots(new AllJots(db, true)).value();
+    }
+
+    @Override
+    public Jot newJot(Jot jot) {
+        return new NewJot(db, jot).value();
     }
 }

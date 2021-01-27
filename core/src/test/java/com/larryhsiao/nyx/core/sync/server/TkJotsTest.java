@@ -30,7 +30,7 @@ class TkJotsTest {
                 + "\"location\":[0.0,0.0],\"mood\":\"\","
                 + "\"privateLock\":false,\"version\":1}]",
             new RsPrint(
-                new TkJots(db).act(new RqFake("GET"))
+                new TkJots(jots, db).act(new RqFake("GET"))
             ).printBody()
         );
     }

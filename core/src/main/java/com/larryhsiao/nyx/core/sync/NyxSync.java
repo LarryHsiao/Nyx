@@ -1,7 +1,10 @@
 package com.larryhsiao.nyx.core.sync;
 
 import com.larryhsiao.nyx.core.Nyx;
-import com.larryhsiao.nyx.core.jots.Jots;
+import com.larryhsiao.nyx.core.jots.Jot;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Object to sync data to given remote host.
@@ -32,7 +35,14 @@ public class NyxSync {
     }
 
     private void syncJots() {
-        final Jots localJots = localNyx.jots();
-        final Jots remoteJots = remoteNyx.jots();
+        final Map<Long, Jot> localJots = localNyx.jots()
+            .all().stream()
+            .collect(Collectors.toMap(Jot::id, jot -> jot));
+        final Map<Long, Jot> remoteJots = remoteNyx.jots()
+            .all().stream()
+            .collect(Collectors.toMap(Jot::id, jot -> jot));
+        for (Map.Entry<Long, Jot> entry : localJots.entrySet()) {
+            Jot local = entry.getValue();
+        }
     }
 }

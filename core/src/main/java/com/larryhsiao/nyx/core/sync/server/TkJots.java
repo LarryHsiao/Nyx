@@ -1,7 +1,9 @@
 package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.clotho.Source;
+import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.jots.AllJots;
+import com.larryhsiao.nyx.core.jots.Jots;
 import com.larryhsiao.nyx.core.jots.QueriedJots;
 import org.takes.Request;
 import org.takes.Response;
@@ -15,16 +17,18 @@ import java.sql.Connection;
  * Take for jots.
  */
 public class TkJots implements Take {
-    private final Source<Connection> db;
+    private final Nyx nyx;
 
-    public TkJots(Source<Connection> db) {
-        this.db = db;
+    public TkJots(Nyx nyx) {
+        this.nyx = nyx;
     }
 
     @Override
     public Response act(Request req) throws IOException {
         return new RsJson(
-            new JotsJsonArray(new QueriedJots(new AllJots(db)).value()).value()
+            new JotsJsonArray(
+                nyx.jots().all()
+            ).value()
         );
     }
 }
