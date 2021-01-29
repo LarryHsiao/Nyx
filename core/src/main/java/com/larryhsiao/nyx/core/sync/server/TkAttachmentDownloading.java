@@ -1,9 +1,7 @@
 package com.larryhsiao.nyx.core.sync.server;
 
-import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.file.FileMimeType;
-import com.larryhsiao.nyx.core.attachments.AttachmentById;
-import com.larryhsiao.nyx.core.attachments.file.AttachmentFiles;
+import com.larryhsiao.nyx.core.Nyx;
 import org.takes.Response;
 import org.takes.facets.fork.RqRegex;
 import org.takes.facets.fork.TkRegex;
@@ -13,27 +11,21 @@ import org.takes.rs.RsWithType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
 
 /**
  * Take for downloading the attachment.
  */
 public class TkAttachmentDownloading implements TkRegex {
-    private final Source<Connection> db;
-    private final AttachmentFiles files;
+    private final Nyx nyx;
 
-    public TkAttachmentDownloading(Source<Connection> db, AttachmentFiles files) {
-        this.db = db;
-        this.files = files;
+    public TkAttachmentDownloading(Nyx nyx) {
+        this.nyx = nyx;
     }
 
     @Override
     public Response act(RqRegex req) throws IOException {
-        final File file = files.fileByUri(
-            new AttachmentById(
-                db,
-                Long.parseLong(req.matcher().group(1))
-            ).value().uri()
+        final File file = nyx.files().fileByUri(
+            nyx.attachments().byId(Long.parseLong(req.matcher().group(1))).uri()
         );
         return new RsWithType(
             new RsWithBody(

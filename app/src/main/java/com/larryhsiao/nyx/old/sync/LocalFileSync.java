@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.old.sync;
 import android.content.Context;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
+import com.larryhsiao.clotho.dgist.MD5;
 import com.larryhsiao.nyx.core.attachments.*;
 import com.larryhsiao.nyx.old.attachments.TempAttachmentFile;
 import com.larryhsiao.nyx.old.settings.DefaultPreference;
@@ -12,7 +13,6 @@ import com.silverhetch.aura.images.JpegCompress;
 import com.silverhetch.aura.uri.UriMimeType;
 import com.larryhsiao.clotho.Action;
 import com.larryhsiao.clotho.Source;
-import com.larryhsiao.clotho.encryption.MD5;
 import com.larryhsiao.clotho.file.ToFile;
 import com.larryhsiao.clotho.source.SingleRefSource;
 

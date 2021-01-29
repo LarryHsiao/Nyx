@@ -2,7 +2,7 @@ package com.larryhsiao.nyx.attachment;
 
 import android.content.Context;
 import android.net.Uri;
-import com.larryhsiao.nyx.core.attachments.file.AttachmentFiles;
+import com.larryhsiao.nyx.core.attachments.file.NyxFiles;
 import com.larryhsiao.nyx.old.attachments.AttachmentFileSource;
 
 import java.io.File;
@@ -10,10 +10,10 @@ import java.io.File;
 /**
  * Attachment Files in the storage.
  */
-public class AttachmentFilesImpl implements AttachmentFiles {
+public class NyxFilesImpl implements NyxFiles {
     private final Context context;
 
-    public AttachmentFilesImpl(Context context) {
+    public NyxFilesImpl(Context context) {
         this.context = context;
     }
 

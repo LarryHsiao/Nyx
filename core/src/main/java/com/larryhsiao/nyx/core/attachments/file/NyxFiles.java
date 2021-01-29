@@ -5,7 +5,9 @@ import java.io.File;
 /**
  * Files of attachments.
  */
-public interface AttachmentFiles {
+public interface NyxFiles {
+    // @todo #102 Files
+
     /**
      * Build {@link File} by uri.
      *

@@ -5,16 +5,19 @@ import android.content.Intent;
 import android.os.IBinder;
 import androidx.annotation.Nullable;
 import com.larryhsiao.nyx.NyxApplication;
-import com.larryhsiao.nyx.attachment.AttachmentFilesImpl;
+import com.larryhsiao.nyx.attachment.NyxFilesImpl;
+import com.larryhsiao.nyx.core.LocalNyx;
 import com.larryhsiao.nyx.core.sync.server.NyxServer;
 
 /**
  * Server for serving Jots.
  */
 public class ServerService extends Service {
-    private final NyxServer server = new NyxServer(() ->
-        ((NyxApplication) getApplicationContext()).getDb().value(),
-        new AttachmentFilesImpl(this)
+    private final NyxServer server = new NyxServer(
+        new LocalNyx(
+            ((NyxApplication) getApplicationContext()).getDb(),
+            new NyxFilesImpl(this)
+        )
     );
 
     @Override

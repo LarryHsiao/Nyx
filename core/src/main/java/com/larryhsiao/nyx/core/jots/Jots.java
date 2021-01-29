@@ -10,4 +10,21 @@ public interface Jots {
      * All Jots.
      */
     List<Jot> all();
+
+    Jot byId(long id);
+
+    /**
+     * Create new jot.
+     */
+    Jot newJot(Jot jot);
+
+    /**
+     * Update the given jot.
+     */
+    void updateJot(Jot jot);
+
+    /**
+     * Delete the given jot by id.
+     */
+    void deleteJotById(long id);
 }
