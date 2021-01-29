@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core.sync.server;
+package com.larryhsiao.nyx.core.sync.json.jots;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.nyx.core.jots.Jot;

@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core.sync.client;
+package com.larryhsiao.nyx.core.sync.json.jots;
 
 import com.larryhsiao.nyx.core.jots.Jot;
 import org.jetbrains.annotations.NotNull;

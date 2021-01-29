@@ -60,19 +60,19 @@ public class NyxSync {
         for (Jot jot1 : jots1.values()) {
             Jot jot2 = jots2.get(jot1.id());
             if (jot2 == null) {
-                nyx2.jots().newJot(jot1);
+                nyx2.jots().create(jot1);
             } else {
                 if (jot1.version() > jot2.version()) {
-                    nyx2.jots().updateJot(jot1);
+                    nyx2.jots().update(jot1);
                 } else if (jot1.version() < jot2.version()) {
-                    nyx1.jots().updateJot(jot2);
+                    nyx1.jots().update(jot2);
                 }
                 jots2.remove(jot1.id());
             }
         }
         // Adding new Jots from second one
         for (Jot jot2 : jots2.values()) {
-            nyx1.jots().newJot(jot2);
+            nyx1.jots().create(jot2);
         }
     }
 }

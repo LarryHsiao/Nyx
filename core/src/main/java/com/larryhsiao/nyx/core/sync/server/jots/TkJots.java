@@ -1,6 +1,7 @@
-package com.larryhsiao.nyx.core.sync.server;
+package com.larryhsiao.nyx.core.sync.server.jots;
 
 import com.larryhsiao.nyx.core.Nyx;
+import com.larryhsiao.nyx.core.sync.json.jots.JotsJsonArray;
 import org.takes.Request;
 import org.takes.Response;
 import org.takes.Take;

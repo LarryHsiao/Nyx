@@ -20,7 +20,7 @@ class NyxSyncTest {
     @Test
     void newJotsToSecond() {
         final Nyx nyx1 = new MemoryNyx();
-        nyx1.jots().newJot(new ConstJot(1, "title", "content", 100));
+        nyx1.jots().create(new ConstJot(1, "title", "content", 100));
         final Nyx nyx2 = new MemoryNyx();
         new NyxSync(nyx1, nyx2).sync();
 
@@ -36,7 +36,7 @@ class NyxSyncTest {
     void newJotToFirst() {
         final Nyx nyx1 = new MemoryNyx();
         final Nyx nyx2 = new MemoryNyx();
-        nyx2.jots().newJot(new ConstJot(1, "title", "content", 100));
+        nyx2.jots().create(new ConstJot(1, "title", "content", 100));
         new NyxSync(nyx1, nyx2).sync();
 
         final List<Jot> jots1 = nyx1.jots().all();
@@ -50,7 +50,7 @@ class NyxSyncTest {
     @Test
     void updateByVersionToSecondOne() {
         final Nyx nyx1 = new MemoryNyx();
-        nyx1.jots().newJot(new ConstJot(
+        nyx1.jots().create(new ConstJot(
             1,
             "title",
             "content",
@@ -60,7 +60,7 @@ class NyxSyncTest {
             2
         ));
         final Nyx nyx2 = new MemoryNyx();
-        nyx2.jots().newJot(new ConstJot(
+        nyx2.jots().create(new ConstJot(
             1,
             "title2",
             "content2",
@@ -83,7 +83,7 @@ class NyxSyncTest {
     @Test
     void updateByVersionToFirstOne() {
         final Nyx nyx1 = new MemoryNyx();
-        nyx1.jots().newJot(new ConstJot(
+        nyx1.jots().create(new ConstJot(
             1,
             "title",
             "content",
@@ -92,7 +92,7 @@ class NyxSyncTest {
             "mood"
         ));
         final Nyx nyx2 = new MemoryNyx();
-        nyx2.jots().newJot(new ConstJot(
+        nyx2.jots().create(new ConstJot(
             1,
             "title2",
             "content2",

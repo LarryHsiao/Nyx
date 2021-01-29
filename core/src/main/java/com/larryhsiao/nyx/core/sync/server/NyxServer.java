@@ -1,13 +1,18 @@
 package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.nyx.core.Nyx;
-import org.takes.Response;
+import com.larryhsiao.nyx.core.sync.server.jots.TkDeleteJot;
+import com.larryhsiao.nyx.core.sync.server.jots.TkJots;
+import com.larryhsiao.nyx.core.sync.server.jots.TkNewJot;
+import com.larryhsiao.nyx.core.sync.server.jots.TkUpdateJot;
+import com.larryhsiao.nyx.core.sync.server.tags.TkDeleteTag;
+import com.larryhsiao.nyx.core.sync.server.tags.TkNewTag;
+import com.larryhsiao.nyx.core.sync.server.tags.TkTags;
+import com.larryhsiao.nyx.core.sync.server.tags.TkUpdateTag;
 import org.takes.facets.auth.PsEmpty;
 import org.takes.facets.auth.TkAuth;
 import org.takes.facets.fork.*;
 import org.takes.http.FtBasic;
-import org.takes.rq.RqMethod;
-import org.takes.rs.RsWithStatus;
 
 import java.io.IOException;
 
@@ -16,6 +21,7 @@ import java.io.IOException;
  */
 public class NyxServer {
     public static final String ENDPOINT_JOTS = "/jots";
+    public static final String ENDPOINT_TAGS = "/tags";
     private final Nyx nyx;
     private boolean isRunning = false;
 
@@ -41,6 +47,15 @@ public class NyxServer {
                             new FkMethods("POST", new TkUpdateJot(nyx))
                         )
                     ),
+                    new FkRegex(
+                        ENDPOINT_TAGS,
+                        new TkFork(
+                            new FkMethods("GET", new TkTags(nyx)),
+                            new FkMethods("PUT", new TkNewTag(nyx)),
+                            new FkMethods("DELETE", new TkDeleteTag(nyx)),
+                            new FkMethods("POST", new TkUpdateTag(nyx))
+                        )
+                    ),
                     new FkRegex("/attachments", new TkAttachments(nyx)),
                     new FkRegex(
                         "/attachments/download/(?<id>[^/]+)",
@@ -48,8 +63,7 @@ public class NyxServer {
                     )
                 ),
                 new PsEmpty()
-            ),
-            8080
+            ), 8080
         ).start(() -> !isRunning);
     }
 

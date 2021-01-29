@@ -26,18 +26,18 @@ public class MemoryJots implements Jots {
     }
 
     @Override
-    public Jot newJot(Jot jot) {
+    public Jot create(Jot jot) {
         jots.put(jot.id(), jot);
         return jot;
     }
 
     @Override
-    public void updateJot(Jot jot) {
+    public void update(Jot jot) {
         jots.put(jot.id(), jot);
     }
 
     @Override
-    public void deleteJotById(long id) {
+    public void deleteById(long id) {
         jots.remove(id);
     }
 }

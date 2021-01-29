@@ -1,7 +1,8 @@
-package com.larryhsiao.nyx.core.sync.server;
+package com.larryhsiao.nyx.core.sync.server.tags;
 
 import com.larryhsiao.nyx.core.Nyx;
-import com.larryhsiao.nyx.core.sync.client.JsonJot;
+import com.larryhsiao.nyx.core.sync.json.jots.JsonJot;
+import com.larryhsiao.nyx.core.sync.json.tags.JsonTag;
 import org.takes.Request;
 import org.takes.Response;
 import org.takes.Take;
@@ -11,19 +12,19 @@ import javax.json.Json;
 import java.io.IOException;
 
 /**
- * Take for jot update.
+ * Take for tag update.
  */
-public class TkUpdateJot implements Take {
+public class TkUpdateTag implements Take {
     private final Nyx nyx;
 
-    public TkUpdateJot(Nyx nyx) {
+    public TkUpdateTag(Nyx nyx) {
         this.nyx = nyx;
     }
 
     @Override
     public Response act(Request req) throws IOException {
-        nyx.jots().updateJot(
-            new JsonJot(Json.createReader(req.body()).readObject())
+        nyx.tags().update(
+            new JsonTag(Json.createReader(req.body()).readObject())
         );
         return new RsWithStatus(204);
     }
