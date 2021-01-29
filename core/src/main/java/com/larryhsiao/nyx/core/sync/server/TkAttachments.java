@@ -28,12 +28,12 @@ public class TkAttachments implements Take {
     public Response act(Request req) throws IOException {
         // @todo #105 Pull the json building process to object.
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-//        for (Attachment attachment : new QueriedAttachments(new AllAttachments(db)).value()) {
-//            JsonObjectBuilder objBuilder = Json.createObjectBuilder();
-//            objBuilder.add("id", attachment.id());
-//            objBuilder.add("title", attachment.uri());
-//            arrayBuilder.add(objBuilder.build());
-//        }
+        for (Attachment attachment : nyx.attachments().all()) {
+            JsonObjectBuilder objBuilder = Json.createObjectBuilder();
+            objBuilder.add("id", attachment.id());
+            objBuilder.add("title", attachment.uri());
+            arrayBuilder.add(objBuilder.build());
+        }
         return new RsJson(arrayBuilder.build());
     }
 }

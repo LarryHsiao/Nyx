@@ -34,7 +34,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"""
                     ).toText())
                 }
                 if (jot.mood()!!.length > 1) {
-                    stmt.setString(4, jot.mood()!!.substring(0, 2))
+                    stmt.setString(4, jot.mood().substring(0, 2))
                 } else {
                     stmt.setString(4, "")
                 }

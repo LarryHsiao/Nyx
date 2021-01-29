@@ -2,7 +2,9 @@ package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.database.h2.MemoryH2Conn;
+import com.larryhsiao.nyx.core.LocalNyx;
 import com.larryhsiao.nyx.core.MemoryNyx;
+import com.larryhsiao.nyx.core.attachments.file.MemoryNyxFiles;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.JotsDb;
 import com.larryhsiao.nyx.core.jots.NewJot;
@@ -31,7 +33,9 @@ class TkJotsTest {
                 + "\"location\":[0.0,0.0],\"mood\":\"\","
                 + "\"privateLock\":false,\"version\":1}]",
             new RsPrint(
-                new TkJots(new MemoryNyx()).act(new RqFake("GET"))
+                new TkJots(new LocalNyx(
+                    db, new MemoryNyxFiles()
+                )).act(new RqFake("GET"))
             ).printBody()
         );
     }
