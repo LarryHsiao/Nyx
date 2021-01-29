@@ -15,7 +15,7 @@ public interface Tags {
      *
      * @return The tag we just create with new Id.
      */
-    Tag newTag(Tag tag);
+    Tag create(Tag tag);
 
     /**
      * Update the given tag.

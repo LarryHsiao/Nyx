@@ -25,7 +25,7 @@ public class TkNewTag implements Take {
         return new RsJson(
             Json.createObjectBuilder().add(
                 "id",
-                nyx.tags().newTag(
+                nyx.tags().create(
                     new JsonTag(Json.createReader(req.body()).readObject())
                 ).id()
             ).build()

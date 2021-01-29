@@ -19,7 +19,7 @@ public class MemoryTags implements Tags {
     }
 
     @Override
-    public Tag newTag(Tag tag) {
+    public Tag create(Tag tag) {
         tags.put(tag.id(), tag);
         return tag;
     }

@@ -23,7 +23,7 @@ public class LocalTags implements Tags {
     }
 
     @Override
-    public Tag newTag(Tag tag) {
+    public Tag create(Tag tag) {
         return new NewTag(db, tag).value();
     }
 

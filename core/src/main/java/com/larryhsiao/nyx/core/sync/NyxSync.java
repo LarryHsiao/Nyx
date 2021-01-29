@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.core.sync;
 
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.tags.Tag;
 
 import java.util.Map;
 
@@ -45,7 +46,31 @@ public class NyxSync {
     }
 
     private void syncTags() {
-        // @todo #108 Tag sync
+        final Map<Long, Tag> tags1 = nyx1.tags()
+            .all()
+            .stream()
+            .collect(toMap(Tag::id, tag -> tag));
+        final Map<Long, Tag> tags2 = nyx2.tags()
+            .all()
+            .stream()
+            .collect(toMap(Tag::id, tag -> tag));
+        for (Tag tag1 : tags1.values()) {
+            Tag tag2 = tags2.get(tag1.id());
+            if (tag2 == null) {
+                nyx2.tags().create(tag1);
+            } else {
+                if (tag1.version() > tag2.version()) {
+                    nyx2.tags().update(tag1);
+                } else if (tag1.version() < tag2.version()) {
+                    nyx1.tags().update(tag2);
+                }
+                tags2.remove(tag1.id());
+            }
+        }
+        // Adding new Jots from second one
+        for (Tag Tag2 : tags2.values()) {
+            nyx1.tags().create(Tag2);
+        }
     }
 
     private void syncJots() {

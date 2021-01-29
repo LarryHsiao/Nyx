@@ -27,7 +27,7 @@ public class RemoteTags implements Tags {
     }
 
     @Override
-    public Tag newTag(Tag tag) {
+    public Tag create(Tag tag) {
         return new PutTag(host, tag).value();
     }
 
