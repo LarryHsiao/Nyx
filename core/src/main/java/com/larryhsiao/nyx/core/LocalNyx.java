@@ -5,6 +5,9 @@ import com.larryhsiao.nyx.core.attachments.Attachments;
 import com.larryhsiao.nyx.core.attachments.file.NyxFiles;
 import com.larryhsiao.nyx.core.jots.Jots;
 import com.larryhsiao.nyx.core.jots.LocalJots;
+import com.larryhsiao.nyx.core.metadata.MetadataSet;
+import com.larryhsiao.nyx.core.tags.LocalTags;
+import com.larryhsiao.nyx.core.tags.Tags;
 
 import java.sql.Connection;
 
@@ -25,6 +28,16 @@ public class LocalNyx implements Nyx {
     @Override
     public Jots jots() {
         return new LocalJots(db);
+    }
+
+    @Override
+    public Tags tags() {
+        return new LocalTags(db);
+    }
+
+    @Override
+    public MetadataSet metadataSet() {
+        return null;
     }
 
     @Override

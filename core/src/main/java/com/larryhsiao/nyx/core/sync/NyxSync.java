@@ -4,7 +4,6 @@ import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.jots.Jot;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -26,14 +25,27 @@ public class NyxSync {
             return;
         }
         running = true;
-        syncJots(); // @todo #107 Jot sync
-        syncTags(); // @todo #108 Tag sync
-        // @todo #109 Attachment sync
-        // @todo #110 Metadata sync
+        syncJots();
+        syncTags();
+        syncAttachment();
+        syncMetadata();
+        syncFile();
+    }
+
+    private void syncFile() {
         // @todo #111 File sync
     }
 
+    private void syncMetadata() {
+        // @todo #110 Metadata sync
+    }
+
+    private void syncAttachment() {
+        // @todo #109 Attachment sync
+    }
+
     private void syncTags() {
+        // @todo #108 Tag sync
     }
 
     private void syncJots() {

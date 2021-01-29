@@ -4,6 +4,8 @@ import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.attachments.Attachments;
 import com.larryhsiao.nyx.core.attachments.file.NyxFiles;
 import com.larryhsiao.nyx.core.jots.Jots;
+import com.larryhsiao.nyx.core.metadata.MetadataSet;
+import com.larryhsiao.nyx.core.tags.Tags;
 
 // @todo #110 Complete this
 /**
@@ -15,6 +17,16 @@ public class RemoteNyx implements Nyx {
 
     public RemoteNyx(String host) {
         this.host = host;
+    }
+
+    @Override
+    public Tags tags() {
+        return new RemoteTags(host);
+    }
+
+    @Override
+    public MetadataSet metadataSet() {
+        return null;
     }
 
     @Override
