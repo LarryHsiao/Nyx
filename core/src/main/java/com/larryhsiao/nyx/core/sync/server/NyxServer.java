@@ -1,12 +1,13 @@
 package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.nyx.core.Nyx;
+import org.takes.Response;
 import org.takes.facets.auth.PsEmpty;
 import org.takes.facets.auth.TkAuth;
-import org.takes.facets.fork.FkMethods;
-import org.takes.facets.fork.FkRegex;
-import org.takes.facets.fork.TkFork;
+import org.takes.facets.fork.*;
 import org.takes.http.FtBasic;
+import org.takes.rq.RqMethod;
+import org.takes.rs.RsWithStatus;
 
 import java.io.IOException;
 
@@ -31,11 +32,15 @@ public class NyxServer {
         new FtBasic(
             new TkAuth(
                 new TkFork(
-                    new FkRegex(ENDPOINT_JOTS, new TkFork(
-                        new FkMethods("GET", new TkJots(nyx)),
-                        new FkMethods("PUT", new TkNewJot(nyx)),
-                        new FkMethods("DELETE", new TkDeleteJot(nyx))
-                    )),
+                    new FkRegex(
+                        ENDPOINT_JOTS,
+                        new TkFork(
+                            new FkMethods("GET", new TkJots(nyx)),
+                            new FkMethods("PUT", new TkNewJot(nyx)),
+                            new FkMethods("DELETE", new TkDeleteJot(nyx)),
+                            new FkMethods("POST", new TkUpdateJot(nyx))
+                        )
+                    ),
                     new FkRegex("/attachments", new TkAttachments(nyx)),
                     new FkRegex(
                         "/attachments/download/(?<id>[^/]+)",

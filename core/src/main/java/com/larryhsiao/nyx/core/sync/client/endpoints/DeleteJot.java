@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.core.sync.client.endpoints;
 
+import com.larryhsiao.clotho.Action;
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.io.StringOutput;
 import com.larryhsiao.nyx.core.jots.Jot;
@@ -13,38 +14,30 @@ import java.net.URL;
 import static com.larryhsiao.nyx.core.sync.server.NyxServer.ENDPOINT_JOTS;
 
 /**
- * Create a new Jot, will return a {@link Jot} with new id.
+ * Delete the given Jot.
  */
-public class PutJot implements Source<Jot> {
+public class DeleteJot implements Action {
     private final String host;
-    private final Jot jot;
+    private final long id;
 
-    public PutJot(String host, Jot jot) {
+    public DeleteJot(String host, long id) {
         this.host = host;
-        this.jot = jot;
+        this.id = id;
     }
 
     @Override
-    public Jot value() {
+    public void fire() {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(
                 host + ENDPOINT_JOTS
             ).openConnection();
-            conn.setRequestMethod("PUT");
-            conn.addRequestProperty("Content-Type", "application/json");
+            conn.setRequestMethod("DELETE");
             new StringOutput(
-                new JotJson(jot).value().toString(),
+                Json.createObjectBuilder()
+                    .add("id", id)
+                    .build().toString(),
                 conn.getOutputStream()
             ).fire();
-            final long id = Json.createReader(
-                conn.getInputStream()
-            ).readObject().getJsonNumber("id").longValue();
-            return new WrappedJot(jot) {
-                @Override
-                public long id() {
-                    return id;
-                }
-            };
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

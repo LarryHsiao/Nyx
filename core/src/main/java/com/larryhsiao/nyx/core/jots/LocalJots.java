@@ -24,4 +24,14 @@ public class LocalJots implements Jots {
     public Jot newJot(Jot jot) {
         return new NewJot(db, jot).value();
     }
+
+    @Override
+    public void updateJot(Jot jot) {
+        new PostedJot(db, jot, true).value();
+    }
+
+    @Override
+    public void deleteJotById(long id) {
+        new JotRemoval(db, id).fire();
+    }
 }
