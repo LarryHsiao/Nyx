@@ -2,7 +2,6 @@ package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.clotho.file.FileMimeType;
 import com.larryhsiao.nyx.core.Nyx;
-import com.larryhsiao.nyx.core.attachments.AttachmentById;
 import org.takes.Response;
 import org.takes.facets.fork.RqRegex;
 import org.takes.facets.fork.TkRegex;

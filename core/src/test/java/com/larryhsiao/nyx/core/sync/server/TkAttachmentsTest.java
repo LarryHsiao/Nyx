@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.core.sync.server;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.database.h2.MemoryH2Conn;
+import com.larryhsiao.nyx.core.MemoryNyx;
 import com.larryhsiao.nyx.core.attachments.AttachmentDb;
 import com.larryhsiao.nyx.core.attachments.NewAttachment;
 import com.larryhsiao.nyx.core.jots.JotsDb;
@@ -24,7 +25,7 @@ class TkAttachmentsTest {
         Assertions.assertEquals(
             "[{\"id\":1,\"title\":\"uri\"}]",
             new RsPrint(
-                new TkAttachments(db).act(new RqFake("GET"))
+                new TkAttachments(new MemoryNyx()).act(new RqFake("GET"))
             ).printBody()
         );
     }

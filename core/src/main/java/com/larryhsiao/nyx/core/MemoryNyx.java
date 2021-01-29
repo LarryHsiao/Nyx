@@ -11,18 +11,22 @@ import com.larryhsiao.nyx.core.jots.MemoryJots;
  * Nyx implementation.
  */
 public class MemoryNyx implements Nyx {
+    private final Jots jots = new MemoryJots();
+    private final Attachments attachments = new MemoryAttachments();
+    private final NyxFiles files = new MemoryNyxFiles();
+
     @Override
     public Jots jots() {
-        return new MemoryJots();
+        return jots;
     }
 
     @Override
     public Attachments attachments() {
-        return new MemoryAttachments();
+        return attachments;
     }
 
     @Override
     public NyxFiles files() {
-        return new MemoryNyxFiles();
+        return files;
     }
 }

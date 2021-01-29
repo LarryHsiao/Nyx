@@ -17,6 +17,15 @@ public class MemoryJots implements Jots {
     }
 
     @Override
+    public Jot byId(long id) {
+        Jot jot = jots.get(id);
+        if (jot == null) {
+            throw new RuntimeException("Jot not found");
+        }
+        return jot;
+    }
+
+    @Override
     public Jot newJot(Jot jot) {
         jots.put(jot.id(), jot);
         return jot;

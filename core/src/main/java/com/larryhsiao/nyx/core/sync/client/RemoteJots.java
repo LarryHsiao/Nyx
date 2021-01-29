@@ -2,10 +2,7 @@ package com.larryhsiao.nyx.core.sync.client;
 
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.Jots;
-import com.larryhsiao.nyx.core.sync.client.endpoints.DeleteJot;
-import com.larryhsiao.nyx.core.sync.client.endpoints.GetJots;
-import com.larryhsiao.nyx.core.sync.client.endpoints.PostJot;
-import com.larryhsiao.nyx.core.sync.client.endpoints.PutJot;
+import com.larryhsiao.nyx.core.sync.client.endpoints.*;
 
 import java.util.List;
 
@@ -22,6 +19,11 @@ public class RemoteJots implements Jots {
     @Override
     public List<Jot> all() {
         return new GetJots(host).value();
+    }
+
+    @Override
+    public Jot byId(long id) {
+        return new GetJotById(host, id).value();
     }
 
     @Override

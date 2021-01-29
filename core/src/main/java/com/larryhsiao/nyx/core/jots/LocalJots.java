@@ -21,6 +21,11 @@ public class LocalJots implements Jots {
     }
 
     @Override
+    public Jot byId(long id) {
+        return new JotById(id, db).value();
+    }
+
+    @Override
     public Jot newJot(Jot jot) {
         return new NewJot(db, jot).value();
     }

@@ -11,6 +11,8 @@ public interface Jots {
      */
     List<Jot> all();
 
+    Jot byId(long id);
+
     /**
      * Create new jot.
      */
