@@ -2,7 +2,8 @@ package com.larryhsiao.nyx.core.sync.client;
 
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.Jot;
-import com.larryhsiao.nyx.core.sync.server.JotsJsonArray;
+import com.larryhsiao.nyx.core.sync.json.jots.JsonJots;
+import com.larryhsiao.nyx.core.sync.json.jots.JotsJsonArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

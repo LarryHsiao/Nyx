@@ -4,6 +4,8 @@ import com.larryhsiao.nyx.core.MemoryNyx;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.jots.ConstJot;
 import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.tags.ConstTag;
+import com.larryhsiao.nyx.core.tags.Tag;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +22,7 @@ class NyxSyncTest {
     @Test
     void newJotsToSecond() {
         final Nyx nyx1 = new MemoryNyx();
-        nyx1.jots().newJot(new ConstJot(1, "title", "content", 100));
+        nyx1.jots().create(new ConstJot(1, "title", "content", 100));
         final Nyx nyx2 = new MemoryNyx();
         new NyxSync(nyx1, nyx2).sync();
 
@@ -36,7 +38,7 @@ class NyxSyncTest {
     void newJotToFirst() {
         final Nyx nyx1 = new MemoryNyx();
         final Nyx nyx2 = new MemoryNyx();
-        nyx2.jots().newJot(new ConstJot(1, "title", "content", 100));
+        nyx2.jots().create(new ConstJot(1, "title", "content", 100));
         new NyxSync(nyx1, nyx2).sync();
 
         final List<Jot> jots1 = nyx1.jots().all();
@@ -48,9 +50,9 @@ class NyxSyncTest {
      * Test if new version of jot will be sync to second one from first one.
      */
     @Test
-    void updateByVersionToSecondOne() {
+    void updateJotByVersionToSecondOne() {
         final Nyx nyx1 = new MemoryNyx();
-        nyx1.jots().newJot(new ConstJot(
+        nyx1.jots().create(new ConstJot(
             1,
             "title",
             "content",
@@ -60,7 +62,7 @@ class NyxSyncTest {
             2
         ));
         final Nyx nyx2 = new MemoryNyx();
-        nyx2.jots().newJot(new ConstJot(
+        nyx2.jots().create(new ConstJot(
             1,
             "title2",
             "content2",
@@ -81,9 +83,9 @@ class NyxSyncTest {
      * Test if new version of jot will be sync to first one from second one.
      */
     @Test
-    void updateByVersionToFirstOne() {
+    void updateJotByVersionToFirstOne() {
         final Nyx nyx1 = new MemoryNyx();
-        nyx1.jots().newJot(new ConstJot(
+        nyx1.jots().create(new ConstJot(
             1,
             "title",
             "content",
@@ -92,7 +94,7 @@ class NyxSyncTest {
             "mood"
         ));
         final Nyx nyx2 = new MemoryNyx();
-        nyx2.jots().newJot(new ConstJot(
+        nyx2.jots().create(new ConstJot(
             1,
             "title2",
             "content2",
@@ -110,5 +112,71 @@ class NyxSyncTest {
         Assertions.assertEquals(jot1.content(), jot2.content());
         Assertions.assertEquals(jot1.createdTime(), jot2.createdTime());
         Assertions.assertEquals(jot1.mood(), jot2.mood());
+    }
+
+    /**
+     * New tags will be sync to second one.
+     */
+    @Test
+    void newTagsToSecond() {
+        final Nyx nyx1 = new MemoryNyx();
+        nyx1.tags().create(new ConstTag(1, "title", 1, false));
+        final Nyx nyx2 = new MemoryNyx();
+        new NyxSync(nyx1, nyx2).sync();
+
+        List<Tag> tags1 = nyx1.tags().all();
+        List<Tag> tags2 = nyx2.tags().all();
+        Assertions.assertEquals(tags1.size(), tags2.size());
+    }
+
+
+    /**
+     * Test if new Tag at second one will be sync to first one.
+     */
+    @Test
+    void newTagToFirst() {
+        final Nyx nyx1 = new MemoryNyx();
+        final Nyx nyx2 = new MemoryNyx();
+        nyx2.tags().create(new ConstTag(1, "title", 1, false));
+        new NyxSync(nyx1, nyx2).sync();
+
+        final List<Tag> tags1 = nyx1.tags().all();
+        final List<Tag> tags2 = nyx2.tags().all();
+        Assertions.assertEquals(tags1.size(), tags2.size());
+    }
+
+    /**
+     * Test if new version of tag will be sync to second one from first one.
+     */
+    @Test
+    void updateTagByVersionToSecondOne() {
+        final Nyx nyx1 = new MemoryNyx();
+        nyx1.tags().create(new ConstTag(1, "title", 2, false));
+        final Nyx nyx2 = new MemoryNyx();
+        nyx2.tags().create(new ConstTag(1, "title2", 1, false));
+        new NyxSync(nyx1, nyx2).sync();
+
+        final Tag tag1 = nyx1.tags().all().get(0);
+        final Tag tag2 = nyx2.tags().all().get(0);
+
+        Assertions.assertEquals(tag1.title(), tag2.title());
+        Assertions.assertEquals(tag1.version(), tag2.version());
+    }
+
+    /**
+     * Test if new version of jot will be sync to first one from second one.
+     */
+    @Test
+    void updateTagByVersionToFirstOne() {
+        final Nyx nyx1 = new MemoryNyx();
+        nyx1.tags().create(new ConstTag(1, "title", 1, false));
+        final Nyx nyx2 = new MemoryNyx();
+        nyx2.tags().create(new ConstTag(1, "title2", 2, false));
+        new NyxSync(nyx1, nyx2).sync();
+
+        final Tag tag1 = nyx1.tags().all().get(0);
+        final Tag tag2 = nyx2.tags().all().get(0);
+
+        Assertions.assertEquals(tag1.title(), tag2.title());
     }
 }

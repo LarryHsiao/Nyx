@@ -1,15 +1,13 @@
-package com.larryhsiao.nyx.core.sync.client.endpoints;
+package com.larryhsiao.nyx.core.sync.client.endpoints.jots;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.io.StringOutput;
 import com.larryhsiao.nyx.core.jots.Jot;
-import com.larryhsiao.nyx.core.sync.client.JsonJot;
-import com.larryhsiao.nyx.core.sync.client.JsonJots;
+import com.larryhsiao.nyx.core.sync.json.jots.JsonJot;
 
 import javax.json.Json;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 import static com.larryhsiao.nyx.core.sync.server.NyxServer.ENDPOINT_JOTS;
 

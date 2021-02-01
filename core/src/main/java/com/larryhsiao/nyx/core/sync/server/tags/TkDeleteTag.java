@@ -1,28 +1,27 @@
-package com.larryhsiao.nyx.core.sync.server;
+package com.larryhsiao.nyx.core.sync.server.tags;
 
 import com.larryhsiao.nyx.core.Nyx;
 import org.takes.Request;
 import org.takes.Response;
 import org.takes.Take;
-import org.takes.facets.fork.RqRegex;
-import org.takes.facets.fork.TkRegex;
-import org.takes.misc.Href;
-import org.takes.rq.RqHref;
 import org.takes.rs.RsWithStatus;
 
 import javax.json.Json;
 import java.io.IOException;
 
-public class TkDeleteJot implements Take {
+/**
+ * Take to delete tag by id.
+ */
+public class TkDeleteTag implements Take {
     private final Nyx nyx;
 
-    public TkDeleteJot(Nyx nyx) {
+    public TkDeleteTag(Nyx nyx) {
         this.nyx = nyx;
     }
 
     @Override
     public Response act(Request req) throws IOException {
-        nyx.jots().deleteJotById(Json.createReader(req.body())
+        nyx.tags().deleteById(Json.createReader(req.body())
             .readObject()
             .getJsonNumber("id")
             .longValue());

@@ -16,15 +16,15 @@ public interface Jots {
     /**
      * Create new jot.
      */
-    Jot newJot(Jot jot);
+    Jot create(Jot jot);
 
     /**
      * Update the given jot.
      */
-    void updateJot(Jot jot);
+    void update(Jot jot);
 
     /**
      * Delete the given jot by id.
      */
-    void deleteJotById(long id);
+    void deleteById(long id);
 }

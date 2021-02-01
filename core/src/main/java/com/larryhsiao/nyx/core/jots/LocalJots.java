@@ -26,17 +26,17 @@ public class LocalJots implements Jots {
     }
 
     @Override
-    public Jot newJot(Jot jot) {
+    public Jot create(Jot jot) {
         return new NewJot(db, jot).value();
     }
 
     @Override
-    public void updateJot(Jot jot) {
+    public void update(Jot jot) {
         new PostedJot(db, jot, true).value();
     }
 
     @Override
-    public void deleteJotById(long id) {
+    public void deleteById(long id) {
         new JotRemoval(db, id).fire();
     }
 }
