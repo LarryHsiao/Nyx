@@ -2,9 +2,10 @@ package com.larryhsiao.nyx.core.tags;
 
 import java.util.List;
 
+/**
+ * Tags in Nyx.
+ */
 public interface Tags {
-    // @todo #112 Tags
-
     /**
      * All of tags.
      */

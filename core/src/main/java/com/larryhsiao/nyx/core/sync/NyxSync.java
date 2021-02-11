@@ -2,9 +2,11 @@ package com.larryhsiao.nyx.core.sync;
 
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.tags.JotTag;
 import com.larryhsiao.nyx.core.tags.Tag;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -28,6 +30,7 @@ public class NyxSync {
         running = true;
         syncJots();
         syncTags();
+        syncJotTags();
         syncAttachment();
         syncMetadata();
         syncFile();
@@ -43,6 +46,40 @@ public class NyxSync {
 
     private void syncAttachment() {
         // @todo #109 Attachment sync
+    }
+
+    private void syncJotTags() {
+//        final Map<String, JotTag> tags1 = nyx1.jotTags()
+//            .all()
+//            .stream()
+//            .collect(toMap(
+//                jotTag -> jotTag.jotId() + " " + jotTag.tagId(),
+//                tag -> tag
+//            ));
+//        final Map<String, JotTag> tags2 = nyx2.jotTags()
+//            .all()
+//            .stream()
+//            .collect(toMap(
+//                jotTag -> jotTag.jotId() + " " + jotTag.tagId(),
+//                tag -> tag
+//            ));
+//        for (JotTag tag1 : tags1.values()) {
+//            JotTag tag2 = tags2.get(tag1.id());
+//            if (tag2 == null) {
+//                nyx2.jotTags().create(tag1);
+//            } else {
+//                if (tag1.version() > tag2.version()) {
+//                    nyx2.tags().update(tag1);
+//                } else if (tag1.version() < tag2.version()) {
+//                    nyx1.tags().update(tag2);
+//                }
+//                tags2.remove(tag1.id());
+//            }
+//        }
+//        // Adding new Jots from second one
+//        for (Tag Tag2 : tags2.values()) {
+//            nyx1.tags().create(Tag2);
+//        }
     }
 
     private void syncTags() {

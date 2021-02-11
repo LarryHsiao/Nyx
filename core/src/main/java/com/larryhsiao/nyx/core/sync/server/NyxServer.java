@@ -5,10 +5,8 @@ import com.larryhsiao.nyx.core.sync.server.jots.TkDeleteJot;
 import com.larryhsiao.nyx.core.sync.server.jots.TkJots;
 import com.larryhsiao.nyx.core.sync.server.jots.TkNewJot;
 import com.larryhsiao.nyx.core.sync.server.jots.TkUpdateJot;
-import com.larryhsiao.nyx.core.sync.server.tags.TkDeleteTag;
-import com.larryhsiao.nyx.core.sync.server.tags.TkNewTag;
-import com.larryhsiao.nyx.core.sync.server.tags.TkTags;
-import com.larryhsiao.nyx.core.sync.server.tags.TkUpdateTag;
+import com.larryhsiao.nyx.core.sync.server.tags.*;
+import com.larryhsiao.nyx.core.sync.server.tags.TkTagLinkDeletion;
 import org.takes.facets.auth.PsEmpty;
 import org.takes.facets.auth.TkAuth;
 import org.takes.facets.fork.*;
@@ -22,6 +20,7 @@ import java.io.IOException;
 public class NyxServer {
     public static final String ENDPOINT_JOTS = "/jots";
     public static final String ENDPOINT_TAGS = "/tags";
+    public static final String ENDPOINT_JOT_TAGS = "/jot_tags";
     private final Nyx nyx;
     private boolean isRunning = false;
 
@@ -54,6 +53,15 @@ public class NyxServer {
                             new FkMethods("PUT", new TkNewTag(nyx)),
                             new FkMethods("DELETE", new TkDeleteTag(nyx)),
                             new FkMethods("POST", new TkUpdateTag(nyx))
+                        )
+                    ),
+                    new FkRegex(
+                        ENDPOINT_JOT_TAGS,
+                        new TkFork(
+                            new FkMethods("GET", new TkJotTags(nyx)),
+                            new FkMethods("PUT", new TkNewJotTag(nyx)),
+                            new FkMethods("POST", new TkUpdateJotTag(nyx)),
+                            new FkMethods("DELETE", new TkTagLinkDeletion(nyx))
                         )
                     ),
                     new FkRegex("/attachments", new TkAttachments(nyx)),
