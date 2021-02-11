@@ -49,37 +49,37 @@ public class NyxSync {
     }
 
     private void syncJotTags() {
-//        final Map<String, JotTag> tags1 = nyx1.jotTags()
-//            .all()
-//            .stream()
-//            .collect(toMap(
-//                jotTag -> jotTag.jotId() + " " + jotTag.tagId(),
-//                tag -> tag
-//            ));
-//        final Map<String, JotTag> tags2 = nyx2.jotTags()
-//            .all()
-//            .stream()
-//            .collect(toMap(
-//                jotTag -> jotTag.jotId() + " " + jotTag.tagId(),
-//                tag -> tag
-//            ));
-//        for (JotTag tag1 : tags1.values()) {
-//            JotTag tag2 = tags2.get(tag1.id());
-//            if (tag2 == null) {
-//                nyx2.jotTags().create(tag1);
-//            } else {
-//                if (tag1.version() > tag2.version()) {
-//                    nyx2.tags().update(tag1);
-//                } else if (tag1.version() < tag2.version()) {
-//                    nyx1.tags().update(tag2);
-//                }
-//                tags2.remove(tag1.id());
-//            }
-//        }
-//        // Adding new Jots from second one
-//        for (Tag Tag2 : tags2.values()) {
-//            nyx1.tags().create(Tag2);
-//        }
+        final Map<String, JotTag> tags1 = nyx1.jotTags()
+            .all()
+            .stream()
+            .collect(toMap(
+                jotTag -> jotTag.jotId() + " " + jotTag.tagId(),
+                tag -> tag
+            ));
+        final Map<String, JotTag> tags2 = nyx2.jotTags()
+            .all()
+            .stream()
+            .collect(toMap(
+                jotTag -> jotTag.jotId() + " " + jotTag.tagId(),
+                tag -> tag
+            ));
+        for (JotTag tag1 : tags1.values()) {
+            JotTag tag2 = tags2.get(tag1.jotId() + " " + tag1.tagId());
+            if (tag2 == null) {
+                nyx2.jotTags().link(tag1.jotId(), tag1.tagId());
+            } else {
+                if (tag1.version() > tag2.version()) {
+                    nyx2.jotTags().update(tag1);
+                } else if (tag1.version() < tag2.version()) {
+                    nyx1.jotTags().update(tag2);
+                }
+                tags2.remove(tag1.jotId() + " " + tag1.tagId());
+            }
+        }
+        // Adding new JotTags from second one
+        for (JotTag tag2 : tags2.values()) {
+            nyx1.jotTags().link(tag2.jotId(), tag2.tagId());
+        }
     }
 
     private void syncTags() {

@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.core.sync.client;
 import com.larryhsiao.nyx.core.sync.client.endpoints.tags.GetJotTags;
 import com.larryhsiao.nyx.core.sync.client.endpoints.tags.PostJotTags;
 import com.larryhsiao.nyx.core.tags.AllJotTags;
+import com.larryhsiao.nyx.core.tags.ConstJotTag;
 import com.larryhsiao.nyx.core.tags.JotTag;
 import com.larryhsiao.nyx.core.tags.JotTags;
 
@@ -25,7 +26,9 @@ public class RemoteJotTags implements JotTags {
 
     @Override
     public void link(long jotId, long tagId) {
-        new PostJotTags(host, jotId, tagId).fire();
+        new PostJotTags(host, new ConstJotTag(
+            jotId, tagId, false, 0
+        )).fire();
     }
 
     @Override
