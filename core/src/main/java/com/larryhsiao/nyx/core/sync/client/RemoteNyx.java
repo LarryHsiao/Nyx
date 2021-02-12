@@ -5,6 +5,7 @@ import com.larryhsiao.nyx.core.attachments.Attachments;
 import com.larryhsiao.nyx.core.attachments.file.NyxFiles;
 import com.larryhsiao.nyx.core.jots.Jots;
 import com.larryhsiao.nyx.core.metadata.MetadataSet;
+import com.larryhsiao.nyx.core.tags.JotTags;
 import com.larryhsiao.nyx.core.tags.Tags;
 
 // @todo #110 Complete this
@@ -22,6 +23,11 @@ public class RemoteNyx implements Nyx {
     @Override
     public Tags tags() {
         return new RemoteTags(host);
+    }
+
+    @Override
+    public JotTags jotTags() {
+        return new RemoteJotTags(host);
     }
 
     @Override

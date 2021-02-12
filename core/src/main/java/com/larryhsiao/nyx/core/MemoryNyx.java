@@ -7,6 +7,8 @@ import com.larryhsiao.nyx.core.attachments.file.MemoryNyxFiles;
 import com.larryhsiao.nyx.core.jots.Jots;
 import com.larryhsiao.nyx.core.jots.MemoryJots;
 import com.larryhsiao.nyx.core.metadata.MetadataSet;
+import com.larryhsiao.nyx.core.tags.JotTags;
+import com.larryhsiao.nyx.core.tags.MemoryJotTags;
 import com.larryhsiao.nyx.core.tags.MemoryTags;
 import com.larryhsiao.nyx.core.tags.Tags;
 
@@ -18,10 +20,16 @@ public class MemoryNyx implements Nyx {
     private final Attachments attachments = new MemoryAttachments();
     private final NyxFiles files = new MemoryNyxFiles();
     private final Tags tags = new MemoryTags();
+    private final JotTags jotTags = new MemoryJotTags();
 
     @Override
     public Jots jots() {
         return jots;
+    }
+
+    @Override
+    public JotTags jotTags() {
+        return jotTags;
     }
 
     @Override
