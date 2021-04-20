@@ -1,11 +1,9 @@
-if (System.getenv("PUBLISH_P12") != null) {
+if (System.getenv("GOOGLE_SERVICE_ACCOUNT_JSON") != null) {
     apply plugin: "com.github.triplet.play"
     play {
-        track = "alpha"
-        releaseStatus = "completed"
-        defaultToAppBundles = true
-        serviceAccountEmail = System.getenv("PUBLISH_ACCOUNT_EMAIL")
-        serviceAccountCredentials = file(System.getenv("PUBLISH_P12"))
+        fromTrack.set("alpha")
+        defaultToAppBundles.set(true)
+        serviceAccountCredentials.set(file(System.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")))
     }
 }
 
