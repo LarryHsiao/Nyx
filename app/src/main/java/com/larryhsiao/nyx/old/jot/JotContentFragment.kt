@@ -54,6 +54,7 @@ import com.silverhetch.aura.images.exif.ExifAttribute
 import com.silverhetch.aura.images.exif.ExifUnixTimeStamp
 import com.silverhetch.aura.location.LocationAddress
 import com.silverhetch.aura.uri.UriMimeType
+import com.silverhetch.aura.view.dialog.InputDialog
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration
 import com.silverhetch.aura.view.recyclerview.slider.Slider
@@ -278,7 +279,7 @@ class JotContentFragment : JotFragment(), BackControl {
             gridView.onItemClickListener = AdapterView.OnItemClickListener { parent: AdapterView<*>?, view12: View, position: Int, id: Long ->
                 if (position == gridView.adapter.count - 1) { // last custom dialog
                     moodDialog.dismiss()
-                    val dialog = newInstance(
+                    val dialog = InputDialog.newInstance(
                         getString(R.string.moods),
                         REQUEST_CODE_INPUT_CUSTOM_MOOD
                     )
@@ -723,9 +724,9 @@ class JotContentFragment : JotFragment(), BackControl {
     }
 
     private fun unsupportedDialog() {
-        newInstance(
-            REQUEST_CODE_ALERT,
-            getString(R.string.not_supported_file)
+        InputDialog.newInstance(
+            getString(R.string.not_supported_file),
+            REQUEST_CODE_ALERT
         ).show(childFragmentManager, null)
     }
 
