@@ -22,21 +22,10 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
-import com.android.billingclient.api.BillingClient
-import com.android.billingclient.api.BillingClient.SkuType
-import com.android.billingclient.api.BillingClientStateListener
-import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.Purchase.PurchaseState
-import com.google.android.gms.tasks.Task
 import com.google.android.material.chip.Chip
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.cloud.landmark.FirebaseVisionCloudLandmark
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionLatLng
-import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText
 import com.google.gson.Gson
+import com.larryhsiao.clotho.date.DateCalendar
+import com.larryhsiao.clotho.source.ConstSource
 import com.larryhsiao.nyx.BuildConfig
 import com.larryhsiao.nyx.NyxApplication
 import com.larryhsiao.nyx.R
@@ -54,7 +43,6 @@ import com.larryhsiao.nyx.old.sync.SyncService
 import com.larryhsiao.nyx.old.util.EmbedMapFragment
 import com.larryhsiao.nyx.old.util.JpegDateComparator
 import com.larryhsiao.nyx.old.util.exif.ExifLocation
-import com.larryhsiao.nyx.old.util.exif.FirebaseLatLngLocation
 import com.linkedin.urls.detection.UrlDetector
 import com.linkedin.urls.detection.UrlDetectorOptions
 import com.schibstedspain.leku.ADDRESS
@@ -66,13 +54,10 @@ import com.silverhetch.aura.images.exif.ExifAttribute
 import com.silverhetch.aura.images.exif.ExifUnixTimeStamp
 import com.silverhetch.aura.location.LocationAddress
 import com.silverhetch.aura.uri.UriMimeType
-import com.silverhetch.aura.view.alert.Alert.Companion.newInstance
-import com.silverhetch.aura.view.dialog.InputDialog.Companion.newInstance
+import com.silverhetch.aura.view.dialog.InputDialog
 import com.silverhetch.aura.view.fab.FabBehavior
 import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration
 import com.silverhetch.aura.view.recyclerview.slider.Slider
-import com.larryhsiao.clotho.date.DateCalendar
-import com.larryhsiao.clotho.source.ConstSource
 import kotlinx.android.synthetic.main.page_jot.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -85,14 +70,13 @@ import java.util.stream.Collectors
  *
  * @todo #0 One click touch template jot with geometry, and some pictures.
  */
-class JotContentFragment : JotFragment(), BackControl, BillingClientStateListener {
+class JotContentFragment : JotFragment(), BackControl {
     private val attachmentOnView: MutableList<Uri?> = ArrayList()
     private val mainHandler = Handler()
     private var backgroundThread: HandlerThread? = null
     private var backgroundHandler: Handler? = null
     private var adapter: AttachmentSliderAdapter? = null
     private var jot: Jot? = null
-    private lateinit var billing: BillingClient
     override fun onDestroy() {
         super.onDestroy()
         backgroundThread!!.quitSafely()
@@ -146,11 +130,6 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
         view: View, savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
-        billing = BillingClient.newBuilder(requireContext())
-            .setListener { res: BillingResult?, list: List<Purchase?>? -> }
-            .enablePendingPurchases()
-            .build()
-        billing.startConnection(this)
         jot_date.setOnClickListener(View.OnClickListener { v: View? ->
             val calendar = DateCalendar(jot!!.createdTime(), Calendar.getInstance()).value()
             val dialog = DatePickerDialog(
@@ -300,7 +279,7 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
             gridView.onItemClickListener = AdapterView.OnItemClickListener { parent: AdapterView<*>?, view12: View, position: Int, id: Long ->
                 if (position == gridView.adapter.count - 1) { // last custom dialog
                     moodDialog.dismiss()
-                    val dialog = newInstance(
+                    val dialog = InputDialog.newInstance(
                         getString(R.string.moods),
                         REQUEST_CODE_INPUT_CUSTOM_MOOD
                     )
@@ -324,7 +303,6 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
                 moodDialog.dismiss()
             }
         })
-        view.findViewById<View>(R.id.jot_ai_magic).setOnClickListener { v: View? -> takePicture(REQUEST_CODE_AI_MAGIC_CAPTURE) }
     }
 
     private fun preferEnterUrl(url: String) {
@@ -337,7 +315,7 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
                         .url(url)
                         .build()
                 ).execute()
-                if (res.code() >= 200 && res.code() <= 299) {
+                if (res.code() in 200..299) {
                     postAddAttachment(url)
                 }
             } catch (ignore: Exception) {
@@ -391,11 +369,6 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
     override fun onPause() {
         super.onPause()
         detachFab()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        billing!!.endConnection()
     }
 
     private fun updateAddress(location: Location) {
@@ -611,16 +584,6 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
             if (resultCode == Activity.RESULT_OK) {
                 takeTempPhoto()
             }
-        } else if (requestCode == REQUEST_CODE_AI_MAGIC_CAPTURE) {
-            if (resultCode == Activity.RESULT_OK) {
-                premiumAiMagic(
-                    FileProvider.getUriForFile(
-                        requireContext(),
-                        NyxApplication.FILE_PROVIDER_AUTHORITY!!,
-                        TempAttachmentFile(requireContext(), TEMP_FILE_NAME).value()
-                    )
-                )
-            }
         }
     }
 
@@ -640,50 +603,6 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
             )
         )
         updateAttachmentView()
-    }
-
-    private fun premiumAiMagic(fileUri: Uri) {
-        try {
-            val image = FirebaseVisionImage.fromFilePath(requireContext(), fileUri)
-            val contentEditText = requireView().findViewById<EditText>(R.id.jot_content)
-            FirebaseVision.getInstance()
-                .cloudDocumentTextRecognizer
-                .processImage(image)
-                .addOnSuccessListener { text: FirebaseVisionDocumentText ->
-                    if (view == null) {
-                        return@addOnSuccessListener
-                    }
-                    contentEditText.append(text.text)
-                }
-                .addOnCompleteListener { task: Task<FirebaseVisionDocumentText?>? ->
-                    FirebaseVision.getInstance()
-                        .visionBarcodeDetector
-                        .detectInImage(image)
-                        .addOnSuccessListener { it: List<FirebaseVisionBarcode> ->
-                            for (barcode in it) {
-                                contentEditText.append("\n")
-                                contentEditText.append(barcode.displayValue)
-                            }
-                        }.addOnCompleteListener { it2: Task<List<FirebaseVisionBarcode?>?>? ->
-                            FirebaseVision.getInstance()
-                                .visionCloudLandmarkDetector
-                                .detectInImage(image)
-                                .addOnSuccessListener { it3: List<FirebaseVisionCloudLandmark> ->
-                                    val sorted = it3.stream().sorted { o1: FirebaseVisionCloudLandmark, o2: FirebaseVisionCloudLandmark -> ((o1.confidence - o2.confidence) * 100).toInt() }.collect(Collectors.toList())
-                                    if (sorted.size > 0) {
-                                        val landmark = sorted[0]
-                                        newChip(landmark.landmark)
-                                        if (landmark.locations.size > 0) {
-                                            updateJotLocation(
-                                                landmark.locations[0])
-                                        }
-                                    }
-                                }.addOnCompleteListener { it: Task<List<FirebaseVisionCloudLandmark?>?>? -> takeTempPhoto() }
-                        }
-                }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     private fun deleteTempAttachments() {
@@ -805,9 +724,9 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
     }
 
     private fun unsupportedDialog() {
-        newInstance(
-            REQUEST_CODE_ALERT,
-            getString(R.string.not_supported_file)
+        InputDialog.newInstance(
+            getString(R.string.not_supported_file),
+            REQUEST_CODE_ALERT
         ).show(childFragmentManager, null)
     }
 
@@ -882,13 +801,6 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
         updateJotLocation(location)
     }
 
-    private fun updateJotLocation(latLng: FirebaseVisionLatLng) {
-        if (isLocationSetup) {
-            return
-        }
-        updateJotLocation(FirebaseLatLngLocation(latLng).value())
-    }
-
     private fun updateJotLocation(location: Location) {
         jot = object : WrappedJot(jot!!) {
             override fun location(): DoubleArray {
@@ -936,23 +848,6 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
         }
     }
 
-    override fun onBillingSetupFinished(billingResult: BillingResult) {
-        val purchasesList = billing!!.queryPurchases(SkuType.SUBS).purchasesList
-        if (purchasesList != null) {
-            for (purchase in purchasesList) {
-                if ("premium" == purchase.sku && purchase.purchaseState == PurchaseState.PURCHASED) {
-                    val view = view
-                    if (view != null) {
-                        view.findViewById<View>(R.id.jot_ai_magic).visibility = View.VISIBLE
-                    }
-                    return
-                }
-            }
-        }
-    }
-
-    override fun onBillingServiceDisconnected() {}
-
     companion object {
         private const val REQUEST_CODE_LOCATION_PICKER = 1000
         private const val REQUEST_CODE_PICK_FILE = 1001
@@ -960,7 +855,6 @@ class JotContentFragment : JotFragment(), BackControl, BillingClientStateListene
         private const val REQUEST_CODE_ALERT = 1003
         private const val REQUEST_CODE_ATTACHMENT_DIALOG = 1004
         private const val REQUEST_CODE_TAKE_PICTURE = 1005
-        private const val REQUEST_CODE_AI_MAGIC_CAPTURE = 1006
         private const val ARG_JOT_JSON = "ARG_JOT"
         private const val ARG_ATTACHMENT_URI = "ARG_ATTACHMENT_URI"
         private const val ARG_REQUEST_CODE = "ARG_REQUEST_CODE"

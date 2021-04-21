@@ -11,10 +11,7 @@ ext {
 
 allprojects {
     repositories {
-        google()
-        jcenter()
-        maven { url = "https://dl.bintray.com/larryhsiao/Elizabeth" }
-        maven { url = "https://jitpack.io" }
+        maven {url = "https://larryhsiao.com:11000/repository/maven-public/"}
     }
 }
 
