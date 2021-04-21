@@ -13,16 +13,17 @@ import com.larryhsiao.nyx.core.sync.server.NyxServer;
  * Server for serving Jots.
  */
 public class ServerService extends Service {
-    private final NyxServer server = new NyxServer(
-        new LocalNyx(
-            ((NyxApplication) getApplicationContext()).getDb(),
-            new NyxFilesImpl(this)
-        )
-    );
+    private NyxServer server;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        server = new NyxServer(
+            new LocalNyx(
+                ((NyxApplication) getApplicationContext()).getDb(),
+                new NyxFilesImpl(this)
+            )
+        );
         new Thread(() -> {
             try {
                 server.launch();

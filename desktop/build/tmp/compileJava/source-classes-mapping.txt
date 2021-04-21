@@ -1,4 +1,0 @@
-com/larryhsiao/nyx/desktop/attachments/DesktopAttachments.java
- com.larryhsiao.nyx.desktop.attachments.DesktopAttachments
-com/larryhsiao/nyx/desktop/Main.java
- com.larryhsiao.nyx.desktop.Main
