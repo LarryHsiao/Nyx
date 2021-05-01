@@ -37,7 +37,12 @@ class JotsSearchingViewModel(private val app: NyxApplication) : ViewModel() {
 
     private suspend fun loadByKeyword(){
         jots.value = withContext(IO) {
-            QueriedJots(JotsByKeyword(app.db, keyword.value ?: "")).value()
+            QueriedJots(
+                JotsByKeyword(
+                    app.db,
+                    keyword.value ?: ""
+                )
+            ).value()
         }
     }
 }
