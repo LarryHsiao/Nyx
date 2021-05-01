@@ -1,7 +1,7 @@
 package com.larryhsiao.nyx.old.attachments;
 
 import android.widget.ImageView;
-import com.silverhetch.aura.uri.UriMimeType;
+import com.larryhsiao.aura.uri.UriMimeType;
 import com.larryhsiao.clotho.Action;
 
 import static android.graphics.Color.BLACK;

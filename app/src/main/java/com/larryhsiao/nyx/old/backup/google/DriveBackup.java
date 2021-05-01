@@ -9,7 +9,7 @@ import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.old.attachments.TempAttachmentFile;
 import com.larryhsiao.nyx.old.backup.Backup;
-import com.silverhetch.aura.uri.UriMimeType;
+import com.larryhsiao.aura.uri.UriMimeType;
 import com.larryhsiao.clotho.Source;
 
 import java.io.FileInputStream;

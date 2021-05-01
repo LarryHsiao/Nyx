@@ -22,8 +22,8 @@ import com.google.android.gms.common.api.Scope;
 import com.google.common.base.Strings;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.base.JotFragment;
-import com.silverhetch.aura.view.span.ClickableStr;
-import com.silverhetch.aura.view.span.ColoredStr;
+import com.larryhsiao.aura.view.span.ClickableStr;
+import com.larryhsiao.aura.view.span.ColoredStr;
 import com.larryhsiao.clotho.source.ConstSource;
 
 import static android.app.Activity.RESULT_OK;

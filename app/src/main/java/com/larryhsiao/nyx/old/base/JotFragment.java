@@ -4,7 +4,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.larryhsiao.nyx.NyxApplication;
-import com.silverhetch.aura.AuraFragment;
+import com.larryhsiao.aura.AuraFragment;
 import com.larryhsiao.clotho.Source;
 
 import java.sql.Connection;

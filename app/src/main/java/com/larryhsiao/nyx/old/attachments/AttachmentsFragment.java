@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.jot.AttachmentAdapter;
-import com.silverhetch.aura.uri.UriMimeType;
-import com.silverhetch.aura.view.alert.Alert;
-import com.silverhetch.aura.view.dialog.FullScreenDialogFragment;
+import com.larryhsiao.aura.uri.UriMimeType;
+import com.larryhsiao.aura.view.alert.Alert;
+import com.larryhsiao.aura.view.dialog.FullScreenDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;

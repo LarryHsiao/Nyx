@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.core.tags.Tag;
-import com.silverhetch.aura.view.measures.DP;
-import com.silverhetch.aura.view.recyclerview.ViewHolder;
+import com.larryhsiao.aura.view.measures.DP;
+import com.larryhsiao.aura.view.recyclerview.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;

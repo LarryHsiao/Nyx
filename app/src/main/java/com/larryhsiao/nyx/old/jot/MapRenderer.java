@@ -15,7 +15,7 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId;
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
-import com.silverhetch.aura.view.measures.DP;
+import com.larryhsiao.aura.view.measures.DP;
 import com.larryhsiao.clotho.Source;
 
 import java.io.IOException;

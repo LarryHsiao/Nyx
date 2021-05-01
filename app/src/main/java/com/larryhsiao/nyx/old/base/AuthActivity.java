@@ -4,7 +4,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.larryhsiao.nyx.NyxApplication;
-import com.silverhetch.aura.fingerprint.BioAuth;
+import com.larryhsiao.aura.fingerprint.BioAuth;
 import kotlin.Unit;
 
 /**

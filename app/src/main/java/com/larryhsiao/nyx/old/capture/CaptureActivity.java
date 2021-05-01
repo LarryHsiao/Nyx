@@ -16,8 +16,8 @@ import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.NewJot;
 import com.larryhsiao.nyx.old.base.JotActivity;
 import com.larryhsiao.nyx.old.util.exif.ExifLocation;
-import com.silverhetch.aura.view.activity.Fullscreen;
-import com.silverhetch.aura.view.bitmap.ResizedImage;
+import com.larryhsiao.aura.view.activity.Fullscreen;
+import com.larryhsiao.aura.view.bitmap.ResizedImage;
 import com.larryhsiao.clotho.io.ProgressedCopy;
 import com.larryhsiao.clotho.source.ConstSource;
 import org.jetbrains.annotations.NotNull;
@@ -135,6 +135,7 @@ public class CaptureActivity extends JotActivity {
             new ProgressedCopy(
                 new FileInputStream(capturedFile),
                 getContentResolver().openOutputStream(extraOutput),
+                4 * 1024 * 1024,
                 integer -> null
             ).value();
         } catch (Exception e) {

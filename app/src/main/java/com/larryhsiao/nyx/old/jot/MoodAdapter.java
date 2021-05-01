@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 import com.larryhsiao.nyx.R;
-import com.silverhetch.aura.view.measures.DP;
+import com.larryhsiao.aura.view.measures.DP;
 
 import java.util.List;
 
