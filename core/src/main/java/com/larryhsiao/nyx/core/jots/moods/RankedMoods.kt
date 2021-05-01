@@ -3,7 +3,7 @@ package com.larryhsiao.nyx.core.jots.moods
 import com.larryhsiao.nyx.core.jots.AllJots
 import com.larryhsiao.nyx.core.jots.QueriedJots
 import com.larryhsiao.clotho.Source
-import com.larryhsiao.clotho.utility.comparator.StringComparator
+import com.larryhsiao.clotho.comparator.StringComparator
 import java.sql.Connection
 import java.util.*
 import java.util.stream.Collectors

@@ -3,9 +3,9 @@ package com.larryhsiao.nyx.old.util;
 import android.content.Context;
 import android.net.Uri;
 import androidx.exifinterface.media.ExifInterface;
-import com.silverhetch.aura.images.exif.ExifAttribute;
-import com.silverhetch.aura.images.exif.ExifUnixTimeStamp;
-import com.silverhetch.aura.uri.UriMimeType;
+import com.larryhsiao.aura.images.exif.ExifAttribute;
+import com.larryhsiao.aura.images.exif.ExifUnixTimeStamp;
+import com.larryhsiao.aura.uri.UriMimeType;
 import com.larryhsiao.clotho.source.ConstSource;
 
 import java.io.IOException;

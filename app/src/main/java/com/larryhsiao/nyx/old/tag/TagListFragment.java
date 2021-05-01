@@ -19,11 +19,11 @@ import com.larryhsiao.nyx.core.tags.*;
 import com.larryhsiao.nyx.old.base.JotFragment;
 import com.larryhsiao.nyx.old.jot.JotListFragment;
 import com.larryhsiao.nyx.old.util.EmptyView;
-import com.silverhetch.aura.view.dialog.InputDialog;
-import com.silverhetch.aura.view.fab.FabBehavior;
-import com.silverhetch.aura.view.recyclerview.EmptyListAdapter;
+import com.larryhsiao.aura.view.dialog.InputDialog;
+import com.larryhsiao.aura.view.fab.FabBehavior;
+import com.larryhsiao.aura.view.recyclerview.EmptyListAdapter;
 import com.larryhsiao.clotho.source.ConstSource;
-import com.larryhsiao.clotho.utility.comparator.StringComparator;
+import com.larryhsiao.clotho.comparator.StringComparator;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -186,6 +186,7 @@ public class RemoteFileSync implements Action {
                 new ProgressedCopy(
                     new CipherInputStream(inputStream, cipher),
                     new FileOutputStream(dist),
+                    4 * 1024 * 1024,
                     (progress) -> null
                 ).value();
                 inputStream.close();

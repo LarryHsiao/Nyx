@@ -5,7 +5,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.larryhsiao.nyx.core.attachments.Attachment
-import com.silverhetch.aura.view.measures.DP
+import com.larryhsiao.aura.view.measures.DP
 import com.squareup.picasso.Picasso
 
 /**

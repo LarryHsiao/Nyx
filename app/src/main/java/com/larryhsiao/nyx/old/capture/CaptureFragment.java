@@ -23,8 +23,8 @@ import androidx.fragment.app.Fragment;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.attachments.TempAttachmentFile;
-import com.silverhetch.aura.AuraFragment;
-import com.silverhetch.aura.location.LocationService;
+import com.larryhsiao.aura.AuraFragment;
+import com.larryhsiao.aura.location.LocationService;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

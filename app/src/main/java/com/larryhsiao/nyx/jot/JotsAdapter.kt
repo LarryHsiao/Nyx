@@ -15,7 +15,7 @@ import com.larryhsiao.clotho.Source
 import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments
 import com.larryhsiao.nyx.utils.AttachmentPagerAdapter
-import com.silverhetch.aura.view.images.pager.PagerImageAdapter
+import com.larryhsiao.aura.view.images.pager.PagerImageAdapter
 import kotlinx.android.synthetic.main.item_jot.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

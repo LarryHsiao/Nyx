@@ -14,10 +14,10 @@ import com.larryhsiao.nyx.core.attachments.QueriedAttachments;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.old.attachments.AttachmentPropertiesDialog;
 import com.larryhsiao.nyx.old.attachments.LaunchAttachment;
-import com.silverhetch.aura.view.measures.DP;
-import com.silverhetch.aura.view.recyclerview.ViewHolder;
-import com.silverhetch.aura.view.recyclerview.slider.DotIndicatorDecoration;
-import com.silverhetch.aura.view.recyclerview.slider.Slider;
+import com.larryhsiao.aura.view.measures.DP;
+import com.larryhsiao.aura.view.recyclerview.ViewHolder;
+import com.larryhsiao.aura.view.recyclerview.slider.DotIndicatorDecoration;
+import com.larryhsiao.aura.view.recyclerview.slider.Slider;
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.date.DateCalendar;
 

@@ -19,7 +19,7 @@ test {
 }
 
 dependencies {
-    api 'com.larryhsiao:clotho:1.18.3'
+    api 'com.larryhsiao:clotho:1.18.7'
     api 'com.h2database:h2:1.4.197'
     implementation 'org.takes:takes:1.11.3'
     implementation  'org.glassfish:javax.json:1.1.4'

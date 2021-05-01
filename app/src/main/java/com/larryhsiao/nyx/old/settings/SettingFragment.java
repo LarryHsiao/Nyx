@@ -8,7 +8,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.sync.SyncService;
-import com.silverhetch.aura.fingerprint.FingerprintImpl;
+import com.larryhsiao.aura.fingerprint.FingerprintImpl;
 import com.larryhsiao.clotho.storage.MemoryCeres;
 
 /**

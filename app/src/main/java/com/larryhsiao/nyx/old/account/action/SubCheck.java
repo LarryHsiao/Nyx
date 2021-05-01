@@ -9,7 +9,7 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.old.account.api.NyxApi;
 import com.larryhsiao.nyx.old.account.api.SubReq;
 import com.larryhsiao.nyx.old.sync.SyncService;
-import com.silverhetch.aura.view.alert.Alert;
+import com.larryhsiao.aura.view.alert.Alert;
 import com.larryhsiao.clotho.Action;
 import retrofit2.Call;
 import retrofit2.Callback;

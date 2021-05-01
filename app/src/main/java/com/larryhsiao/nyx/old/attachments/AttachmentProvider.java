@@ -19,7 +19,7 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.core.attachments.*;
 import com.larryhsiao.nyx.core.jots.*;
 import com.larryhsiao.nyx.core.tags.TagDb;
-import com.silverhetch.aura.uri.UriMimeType;
+import com.larryhsiao.aura.uri.UriMimeType;
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.database.SingleConn;
 import com.larryhsiao.clotho.database.h2.EmbedH2Conn;

@@ -18,8 +18,8 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.core.jots.*;
 import com.larryhsiao.nyx.old.base.JotFragment;
 import com.larryhsiao.nyx.old.util.EmptyView;
-import com.silverhetch.aura.view.fab.FabBehavior;
-import com.silverhetch.aura.view.recyclerview.EmptyListAdapter;
+import com.larryhsiao.aura.view.fab.FabBehavior;
+import com.larryhsiao.aura.view.recyclerview.EmptyListAdapter;
 
 import java.text.DateFormat;
 import java.util.Date;

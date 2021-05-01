@@ -30,9 +30,9 @@ import com.larryhsiao.nyx.old.account.action.LogoutAction;
 import com.larryhsiao.nyx.old.account.action.SubCheck;
 import com.larryhsiao.nyx.old.attachments.FileSize;
 import com.larryhsiao.nyx.old.base.JotFragment;
-import com.silverhetch.aura.view.bitmap.CircledDrawable;
-import com.silverhetch.aura.view.span.ClickableStr;
-import com.silverhetch.aura.view.span.ColoredStr;
+import com.larryhsiao.aura.view.bitmap.CircledDrawable;
+import com.larryhsiao.aura.view.span.ClickableStr;
+import com.larryhsiao.aura.view.span.ColoredStr;
 import com.larryhsiao.clotho.file.SizeText;
 import com.larryhsiao.clotho.source.ConstSource;
 

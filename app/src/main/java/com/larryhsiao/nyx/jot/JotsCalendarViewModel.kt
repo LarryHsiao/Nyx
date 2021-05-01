@@ -11,8 +11,8 @@ import com.larryhsiao.nyx.core.attachments.NewAttachments
 import com.larryhsiao.nyx.core.jots.*
 import com.larryhsiao.nyx.core.jots.goemetry.MeterDelta
 import com.larryhsiao.nyx.jot.JotsCalendarViewModel.ListType.LIST
-import com.silverhetch.aura.images.exif.ExifAttribute
-import com.silverhetch.aura.images.exif.ExifUnixTimeStamp
+import com.larryhsiao.aura.images.exif.ExifAttribute
+import com.larryhsiao.aura.images.exif.ExifUnixTimeStamp
 import com.larryhsiao.clotho.source.ConstSource
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch

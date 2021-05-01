@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import com.larryhsiao.nyx.R;
-import com.silverhetch.aura.uri.UriMimeType;
+import com.larryhsiao.aura.uri.UriMimeType;
 import com.larryhsiao.clotho.Action;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 
