@@ -36,7 +36,7 @@ class JotsSearchingViewModel(private val app: NyxApplication) : ViewModel() {
     }
 
     private suspend fun loadByKeyword(){
-        jots.value = withContext(IO) {
+        val result: List<Jot> = withContext(IO) {
             QueriedJots(
                 JotsByKeyword(
                     app.db,
@@ -44,5 +44,6 @@ class JotsSearchingViewModel(private val app: NyxApplication) : ViewModel() {
                 )
             ).value()
         }
+        jots.value = result
     }
 }
