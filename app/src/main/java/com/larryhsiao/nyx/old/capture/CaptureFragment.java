@@ -185,25 +185,23 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
         } else {
             throw new RuntimeException("No camera available");
         }
-        CameraSelector cameraSelector = new Builder()
-            .requireLensFacing(lenFacing)
-            .build();
-
-        Preview preview = new Preview.Builder().build();
         PreviewView previewView = requireView().findViewById(R.id.photoCapture_preview);
+        Preview preview = new Preview.Builder().build();
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
-
         DisplayMetrics metrics = new DisplayMetrics();
         requireView().getDisplay().getRealMetrics(metrics);
-
         imgCapture = new ImageCapture.Builder()
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .setTargetAspectRatio(AspectRatio.RATIO_16_9)
             .setTargetRotation(requireView().getDisplay().getRotation())
             .build();
-
         cameraProvider.unbindAll();
-        cameraProvider.bindToLifecycle(this, cameraSelector, imgCapture, preview);
+        cameraProvider.bindToLifecycle(
+            this,
+            new Builder().requireLensFacing(lenFacing).build(),
+            imgCapture,
+            preview
+        );
     }
 
     private boolean allPermissionsGranted() {
