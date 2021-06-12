@@ -46,7 +46,6 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
     };
     private static final String ARG_REQUEST_CODE = "ARG_REQUEST_CODE";
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    private CameraSelector cameraSelector = new CameraSelector.Builder().build();
     private Integer lenFacing = LENS_FACING_BACK;
     private ImageCapture imgCapture;
     private ExecutorService cameraExecutor;
@@ -143,9 +142,7 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
 
                     @Override
                     public void onError(@NotNull ImageCaptureException exception) {
-                        requireView().post(() -> {
-                            showError();
-                        });
+                        requireView().post(CaptureFragment.this::showError);
                     }
                 }
             );
@@ -188,13 +185,13 @@ public class CaptureFragment extends AuraFragment implements ServiceConnection {
         } else {
             throw new RuntimeException("No camera available");
         }
-        cameraSelector = new CameraSelector.Builder()
+        CameraSelector cameraSelector = new Builder()
             .requireLensFacing(lenFacing)
             .build();
 
         Preview preview = new Preview.Builder().build();
         PreviewView previewView = requireView().findViewById(R.id.photoCapture_preview);
-        preview.setSurfaceProvider(previewView.createSurfaceProvider());
+        preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
         DisplayMetrics metrics = new DisplayMetrics();
         requireView().getDisplay().getRealMetrics(metrics);

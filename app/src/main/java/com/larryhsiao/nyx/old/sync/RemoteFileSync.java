@@ -188,7 +188,7 @@ public class RemoteFileSync implements Action {
                     new FileOutputStream(dist),
                     4 * 1024 * 1024,
                     (progress) -> null
-                ).value();
+                ).fire();
                 inputStream.close();
             }
         );
