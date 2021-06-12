@@ -137,7 +137,7 @@ public class CaptureActivity extends JotActivity {
                 getContentResolver().openOutputStream(extraOutput),
                 4 * 1024 * 1024,
                 integer -> null
-            ).value();
+            ).fire();
         } catch (Exception e) {
             Toast.makeText(this, R.string.appError_unknown, Toast.LENGTH_SHORT).show();
         }

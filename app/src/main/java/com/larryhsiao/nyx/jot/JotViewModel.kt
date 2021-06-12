@@ -78,8 +78,8 @@ class JotViewModel(
     private val isModified = MutableLiveData<Boolean>()
     fun isModified(): LiveData<Boolean> = isModified
 
-    private val weather = MutableLiveData<Weather>()
-    fun weather(): LiveData<Weather> = weather
+    private val weather = MutableLiveData<Weather?>()
+    fun weather(): LiveData<Weather?> = weather
 
     private val tags: MutableMap<String, Tag> = HashMap<String, Tag>()
     private val tagsLiveData = MutableLiveData<Map<String, Tag>>().apply {
@@ -267,13 +267,14 @@ class JotViewModel(
     }
 
     private fun loadWeather(longitude: Double, latitude: Double) = viewModelScope.launch {
-        weather.value = withContext(IO) {
+        val result = withContext(IO) {
             CurrentWeather(
                 OPEN_WEATHER_API_KEY,
                 latitude,
                 longitude
             ).value()
         }
+        weather.value = result
     }
 
     fun preferAttachments(newAttachments: List<Uri>) {
