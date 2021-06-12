@@ -2,9 +2,11 @@ package com.larryhsiao.nyx.core;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.nyx.core.attachments.Attachments;
-import com.larryhsiao.nyx.core.attachments.file.NyxFiles;
+import com.larryhsiao.nyx.core.attachments.LocalAttachments;
+import com.larryhsiao.nyx.core.attachments.NyxFiles;
 import com.larryhsiao.nyx.core.jots.Jots;
 import com.larryhsiao.nyx.core.jots.LocalJots;
+import com.larryhsiao.nyx.core.metadata.LocalMetadataSet;
 import com.larryhsiao.nyx.core.metadata.MetadataSet;
 import com.larryhsiao.nyx.core.tags.JotTags;
 import com.larryhsiao.nyx.core.tags.LocalJotTags;
@@ -12,8 +14,6 @@ import com.larryhsiao.nyx.core.tags.LocalTags;
 import com.larryhsiao.nyx.core.tags.Tags;
 
 import java.sql.Connection;
-
-// @todo #111 Complete this
 
 /**
  * Implementation of local storing data.
@@ -44,12 +44,12 @@ public class LocalNyx implements Nyx {
 
     @Override
     public MetadataSet metadataSet() {
-        return null;
+        return new LocalMetadataSet(db);
     }
 
     @Override
     public Attachments attachments() {
-        return null;
+        return new LocalAttachments(db);
     }
 
     @Override

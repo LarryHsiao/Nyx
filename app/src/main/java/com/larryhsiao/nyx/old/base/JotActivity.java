@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 import com.larryhsiao.nyx.NyxApplication;
+import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.old.settings.DefaultPreference;
 import com.larryhsiao.nyx.old.settings.NyxSettings;
 import com.larryhsiao.nyx.old.settings.NyxSettingsImpl;
@@ -21,14 +22,14 @@ import java.sql.Connection;
  * Activity for Jot.
  */
 public abstract class JotActivity extends AuraActivity {
-    protected Source<Connection> db;
+    protected Nyx nyx;
     protected NyxSettings settings;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         NyxApplication app = ((NyxApplication) getApplicationContext());
-        db = app.getDb();
+        nyx = app.nyx();
         settings = new NyxSettingsImpl(new SingleRefSource<>(new DefaultPreference(this)));
     }
 

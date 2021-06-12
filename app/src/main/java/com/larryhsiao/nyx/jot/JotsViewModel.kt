@@ -21,13 +21,13 @@ class JotsViewModel(private val app: NyxApplication) : ViewModel() {
     fun preferAllJots() = preferJots("")
 
     fun preferJots(ids: LongArray) = viewModelScope.launch {
-        val result : List<Jot> = withContext(IO) { QueriedJots(JotsByIds(app.db, ids)).value() }
+        val result : List<Jot> = withContext(IO) { app.nyx().jots().byIds(ids) }
         jots.value = result
     }
 
     fun preferJots(keyword: String) = viewModelScope.launch {
         val result: List<Jot> = withContext(IO) {
-            QueriedJots(JotsByKeyword(app.db, keyword)).value()
+            app.nyx().jots().byKeyword(keyword)
         }
         jots.value = result
     }

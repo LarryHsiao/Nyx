@@ -37,12 +37,7 @@ class JotsSearchingViewModel(private val app: NyxApplication) : ViewModel() {
 
     private suspend fun loadByKeyword(){
         val result: List<Jot> = withContext(IO) {
-            QueriedJots(
-                JotsByKeyword(
-                    app.db,
-                    keyword.value ?: ""
-                )
-            ).value()
+            app.nyx().jots().byKeyword(keyword.value?:"")
         }
         jots.value = result
     }

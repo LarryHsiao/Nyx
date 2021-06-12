@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 import com.larryhsiao.clotho.dgist.MD5;
+import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.attachments.*;
 import com.larryhsiao.nyx.old.attachments.TempAttachmentFile;
 import com.larryhsiao.nyx.old.settings.DefaultPreference;
@@ -15,6 +16,7 @@ import com.larryhsiao.clotho.Action;
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.file.ToFile;
 import com.larryhsiao.clotho.source.SingleRefSource;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,12 +38,12 @@ import static java.util.stream.Collectors.toList;
 public class LocalFileSync implements Action {
     private final MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
     private final Context context;
-    private final Source<Connection> db;
+    private final Nyx nyx;
     private final NyxSettings settings;
 
-    public LocalFileSync(Context context, Source<Connection> db) {
+    public LocalFileSync(Context context, Nyx nyx) {
         this.context = context;
-        this.db = db;
+        this.nyx =nyx;
         this.settings = new NyxSettingsImpl(
             new SingleRefSource<>(new DefaultPreference(context))
         );
@@ -51,9 +53,7 @@ public class LocalFileSync implements Action {
     public void fire() {
         final File internalRoot = new File(context.getFilesDir(), "attachments");
         internalRoot.mkdir();
-        final List<Attachment> dbAttachments = new QueriedAttachments(
-            new AllAttachments(db, true)
-        ).value()
+        final List<Attachment> dbAttachments = nyx.attachments().all()
             .stream()
             .filter(it -> !it.uri().isEmpty())
             .collect(toList());
@@ -122,12 +122,12 @@ public class LocalFileSync implements Action {
             new MD5(new FileInputStream(compressTemp)).value()
         );
         compressTemp.renameTo(new File(internalRoot, fileName));
-        new UpdateAttachment(db, new WrappedAttachment(attachment) {
+        nyx.attachments().update(new WrappedAttachment(attachment) {
             @Override
             public String uri() {
                 return URI_FILE_PROVIDER + fileName;
             }
-        }).fire();
+        });
         temp.delete();
     }
 
@@ -154,11 +154,12 @@ public class LocalFileSync implements Action {
                 integer -> null
             ).fire();
         }
-        new UpdateAttachment(db, new WrappedAttachment(attachment) {
+        nyx.attachments().update(new WrappedAttachment(attachment) {
+            @NotNull
             @Override
             public String uri() {
                 return URI_FILE_PROVIDER + fileName;
             }
-        }).fire();
+        });
     }
 }

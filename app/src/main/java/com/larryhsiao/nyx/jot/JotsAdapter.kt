@@ -16,6 +16,7 @@ import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId
 import com.larryhsiao.nyx.core.attachments.QueriedAttachments
 import com.larryhsiao.nyx.utils.AttachmentPagerAdapter
 import com.larryhsiao.aura.view.images.pager.PagerImageAdapter
+import com.larryhsiao.nyx.core.Nyx
 import kotlinx.android.synthetic.main.item_jot.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -31,9 +32,9 @@ import kotlin.collections.ArrayList
  * Adapter to show jots.
  */
 class JotsAdapter(
-        private val db: Source<Connection>,
-        private val lifeCoroutineScope: CoroutineScope,
-        private val itemClicked: (item: Jot) -> Unit
+    private val nyx: Nyx,
+    private val lifeCoroutineScope: CoroutineScope,
+    private val itemClicked: (item: Jot) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val dateFormat by lazy { SimpleDateFormat("MM/dd", Locale.US) }
     private val timeFormat by lazy { SimpleDateFormat("HH:mm", Locale.US) }
@@ -68,10 +69,10 @@ class JotsAdapter(
         holder.itemView.setOnClickListener { itemClicked(jots[position]) }
         lifeCoroutineScope.launch {
             val tagsAsync = async(IO) {
-                QueriedTags(TagsByJotId(db, jot.id())).value()
+                nyx.tags().byJotId(jot.id())
             }
             val attachmentAsync = async(IO) {
-                QueriedAttachments(AttachmentsByJotId(db, jot.id())).value()
+                nyx.attachments().byJotId(jot.id())
             }
             val tags = tagsAsync.await()
             val attachments = attachmentAsync.await()

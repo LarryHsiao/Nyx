@@ -56,7 +56,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".old.KeyChangingActivity" />
         <activity
             android:name=".jot.InstantJotActivity"
             android:launchMode="singleInstance" />

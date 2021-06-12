@@ -10,9 +10,5 @@
         android:shortcutShortLabel="@string/JCamera"
         android:shortcutLongLabel="@string/Capture_photos_for_your_journey"
         android:shortcutDisabledMessage="@string/Camera_disabled">
-        <intent
-            android:action="android.media.action.IMAGE_CAPTURE"
-            android:targetPackage="com.larryhsiao.nyx"
-            android:targetClass="com.larryhsiao.nyx.old.capture.CaptureActivity" />
     </shortcut>
 </shortcuts>

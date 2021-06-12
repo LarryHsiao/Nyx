@@ -15,4 +15,10 @@ public interface Attachments {
     Attachment newAttachment(Attachment attachment);
 
     Attachment byId(long id);
+
+    List<Attachment> byJotId(long id);
+
+    void update(Attachment attachment);
+
+    void deleteById(long id);
 }

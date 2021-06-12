@@ -1,5 +1,8 @@
 package com.larryhsiao.nyx.core.jots;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -21,10 +24,22 @@ public interface Jots {
     /**
      * Update the given jot.
      */
-    void update(Jot jot);
+    Jot update(Jot jot);
 
     /**
      * Delete the given jot by id.
      */
     void deleteById(long id);
+
+    List<Jot> byDateRange(Calendar from, Calendar to);
+
+    Jot createByTimeSpace(
+        Calendar time,
+        double[] longLat,
+        int offset
+    );
+
+    List<Jot> byKeyword(String keyword);
+
+    List<Jot> byIds(long[] ids);
 }

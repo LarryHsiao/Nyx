@@ -1,6 +1,6 @@
 package com.larryhsiao.nyx.desktop.attachments;
 
-import com.larryhsiao.nyx.core.attachments.file.NyxFiles;
+import com.larryhsiao.nyx.core.attachments.NyxFiles;
 
 import java.io.File;
 

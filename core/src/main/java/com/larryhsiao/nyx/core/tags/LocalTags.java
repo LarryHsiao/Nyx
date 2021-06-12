@@ -23,6 +23,15 @@ public class LocalTags implements Tags {
     }
 
     @Override
+    public List<Tag> byJotId(long id) { return new QueriedTags(new TagsByJotId(db, id)).value();
+    }
+
+    @Override
+    public Tag create(String name) {
+        return new CreatedTagByName(db, name).value();
+    }
+
+    @Override
     public Tag create(Tag tag) {
         return new NewTag(db, tag).value();
     }

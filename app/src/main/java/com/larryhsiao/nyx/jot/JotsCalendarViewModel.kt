@@ -6,20 +6,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.larryhsiao.nyx.NyxApplication
-import com.larryhsiao.nyx.core.attachments.NewAttachments
-import com.larryhsiao.nyx.core.jots.*
-import com.larryhsiao.nyx.core.jots.goemetry.MeterDelta
-import com.larryhsiao.nyx.jot.JotsCalendarViewModel.ListType.LIST
 import com.larryhsiao.aura.images.exif.ExifAttribute
 import com.larryhsiao.aura.images.exif.ExifUnixTimeStamp
 import com.larryhsiao.clotho.source.ConstSource
+import com.larryhsiao.nyx.NyxApplication
+import com.larryhsiao.nyx.core.attachments.ConstAttachment
+import com.larryhsiao.nyx.core.jots.*
+import com.larryhsiao.nyx.core.jots.goemetry.MeterDelta
+import com.larryhsiao.nyx.jot.JotsCalendarViewModel.ListType.LIST
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.Double.Companion.MIN_VALUE
-import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -61,21 +60,19 @@ class JotsCalendarViewModel(private val app: NyxApplication) : ViewModel() {
         withContext(IO) {
             loading.postValue(true)
             selected.postValue(calendar)
-            jots.postValue(
-                QueriedJots(JotsByDateRange(app.db, calendar, calendar)).value()
-            )
+            jots.postValue(app.nyx().jots().byDateRange(calendar, calendar))
             loading.postValue(false)
         }
     }
 
     fun newJotsByImage(vararg uris: Uri) = viewModelScope.launch {
         loading.value = true
-        val jots = HashMap<ExifInterface, ArrayList<Uri>>()
+        val exifToUri = HashMap<ExifInterface, ArrayList<Uri>>()
         uris.forEach { uri ->
             val uriExif = ExifInterface(app.contentResolver.openInputStream(uri) ?: return@forEach)
             val uriLatLong = uriExif.latLong ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
             val uriTime = exifTime(uriExif)
-            jots.keys.forEach existForEach@{ existExif ->
+            exifToUri.keys.forEach existForEach@{ existExif ->
                 val existLatLong = existExif.latLong ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
                 // @todo #1 Accurate distance determination
                 // @todo #2 Configurable distance range and time range
@@ -91,27 +88,38 @@ class JotsCalendarViewModel(private val app: NyxApplication) : ViewModel() {
                 if (isSameLocation &&
                     abs(uriTime - exifTime(existExif)) < SAME_JOT_RANGE_MILLIS // 30 min
                 ) {
-                    jots[existExif] = jots[existExif]?.apply { add(uri) } ?: arrayListOf(uri)
+                    exifToUri[existExif] =
+                        exifToUri[existExif]?.apply { add(uri) } ?: arrayListOf(uri)
                     return@forEach
                 }
             }
-            jots[uriExif] = arrayListOf(uri)
+            exifToUri[uriExif] = arrayListOf(uri)
         }
-        jots.forEach { it ->
-            NewAttachments(
-                app.db,
-                PostedJotByTimeRange(
-                    app.db,
-                    Calendar.getInstance().apply { timeInMillis = exifTime(it.key) },
-                    it.key.latLong?.reversedArray() ?: doubleArrayOf(MIN_VALUE, MIN_VALUE),
-                    SAME_JOT_RANGE_MILLIS
-                ).value().id(),
-                it.value.map { it.toString() }.toTypedArray()
-            ).value()
+        exifToUri.forEach { exifUriEntry ->
+            exifUriEntry.value.map { it.toString() }.forEach {
+                app.nyx().attachments().newAttachment(
+                    ConstAttachment(
+                        -1,
+                        app.nyx().jots().createByTimeSpace(
+                            Calendar.getInstance().apply {
+                                timeInMillis = exifTime(exifUriEntry.key)
+                            },
+                            (exifUriEntry.key.latLong?.reversedArray() ?: doubleArrayOf(
+                                MIN_VALUE,
+                                MIN_VALUE
+                            )),
+                            SAME_JOT_RANGE_MILLIS
+                        ).id(),
+                        it,
+                        0,
+                        0
+                    )
+                )
+            }
         }
-        if (jots.size > 0) {
+        if (exifToUri.size > 0) {
             selectDate(Calendar.getInstance().apply {
-                timeInMillis = exifTime(jots.keys.first())
+                timeInMillis = exifTime(exifToUri.keys.first())
             })
         }
         loading.value = false

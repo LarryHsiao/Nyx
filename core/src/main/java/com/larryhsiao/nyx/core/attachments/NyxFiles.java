@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.core.attachments.file;
+package com.larryhsiao.nyx.core.attachments;
 
 import java.io.File;
 

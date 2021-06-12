@@ -6,6 +6,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.aura.AuraFragment;
 import com.larryhsiao.clotho.Source;
+import com.larryhsiao.nyx.core.Nyx;
 
 import java.sql.Connection;
 
@@ -13,13 +14,11 @@ import java.sql.Connection;
  * Base fragment for Jot
  */
 public abstract class JotFragment extends AuraFragment {
-    protected Source<Connection> db;
-    protected FirebaseRemoteConfig remoteConfig;
+    protected Nyx nyx;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = ((NyxApplication) getContext().getApplicationContext()).getDb();
-        remoteConfig = ((NyxApplication) getContext().getApplicationContext()).remoteConfig;
+        nyx = ((NyxApplication) getContext().getApplicationContext()).nyx();
     }
 }
