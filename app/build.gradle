@@ -9,7 +9,7 @@ buildscript {
         maven {url = "https://larryhsiao.com:11000/repository/maven-public/"}
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.3'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "com.github.triplet.gradle:play-publisher:3.4.0"
         classpath 'com.google.gms:google-services:4.3.3'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.2.1'
