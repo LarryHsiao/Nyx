@@ -25,4 +25,6 @@ public interface JotTags {
      * Delete a jot tag link by jot and tag id.
      */
     void deleteByIds(long jotId, long tagId);
+
+    void deleteByJotId(long jotId);
 }

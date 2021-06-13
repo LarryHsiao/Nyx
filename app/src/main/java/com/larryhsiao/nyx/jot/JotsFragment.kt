@@ -32,7 +32,7 @@ class JotsFragment : NyxFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = JotsAdapter(app.db, lifecycleScope) {
+        val adapter = JotsAdapter(app.nyx(), lifecycleScope) {
             findNavController().navigate(
                 JotsFragmentDirections.actionJotsFragmentToJotFragment(
                     it.id()

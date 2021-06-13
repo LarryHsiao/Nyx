@@ -29,7 +29,7 @@ class JotSearchingFragment : NyxFragment() {
 
     private val adapter by lazy {
         JotsAdapter(
-                app.db,
+                app.nyx(),
                 lifecycleScope
         ) { PreferJotAction(this, it, ::toJotFragment).fire() }
     }

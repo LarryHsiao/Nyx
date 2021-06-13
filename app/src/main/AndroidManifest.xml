@@ -56,10 +56,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".old.KeyChangingActivity" />
-        <activity
-            android:name=".jot.InstantJotActivity"
-            android:launchMode="singleInstance" />
 
         <provider
             android:authorities="com.larryhsiao.nyx.fileprovider"
@@ -70,20 +66,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider" />
         </provider>
-
-        <receiver android:name=".NyxWidgetProvider">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/nyx_widget_provider" />
-        </receiver>
-
-        <service
-            android:name=".old.sync.SyncService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service android:name=".server.ServerService" />
 
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"

@@ -25,11 +25,7 @@ public class LocalJotTags implements JotTags {
 
     @Override
     public void link(long jotId, long tagId) {
-        new NewJotTag(
-            db,
-            new ConstSource<>(jotId),
-            new ConstSource<>(tagId)
-        ).fire();
+        new NewJotTag(db, new ConstSource<>(jotId), new ConstSource<>(tagId)).fire();
     }
 
     @Override
@@ -40,5 +36,10 @@ public class LocalJotTags implements JotTags {
     @Override
     public void deleteByIds(long jotId, long tagId) {
         new JotTagRemoval(db, jotId, tagId).fire();
+    }
+
+    @Override
+    public void deleteByJotId(long id) {
+        new JotTagsRemoval(db, id).fire();
     }
 }

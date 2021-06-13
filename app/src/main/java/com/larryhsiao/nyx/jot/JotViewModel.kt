@@ -12,20 +12,17 @@ import com.larryhsiao.nyx.BuildConfig.OPEN_WEATHER_API_KEY
 import com.larryhsiao.nyx.core.util.StringHashTags
 import com.larryhsiao.nyx.core.attachments.*
 import com.larryhsiao.nyx.core.jots.*
-import com.larryhsiao.nyx.core.metadata.*
 import com.larryhsiao.nyx.core.metadata.Metadata.Type.OPEN_WEATHER
 import com.larryhsiao.nyx.core.metadata.openweather.PostedWeatherMeta
-import com.larryhsiao.nyx.core.metadata.openweather.WeatherRemovalByJotId
 import com.larryhsiao.nyx.core.tags.*
 import com.larryhsiao.clotho.Action
-import com.larryhsiao.clotho.Source
 import com.larryhsiao.clotho.source.ConstSource
+import com.larryhsiao.nyx.core.Nyx
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.sql.Connection
 import java.util.*
 import kotlin.Double.Companion.MIN_VALUE
 import kotlin.collections.ArrayList
@@ -34,7 +31,7 @@ import kotlin.collections.ArrayList
  * ViewModel to representing a jot.
  */
 class JotViewModel(
-    private val db: Source<Connection>,
+    private val nyx: Nyx,
     private val localFileSync: Action
 ) : ViewModel() {
     companion object {
@@ -96,7 +93,7 @@ class JotViewModel(
             newJot(Calendar.getInstance())
         } else {
             isNewJotLiveData.postValue(false)
-            val jot = JotById(id, db).value()
+            val jot = nyx.jots().byId(id)
             loadContent(jot)
             loadAttachments(jot)
             loadWeather(jot)
@@ -106,18 +103,14 @@ class JotViewModel(
 
     private fun loadTags(jot: Jot) {
         tagsLiveData.postValue(
-            QueriedTags(
-                TagsByJotId(db, jot.id())
-            ).value()
+            nyx.tags().byJotId(jot.id())
                 .map { it.title() to it }
                 .toMap()
         )
     }
 
     private fun loadWeather(jot: Jot) {
-        val filter = QueriedMetadata(
-            MetadataByJotId(db, jot.id())
-        ).value().filter { it.type() == OPEN_WEATHER }
+        val filter = nyx.metadataSet().byJotId(jot.id()).filter { it.type() == OPEN_WEATHER }
 
         if (filter.isNotEmpty()) {
             weather.postValue(
@@ -148,48 +141,47 @@ class JotViewModel(
 
     private fun loadAttachments(jot: Jot) = viewModelScope.launch(IO) {
         attachments.postValue(
-            QueriedAttachments(AttachmentsByJotId(db, jot.id())).value().map { it.uri() }
+            nyx.attachments().byJotId(jot.id()).map { it.uri() }
         )
     }
 
     suspend fun save() = withContext(IO) {
         preferTags()
-        val savedJot = PostedJot(db, object : WrappedJot(jot.value ?: ConstJot()) {
+        val savedJot = nyx.jots().update(object : WrappedJot(jot.value ?: ConstJot()) {
             override fun content() = content.value ?: ""
             override fun title() = title.value ?: ""
             override fun createdTime() = time.value ?: 0L
             override fun location() = location.value ?: doubleArrayOf(MIN_VALUE, MIN_VALUE)
             override fun privateLock() = privateLock.value ?: false
-        }).value()
+        })
         saveAttachments(savedJot)
         saveWeather(savedJot)
         saveTags(savedJot)
     }
 
     private fun saveTags(jot: Jot) {
-        JotTagsRemoval(db, jot.id()).fire()
+        nyx.jotTags().deleteByJotId(jot.id())
         tags.values.forEach { selected ->
-            val tag = CreatedTagByName(db, selected.title()).value()
-            NewJotTag(
-                db,
-                ConstSource(jot.id()),
-                ConstSource(tag.id())
-            ).fire()
+            val tag = nyx.tags().create(selected.title())
+            nyx.jotTags().link(
+                ConstSource(jot.id()).value(),
+                ConstSource(tag.id()).value()
+            )
         }
     }
 
     private fun saveWeather(savedJot: Jot) {
         if (weather.value == null) {
-            WeatherRemovalByJotId(db, savedJot.id()).fire()
+            nyx.metadataSet().weathers().removeByJotId(savedJot.id())
         } else {
             weather.value?.let {
-                PostedWeatherMeta(db, it, savedJot.id()).value()
+                nyx.metadataSet().weathers().update(savedJot.id(), it)
             }
         }
     }
 
     private fun saveAttachments(jot: Jot) {
-        val exists = QueriedAttachments(AttachmentsByJotId(db, jot.id())).value()
+        val exists = nyx.attachments().byJotId(jot.id())
         val new = (attachments.value ?: emptyList()).map { it }.toHashSet()
         val delete = ArrayList<Attachment>()
         exists.forEach { exist ->
@@ -198,8 +190,10 @@ class JotViewModel(
             }
             new.remove(exist.uri())
         }
-        new.forEach { NewAttachment(db, it, jot.id()).value() }
-        delete.forEach { RemovalAttachment(db, it.id()).fire() }
+        new.forEach {
+            nyx.attachments().newAttachment(ConstAttachment(-1, jot.id(), it, 0, 0))
+        }
+        delete.forEach { nyx.attachments().deleteById(it.id()) }
         localFileSync.fire()
     }
 
@@ -283,8 +277,7 @@ class JotViewModel(
     }
 
     suspend fun delete() = withContext(IO) {
-        RemovalAttachmentByJotId(db, jot.value?.id() ?: -1).fire()
-        JotRemoval(db, jot.value?.id() ?: -1).fire()
+        nyx.jots().deleteById(jot.value?.id() ?: -1)
     }
 
     private fun markModified() {

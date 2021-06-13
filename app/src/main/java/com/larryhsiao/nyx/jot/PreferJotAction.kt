@@ -3,6 +3,8 @@ package com.larryhsiao.nyx.jot
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import com.larryhsiao.clotho.Action
@@ -26,7 +28,9 @@ class PreferJotAction(
                     object : BiometricPrompt.AuthenticationCallback() {
                         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                             super.onAuthenticationSucceeded(result)
-                            success(jot)
+                            Handler(Looper.getMainLooper()).post {
+                                success(jot)
+                            }
                         }
 
                         override fun onAuthenticationError(
@@ -43,7 +47,9 @@ class PreferJotAction(
                                 keyguardManager.isKeyguardSecure
                             }
                             if (!isSecured) {
-                                success(jot)
+                                Handler(Looper.getMainLooper()).post {
+                                    success(jot)
+                                }
                             }
                         }
                     }

@@ -12,9 +12,6 @@
             android:id="@+id/action_jotsCalendarFragment_to_jotFragment"
             app:destination="@id/jotFragment" />
         <action
-            android:id="@+id/action_jotsCalendarFragment_to_cloudFragment"
-            app:destination="@id/cloudFragment" />
-        <action
             android:id="@+id/action_jotsCalendarFragment_to_newJotFragment"
             app:destination="@id/newJotFragment" />
         <action
@@ -32,10 +29,6 @@
             android:name="id"
             app:argType="long" />
     </fragment>
-    <fragment
-        android:id="@+id/cloudFragment"
-        android:name="com.larryhsiao.nyx.old.account.CloudFragment"
-        android:label="CloudFragment" />
     <fragment
         android:id="@+id/newJotFragment"
         android:name="com.larryhsiao.nyx.jot.JotFragment"

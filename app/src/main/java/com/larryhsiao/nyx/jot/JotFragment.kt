@@ -1,13 +1,11 @@
 package com.larryhsiao.nyx.jot
 
-import android.Manifest
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -34,8 +32,8 @@ import com.larryhsiao.clotho.openweather.Weather.Type.*
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
-import com.larryhsiao.nyx.old.attachments.AttachmentsFragment
-import com.larryhsiao.nyx.old.util.JpegDateComparator
+import com.larryhsiao.nyx.attachment.AttachmentsFragment
+import com.larryhsiao.nyx.utils.JpegDateComparator
 import com.larryhsiao.nyx.utils.HashTagEnlightenAction
 import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE

@@ -11,12 +11,16 @@ public interface Tags {
      */
     List<Tag> all();
 
+    List<Tag> byJotId(long id);
+
     /**
      * Create new {@link Tag} new tag.
      *
      * @return The tag we just create with new Id.
      */
     Tag create(Tag tag);
+
+    Tag create(String name);
 
     /**
      * Update the given tag.

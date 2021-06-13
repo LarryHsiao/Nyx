@@ -4,14 +4,11 @@ import android.Manifest.permission.CAMERA
 import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.BUTTON_NEGATIVE
-import android.app.KeyguardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -20,7 +17,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.DatePicker
-import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
@@ -40,13 +36,11 @@ import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.core.jots.Jot
-import com.larryhsiao.nyx.old.attachments.AttachmentPickerIntent
-import com.larryhsiao.nyx.old.attachments.TempAttachmentFile
-import com.larryhsiao.nyx.old.sync.SyncService
+import com.larryhsiao.nyx.attachment.AttachmentPickerIntent
+import com.larryhsiao.nyx.attachment.TempAttachmentFile
 import kotlinx.android.synthetic.main.fragment_jots_calendar.*
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.Executors
 import kotlin.Double.Companion.MIN_VALUE
 
 /**
@@ -64,7 +58,10 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         private const val TEMP_FILE_PHOTO_CAPTURE = "TEMP_FILE_PHOTO_CAPTURE"
     }
 
-    private val photoTempFile by lazy { TempAttachmentFile(requireContext(), TEMP_FILE_PHOTO_CAPTURE).value() }
+    private val photoTempFile by lazy { TempAttachmentFile(
+        requireContext(),
+        TEMP_FILE_PHOTO_CAPTURE
+    ).value() }
     private val dateFormat by lazy { SimpleDateFormat("yyyy MM", Locale.getDefault()) }
     private val dayFormat by lazy { SimpleDateFormat("MM/dd", Locale.getDefault()) }
     private val model by lazy {
@@ -75,7 +72,7 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
     }
     private val adapter by lazy {
         JotsAdapter(
-                app.db,
+                app.nyx(),
                 lifecycleScope
         ) { PreferJotAction(this, it, ::toJotFragment).fire() }
     }
@@ -109,21 +106,16 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         jots_month_textView.setOnClickListener(::onMonthIndicatorClicked)
         jot_list_map_switcher_imageView.setOnClickListener(::onSwitchListMap)
         jots_searchButton.setOnClickListener(::searchJots)
-        jots_blackhole_textView.setOnLongClickListener {
-            findNavController().navigate(R.id.cloudFragment)
-            SyncService.enqueue(it.context)
-            true
-        }
-        model.loading().observe(viewLifecycleOwner, {
+        model.loading().observe(viewLifecycleOwner) {
             if (it) {
                 jots_blackhole_textView.visibility = GONE
                 jots_loadingBar.visibility = VISIBLE
             } else {
                 jots_loadingBar.visibility = GONE
             }
-        })
+        }
         model.jots().observe(viewLifecycleOwner, ::loadJots)
-        model.selected().observe(viewLifecycleOwner, {
+        model.selected().observe(viewLifecycleOwner) {
             jots_calendarView.setSelectRangeMode()
             Calendar().apply {
                 year = it.get(java.util.Calendar.YEAR)
@@ -134,13 +126,13 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
                 jots_calendarView.setSelectCalendarRange(it, it)
                 jots_day_textView.text = dayFormat.format(Date(it.timeInMillis))
             }
-        })
-        model.listType().observe(viewLifecycleOwner, {
+        }
+        model.listType().observe(viewLifecycleOwner) {
             when (it) {
                 JotsCalendarViewModel.ListType.LIST -> loadList()
                 JotsCalendarViewModel.ListType.MAP -> loadMap()
             }
-        })
+        }
         model.initJots()
     }
 
@@ -268,8 +260,8 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         } else if (requestCode == REQUEST_CODE_CAPTURE_PHOTO && resultCode == RESULT_OK) {
             if (photoTempFile.exists()) {
                 val tempFile = TempAttachmentFile(
-                        requireContext(),
-                        "" + System.currentTimeMillis() + ".jpg"
+                    requireContext(),
+                    "" + System.currentTimeMillis() + ".jpg"
                 ).value()
                 photoTempFile.renameTo(tempFile)
                 model.newJotsByImage(
