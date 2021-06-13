@@ -3,7 +3,6 @@ package com.larryhsiao.nyx.attachment;
 import android.content.Context;
 import android.net.Uri;
 import com.larryhsiao.nyx.core.attachments.NyxFiles;
-import com.larryhsiao.nyx.old.attachments.AttachmentFileSource;
 
 import java.io.File;
 

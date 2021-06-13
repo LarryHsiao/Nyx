@@ -26,9 +26,6 @@
 -keep class org.h2.**{*;}
 -keep class com.haibin.calendarview.**{*;}
 
--keep class com.larryhsiao.nyx.old.jot.JotMonthView { *; }
--keep class com.larryhsiao.nyx.old.jot.JotWeekView { *; }
--keep class com.larryhsiao.nyx.old.jot.SelectRangeMonthView { *; }
 -keep class * extends com.haibin.calendarview.MonthView {*;}
 
 -keep class androidx.exifinterface.media.ExifInterface { *; }

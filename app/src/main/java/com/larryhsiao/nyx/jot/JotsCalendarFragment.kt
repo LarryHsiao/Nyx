@@ -36,8 +36,8 @@ import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.core.jots.Jot
-import com.larryhsiao.nyx.old.attachments.AttachmentPickerIntent
-import com.larryhsiao.nyx.old.attachments.TempAttachmentFile
+import com.larryhsiao.nyx.attachment.AttachmentPickerIntent
+import com.larryhsiao.nyx.attachment.TempAttachmentFile
 import kotlinx.android.synthetic.main.fragment_jots_calendar.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -58,7 +58,10 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         private const val TEMP_FILE_PHOTO_CAPTURE = "TEMP_FILE_PHOTO_CAPTURE"
     }
 
-    private val photoTempFile by lazy { TempAttachmentFile(requireContext(), TEMP_FILE_PHOTO_CAPTURE).value() }
+    private val photoTempFile by lazy { TempAttachmentFile(
+        requireContext(),
+        TEMP_FILE_PHOTO_CAPTURE
+    ).value() }
     private val dateFormat by lazy { SimpleDateFormat("yyyy MM", Locale.getDefault()) }
     private val dayFormat by lazy { SimpleDateFormat("MM/dd", Locale.getDefault()) }
     private val model by lazy {
@@ -257,8 +260,8 @@ class JotsCalendarFragment : NyxFragment(), CalendarView.OnCalendarSelectListene
         } else if (requestCode == REQUEST_CODE_CAPTURE_PHOTO && resultCode == RESULT_OK) {
             if (photoTempFile.exists()) {
                 val tempFile = TempAttachmentFile(
-                        requireContext(),
-                        "" + System.currentTimeMillis() + ".jpg"
+                    requireContext(),
+                    "" + System.currentTimeMillis() + ".jpg"
                 ).value()
                 photoTempFile.renameTo(tempFile)
                 model.newJotsByImage(
