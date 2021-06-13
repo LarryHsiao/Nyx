@@ -7,9 +7,6 @@ import com.larryhsiao.clotho.dgist.MD5;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.attachments.*;
 import com.larryhsiao.nyx.attachment.TempAttachmentFile;
-import com.larryhsiao.nyx.settings.DefaultPreference;
-import com.larryhsiao.nyx.settings.NyxSettings;
-import com.larryhsiao.nyx.settings.NyxSettingsImpl;
 import com.larryhsiao.aura.images.JpegCompress;
 import com.larryhsiao.aura.uri.UriMimeType;
 import com.larryhsiao.clotho.Action;
@@ -37,14 +34,10 @@ public class LocalFileSync implements Action {
     private final MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
     private final Context context;
     private final Nyx nyx;
-    private final NyxSettings settings;
 
     public LocalFileSync(Context context, Nyx nyx) {
         this.context = context;
         this.nyx =nyx;
-        this.settings = new NyxSettingsImpl(
-            new SingleRefSource<>(new DefaultPreference(context))
-        );
     }
 
     @Override
@@ -113,7 +106,7 @@ public class LocalFileSync implements Action {
                 it -> null
             ).fire();
         }
-        new JpegCompress(temp, compressTemp, settings.imageQuality().amount).fire();
+        new JpegCompress(temp, compressTemp, BuildConfig.JPG_COMPRESS_QUALITY).fire();
         temp.delete();
         final String fileName = generateFileName(
             "jpg",
