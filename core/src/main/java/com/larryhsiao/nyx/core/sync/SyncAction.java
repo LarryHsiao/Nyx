@@ -14,19 +14,24 @@ import java.util.stream.Collectors;
  */
 public class SyncAction implements Action {
     private final Nyx nyx;
-    private final NyxIndexes remoteNyxIndexes;
+    private final NyxIndexes remoteIndexes;
     private final RemoteFiles remoteFiles;
 
-    public SyncAction(Nyx nyx, NyxIndexes remoteNyxIndexes, RemoteFiles remoteFiles) {
+    public SyncAction(Nyx nyx, NyxIndexes remoteIndexes, RemoteFiles remoteFiles) {
         this.nyx = nyx;
-        this.remoteNyxIndexes = remoteNyxIndexes;
+        this.remoteIndexes = remoteIndexes;
         this.remoteFiles = remoteFiles;
     }
 
     @Override
     public void fire() {
+        new SyncTagsAction(nyx, remoteIndexes).fire();
+        syncJots();
+    }
+
+    private void syncJots() {
         final List<Jot> all = nyx.jots().all();
-        final Map<Long, JotIndex> remoteJot = remoteNyxIndexes.jots()
+        final Map<Long, JotIndex> remoteJot = remoteIndexes.jots()
             .stream()
             .collect(Collectors.toMap(JotIndex::id, Function.identity()));
     }

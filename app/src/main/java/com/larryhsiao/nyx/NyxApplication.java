@@ -31,7 +31,8 @@ public class NyxApplication extends Application {
                     new File(
                         getFilesDir(),
                         "jot"
-                    )
+                    ),
+                    false
                 )
             ),
             new NyxFilesImpl(this)

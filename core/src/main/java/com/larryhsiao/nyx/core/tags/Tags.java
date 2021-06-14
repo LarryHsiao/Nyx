@@ -28,6 +28,11 @@ public interface Tags {
     void update(Tag tag);
 
     /**
+     * Replace an exist tag. (No version updates.)
+     */
+    void replace(Tag tag);
+
+    /**
      * Delete tag by given id.
      */
     void deleteById(long id);
