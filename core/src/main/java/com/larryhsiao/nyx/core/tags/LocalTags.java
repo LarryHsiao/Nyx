@@ -23,7 +23,8 @@ public class LocalTags implements Tags {
     }
 
     @Override
-    public List<Tag> byJotId(long id) { return new QueriedTags(new TagsByJotId(db, id)).value();
+    public List<Tag> byJotId(long id) {
+        return new QueriedTags(new TagsByJotId(db, id)).value();
     }
 
     @Override
@@ -39,6 +40,11 @@ public class LocalTags implements Tags {
     @Override
     public void update(Tag tag) {
         new UpdateTag(db, tag).fire();
+    }
+
+    @Override
+    public void replace(Tag tag) {
+        new UpdateTag(db, tag, false).fire();
     }
 
     @Override
