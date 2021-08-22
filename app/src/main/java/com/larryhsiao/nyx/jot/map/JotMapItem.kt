@@ -1,9 +1,8 @@
-package com.larryhsiao.nyx.jot
+package com.larryhsiao.nyx.jot.map
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 import com.larryhsiao.nyx.core.jots.Jot
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 

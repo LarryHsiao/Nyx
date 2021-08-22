@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
     app:startDestination="@id/jotsCalendarFragment">
 
@@ -54,6 +55,17 @@
         android:label="JotSearchingFragment" >
         <action
             android:id="@+id/action_jotSearchingFragment_to_jotFragment"
+            app:destination="@id/jotFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/jotsMapFragment"
+        android:name="com.larryhsiao.nyx.jot.map.JotsMapFragment"
+        android:label="JotsMapFragment" >
+        <action
+            android:id="@+id/action_jotsMapFragment_to_jotsFragment"
+            app:destination="@id/jotsFragment" />
+        <action
+            android:id="@+id/action_jotsMapFragment_to_jotFragment2"
             app:destination="@id/jotFragment" />
     </fragment>
 </navigation>

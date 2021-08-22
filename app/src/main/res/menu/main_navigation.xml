@@ -1,43 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:checkableBehavior="single">
-        <item
-            android:title="@string/jots"
-            android:id="@+id/menuItem_jots"
-            android:icon="@drawable/ic_agenda"
-            app:iconTint="@color/colorPrimaryDark" />
-
-        <item
-            android:title="@string/tags"
-            android:id="@+id/menuItem_tags"
-            android:icon="@drawable/ic_tag"
-            app:iconTint="@color/colorPrimaryDark"
-            />
-
-        <item
-            android:title="@string/settings"
-            android:icon="@drawable/ic_config"
-            app:iconTint="@color/colorPrimaryDark"
-            android:id="@+id/menuItem_settings" />
-
-        <item
-            android:title="@string/Cloud_syncs"
-            android:icon="@drawable/ic_cloud_sync"
-            android:iconTint="@color/colorPrimaryDark"
-            android:id="@+id/menuItem_cloudSync"
-            />
-    </group>
+    <item
+        android:title="@string/jots"
+        android:id="@id/jotsCalendarFragment"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_agenda"
+        app:iconTint="@color/colorPrimaryDark" />
 
     <item
-        android:title="@string/JCamera"
-        android:id="@+id/menuItem_camera"
-        android:iconTint="@color/colorPrimaryDark"
-        android:icon="@drawable/ic_camera"
-        />
-    <item
-        android:title="@string/Version"
-        android:id="@+id/menuItem_version"
+        android:title="@string/map"
+        app:showAsAction="always"
+        android:id="@id/jotsMapFragment"
         app:iconTint="@color/colorPrimaryDark"
-        android:icon="@drawable/ic_info" />
+        android:icon="@drawable/ic_map" />
 </menu>
