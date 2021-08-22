@@ -79,7 +79,10 @@ class JotsAdapter(
             if (holder.adapterPosition == position) {
                 holder.itemView.itemJot_attachments.apply {
                     isVisible = attachments.isNotEmpty()
-                    adapter = AttachmentPagerAdapter(ArrayList(attachments.toList())) {
+                    adapter = AttachmentPagerAdapter(
+                        ArrayList(attachments.toList()),
+                        jot.privateLock()
+                    ) {
                         itemClicked(jots[position])
                     }
                 }
