@@ -25,12 +25,12 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "com.larryhsiao.nyx"
         minSdkVersion 23
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode nyxVersionCode
         versionName nyxVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -95,6 +95,10 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 configurations.all {
     resolutionStrategy.force 'junit:junit:4.13'
@@ -136,7 +140,7 @@ dependencies {
     implementation 'io.github.ponnamkarthik:richlinkpreview:1.0.9'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.larryhsiao:aura:1.24.0'
+    implementation 'com.larryhsiao:aura:1.24.1'
     implementation platform('com.google.firebase:firebase-bom:28.1.0')
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation 'com.google.firebase:firebase-iid'
