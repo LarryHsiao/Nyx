@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.core.sync;
 
+import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.Tags;
 
@@ -14,4 +15,6 @@ public interface NyxIndexes {
     List<Tag> tags();
 
     void updateTags(List<Tag> tags);
+
+    void updateJots(List<Jot> jots);
 }

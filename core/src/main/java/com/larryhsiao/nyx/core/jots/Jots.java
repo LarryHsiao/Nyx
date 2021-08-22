@@ -17,6 +17,11 @@ public interface Jots {
     Jot byId(long id);
 
     /**
+     * Replace exist jot without increasing version.
+     */
+    void replace(Jot jot);
+
+    /**
      * Create new jot.
      */
     Jot create(Jot jot);

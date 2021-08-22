@@ -14,7 +14,7 @@ public interface JotIndex {
 
     List<Long> tagIds(); // Data link only, the tags will be sync independently. Actual jot file will have the tag name but missing is okay.
 
-    List<AttachmentIndex> attachments(); // The attachment is one to one structure, so we just put it here rather then root index.
+    List<AttachmentIndex> attachments(); // The attachment is one to one structure, so we just put it here rather than root index.
 
-    List<MetadataIndex> metadata(); // The metadata is one to one structure, so we just put it here rather then root index.
+    List<MetadataIndex> metadata(); // The metadata is one to one structure, so we just put it here rather than root index.
 }
