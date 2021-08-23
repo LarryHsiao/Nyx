@@ -1,8 +1,11 @@
 package com.larryhsiao.nyx.core.sync;
 
+import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.tags.Tag;
+import sun.security.pkcs11.wrapper.Functions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,5 +33,22 @@ public class MemoryIndexes implements NyxIndexes {
     @Override
     public void updateTags(List<Tag> newTags) {
         tags.putAll(newTags.stream().collect(Collectors.toMap(Tag::id, Function.identity())));
+    }
+
+    @Override
+    public void updateJots(List<Jot> newJots) {
+        for (Jot newJot : newJots) {
+            jots.put(
+                newJot.id(),
+                new ConstJotIndex(
+                    newJot.id(),
+                    newJot.version(),
+                    newJot.deleted(),
+                    Collections.emptyList(), // Update later @todo #100 Figure out if this is correct
+                    Collections.emptyList(), // Update later
+                    Collections.emptyList()  // Update later
+                )
+            );
+        }
     }
 }

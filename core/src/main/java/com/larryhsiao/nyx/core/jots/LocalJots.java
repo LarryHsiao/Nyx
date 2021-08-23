@@ -70,4 +70,9 @@ public class LocalJots implements Jots {
     public List<Jot> byIds(long[] ids) {
         return new QueriedJots(new JotsByIds(db, ids)).value();
     }
+
+    @Override
+    public void replace(Jot jot) {
+        new UpdateJot(jot, db, false).fire();
+    }
 }
