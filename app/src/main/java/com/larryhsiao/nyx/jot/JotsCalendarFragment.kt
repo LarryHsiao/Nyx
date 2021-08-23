@@ -38,6 +38,7 @@ import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.core.jots.Jot
 import com.larryhsiao.nyx.attachment.AttachmentPickerIntent
 import com.larryhsiao.nyx.attachment.TempAttachmentFile
+import com.larryhsiao.nyx.jot.map.JotMapItem
 import kotlinx.android.synthetic.main.fragment_jots_calendar.*
 import java.text.SimpleDateFormat
 import java.util.*

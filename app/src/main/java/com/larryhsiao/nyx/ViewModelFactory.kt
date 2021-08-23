@@ -6,6 +6,7 @@ import com.larryhsiao.nyx.jot.JotViewModel
 import com.larryhsiao.nyx.jot.JotsCalendarViewModel
 import com.larryhsiao.nyx.jot.JotsSearchingViewModel
 import com.larryhsiao.nyx.jot.JotsViewModel
+import com.larryhsiao.nyx.jot.map.JotsMapViewModel
 
 /**
  * Factory to build ViewModel for Nyx.
@@ -19,6 +20,7 @@ class ViewModelFactory(private val app: NyxApplication) : ViewModelProvider.Fact
             ) as T
             modelClass.isAssignableFrom(JotsViewModel::class.java) -> JotsViewModel(app) as T
             modelClass.isAssignableFrom(JotsSearchingViewModel::class.java) -> JotsSearchingViewModel(app) as T
+            modelClass.isAssignableFrom(JotsMapViewModel::class.java)-> JotsMapViewModel(app) as T
             else -> modelClass.getConstructor().newInstance()
         }
     }
