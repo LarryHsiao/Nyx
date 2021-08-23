@@ -14,16 +14,16 @@ public class DropboxRemoteFiles implements RemoteFiles {
 
     @Override
     public InputStream get(String path) {
-        return new DropboxFileSource(token, PATH_PREFIX + path).value();
+        return new DBFileStream(token, PATH_PREFIX + path).value();
     }
 
     @Override
     public void post(String path, InputStream inputStream) {
-
+        new DBFileUploading(token, path, inputStream).fire();
     }
 
     @Override
     public void delete(String path) {
-
+        new DBFileDeletion(token, path).fire();
     }
 }

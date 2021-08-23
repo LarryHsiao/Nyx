@@ -9,12 +9,12 @@ import java.net.URL;
 /**
  * Source to build InputStream of file at Dropbox
  */
-public class DropboxFileSource implements Source<InputStream> {
+public class DBFileStream implements Source<InputStream> {
     private static final String URL = "https://content.dropboxapi.com/2/files/download";
     private final String token;
     private final String path;
 
-    public DropboxFileSource(String token, String path) {
+    public DBFileStream(String token, String path) {
         this.token = token;
         this.path = path;
     }
