@@ -4,6 +4,9 @@ import com.larryhsiao.nyx.core.jots.Jot;
 import org.jetbrains.annotations.NotNull;
 
 import javax.json.JsonObject;
+import javax.json.JsonValue;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 
 /**
  * Json implementation of {@link Jot}.
@@ -17,50 +20,89 @@ public class JsonJot implements Jot {
 
     @Override
     public long id() {
-        return 0;
+        try {
+            return json.getJsonNumber("id").longValue();
+        }catch (Exception e){
+            return -1L;
+        }
     }
 
     @NotNull
     @Override
     public String title() {
-        return null;
+        try {
+            return json.getString("title");
+        }catch (Exception e){
+            return "";
+        }
     }
 
     @NotNull
     @Override
     public String content() {
-        return null;
+        try {
+            return json.getString("content");
+        }catch (Exception e){
+            return "";
+        }
     }
 
     @Override
     public long createdTime() {
-        return 0;
+        try {
+            return json.getJsonNumber("createdTime").longValue();
+        }catch (Exception e){
+            return -1L;
+        }
     }
 
     @NotNull
     @Override
     public double[] location() {
-        return new double[0];
+        try {
+            return json.getJsonArray("location")
+                .stream()
+                .mapToDouble(jsonValue -> 0.0)
+                .toArray();
+        }catch (Exception e){
+            return new double[]{0,0};
+        }
     }
 
     @NotNull
     @Override
     public String mood() {
-        return null;
+        try {
+            return json.getString("mood");
+        }catch (Exception e){
+            return "";
+        }
     }
 
     @Override
     public int version() {
-        return 0;
+        try {
+            return json.getInt("version");
+        }catch (Exception e){
+            return -1;
+        }
     }
 
     @Override
     public boolean privateLock() {
-        return false;
+        try {
+            return json.getBoolean("privateLock");
+        }catch (Exception e){
+            return false;
+        }
     }
 
     @Override
     public boolean deleted() {
-        return false;
+        try {
+            return json.getBoolean("deleted");
+        }catch (Exception e){
+            return false;
+        }
     }
 }

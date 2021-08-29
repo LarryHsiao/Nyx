@@ -3,6 +3,7 @@ package com.larryhsiao.nyx.core.sync;
 import com.larryhsiao.clotho.Action;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.jots.moods.JotJson;
 import com.larryhsiao.nyx.core.jots.moods.JsonJot;
 import com.larryhsiao.nyx.core.tags.Tag;
 
@@ -19,8 +20,7 @@ import java.util.stream.Collectors;
  * Action to sync local jot to remote's file base system.
  */
 public class SyncJotsAction implements Action {
-    private static final String titleFilePath = "/%s/title.txt";
-    private static final String contentFilePath = "/%s/content.txt";
+    private static final String contentFilePath = "/%s/content.json";
     private static final String tagFilePath = "/%s/tags.txt";
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
@@ -58,12 +58,13 @@ public class SyncJotsAction implements Action {
         remoteUpdates.addAll(localJotMap.values()); // New jots at remote
         for (Jot remoteUpdate : remoteUpdates) {
             remoteFiles.post(
-                String.format(titleFilePath, remoteUpdate.id() + ""),
-                new ByteArrayInputStream(remoteUpdate.title().getBytes())
-            );
-            remoteFiles.post(
                 String.format(contentFilePath, remoteUpdate.id() + ""),
-                new ByteArrayInputStream(remoteUpdate.content().getBytes())
+                new ByteArrayInputStream(
+                    new JotJson(remoteUpdate)
+                        .value()
+                        .toString()
+                        .getBytes()
+                )
             );
             remoteFiles.post(
                 String.format(tagFilePath, remoteUpdate.id() + ""),

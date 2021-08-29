@@ -1,7 +1,5 @@
 package com.larryhsiao.nyx.core.jots;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Calendar;
 import java.util.List;
 
@@ -22,7 +20,7 @@ public interface Jots {
     void replace(Jot jot);
 
     /**
-     * Create new jot.
+     * Create new jot with defaults time and versions.
      */
     Jot create(Jot jot);
 

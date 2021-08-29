@@ -69,8 +69,8 @@ class NewJot : Source<Jot> {
         try {
             db.value().prepareStatement( // language=H2
                 """// 
-INSERT INTO jots(content, createdTime, location, mood, VERSION, TITLE, PRIVATE)
-VALUES (?, ?, ?, ?, ?, ?, ?)""",
+INSERT INTO jots(content, createdTime, location, mood, VERSION, TITLE, PRIVATE, delete)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
                 RETURN_GENERATED_KEYS
             ).use { stmt ->
                 stmt.setString(1, jot.content())
@@ -89,6 +89,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 stmt.setInt(5, jot.version())
                 stmt.setString(6, jot.title())
                 stmt.setBoolean(7, jot.privateLock())
+                stmt.setBoolean(8, jot.deleted())
                 if (stmt.executeUpdate() == 0) {
                     throw SQLException("Insert failed")
                 }
