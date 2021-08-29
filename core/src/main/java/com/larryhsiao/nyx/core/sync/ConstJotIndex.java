@@ -10,23 +10,17 @@ public class ConstJotIndex implements JotIndex {
     private final int version;
     private final boolean delete;
     private final List<Long> tagIds;
-    private final List<AttachmentIndex> attachments;
-    private final List<MetadataIndex> metadata;
 
     public ConstJotIndex(
         long id,
         int version,
         boolean delete,
-        List<Long> tagIds,
-        List<AttachmentIndex> attachments,
-        List<MetadataIndex> metadata
+        List<Long> tagIds
     ) {
         this.id = id;
         this.version = version;
         this.delete = delete;
         this.tagIds = tagIds;
-        this.attachments = attachments;
-        this.metadata = metadata;
     }
 
     @Override
@@ -47,15 +41,5 @@ public class ConstJotIndex implements JotIndex {
     @Override
     public List<Long> tagIds() {
         return tagIds;
-    }
-
-    @Override
-    public List<AttachmentIndex> attachments() {
-        return attachments;
-    }
-
-    @Override
-    public List<MetadataIndex> metadata() {
-        return metadata;
     }
 }

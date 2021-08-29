@@ -44,9 +44,7 @@ public class MemoryIndexes implements NyxIndexes {
                     newJot.id(),
                     newJot.version(),
                     newJot.deleted(),
-                    Collections.emptyList(), // Update later @todo #100 Figure out if this is correct
-                    Collections.emptyList(), // Update later
-                    Collections.emptyList()  // Update later
+                    Collections.emptyList() // Update later @todo #100 Figure out if this is correct
                 )
             );
         }

@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.core.sync;
 
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import java.util.Collections;
 import java.util.List;;
 import java.util.stream.Collectors;
 
@@ -34,35 +35,29 @@ public class JsonJotIndex implements JotIndex {
     public boolean deleted() {
         try {
             return jsonObj.getBoolean("deleted");
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
 
     @Override
     public List<Long> tagIds() {
-        return jsonObj.getJsonArray("tagIds")
-            .stream()
-            .mapToLong(jsonValue -> {
-                    try {
-                        return ((JsonNumber) jsonValue).longValue();
-                    } catch (Exception e){
-                        return -1L;
+        try {
+            return jsonObj.getJsonArray("tagIds")
+                .stream()
+                .mapToLong(jsonValue -> {
+                        try {
+                            return ((JsonNumber) jsonValue).longValue();
+                        } catch (Exception e) {
+                            return -1L;
+                        }
                     }
-                }
-            )
-            .filter(l -> l != -1)
-            .boxed()
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<AttachmentIndex> attachments() {
-        return null;
-    }
-
-    @Override
-    public List<MetadataIndex> metadata() {
-        return null;
+                )
+                .filter(l -> l != -1)
+                .boxed()
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 }

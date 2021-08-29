@@ -1,9 +1,7 @@
 package com.larryhsiao.nyx.core.sync;
 
 import com.larryhsiao.nyx.core.Nyx;
-import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.jots.Jot;
-import com.larryhsiao.nyx.core.metadata.Metadata;
 import com.larryhsiao.nyx.core.tags.JsonTag;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagJson;
@@ -16,8 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 public class RemoteIndexes implements NyxIndexes {
     private static final String PATH_TAG_JSON = "/tags.json";
@@ -58,9 +57,8 @@ public class RemoteIndexes implements NyxIndexes {
 
     @Override
     public void updateTags(List<Tag> newTags) {
-        final Map<Long, Tag> allTags =
-            tags().stream().collect(Collectors.toMap(Tag::id, Function.identity()));
-        allTags.putAll(newTags.stream().collect(Collectors.toMap(Tag::id, Function.identity())));
+        final Map<Long, Tag> allTags = tags().stream().collect(toMap(Tag::id, Function.identity()));
+        allTags.putAll(newTags.stream().collect(toMap(Tag::id, Function.identity())));
         final JsonArrayBuilder jsonArray = Json.createArrayBuilder();
         for (Tag tag : allTags.values()) {
             jsonArray.add(new TagJson(tag).value());
@@ -75,15 +73,9 @@ public class RemoteIndexes implements NyxIndexes {
 
     @Override
     public void updateJots(List<Jot> newJots) {
-        for (Jot newJot : newJots) {
-            remoteFiles.post(
-                "/" + newJot.id() + "/content.txt",
-                new ByteArrayInputStream(newJot.content().getBytes())
-            );
-        }
         final Map<Long, JotIndex> allJotIndexes = jots()
             .stream()
-            .collect(Collectors.toMap(JotIndex::id, Function.identity()));
+            .collect(toMap(JotIndex::id, Function.identity()));
         allJotIndexes.putAll(
             newJots.stream().map((Function<Jot, JotIndex>) jot -> new ConstJotIndex(
                 jot.id(),
@@ -93,16 +85,8 @@ public class RemoteIndexes implements NyxIndexes {
                     .stream()
                     .mapToLong(Tag::id)
                     .boxed()
-                    .collect(Collectors.toList()),
-                nyx.attachments().byJotId(jot.id())
-                    .stream()
-                    .map((Function<Attachment, AttachmentIndex>) attachment -> null
-                    ).collect(Collectors.toList()),
-                nyx.metadataSet().byJotId(jot.id())
-                    .stream()
-                    .map((Function<Metadata, MetadataIndex>) metadata -> null
-                    ).collect(Collectors.toList())
-            )).collect(Collectors.toMap(JotIndex::id, Function.identity()))
+                    .collect(Collectors.toList())
+            )).collect(toMap(JotIndex::id, Function.identity()))
         );
         final JsonArrayBuilder jsonArray = Json.createArrayBuilder();
         for (JotIndex jotIndex : allJotIndexes.values()) {
