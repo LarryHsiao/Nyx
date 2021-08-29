@@ -39,6 +39,9 @@ import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
 import com.larryhsiao.clotho.temperature.FahrenheitCelsius
+import com.larryhsiao.nyx.core.sync.SyncAction
+import com.larryhsiao.nyx.core.sync.RemoteIndexes
+import com.larryhsiao.nyx.core.sync.dropbox.DropboxRemoteFiles
 import kotlinx.android.synthetic.main.dialog_weather.*
 import kotlinx.android.synthetic.main.fragment_jot.*
 import kotlinx.coroutines.launch
@@ -213,6 +216,13 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     override fun onResume() {
         super.onResume()
         updateLocationSilently()
+        Thread {
+            val remoteFiles = DropboxRemoteFiles(
+                ""
+            )
+            SyncAction(app.nyx(),
+                RemoteIndexes(app.nyx(), remoteFiles), remoteFiles).fire()
+        }.start()
     }
 
     private fun updateLocationSilently() {

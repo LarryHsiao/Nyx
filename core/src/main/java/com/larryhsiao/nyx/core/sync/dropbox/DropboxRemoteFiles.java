@@ -4,8 +4,10 @@ import com.larryhsiao.nyx.core.sync.RemoteFiles;
 
 import java.io.InputStream;
 
+/**
+ * Dropbox's implementation of {@link RemoteFiles}.
+ */
 public class DropboxRemoteFiles implements RemoteFiles {
-    private static final String PATH_PREFIX = "/jotted_nyx";
     private final String token;
 
     public DropboxRemoteFiles(String token) {
@@ -14,7 +16,7 @@ public class DropboxRemoteFiles implements RemoteFiles {
 
     @Override
     public InputStream get(String path) {
-        return new DBFileStream(token, PATH_PREFIX + path).value();
+        return new DBFileStream(token, path).value();
     }
 
     @Override
@@ -25,5 +27,10 @@ public class DropboxRemoteFiles implements RemoteFiles {
     @Override
     public void delete(String path) {
         new DBFileDeletion(token, path).fire();
+    }
+
+    @Override
+    public boolean exist(String path) {
+        return new DBFileExist(token, path).value();
     }
 }

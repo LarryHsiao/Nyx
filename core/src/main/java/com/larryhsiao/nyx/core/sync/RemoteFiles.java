@@ -20,4 +20,9 @@ public interface RemoteFiles {
      * Delete given file.
      */
     void delete(String path);
+
+    /**
+     * Check if file exist
+     */
+    boolean exist(String path);
 }

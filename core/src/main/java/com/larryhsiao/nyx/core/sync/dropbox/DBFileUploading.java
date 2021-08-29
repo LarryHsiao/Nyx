@@ -4,6 +4,7 @@ import com.larryhsiao.clotho.Action;
 import com.larryhsiao.clotho.io.ProgressedCopy;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -28,17 +29,20 @@ public class DBFileUploading implements Action {
             final HttpURLConnection conn = (HttpURLConnection) new URL(URL).openConnection();
             conn.addRequestProperty("Authorization", "Bearer " + token);
             conn.addRequestProperty("Content-Type", "application/octet-stream");
-            conn.addRequestProperty("Dropbox-API-Arg", "{\"path\":\"" + path + "\"}");
+            conn.addRequestProperty("Dropbox-API-Arg", "{\"path\":\"" + path + "\",\"mode\":{\".tag\":\"overwrite\"}}");
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.connect();
+            final OutputStream outputStream = conn.getOutputStream();
             new ProgressedCopy(
                 inputStream,
-                conn.getOutputStream(),
+                outputStream,
                 4096,
                 true,
                 progress -> null
             ).fire();
+            inputStream.close();
+            outputStream.close();
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("Upload file failure: " + path);
             }

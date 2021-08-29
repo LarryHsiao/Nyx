@@ -21,8 +21,9 @@ public class DBFileStream implements Source<InputStream> {
 
     @Override
     public InputStream value() {
+        final HttpURLConnection conn;
         try {
-            final HttpURLConnection conn = (HttpURLConnection) new URL(URL).openConnection();
+            conn = (HttpURLConnection) new URL(URL).openConnection();
             conn.addRequestProperty("Authorization", "Bearer " + token);
             conn.addRequestProperty("Dropbox-API-Arg", "{\"path\":\"" + path + "\"}");
             conn.connect();

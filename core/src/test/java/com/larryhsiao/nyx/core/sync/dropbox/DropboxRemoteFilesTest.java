@@ -17,7 +17,7 @@ import java.io.IOException;
 public class DropboxRemoteFilesTest {
     private static final String token = "";
     private static final String downloadDst = "/home/larryhsiao/file.txt";
-    private static final String remotePath = "/jotted_nyx/file.txt";
+    private static final String remotePath = "/file.txt";
 
     /**
      * Check if we can upload file.
@@ -60,5 +60,15 @@ public class DropboxRemoteFilesTest {
         }catch (Exception e){
             Assertions.assertTrue(true);
         }
+    }
+
+    /**
+     * Getting metadata
+     */
+    @Test
+    void getMetadata() {
+        Assertions.assertTrue(
+            new DBFileExist(token, remotePath).value()
+        );
     }
 }

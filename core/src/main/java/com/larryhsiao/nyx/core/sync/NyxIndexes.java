@@ -14,7 +14,7 @@ public interface NyxIndexes {
 
     List<Tag> tags();
 
-    void updateTags(List<Tag> tags);
+    void updateTags(List<Tag> newTags);
 
-    void updateJots(List<Jot> jots);
+    void updateJots(List<Jot> newJots);
 }

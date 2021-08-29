@@ -41,7 +41,7 @@ public class SyncJotsAction implements Action {
                 final Jot localJot = localJotMap.get(remoteIndex.id());
                 if (remoteIndex.version() > localJot.version()) {
                     nyx.jots().replace(toJot(remoteIndex));
-                } else {
+                } else if (remoteIndex.version() < localJot.version()){
                     remoteUpdates.add(localJot);
                 }
                 localJotMap.remove(remoteIndex.id());
