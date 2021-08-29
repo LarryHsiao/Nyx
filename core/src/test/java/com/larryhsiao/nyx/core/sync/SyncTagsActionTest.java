@@ -29,7 +29,7 @@ class SyncTagsActionTest {
             new FileAttachments(Files.createTempFile("temp", "attachments").toFile())
         );
         new SyncTagsAction(
-            localNyx,
+            localNyx.tags(),
             new MemoryIndexes(
                 Collections.emptyList(),
                 Collections.singletonList(new ConstTag(1, "title", 1, true))
@@ -49,7 +49,7 @@ class SyncTagsActionTest {
         );
         localNyx.tags().create(new ConstTag(-1, "title", 0, false));
         new SyncTagsAction(
-            localNyx,
+            localNyx.tags(),
             new MemoryIndexes(
                 Collections.emptyList(),
                 Collections.singletonList(new ConstTag(1, "title2", 2, true))
@@ -74,7 +74,7 @@ class SyncTagsActionTest {
         final NyxIndexes remoteIndexes =
             new MemoryIndexes(Collections.emptyList(), Collections.emptyList());
         localNyx.tags().create(new ConstTag(-1, "title", 0, false));
-        new SyncTagsAction(localNyx, remoteIndexes).fire();
+        new SyncTagsAction(localNyx.tags(), remoteIndexes).fire();
         Assertions.assertEquals(1, localNyx.tags().all().size());
         Assertions.assertEquals(1, remoteIndexes.tags().size());
     }
@@ -95,7 +95,7 @@ class SyncTagsActionTest {
             Collections.emptyList(),
             Collections.singletonList(new ConstTag(1, "title2", 1, true))
         );
-        new SyncTagsAction(localNyx, remoteIndexes).fire();
+        new SyncTagsAction(localNyx.tags(), remoteIndexes).fire();
         Assertions.assertEquals(1, localNyx.tags().all().size());
         Assertions.assertEquals(1, remoteIndexes.tags().size());
         final Tag remoteTag = remoteIndexes.tags().get(0);

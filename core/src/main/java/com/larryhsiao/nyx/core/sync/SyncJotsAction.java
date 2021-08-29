@@ -8,7 +8,6 @@ import com.larryhsiao.nyx.core.jots.moods.JsonJot;
 import com.larryhsiao.nyx.core.tags.Tag;
 
 import javax.json.Json;
-import javax.json.JsonArrayBuilder;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;

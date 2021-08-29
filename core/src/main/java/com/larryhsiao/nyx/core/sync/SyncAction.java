@@ -23,7 +23,8 @@ public class SyncAction implements Action {
 
     @Override
     public void fire() {
-        new SyncTagsAction(nyx, remoteIndexes).fire();
+        new SyncTagsAction(nyx.tags(), remoteIndexes).fire();
         new SyncJotsAction(nyx, remoteFiles, remoteIndexes).fire();
+        new SyncAttachmentAction(nyx, remoteFiles, remoteIndexes).fire();
     }
 }

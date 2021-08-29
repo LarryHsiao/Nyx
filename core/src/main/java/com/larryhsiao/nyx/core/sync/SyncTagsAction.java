@@ -1,7 +1,6 @@
 package com.larryhsiao.nyx.core.sync;
 
 import com.larryhsiao.clotho.Action;
-import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.Tags;
 
@@ -12,19 +11,18 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SyncTagsAction implements Action {
-    private final Nyx nyx;
+    private final Tags localTags;
     private final NyxIndexes remoteIndexes;
 
-    public SyncTagsAction(Nyx nyx, NyxIndexes remoteIndexes) {
-        this.nyx = nyx;
+    public SyncTagsAction(Tags localTags, NyxIndexes remoteIndexes) {
+        this.localTags = localTags;
         this.remoteIndexes = remoteIndexes;
     }
 
     @Override
     public void fire() {
         final List<Tag> remoteUpdates = new ArrayList<>();
-        final Tags localTags = nyx.tags();
-        final Map<Long, Tag> localTagMap = nyx.tags()
+        final Map<Long, Tag> localTagMap = localTags
             .all()
             .stream()
             .collect(Collectors.toMap(Tag::id, Function.identity()));
