@@ -25,6 +25,11 @@ public interface Jots {
     Jot create(Jot jot);
 
     /**
+     * Dump a jot into db without any checking.
+     */
+    void dump(Jot jot);
+
+    /**
      * Update the given jot.
      */
     Jot update(Jot jot);

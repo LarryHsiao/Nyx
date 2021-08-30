@@ -51,7 +51,7 @@ public class SyncJotsAction implements Action {
                 }
                 localJotMap.remove(remoteIndex.id());
             } else {
-                nyx.jots().create(toJot(remoteIndex));
+                nyx.jots().dump(toJot(remoteIndex));
             }
         }
         remoteUpdates.addAll(localJotMap.values()); // New jots at remote

@@ -35,6 +35,11 @@ public class LocalJots implements Jots {
     }
 
     @Override
+    public void dump(Jot jot) {
+         new DumpJot(db, jot).fire();
+    }
+
+    @Override
     public Jot update(Jot jot) {
         return new PostedJot(db, jot, true).value();
     }
