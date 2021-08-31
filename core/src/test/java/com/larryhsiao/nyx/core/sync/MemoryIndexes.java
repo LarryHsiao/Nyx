@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.core.sync;
 
+import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.tags.Tag;
 import sun.security.pkcs11.wrapper.Functions;
@@ -48,5 +49,15 @@ public class MemoryIndexes implements NyxIndexes {
                 )
             );
         }
+    }
+
+    @Override
+    public List<Attachment> attachments() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void updateAttachments(List<Attachment> newAttachments) {
+        // TODO
     }
 }

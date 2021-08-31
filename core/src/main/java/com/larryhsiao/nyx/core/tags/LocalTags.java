@@ -38,6 +38,11 @@ public class LocalTags implements Tags {
     }
 
     @Override
+    public void createWithId(Tag tag) {
+        new InsertTagWithId(db, tag).fire();
+    }
+
+    @Override
     public void update(Tag tag) {
         new UpdateTag(db, tag).fire();
     }

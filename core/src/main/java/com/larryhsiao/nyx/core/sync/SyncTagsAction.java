@@ -40,7 +40,7 @@ public class SyncTagsAction implements Action {
                 // Remove updated tag so new tag at local remains.
                 localTagMap.remove(remoteTag.id());
             } else {
-                localTags.create(remoteTag);
+                localTags.createWithId(remoteTag);
             }
         }
         remoteUpdates.addAll(localTagMap.values());

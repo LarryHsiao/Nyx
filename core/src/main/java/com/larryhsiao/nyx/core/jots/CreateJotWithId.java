@@ -16,11 +16,11 @@ import java.util.Calendar;
 /**
  * Action to dump a {@link Jot} into database.
  */
-public class DumpJot implements Action {
+public class CreateJotWithId implements Action {
     private final Source<Connection> db;
     private final Jot jot;
 
-    public DumpJot(Source<Connection> db, Jot jot) {
+    public CreateJotWithId(Source<Connection> db, Jot jot) {
         this.db = db;
         this.jot = jot;
     }

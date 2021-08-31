@@ -25,9 +25,9 @@ public interface Jots {
     Jot create(Jot jot);
 
     /**
-     * Dump a jot into db without any checking.
+     * Create a jot into db with specific id.
      */
-    void dump(Jot jot);
+    void createWithId(Jot jot);
 
     /**
      * Update the given jot.

@@ -1,12 +1,16 @@
 package com.larryhsiao.nyx.core.sync;
 
 import com.larryhsiao.nyx.core.Nyx;
+import com.larryhsiao.nyx.core.attachments.Attachment;
+import com.larryhsiao.nyx.core.attachments.AttachmentJson;
+import com.larryhsiao.nyx.core.attachments.JsonAttachment;
 import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.tags.JsonTag;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagJson;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonValue;
 import java.io.ByteArrayInputStream;
@@ -21,6 +25,7 @@ import static java.util.stream.Collectors.toMap;
 public class RemoteIndexes implements NyxIndexes {
     private static final String PATH_TAG_JSON = "/tags.json";
     private static final String PATH_JOT_INDEX_JSON = "/jotIndex.json";
+    private static final String PATH_ATTACHMENT_JSON = "/attachment.json";
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
 
@@ -53,6 +58,40 @@ public class RemoteIndexes implements NyxIndexes {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public List<Attachment> attachments() {
+        if (remoteFiles.exist(PATH_ATTACHMENT_JSON)) {
+            return Json.createReader(
+                remoteFiles.get(PATH_ATTACHMENT_JSON)
+            ).readArray().stream().map((Function<JsonValue, Attachment>) jsonValue ->
+                new JsonAttachment(jsonValue.asJsonObject())
+            ).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public void updateAttachments(List<Attachment> newAttachments) {
+        final Map<Long, Attachment> allAttachments = attachments()
+            .stream()
+            .collect(toMap(Attachment::id, Function.identity()));
+        allAttachments.putAll(
+            newAttachments.stream()
+                .collect(toMap(Attachment::id, Function.identity()))
+        );
+        final JsonArrayBuilder jsonArray = Json.createArrayBuilder();
+        for (Attachment attachment: allAttachments.values()){
+            jsonArray.add(new AttachmentJson(attachment).value());
+        }
+        remoteFiles.post(
+            PATH_ATTACHMENT_JSON,
+            new ByteArrayInputStream(
+                jsonArray.build().toString().getBytes()
+            )
+        );
     }
 
     @Override

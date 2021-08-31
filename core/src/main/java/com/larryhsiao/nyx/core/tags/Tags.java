@@ -20,6 +20,11 @@ public interface Tags {
      */
     Tag create(Tag tag);
 
+    /**
+     * Create new Tag with specific id.
+     */
+    void createWithId(Tag tag);
+
     Tag create(String name);
 
     /**

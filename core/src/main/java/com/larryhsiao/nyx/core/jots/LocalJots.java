@@ -2,7 +2,6 @@ package com.larryhsiao.nyx.core.jots;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.nyx.core.attachments.RemovalAttachmentByJotId;
-import com.larryhsiao.nyx.core.metadata.MetadataDeletionById;
 import com.larryhsiao.nyx.core.metadata.MetadataDeletionByJotId;
 
 import java.sql.Connection;
@@ -35,8 +34,8 @@ public class LocalJots implements Jots {
     }
 
     @Override
-    public void dump(Jot jot) {
-         new DumpJot(db, jot).fire();
+    public void createWithId(Jot jot) {
+        new CreateJotWithId(db, jot).fire();
     }
 
     @Override

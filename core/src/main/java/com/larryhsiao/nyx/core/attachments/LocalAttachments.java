@@ -21,6 +21,16 @@ public class LocalAttachments implements Attachments {
     }
 
     @Override
+    public void newAttachmentWithId(Attachment attachment) {
+        new NewAttachmentWithId(db, attachment).fire();
+    }
+
+    @Override
+    public void replace(Attachment attachment) {
+        new UpdateAttachment(db, attachment, false).fire();
+    }
+
+    @Override
     public Attachment byId(long id) {
         return new AttachmentById(db, id).value();
     }
