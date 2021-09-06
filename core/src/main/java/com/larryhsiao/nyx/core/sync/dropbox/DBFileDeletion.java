@@ -36,7 +36,7 @@ public class DBFileDeletion implements Action {
                 progress -> null
             ).fire();
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Download file failure: " + path);
+                throw new RuntimeException("Delete file failure: " + path);
             }
         }catch (Exception e){
             throw new RuntimeException(e);

@@ -16,7 +16,6 @@ public class NyxApplication extends Application {
     public static final String URI_FILE_PROVIDER = FILE_PROVIDER_AUTHORITY + "/attachments/";
     public static final String URI_FILE_TEMP_PROVIDER = FILE_PROVIDER_AUTHORITY + "/attachments_temp/";
     private Nyx nyx;
-    public long lastAuthed = 0;
 
     @Override
     public void onCreate() {

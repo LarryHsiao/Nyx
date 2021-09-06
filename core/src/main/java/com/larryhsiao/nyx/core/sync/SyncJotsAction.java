@@ -45,16 +45,24 @@ public class SyncJotsAction implements Action {
             if (localJotMap.containsKey(remoteIndex.id())) {
                 final Jot localJot = localJotMap.get(remoteIndex.id());
                 if (remoteIndex.version() > localJot.version()) {
-                    nyx.jots().replace(toJot(remoteIndex));
+                    try {
+                        nyx.jots().replace(toJot(remoteIndex));
+                    } catch (Exception ignore) { // @todo #101 Failure of jot downloading
+                    }
                 } else if (remoteIndex.version() < localJot.version()) {
                     remoteUpdates.add(localJot);
                 }
                 localJotMap.remove(remoteIndex.id());
+                // @todo #100 Remove remote jot file
             } else {
                 nyx.jots().createWithId(toJot(remoteIndex));
             }
         }
         remoteUpdates.addAll(localJotMap.values()); // New jots at remote
+        updateRemotes(remoteUpdates);
+    }
+
+    private void updateRemotes(List<Jot> remoteUpdates) {
         for (Jot remoteUpdate : remoteUpdates) {
             remoteFiles.post(
                 String.format(contentFilePath, remoteUpdate.id() + ""),

@@ -216,13 +216,6 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     override fun onResume() {
         super.onResume()
         updateLocationSilently()
-        Thread {
-            val remoteFiles = DropboxRemoteFiles(
-                "8rxe_HvA6aEAAAAAAAAAAdUYHU6sHVpSg4V0Y_FjcUE-1Wrc0XjpPvWFSU5Z6fT5"
-            )
-            SyncAction(app.nyx(),
-                RemoteIndexes(app.nyx(), remoteFiles), remoteFiles).fire()
-        }.start()
     }
 
     private fun updateLocationSilently() {

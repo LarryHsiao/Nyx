@@ -12,7 +12,7 @@ public class LocalAttachments implements Attachments {
 
     @Override
     public List<Attachment> all() {
-        return new QueriedAttachments(new AllAttachments(db)).value();
+        return new QueriedAttachments(new AllAttachments(db, true)).value();
     }
 
     @Override
