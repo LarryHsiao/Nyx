@@ -26,7 +26,10 @@ public class DropboxRemoteFiles implements RemoteFiles {
 
     @Override
     public void delete(String path) {
-        new DBFileDeletion(token, path).fire();
+        try {
+            new DBFileDeletion(token, path).fire();
+        }catch (Exception ignore){
+        }
     }
 
     @Override

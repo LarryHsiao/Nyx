@@ -55,7 +55,7 @@ public class SyncAttachmentAction implements Action {
             }
         }
         remoteUpdates.addAll(localMap.values());
-            updateRemoteFiles(remoteUpdates);
+        updateRemoteFiles(remoteUpdates);
     }
 
     private void updateLocaleFile(Attachment remoteAttachment) {
