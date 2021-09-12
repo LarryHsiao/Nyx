@@ -5,6 +5,9 @@ import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentJson;
 import com.larryhsiao.nyx.core.attachments.JsonAttachment;
 import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.metadata.JsonMetadata;
+import com.larryhsiao.nyx.core.metadata.Metadata;
+import com.larryhsiao.nyx.core.metadata.MetadataJson;
 import com.larryhsiao.nyx.core.tags.JsonTag;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagJson;
@@ -26,6 +29,7 @@ public class RemoteIndexes implements NyxIndexes {
     private static final String PATH_TAG_JSON = "/tags.json";
     private static final String PATH_JOT_INDEX_JSON = "/jotIndex.json";
     private static final String PATH_ATTACHMENT_JSON = "/attachment.json";
+    private static final String PATH_METADATA_JSON = "/metadata.json";
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
 
@@ -83,7 +87,7 @@ public class RemoteIndexes implements NyxIndexes {
                 .collect(toMap(Attachment::id, Function.identity()))
         );
         final JsonArrayBuilder jsonArray = Json.createArrayBuilder();
-        for (Attachment attachment: allAttachments.values()){
+        for (Attachment attachment : allAttachments.values()) {
             jsonArray.add(new AttachmentJson(attachment).value());
         }
         remoteFiles.post(
@@ -137,5 +141,35 @@ public class RemoteIndexes implements NyxIndexes {
                 jsonArray.build().toString().getBytes()
             )
         );
+    }
+
+    @Override
+    public void updateMetadata(List<Metadata> newMetadata) {
+        final Map<Long, Metadata> allMetadata =
+            metadata().stream().collect(toMap(Metadata::id, Function.identity()));
+        allMetadata.putAll(newMetadata.stream().collect(toMap(Metadata::id, Function.identity())));
+        final JsonArrayBuilder jsonArray = Json.createArrayBuilder();
+        for (Metadata metadata : allMetadata.values()) {
+            jsonArray.add(new MetadataJson(metadata).value());
+        }
+        remoteFiles.post(
+            PATH_METADATA_JSON,
+            new ByteArrayInputStream(
+                jsonArray.build().toString().getBytes()
+            )
+        );
+    }
+
+    @Override
+    public List<Metadata> metadata() {
+        if (remoteFiles.exist(PATH_METADATA_JSON)) {
+            return Json.createReader(
+                remoteFiles.get(PATH_METADATA_JSON)
+            ).readArray().stream().map((Function<JsonValue, Metadata>) jsonValue ->
+                new JsonMetadata(jsonValue.asJsonObject())
+            ).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
 }

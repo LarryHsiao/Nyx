@@ -22,7 +22,8 @@ SET TITLE=?,
     VALUE_DECIMAL=?,
     VALUE=?,
     DELETED=?,
-    VERSION=?
+    VERSION=?,
+    TYPE = ?
 WHERE JOT_ID = ?"""
         ).use { stmt ->
             stmt.setString(1, metadata.title())
@@ -32,6 +33,7 @@ WHERE JOT_ID = ?"""
             stmt.setInt(5, if (metadata.deleted()) 1 else 0)
             stmt.setLong(6, if (increaseVer) metadata.version() + 1 else metadata.version())
             stmt.setLong(7, metadata.jotId())
+            stmt.setString(8, metadata.type().name)
             val result = stmt.executeUpdate()
             if (result == 1) {
                 return object : WrappedMetadata(metadata) {

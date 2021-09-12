@@ -26,5 +26,6 @@ public class SyncAction implements Action {
         new SyncTagsAction(nyx.tags(), remoteIndexes).fire();
         new SyncJotsAction(nyx, remoteFiles, remoteIndexes).fire();
         new SyncAttachmentAction(nyx, remoteFiles, remoteIndexes).fire();
+        new SyncMetadataAction(nyx.metadataSet(), remoteIndexes, remoteFiles).fire();
     }
 }
