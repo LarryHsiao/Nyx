@@ -68,4 +68,8 @@
             android:id="@+id/action_jotsMapFragment_to_jotFragment2"
             app:destination="@id/jotFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.larryhsiao.nyx.settings.SettingFragment"
+        android:label="SettingFragment" />
 </navigation>
