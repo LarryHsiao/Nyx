@@ -45,7 +45,7 @@ public class SyncMetadataAction implements Action {
                 } else if (remoteMetadata.version() < localMetadata.version()) {
                     remoteUpdates.add(localMetadata);
                 }
-                // Remove updated metadata so new metadata at local remains.
+                // Remove updated metadata so new metadata at localMap remains for adding to remote.
                 localMetadataMap.remove(remoteMetadata.id());
             } else {
                 localMetadataSet.createWithId(remoteMetadata);
@@ -56,24 +56,7 @@ public class SyncMetadataAction implements Action {
     }
 
     private void updateRemote(List<Metadata> remoteUpdates) {
-//        final Map<Long, String> updates = remoteUpdates.stream()
-//            .collect(Collectors.toMap(
-//                Metadata::jotId,
-//                Metadata::title,
-//                {it-> ""}
-//            ));
-//        for (Metadata remoteUpdate : remoteUpdates) {
-//            remoteFiles.post(
-//                String.format(metadataPath, remoteUpdate.id() + ""),
-//                new ByteArrayInputStream(
-//                    localMetadataSet.byJotId(remoteUpdate.id())
-//                        .stream()
-//                        .map(Metadata::title)
-//                        .collect(Collectors.joining(","))
-//                        .getBytes()
-//                )
-//            );
-//        }
+        // @todo #0 Metadata in jot folder.
         remoteIndexes.updateMetadata(remoteUpdates);
     }
 }

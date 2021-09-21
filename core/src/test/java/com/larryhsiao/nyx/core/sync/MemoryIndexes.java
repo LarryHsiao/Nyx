@@ -59,7 +59,6 @@ public class MemoryIndexes implements NyxIndexes {
 
     @Override
     public void updateAttachments(List<Attachment> newAttachments) {
-        // TODO
     }
 
     @Override

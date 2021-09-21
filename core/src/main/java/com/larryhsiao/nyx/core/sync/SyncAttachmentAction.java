@@ -32,7 +32,7 @@ public class SyncAttachmentAction implements Action {
     @Override
     public void fire() {
         final List<Attachment> remoteUpdates = new ArrayList<>();
-        final Map<Long, Attachment> localMap = nyx.attachments()
+        final Map<Long, Attachment> localUpdates = nyx.attachments()
             .all()
             .stream()
             .collect(Collectors.toMap(Attachment::id, Function.identity()));
@@ -40,21 +40,19 @@ public class SyncAttachmentAction implements Action {
             .stream()
             .collect(Collectors.toMap(Attachment::id, Function.identity()));
         for (Attachment remoteAttachment : remoteAttachments.values()) {
-            if (localMap.containsKey(remoteAttachment.id())) {
-                final Attachment localAttachment = localMap.get(remoteAttachment.id());
+            if (localUpdates.containsKey(remoteAttachment.id())) {
+                final Attachment localAttachment = localUpdates.get(remoteAttachment.id());
                 if (remoteAttachment.version() > localAttachment.version()) {
                     nyx.attachments().replace(remoteAttachment);
                 } else if (remoteAttachment.version() < localAttachment.version()) {
                     remoteUpdates.add(localAttachment);
                 }
-                // Remove updated tag so new tag at local remains.
-                localMap.remove(remoteAttachment.id());
-                // @todo #100 Remove remote attachment file?
+                localUpdates.remove(remoteAttachment.id());
             } else {
                 updateLocaleFile(remoteAttachment);
             }
         }
-        remoteUpdates.addAll(localMap.values());
+        remoteUpdates.addAll(localUpdates.values());
         updateRemoteFiles(remoteUpdates);
     }
 
@@ -89,7 +87,7 @@ public class SyncAttachmentAction implements Action {
                 true,
                 integer -> null
             ).fire();
-        } catch (Exception ignore) { // @todo #102 Attachment downloading failure
+        } catch (Exception ignore) {
         }
     }
 

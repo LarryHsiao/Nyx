@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Action to sync local jot to remote's file base system.
  */
 public class SyncJotsAction implements Action {
-    private static final String contentFilePath = "/%s/content.json";
+    private static final String contentFilePath = "/%s/content.txt";
     private static final String tagFilePath = "/%s/tags.txt";
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
@@ -53,7 +53,6 @@ public class SyncJotsAction implements Action {
                     remoteUpdates.add(localJot);
                 }
                 localJotMap.remove(remoteIndex.id());
-                // @todo #100 Remove remote jot file
             } else {
                 nyx.jots().createWithId(toJot(remoteIndex));
             }
@@ -64,25 +63,26 @@ public class SyncJotsAction implements Action {
 
     private void updateRemotes(List<Jot> remoteUpdates) {
         for (Jot remoteUpdate : remoteUpdates) {
-            remoteFiles.post(
-                String.format(contentFilePath, remoteUpdate.id() + ""),
-                new ByteArrayInputStream(
-                    new JotJson(remoteUpdate)
-                        .value()
-                        .toString()
-                        .getBytes()
-                )
-            );
-            remoteFiles.post(
-                String.format(tagFilePath, remoteUpdate.id() + ""),
-                new ByteArrayInputStream(
-                    nyx.tags().byJotId(remoteUpdate.id())
-                        .stream()
-                        .map(Tag::title)
-                        .collect(Collectors.joining(","))
-                        .getBytes()
-                )
-            );
+            if (remoteUpdate.deleted()) {
+                remoteFiles.delete("/" + remoteUpdate.id());// remove jot folder
+            } else {
+                remoteFiles.post(
+                    String.format(contentFilePath, remoteUpdate.id() + ""),
+                    new ByteArrayInputStream(
+                        remoteUpdate.content().getBytes()
+                    )
+                );
+                remoteFiles.post(
+                    String.format(tagFilePath, remoteUpdate.id() + ""),
+                    new ByteArrayInputStream(
+                        nyx.tags().byJotId(remoteUpdate.id())
+                            .stream()
+                            .map(Tag::title)
+                            .collect(Collectors.joining(","))
+                            .getBytes()
+                    )
+                );
+            }
         }
         remoteIndexes.updateJots(remoteUpdates);
     }

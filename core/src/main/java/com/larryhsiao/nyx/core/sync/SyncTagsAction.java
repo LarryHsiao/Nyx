@@ -37,7 +37,7 @@ public class SyncTagsAction implements Action {
                 } else if (remoteTag.version() < localTag.version()) {
                     remoteUpdates.add(localTag);
                 }
-                // Remove updated tag so new tag at local remains.
+                // Remove updated tag so new tag at the map remains for adding to remote.
                 localTagMap.remove(remoteTag.id());
             } else {
                 localTags.createWithId(remoteTag);
