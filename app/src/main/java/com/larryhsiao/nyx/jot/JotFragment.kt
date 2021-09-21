@@ -29,7 +29,6 @@ import com.google.android.gms.location.*
 import com.larryhsiao.clotho.openweather.Weather
 import com.larryhsiao.clotho.openweather.Weather.Type
 import com.larryhsiao.clotho.openweather.Weather.Type.*
-import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.attachment.AttachmentsFragment
@@ -39,9 +38,7 @@ import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
 import com.larryhsiao.clotho.temperature.FahrenheitCelsius
-import com.larryhsiao.nyx.core.sync.SyncAction
-import com.larryhsiao.nyx.core.sync.RemoteIndexes
-import com.larryhsiao.nyx.core.sync.dropbox.DropboxRemoteFiles
+import com.larryhsiao.nyx.NyxFragment
 import kotlinx.android.synthetic.main.dialog_weather.*
 import kotlinx.android.synthetic.main.fragment_jot.*
 import kotlinx.coroutines.launch
@@ -106,17 +103,6 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             .create()
     }
 
-    private val discardConfirmationDialog by lazy {
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.discard)
-            .setMessage(R.string.Are_you_sure_to_discard_)
-            .setNegativeButton(R.string.No) { _, _ -> }
-            .setPositiveButton(R.string.discard) { _, _ ->
-                findNavController().popBackStack()
-            }
-            .create()
-    }
-
     private val timePicker by lazy {
         val current = Calendar.getInstance()
         TimePickerDialog(
@@ -128,16 +114,39 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         )
     }
 
+    override fun preferChangePage(canChangeCallback: Runnable?): Boolean {
+        return if (jotViewModel.isModified().value == true) {
+            discardConfirmationDialog { canChangeCallback?.run() }
+            false
+        } else {
+            true
+        }
+    }
+
     private val onBackCallback by lazy {
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (jotViewModel.isModified().value == true) {
-                    discardConfirmationDialog.show()
+                    discardConfirmationDialog{
+                        findNavController().popBackStack()
+                    }
                 } else {
                     findNavController().popBackStack()
                 }
             }
         }
+    }
+
+    private fun discardConfirmationDialog(discardCallback: Runnable){
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.discard)
+            .setMessage(R.string.Are_you_sure_to_discard_)
+            .setNegativeButton(R.string.No) { _, _ -> }
+            .setPositiveButton(R.string.discard) { _, _ ->
+                discardCallback.run()
+            }
+            .create()
+            .show()
     }
 
     override fun onCreateView(
@@ -170,36 +179,38 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jot_content_editText.doAfterTextChanged { jotViewModel.preferContent(it?.toString() ?: "") }
         jot_private_lock_imageView.setOnClickListener { jotViewModel.togglePrivateContent() }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackCallback);
-        jotViewModel.isNewJot().observe(viewLifecycleOwner, {
+        jotViewModel.isNewJot().observe(viewLifecycleOwner) {
             jot_title_bar_title_textView.text = if (it) {
                 getString(R.string.New_Jot)
             } else {
                 getString(R.string.Edit)
             }
-        })
-        jotViewModel.title().observe(viewLifecycleOwner, {
+        }
+        jotViewModel.title().observe(viewLifecycleOwner) {
             if (it != jot_title_editText.text.toString()) {
                 jot_title_editText.setText(it)
             }
-        })
-        jotViewModel.content().observe(viewLifecycleOwner, { content ->
+        }
+        jotViewModel.content().observe(viewLifecycleOwner) { content ->
             if (content != jot_content_editText.text.toString()) {
                 updateContent()
             }
-        })
-        jotViewModel.tags().observe(viewLifecycleOwner, {
+        }
+        jotViewModel.tags().observe(viewLifecycleOwner) {
             if (!jotViewModel.content().value.isNullOrBlank() && it.isNotEmpty()) {
                 updateContent()
             }
-        })
-        jotViewModel.isNewJot().observe(viewLifecycleOwner, {
+        }
+        jotViewModel.isNewJot().observe(viewLifecycleOwner) {
             jot_title_left_textView.text = if (it == true) {
                 getString(R.string.discard)
             } else {
                 getString(R.string.delete)
             }
-        })
-        jotViewModel.time().observe(viewLifecycleOwner, { jot_datetime_textView.text = formattedDate(it) })
+        }
+        jotViewModel.time().observe(viewLifecycleOwner) {
+            jot_datetime_textView.text = formattedDate(it)
+        }
         jotViewModel.location().observe(viewLifecycleOwner, ::loadUpLocation)
         jotViewModel.attachments().observe(viewLifecycleOwner, ::loadUpAttachments)
         jotViewModel.weather().observe(viewLifecycleOwner, ::loadUpWeather)
@@ -308,7 +319,9 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     private fun delete() {
         if (jotViewModel.isNewJot().value == true) {
             if (jotViewModel.isModified().value == true) {
-                discardConfirmationDialog.show()
+                discardConfirmationDialog{
+                    findNavController().popBackStack()
+                }
             } else {
                 findNavController().popBackStack()
             }
