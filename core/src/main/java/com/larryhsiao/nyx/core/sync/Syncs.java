@@ -1,13 +1,17 @@
 package com.larryhsiao.nyx.core.sync;
 
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+
 public interface Syncs {
     public enum Dest {
         DROPBOX
     }
 
-    Dest[] loggedInDest();
+    Set<Dest> loggedInDest();
 
-    void authCodeFlow(Dest dest, Runnable success);
+    void login(Dest dest, Runnable success);
 
     /**
      * Logout given destination

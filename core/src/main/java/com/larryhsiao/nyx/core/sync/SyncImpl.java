@@ -1,35 +1,38 @@
 package com.larryhsiao.nyx.core.sync;
 
-import com.larryhsiao.clotho.Action;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.sync.dropbox.DropboxRemoteFiles;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 public class SyncImpl implements Syncs {
+    public interface Login {
+        void login(Function<String, Void> callback);
+    }
     private final Map<Dest, String> tokens = new HashMap<>();
-    private final Action dbAuthFlow;
+    private final Login dbAuthFlow;
     private final Nyx nyx;
 
-    public SyncImpl(Nyx nyx, Action dbAuthFlow) {
+    public SyncImpl(Nyx nyx, Login dbAuthFlow) {
         this.nyx = nyx;
         this.dbAuthFlow = dbAuthFlow;
     }
 
     @Override
-    public Dest[] loggedInDest() {
-        return tokens.keySet().toArray(new Dest[0]);
+    public Set<Dest> loggedInDest() {
+        return tokens.keySet();
     }
 
     @Override
-    public void authCodeFlow(Dest dest, Runnable success) {
-        switch (dest){
-            // @todo #0 Auth code flow for others
-            case DROPBOX:{
-                dbAuthFlow.fire();
-                break;
-            }
+    public void login(Dest dest, Runnable success) {
+        if (dest == Dest.DROPBOX) {
+            dbAuthFlow.login((token) -> {
+                tokens.put(Dest.DROPBOX, token);
+                return null;
+            });
         }
     }
 
@@ -48,17 +51,14 @@ public class SyncImpl implements Syncs {
     @Override
     public void sync() {
         for (Dest dest : tokens.keySet()) {
-            switch (dest) {
-                // @todo #0 More destinations.
-                case DROPBOX: {
-                    final RemoteFiles remoteFiles =
-                        new DropboxRemoteFiles(tokens.get(Dest.DROPBOX));
-                    new SyncAction(
-                        nyx,
-                        new RemoteIndexes(nyx, remoteFiles),
-                        remoteFiles
-                    ).fire();
-                }
+            if (dest == Dest.DROPBOX) {
+                final RemoteFiles remoteFiles =
+                    new DropboxRemoteFiles(tokens.get(Dest.DROPBOX));
+                new SyncAction(
+                    nyx,
+                    new RemoteIndexes(nyx, remoteFiles),
+                    remoteFiles
+                ).fire();
             }
         }
     }
