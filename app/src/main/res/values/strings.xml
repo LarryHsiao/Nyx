@@ -174,4 +174,5 @@
     <string name="Private_content">Private Content</string>
     <string name="Unlock_for_the_private_content">Unlock for the private content</string>
     <string name="Nothing_found">Nothing found</string>
+    <string name="sync">sync</string>
 </resources>

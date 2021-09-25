@@ -17,6 +17,7 @@ public class SyncImpl implements Syncs {
     private final Login dbAuthFlow;
     private final Nyx nyx;
     private final Ceres ceres;
+    private boolean isSyncing = false;
 
     public SyncImpl(Nyx nyx, Login dbAuthFlow, Ceres ceres,Source<Map<Dest, String>> tokenSrc) {
         this.nyx = nyx;
@@ -60,6 +61,10 @@ public class SyncImpl implements Syncs {
 
     @Override
     public void sync() {
+        if (isSyncing) {
+            return;
+        }
+        isSyncing = true;
         for (Dest dest : tokenSrc.value().keySet()) {
             if (dest == Dest.DROPBOX) {
                 final RemoteFiles remoteFiles =
@@ -71,5 +76,6 @@ public class SyncImpl implements Syncs {
                 ).fire();
             }
         }
+        isSyncing = false;
     }
 }
