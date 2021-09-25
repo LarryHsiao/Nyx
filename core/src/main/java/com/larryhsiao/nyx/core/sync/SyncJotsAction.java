@@ -47,14 +47,19 @@ public class SyncJotsAction implements Action {
                 if (remoteIndex.version() > localJot.version()) {
                     try {
                         nyx.jots().replace(toJot(remoteIndex));
-                    } catch (Exception ignore) { // @todo #101 Failure of jot downloading
+                    } catch (Exception e) { // @todo #101 Failure of jot downloading
+                        e.printStackTrace();
                     }
                 } else if (remoteIndex.version() < localJot.version()) {
                     remoteUpdates.add(localJot);
                 }
                 localJotMap.remove(remoteIndex.id());
             } else {
-                nyx.jots().createWithId(toJot(remoteIndex));
+                try {
+                    nyx.jots().createWithId(toJot(remoteIndex));
+                } catch (Exception e) { // @todo #102 Failure of jot downloading.
+                    e.printStackTrace();
+                }
             }
         }
         remoteUpdates.addAll(localJotMap.values()); // New jots at remote

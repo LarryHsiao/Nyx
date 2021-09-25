@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.core.sync.dropbox;
 
 import com.larryhsiao.clotho.Action;
 import com.larryhsiao.clotho.io.ProgressedCopy;
+import com.larryhsiao.clotho.stream.StreamString;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,7 +45,10 @@ public class DBFileUploading implements Action {
             inputStream.close();
             outputStream.close();
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Upload file failure: " + path);
+                throw new RuntimeException(
+                    "Upload file failure: " + path + "\n" +
+                        new StreamString(conn.getErrorStream()).value()
+                );
             }
         }catch (Exception e){
             throw new RuntimeException(e);

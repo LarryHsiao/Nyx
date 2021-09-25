@@ -34,7 +34,7 @@
                 android:padding="8dp"
                 android:id="@+id/setting_sync"
                 android:visibility="gone"
-                android:text="@string/sync"
+                android:text="@string/Sync"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:layout_height="wrap_content" />
 

@@ -5,6 +5,9 @@ import com.larryhsiao.clotho.storage.Ceres;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.sync.dropbox.DropboxRemoteFiles;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -61,21 +64,32 @@ public class SyncImpl implements Syncs {
 
     @Override
     public void sync() {
-        if (isSyncing) {
-            return;
-        }
-        isSyncing = true;
-        for (Dest dest : tokenSrc.value().keySet()) {
-            if (dest == Dest.DROPBOX) {
-                final RemoteFiles remoteFiles =
-                    new DropboxRemoteFiles(tokenSrc.value().get(Dest.DROPBOX));
-                new SyncAction(
-                    nyx,
-                    new RemoteIndexes(nyx, remoteFiles),
-                    remoteFiles
-                ).fire();
+        try {
+            if (isSyncing) {
+                return;
             }
+            isSyncing = true;
+            for (Dest dest : tokenSrc.value().keySet()) {
+                if (dest == Dest.DROPBOX) {
+                    final String jsonString = tokenSrc.value().get(Dest.DROPBOX);
+                    if (jsonString.length() == 0) {
+                        continue;
+                    }
+                    final JsonObject jsonObj = Json.createReader(
+                        new StringReader(jsonString)
+                    ).readObject();
+                    final RemoteFiles remoteFiles = new DropboxRemoteFiles(
+                        jsonObj.getString("access_token")
+                    );
+                    new SyncAction(
+                        nyx,
+                        new RemoteIndexes(nyx, remoteFiles),
+                        remoteFiles
+                    ).fire();
+                }
+            }
+        } finally {
+            isSyncing = false;
         }
-        isSyncing = false;
     }
 }
