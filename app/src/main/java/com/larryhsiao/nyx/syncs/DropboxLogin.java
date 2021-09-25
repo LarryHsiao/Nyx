@@ -3,7 +3,11 @@ package com.larryhsiao.nyx.syncs;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import com.larryhsiao.clotho.storage.Ceres;
 import com.larryhsiao.nyx.core.sync.SyncImpl;
+import com.larryhsiao.nyx.core.sync.dropbox.DBToken;
 import fi.iki.elonen.NanoHTTPD;
 
 import java.io.IOException;
@@ -13,6 +17,7 @@ import java.util.function.Function;
 public class DropboxLogin implements SyncImpl.Login {
     private static final String URL_CODE_FLOW =
         "https://www.dropbox.com/oauth2/authorize?client_id=%s&response_type=code&redirect_uri=http://localhost:9981/token";
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Context context;
     private final String apiKey;
 
@@ -56,22 +61,17 @@ public class DropboxLogin implements SyncImpl.Login {
                             "  \n" +
                             "</html>";
                     final List<String> code = session.getParameters().get("code");
-                    if (code !=null) {
-                        // @todo #1 Exchange access token
+                    if (code == null || code.size() == 0){
+                        throw new IllegalArgumentException("Auth code fetching failure");
                     }
+                    final String token = new DBToken(code.get(0)).value();
+                    mainHandler.post(() -> success.apply(token));
                     stopByDelay(5000);
                     return newFixedLengthResponse(msg);
                 }
 
                 private void stopByDelay(int delay){
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(delay);
-                            stop();
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    }).start();
+                    mainHandler.postDelayed(this::stop, delay);
                 }
 
                 @Override
@@ -84,10 +84,7 @@ public class DropboxLogin implements SyncImpl.Login {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        final String authFlow = String.format(
-            URL_CODE_FLOW,
-            apiKey
-        );
+        final String authFlow = String.format(URL_CODE_FLOW, apiKey);
         final Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(authFlow));
         context.startActivity(intent);

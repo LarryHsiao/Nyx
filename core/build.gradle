@@ -19,7 +19,7 @@ test {
 }
 
 dependencies {
-    api 'com.larryhsiao:clotho:1.18.16'
+    api 'com.larryhsiao:clotho:1.18.17'
     api 'com.h2database:h2:1.4.197'
     implementation  'org.glassfish:javax.json:1.1.4'
     api 'com.larryhsiao:clotho-openweather:1.0.2'

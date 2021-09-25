@@ -1,8 +1,6 @@
 package com.larryhsiao.nyx.core.sync;
 
-import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 public interface Syncs {
     public enum Dest {
