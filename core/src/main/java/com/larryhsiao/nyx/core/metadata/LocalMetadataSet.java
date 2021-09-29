@@ -30,4 +30,21 @@ public class LocalMetadataSet implements MetadataSet {
     public Weathers weathers() {
         return new LocalWeathers(db);
     }
+
+    @Override
+    public List<Metadata> all() {
+        return new QueriedMetadata(
+            new AllMetadata(db, true)
+        ).value();
+    }
+
+    @Override
+    public void createWithId(Metadata metadata) {
+        new NewMetadataWithId(db, metadata).fire();
+    }
+
+    @Override
+    public void replace(Metadata metadata) {
+        new UpdatedMetadata(db, metadata, false).value();
+    }
 }

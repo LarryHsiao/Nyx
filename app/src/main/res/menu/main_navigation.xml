@@ -14,4 +14,11 @@
         android:id="@id/jotsMapFragment"
         app:iconTint="@color/colorPrimaryDark"
         android:icon="@drawable/ic_map" />
+
+    <item
+        android:title="@string/settings"
+        app:showAsAction="always"
+        android:id="@+id/settingFragment"
+        app:iconTint="@color/colorPrimaryDark"
+        android:icon="@drawable/ic_gear" />
 </menu>

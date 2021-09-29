@@ -1,7 +1,5 @@
 package com.larryhsiao.nyx.core.jots;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Calendar;
 import java.util.List;
 
@@ -17,9 +15,19 @@ public interface Jots {
     Jot byId(long id);
 
     /**
-     * Create new jot.
+     * Replace exist jot without increasing version.
+     */
+    void replace(Jot jot);
+
+    /**
+     * Create new jot with defaults time and versions.
      */
     Jot create(Jot jot);
+
+    /**
+     * Create a jot into db with specific id.
+     */
+    void createWithId(Jot jot);
 
     /**
      * Update the given jot.

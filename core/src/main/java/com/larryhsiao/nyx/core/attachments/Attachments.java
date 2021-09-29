@@ -14,9 +14,19 @@ public interface Attachments {
      */
     Attachment newAttachment(Attachment attachment);
 
+    /**
+     * Create an attachment entry with specific id.
+     */
+    void newAttachmentWithId(Attachment attachment);
+
     Attachment byId(long id);
 
     List<Attachment> byJotId(long id);
+
+    /**
+     * Replace an attachment without increase version.
+     */
+    void replace(Attachment attachment);
 
     void update(Attachment attachment);
 

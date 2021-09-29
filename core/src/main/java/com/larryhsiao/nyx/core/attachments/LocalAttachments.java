@@ -12,12 +12,22 @@ public class LocalAttachments implements Attachments {
 
     @Override
     public List<Attachment> all() {
-        return new QueriedAttachments(new AllAttachments(db)).value();
+        return new QueriedAttachments(new AllAttachments(db, true)).value();
     }
 
     @Override
     public Attachment newAttachment(Attachment attachment) {
         return new NewAttachment(db, attachment.uri(), attachment.jotId()).value();
+    }
+
+    @Override
+    public void newAttachmentWithId(Attachment attachment) {
+        new NewAttachmentWithId(db, attachment).fire();
+    }
+
+    @Override
+    public void replace(Attachment attachment) {
+        new UpdateAttachment(db, attachment, false).fire();
     }
 
     @Override

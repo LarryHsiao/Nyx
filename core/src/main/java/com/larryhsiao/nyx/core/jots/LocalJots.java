@@ -2,7 +2,6 @@ package com.larryhsiao.nyx.core.jots;
 
 import com.larryhsiao.clotho.Source;
 import com.larryhsiao.nyx.core.attachments.RemovalAttachmentByJotId;
-import com.larryhsiao.nyx.core.metadata.MetadataDeletionById;
 import com.larryhsiao.nyx.core.metadata.MetadataDeletionByJotId;
 
 import java.sql.Connection;
@@ -32,6 +31,11 @@ public class LocalJots implements Jots {
     @Override
     public Jot create(Jot jot) {
         return new NewJot(db, jot).value();
+    }
+
+    @Override
+    public void createWithId(Jot jot) {
+        new CreateJotWithId(db, jot).fire();
     }
 
     @Override
@@ -69,5 +73,10 @@ public class LocalJots implements Jots {
     @Override
     public List<Jot> byIds(long[] ids) {
         return new QueriedJots(new JotsByIds(db, ids)).value();
+    }
+
+    @Override
+    public void replace(Jot jot) {
+        new UpdateJot(jot, db, false).fire();
     }
 }
