@@ -24,7 +24,7 @@ class RankedMoods(private val db: Source<Connection>) : Source<List<RankedMood>>
                 result[jot.mood()] = 1
             }
         }
-        val strComparator: Comparator<String> = StringComparator()
+        val strComparator: Comparator<String> = StringComparator().reversed()
         return result.entries.stream()
             .map {
                 ConstRankedMood(

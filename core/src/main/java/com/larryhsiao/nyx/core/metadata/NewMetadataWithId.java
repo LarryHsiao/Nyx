@@ -20,8 +20,8 @@ public class NewMetadataWithId implements Action {
     public void fire() {
         try (final PreparedStatement stmt = db.value().prepareStatement(
             // language=H2
-            "INSERT INTO METADATA(ID, TYPE, TITLE, VALUE, VALUE_DECIMAL, COMMENT, JOT_ID, VERSION, DELETED)\n" +
-                "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);"
+            "INSERT INTO METADATA(ID, TYPE, TITLE, VALUE, VALUE_DECIMAL, COMMENT, JOT_ID, VERSION, DELETED)\n"
+                + "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);"
         )) {
             stmt.setLong(1, metadata.id());
             stmt.setString(2, metadata.type().name());
