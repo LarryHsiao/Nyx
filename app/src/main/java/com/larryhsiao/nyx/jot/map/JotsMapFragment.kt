@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.clustering.ClusterManager
@@ -25,6 +26,9 @@ class JotsMapFragment : NyxFragment() {
             ViewModelFactory(app)
         ).get(JotsMapViewModel::class.java)
     }
+    private var lastCameraPosition: CameraPosition? = null
+    private var map: GoogleMap? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,11 +43,19 @@ class JotsMapFragment : NyxFragment() {
             .replace(
                 R.id.jotsMap_mapContainer,
                 SupportMapFragment.newInstance().apply {
-                    getMapAsync (::loadUpMap)
+                    getMapAsync {
+                        map = it
+                        loadUpMap(it)
+                    }
 
                 }
             )
             .commit()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        lastCameraPosition = map?.cameraPosition
     }
 
     private fun loadUpMap(map: GoogleMap) {
@@ -87,11 +99,15 @@ class JotsMapFragment : NyxFragment() {
             latLngBounds.include(position)
             haveLocation = true
         }
-        if (haveLocation) {
-            map.setMaxZoomPreference(15f)
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 200))
-        } else {
-            map.animateCamera(CameraUpdateFactory.zoomTo(10f))
+        if (lastCameraPosition!=null){
+            map.moveCamera(CameraUpdateFactory.newCameraPosition(lastCameraPosition))
+        }else {
+            if (haveLocation) {
+                map.setMaxZoomPreference(15f)
+                map.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 200))
+            } else {
+                map.animateCamera(CameraUpdateFactory.zoomTo(10f))
+            }
         }
     }
 
