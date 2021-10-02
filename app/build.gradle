@@ -42,6 +42,7 @@ android {
         buildConfigField("String", "FILE_PROVIDER_AUTHORITY", "\"$AUTHORITY\"")
         buildConfigField("String", "URI_FILE_PROVIDER", "\"content://$AUTHORITY/$ATTACHMENT_FOLDER_NAME/\"")
         buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"a5817f5f724548529f05f64e8780ee41\"")
+        buildConfigField("String", "DROPBOX_API_KEY", "\"uxql3ekxg82j8aq\"")
         buildConfigField("int", "JPG_COMPRESS_QUALITY", "85")
     }
     buildTypes {
