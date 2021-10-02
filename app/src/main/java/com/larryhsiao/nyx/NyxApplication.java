@@ -2,7 +2,6 @@ package com.larryhsiao.nyx;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import com.larryhsiao.aura.storage.SPCeres;
 import com.larryhsiao.clotho.database.SingleConn;
@@ -26,9 +25,11 @@ public class NyxApplication extends Application {
     public static final int NOTIFICATION_ID_SYNC = 1000;
 
     public static final int SERVICE_ID_SYNC = 1000;
-    public static final String FILE_PROVIDER_AUTHORITY = "content://com.larryhsiao.nyx.fileprovider";
+    public static final String FILE_PROVIDER_AUTHORITY =
+        "content://com.larryhsiao.nyx.fileprovider";
     public static final String URI_FILE_PROVIDER = FILE_PROVIDER_AUTHORITY + "/attachments/";
-    public static final String URI_FILE_TEMP_PROVIDER = FILE_PROVIDER_AUTHORITY + "/attachments_temp/";
+    public static final String URI_FILE_TEMP_PROVIDER =
+        FILE_PROVIDER_AUTHORITY + "/attachments_temp/";
     private Nyx nyx;
     private Ceres storage;
     private Syncs syncs;
@@ -41,33 +42,15 @@ public class NyxApplication extends Application {
             return;
         }
         nyx = new LocalNyx(
-            new SingleConn(
-                new NyxDb(
-                    new File(
-                        getFilesDir(),
-                        "jot"
-                    ),
-                    false
-                )
-            ),
+            new SingleConn(new NyxDb(new File(getFilesDir(), "jot"), false)),
             new NyxFilesImpl(this)
         );
-        storage = new SPCeres(
-            getSharedPreferences(
-                "settings",
-                Context.MODE_PRIVATE
-            )
-        );
+        storage = new SPCeres(getSharedPreferences("settings", Context.MODE_PRIVATE));
         syncs = new SyncImpl(
             nyx,
-            new DropboxLogin(
-                this,
-                BuildConfig.DROPBOX_API_KEY
-            ),
+            new DropboxLogin(this, BuildConfig.DROPBOX_API_KEY),
             getStorage(),
-            new SingleRefSource<>(
-                new StoredTokenSrc(getStorage())
-            )
+            new SingleRefSource<>(new StoredTokenSrc(getStorage()))
         );
     }
 
@@ -79,7 +62,7 @@ public class NyxApplication extends Application {
         return storage;
     }
 
-    public Syncs getSyncs(){
+    public Syncs getSyncs() {
         return syncs;
     }
 }

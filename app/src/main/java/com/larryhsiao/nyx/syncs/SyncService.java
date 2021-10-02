@@ -1,6 +1,5 @@
 package com.larryhsiao.nyx.syncs;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -14,7 +13,9 @@ import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.core.sync.Syncs;
 import org.jetbrains.annotations.NotNull;
 
-import static com.larryhsiao.nyx.NyxApplication.*;
+import static com.larryhsiao.nyx.NyxApplication.CHANNEL_ID_SYNC;
+import static com.larryhsiao.nyx.NyxApplication.NOTIFICATION_ID_SYNC;
+import static com.larryhsiao.nyx.NyxApplication.SERVICE_ID_SYNC;
 
 /**
  * Service for doing a sync.
@@ -60,7 +61,7 @@ public class SyncService extends JobIntentService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(
-                NyxApplication.CHANNEL_ID_SYNC,
+                CHANNEL_ID_SYNC,
                 getString(R.string.Sync),
                 importance
             );
