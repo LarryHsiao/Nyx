@@ -3,7 +3,6 @@ package com.larryhsiao.nyx.core.sync;
 import com.larryhsiao.clotho.Action;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.jots.Jot;
-import com.larryhsiao.nyx.core.jots.moods.JotJson;
 import com.larryhsiao.nyx.core.jots.moods.JsonJot;
 import com.larryhsiao.nyx.core.tags.Tag;
 
@@ -19,8 +18,8 @@ import java.util.stream.Collectors;
  * Action to sync local jot to remote's file base system.
  */
 public class SyncJotsAction implements Action {
-    private static final String contentFilePath = "/%s/content.txt";
-    private static final String tagFilePath = "/%s/tags.txt";
+    private static final String CONTENT_FILE_PATH = "/%s/content.txt";
+    private static final String TAG_FILE_PATH = "/%s/tags.txt";
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
     private final NyxIndexes remoteIndexes;
@@ -72,13 +71,13 @@ public class SyncJotsAction implements Action {
                 remoteFiles.delete("/" + remoteUpdate.id());// remove jot folder
             } else {
                 remoteFiles.post(
-                    String.format(contentFilePath, remoteUpdate.id() + ""),
+                    String.format(CONTENT_FILE_PATH, remoteUpdate.id() + ""),
                     new ByteArrayInputStream(
                         remoteUpdate.content().getBytes()
                     )
                 );
                 remoteFiles.post(
-                    String.format(tagFilePath, remoteUpdate.id() + ""),
+                    String.format(TAG_FILE_PATH, remoteUpdate.id() + ""),
                     new ByteArrayInputStream(
                         nyx.tags().byJotId(remoteUpdate.id())
                             .stream()
@@ -96,7 +95,7 @@ public class SyncJotsAction implements Action {
         return new JsonJot(
             Json.createReader(
                 remoteFiles.get(
-                    String.format(contentFilePath, remoteJot.id() + "")
+                    String.format(CONTENT_FILE_PATH, remoteJot.id() + "")
                 )
             ).readObject()
         );

@@ -27,6 +27,7 @@ public class DropboxLogin implements SyncImpl.Login {
         launchHttpServer(success);
         final String authFlow = String.format(URL_CODE_FLOW, apiKey);
         final Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setData(Uri.parse(authFlow));
         context.startActivity(intent);
     }
