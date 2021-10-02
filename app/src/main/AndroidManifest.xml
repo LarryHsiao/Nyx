@@ -33,6 +33,7 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -56,6 +57,11 @@
                 android:value=".MainActivity" />
         </activity>
 
+        <service
+            android:name=".syncs.SyncService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
+
         <provider
             android:authorities="com.larryhsiao.nyx.fileprovider"
             android:exported="false"
@@ -65,7 +71,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider" />
         </provider>
-
 
 
         <meta-data

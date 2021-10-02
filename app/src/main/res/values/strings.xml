@@ -175,4 +175,5 @@
     <string name="Unlock_for_the_private_content">Unlock for the private content</string>
     <string name="Nothing_found">Nothing found</string>
     <string name="Sync">Sync</string>
+    <string name="service_for_syncing">Service for syncing</string>
 </resources>
