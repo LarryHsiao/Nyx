@@ -137,8 +137,6 @@ dependencies {
     implementation "androidx.biometric:biometric:1.1.0"
     implementation "androidx.core:core-ktx:1.3.1"
     implementation 'org.jasypt:jasypt:1.9.3'
-    implementation 'jp.wasabeef:picasso-transformations:2.2.1'
-    implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.android.billingclient:billing:3.0.0'
@@ -156,7 +154,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.haibin:calendarview:3.6.8'
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'jp.wasabeef:glide-transformations:4.3.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.github.stfalcon:stfalcon-imageviewer:1.0.0'
     implementation 'com.google.maps.android:maps-utils-ktx:1.8.0'
