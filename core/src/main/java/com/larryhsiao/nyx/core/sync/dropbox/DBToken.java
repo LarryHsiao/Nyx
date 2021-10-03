@@ -14,9 +14,11 @@ import java.net.URL;
 public class DBToken implements Source<String> {
     private static final String URL_TOKEN = "https://api.dropbox.com/oauth2/token";
     private static final String BODY = "code=%s&grant_type=authorization_code&redirect_uri=http://localhost:9981/token";
+    private final String apiToken;
     private final String code;
 
-    public DBToken(String code) {
+    public DBToken(String apiToken, String code) {
+        this.apiToken = apiToken;
         this.code = code;
     }
 
@@ -26,10 +28,7 @@ public class DBToken implements Source<String> {
             final HttpURLConnection conn =
                 ((HttpURLConnection) new URL(URL_TOKEN).openConnection());
             conn.setRequestMethod("POST");
-            conn.addRequestProperty(
-                "Authorization",
-                "Basic dXhxbDNla3hnODJqOGFxOjV3bW1lbnZlNGFvMjc4ZA=="
-            );
+            conn.addRequestProperty("Authorization", apiToken);
             conn.setDoOutput(true);
             new ProgressedCopy(
                 new ByteArrayInputStream(String.format(BODY, code).getBytes()),

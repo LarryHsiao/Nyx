@@ -15,8 +15,9 @@ class DBTokenTest {
      */
     @Test
     void checkIfRequest() {
+        final String apiAuth = "";
         final String code = "848T7xnq2m4AAAAAAAAu0IfxPev_Vpu4_wxK0AUcxdQ";
-        new DBToken(code).value();
+        new DBToken(apiAuth, code).value();
         assertTrue(true);
     }
 }

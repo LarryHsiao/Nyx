@@ -42,7 +42,8 @@ android {
         buildConfigField("String", "FILE_PROVIDER_AUTHORITY", "\"$AUTHORITY\"")
         buildConfigField("String", "URI_FILE_PROVIDER", "\"content://$AUTHORITY/$ATTACHMENT_FOLDER_NAME/\"")
         buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"a5817f5f724548529f05f64e8780ee41\"")
-        buildConfigField("String", "DROPBOX_API_KEY", "\"uxql3ekxg82j8aq\"")
+        buildConfigField("String", "DROPBOX_API_KEY", "\"$System.env.NYX_DROPBOX_APP_ID\"")
+        buildConfigField("String", "DROPBOX_API_TOKEN", "\"$System.env.NYX_DROPBOX_TOKEN\"")
         buildConfigField("int", "JPG_COMPRESS_QUALITY", "85")
     }
     buildTypes {
@@ -51,6 +52,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             ext.enableCrashlytics = false
             ext.alwaysUpdateBuildId = false
+
+            buildConfigField("String", "DROPBOX_API_KEY", "\"$System.env.NYX_DROPBOX_APP_ID_DEBUG\"")
+            buildConfigField("String", "DROPBOX_API_TOKEN", "\"$System.env.NYX_DROPBOX_TOKEN_DEBUG\"")
         }
         release {
             minifyEnabled true
