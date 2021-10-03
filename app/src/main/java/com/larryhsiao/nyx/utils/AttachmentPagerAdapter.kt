@@ -7,16 +7,18 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.larryhsiao.aura.view.measures.DP
 import com.larryhsiao.nyx.core.attachments.Attachment
+import com.larryhsiao.nyx.core.attachments.Attachments
 import jp.wasabeef.glide.transformations.BlurTransformation
 
 /**
  * Adapter for pager which has one image
  */
 class AttachmentPagerAdapter(
-        private val uris: ArrayList<Attachment>,
         private val blurImage: Boolean,
-        private val itemClicked: (attachment: Attachment) -> Unit
+        private val itemClicked: (attachmentUri: String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val uris: ArrayList<String> = ArrayList()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return object : RecyclerView.ViewHolder(
             ImageView(parent.context).apply {
@@ -33,7 +35,7 @@ class AttachmentPagerAdapter(
             val placeHolder = CircularProgressDrawable(context)
             placeHolder.setStyle(CircularProgressDrawable.DEFAULT)
             Glide.with(holder.itemView)
-                .load(uris[position].uri())
+                .load(uris[position])
                 .apply{
                     if (blurImage){
                         transform(BlurTransformation(5))
@@ -42,6 +44,12 @@ class AttachmentPagerAdapter(
                 .placeholder(CircularProgressDrawable(holder.itemView.context))
                 .into(this)
         }
+    }
+
+    fun loadUp(newAttachments: List<String>) {
+        this.uris.clear()
+        this.uris.addAll(newAttachments)
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

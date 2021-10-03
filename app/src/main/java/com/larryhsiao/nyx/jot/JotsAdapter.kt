@@ -18,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.stream.Collectors
 
 /**
  * Adapter to show jots.
@@ -71,10 +72,15 @@ class JotsAdapter(
                 holder.itemView.itemJot_attachments.apply {
                     isVisible = attachments.isNotEmpty()
                     adapter = AttachmentPagerAdapter(
-                        ArrayList(attachments.toList()),
                         jot.privateLock()
                     ) {
                         itemClicked(jots[position])
+                    }.apply {
+                        loadUp(
+                            attachments.stream()
+                                .map { it.uri() }
+                                .collect(Collectors.toList())
+                        )
                     }
                 }
                 HashTagEnlightenAction(

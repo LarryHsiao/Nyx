@@ -154,9 +154,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<ViewHolder> {
         new StfalconImageViewer.Builder<>(
             context,
             Collections.singletonList(uri),
-            (imageView, image) -> {
-                new JotImageLoading(imageView, uri.toString(), WHITE).fire();
-            }
+            (imageView, image) -> new JotImageLoading(imageView, uri.toString(), WHITE).fire()
         ).show();
     }
 
