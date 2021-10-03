@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.syncs;
 
 import android.os.Handler;
+import com.larryhsiao.nyx.BuildConfig;
 import com.larryhsiao.nyx.core.sync.dropbox.DBToken;
 import fi.iki.elonen.NanoHTTPD;
 
@@ -24,7 +25,10 @@ public class CallBackServer extends NanoHTTPD {
         if (code == null || code.size() == 0) {
             throw new IllegalArgumentException("Auth code fetching failure");
         }
-        final String token = new DBToken(code.get(0)).value();
+        final String token = new DBToken(
+            BuildConfig.DROPBOX_API_TOKEN,
+            code.get(0)
+        ).value();
         mainHandler.post(() -> success.apply(token));
         stopByDelay(this, 5000);
         return newFixedLengthResponse(msg);
