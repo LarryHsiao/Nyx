@@ -3,5 +3,5 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:id="@+id/itemAttachmentImage_icon"
-    tools:src="@android:drawable/ic_notification_clear_all"
+    tools:src="@tools:sample/avatars"
     android:layout_height="match_parent" />

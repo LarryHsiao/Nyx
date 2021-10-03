@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import android.widget.ImageView
 import android.widget.TimePicker
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
@@ -25,20 +26,26 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.location.*
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.larryhsiao.clotho.openweather.Weather
 import com.larryhsiao.clotho.openweather.Weather.Type
 import com.larryhsiao.clotho.openweather.Weather.Type.*
+import com.larryhsiao.clotho.temperature.FahrenheitCelsius
+import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.attachment.AttachmentsFragment
-import com.larryhsiao.nyx.utils.JpegDateComparator
+import com.larryhsiao.nyx.attachment.JotImageLoading
+import com.larryhsiao.nyx.utils.AttachmentPagerAdapter
 import com.larryhsiao.nyx.utils.HashTagEnlightenAction
+import com.larryhsiao.nyx.utils.JpegDateComparator
 import com.schibstedspain.leku.LATITUDE
 import com.schibstedspain.leku.LONGITUDE
 import com.schibstedspain.leku.LocationPickerActivity
-import com.larryhsiao.clotho.temperature.FahrenheitCelsius
-import com.larryhsiao.nyx.NyxFragment
+import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.dialog_weather.*
 import kotlinx.android.synthetic.main.fragment_jot.*
 import kotlinx.coroutines.launch
@@ -50,10 +57,26 @@ import kotlin.Double.Companion.MIN_VALUE
 /**
  * Fragment for representing a Jot.
  */
-class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener,
+    TimePickerDialog.OnTimeSetListener {
     companion object {
         private const val REQUEST_CODE_LOCATION_PICKER: Int = 1000
         private const val REQUEST_CODE_ATTACHMENT_DIALOG: Int = 1001
+    }
+
+    private val attachmentAdapter by lazy {
+        AttachmentPagerAdapter(false) {
+            StfalconImageViewer.Builder(
+                context,
+                listOf<Uri>(Uri.parse(it))
+            ) { imageView: ImageView?, image: Uri? ->
+                JotImageLoading(
+                    imageView,
+                    it,
+                    Color.WHITE
+                ).fire()
+            }.show()
+        }
     }
 
     private val dateFormatter by lazy {
@@ -63,7 +86,10 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         ViewModelProvider(this, ViewModelFactory(app)).get(JotViewModel::class.java)
     }
     private val jotsViewModel by lazy {
-        ViewModelProvider(requireActivity(), ViewModelFactory(app)).get(JotsCalendarViewModel::class.java)
+        ViewModelProvider(
+            requireActivity(),
+            ViewModelFactory(app)
+        ).get(JotsCalendarViewModel::class.java)
     }
     private val datePicker by lazy {
         val current = Calendar.getInstance()
@@ -127,7 +153,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (jotViewModel.isModified().value == true) {
-                    discardConfirmationDialog{
+                    discardConfirmationDialog {
                         findNavController().popBackStack()
                     }
                 } else {
@@ -137,7 +163,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         }
     }
 
-    private fun discardConfirmationDialog(discardCallback: Runnable){
+    private fun discardConfirmationDialog(discardCallback: Runnable) {
         AlertDialog.Builder(requireContext())
             .setTitle(R.string.discard)
             .setMessage(R.string.Are_you_sure_to_discard_)
@@ -167,7 +193,8 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             val currentLocation = jotViewModel.location().value
             if (currentLocation != null && !currentLocation.contentEquals(
                     doubleArrayOf(MIN_VALUE, MIN_VALUE)
-                )) {
+                )
+            ) {
                 promoteRemoveLocation()
             } else {
                 showLocationPicker()
@@ -178,6 +205,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         jot_title_editText.doAfterTextChanged { jotViewModel.preferTitle(it?.toString() ?: "") }
         jot_content_editText.doAfterTextChanged { jotViewModel.preferContent(it?.toString() ?: "") }
         jot_private_lock_imageView.setOnClickListener { jotViewModel.togglePrivateContent() }
+        jotAttachment_list.adapter = attachmentAdapter
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackCallback);
         jotViewModel.isNewJot().observe(viewLifecycleOwner) {
             jot_title_bar_title_textView.text = if (it) {
@@ -233,7 +261,8 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 ACCESS_FINE_LOCATION
-            ) == PERMISSION_GRANTED) {
+            ) == PERMISSION_GRANTED
+        ) {
             LocationServices.getFusedLocationProviderClient(requireContext()).let {
                 it.requestLocationUpdates(
                     LocationRequest.create().setNumUpdates(1),
@@ -319,7 +348,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     private fun delete() {
         if (jotViewModel.isNewJot().value == true) {
             if (jotViewModel.isModified().value == true) {
-                discardConfirmationDialog{
+                discardConfirmationDialog {
                     findNavController().popBackStack()
                 }
             } else {
@@ -331,6 +360,7 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
     }
 
     private fun loadUpAttachments(attachments: List<String>) {
+        attachmentAdapter.loadUp(attachments)
         ImageViewCompat.setImageTintList(
             jot_image_imageView,
             ColorStateList.valueOf(
@@ -431,10 +461,12 @@ class JotFragment : NyxFragment(), DatePickerDialog.OnDateSetListener, TimePicke
             if (data == null) {
                 return
             }
-            jotViewModel.preferLocation(doubleArrayOf(
-                data.getDoubleExtra(LONGITUDE, 0.0),
-                data.getDoubleExtra(LATITUDE, 0.0)
-            ))
+            jotViewModel.preferLocation(
+                doubleArrayOf(
+                    data.getDoubleExtra(LONGITUDE, 0.0),
+                    data.getDoubleExtra(LATITUDE, 0.0)
+                )
+            )
         } else if (requestCode == REQUEST_CODE_ATTACHMENT_DIALOG && resultCode == RESULT_OK) {
             if (data == null) {
                 return
