@@ -12,6 +12,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.larryhsiao.aura.view.activity.navigationbar.NavigationBarColor;
+import com.larryhsiao.aura.view.activity.statusbar.StatusBarColor;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
@@ -66,6 +68,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new NavigationBarColor(getWindow(), getColor(R.color.white), 0.6f).fire();
+        new StatusBarColor(getWindow(), getColor(R.color.white), 0.6f).fire();
     }
 
     private boolean matchDestination(@NonNull NavDestination dest, @IdRes int destId) {
