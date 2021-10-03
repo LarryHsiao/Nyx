@@ -7,26 +7,17 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.larryhsiao.nyx.R
-import com.larryhsiao.nyx.core.jots.Jot
-import com.larryhsiao.nyx.core.tags.QueriedTags
-import com.larryhsiao.nyx.core.tags.TagsByJotId
-import com.larryhsiao.nyx.utils.HashTagEnlightenAction
-import com.larryhsiao.clotho.Source
-import com.larryhsiao.nyx.core.attachments.AttachmentsByJotId
-import com.larryhsiao.nyx.core.attachments.QueriedAttachments
-import com.larryhsiao.nyx.utils.AttachmentPagerAdapter
-import com.larryhsiao.aura.view.images.pager.PagerImageAdapter
 import com.larryhsiao.nyx.core.Nyx
+import com.larryhsiao.nyx.core.jots.Jot
+import com.larryhsiao.nyx.utils.AttachmentPagerAdapter
+import com.larryhsiao.nyx.utils.HashTagEnlightenAction
 import kotlinx.android.synthetic.main.item_jot.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.sql.Connection
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Adapter to show jots.
@@ -119,7 +110,7 @@ class JotsAdapter(
 
     private fun jotCalendar(jot: Jot): Calendar {
         return Calendar.getInstance().apply {
-            timeInMillis = jots.first().createdTime()
+            timeInMillis = jot.createdTime()
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
