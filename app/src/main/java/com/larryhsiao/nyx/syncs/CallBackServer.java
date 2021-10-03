@@ -12,11 +12,13 @@ import java.util.function.Function;
 public class CallBackServer extends NanoHTTPD {
     private final Handler mainHandler;
     private final Function<String, Void> success;
+
     public CallBackServer(int port, Handler mainHandler, Function<String, Void> success) {
         super(port);
         this.mainHandler = mainHandler;
         this.success = success;
     }
+
     @Override
     public Response serve(IHTTPSession session) {
         String msg = loginSuccessHtml();

@@ -8,6 +8,7 @@ import com.larryhsiao.nyx.core.sync.dropbox.DropboxRemoteFiles;
 import javax.json.Json;
 import javax.json.JsonObject;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -16,13 +17,14 @@ public class SyncImpl implements Syncs {
     public interface Login {
         void login(Function<String, Void> callback);
     }
+
     private final Source<Map<Dest, String>> tokenSrc;
     private final Login dbAuthFlow;
     private final Nyx nyx;
     private final Ceres ceres;
     private boolean isSyncing = false;
 
-    public SyncImpl(Nyx nyx, Login dbAuthFlow, Ceres ceres,Source<Map<Dest, String>> tokenSrc) {
+    public SyncImpl(Nyx nyx, Login dbAuthFlow, Ceres ceres, Source<Map<Dest, String>> tokenSrc) {
         this.nyx = nyx;
         this.dbAuthFlow = dbAuthFlow;
         this.ceres = ceres;
@@ -32,6 +34,23 @@ public class SyncImpl implements Syncs {
     @Override
     public Set<Dest> loggedInDest() {
         return tokenSrc.value().keySet();
+    }
+
+    @Override
+    public Map<Dest, Jwt> loggedInAccount() {
+        final Map<Dest, Jwt> account = new HashMap<>();
+        tokenSrc.value().forEach((dest, s) -> {
+            try {
+                account.put(
+                    dest,
+                    new JsonJwt(dest, Json.createReader(new StringReader(s)).readObject())
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+                // @todo #130 Publish the failure.
+            }
+        });
+        return account;
     }
 
     @Override
@@ -57,7 +76,7 @@ public class SyncImpl implements Syncs {
     public void logoutAll() {
         tokenSrc.value().clear();
         for (Dest value : Dest.values()) {
-           ceres.delete(value.name());
+            ceres.delete(value.name());
         }
         // @todo #0 Invoke tokens
     }

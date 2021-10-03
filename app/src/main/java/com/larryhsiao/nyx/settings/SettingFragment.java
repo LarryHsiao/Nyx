@@ -9,7 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.larryhsiao.nyx.NyxFragment;
 import com.larryhsiao.nyx.R;
+import com.larryhsiao.nyx.core.sync.Jwt;
 import com.larryhsiao.nyx.core.sync.Syncs;
+import com.larryhsiao.nyx.core.sync.dropbox.DBAccountName;
 import com.larryhsiao.nyx.syncs.SyncService;
 
 public class SettingFragment extends NyxFragment {
@@ -31,6 +33,7 @@ public class SettingFragment extends NyxFragment {
 
     private void updateLoginUi(View view) {
         final TextView loginIndicator = view.findViewById(R.id.setting_login);
+        final TextView dropboxAccount = view.findViewById(R.id.setting_dropboxAccount);
         final View syncButton = view.findViewById(R.id.setting_sync);
         final Syncs syncs = getApp().getSyncs();
         if (syncs.loggedInDest().contains(Syncs.Dest.DROPBOX)) {
@@ -43,7 +46,22 @@ public class SettingFragment extends NyxFragment {
                 syncs.logout(Syncs.Dest.DROPBOX);
                 updateLoginUi(view);
             });
+            final Jwt jwt = syncs.loggedInAccount().get(Syncs.Dest.DROPBOX);
+            if (jwt != null) {
+                async(() -> {
+                    try {
+                        final String account = new DBAccountName(jwt).value();
+                        view.post(() -> dropboxAccount.setText(
+                            getString(R.string.Account__, account)
+                        ));
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        // @todo #151 Publish the failure.
+                    }
+                });
+            }
         } else {
+            dropboxAccount.setText("");
             syncButton.setVisibility(View.GONE);
             syncButton.setOnClickListener(null);
             loginIndicator.setText(R.string.login);

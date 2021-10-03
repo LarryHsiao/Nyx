@@ -1,13 +1,16 @@
 package com.larryhsiao.nyx.core.sync;
 
+import java.util.Map;
 import java.util.Set;
 
 public interface Syncs {
-    public enum Dest {
+    enum Dest {
         DROPBOX
     }
 
     Set<Dest> loggedInDest();
+
+    Map<Dest, Jwt> loggedInAccount();
 
     void login(Dest dest, Runnable success);
 
