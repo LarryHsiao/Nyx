@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
  * ViewModels for jots searching.
  */
 class JotsSearchingViewModel(private val app: NyxApplication) : ViewModel() {
-    private val keyword = MutableLiveData("_")
+    private val keyword = MutableLiveData("")
     private val jots = MutableLiveData<List<Jot>>()
 
     fun jots(): LiveData<List<Jot>> = jots
