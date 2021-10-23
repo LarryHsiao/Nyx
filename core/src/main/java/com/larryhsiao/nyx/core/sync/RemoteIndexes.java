@@ -30,6 +30,7 @@ public class RemoteIndexes implements NyxIndexes {
     private static final String PATH_JOT_INDEX_JSON = "/jotIndex.json";
     private static final String PATH_ATTACHMENT_JSON = "/attachment.json";
     private static final String PATH_METADATA_JSON = "/metadata.json";
+    private static final String PATH_LOCK_FILE = "/lock.lck";
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
 
@@ -171,5 +172,25 @@ public class RemoteIndexes implements NyxIndexes {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public void lock() {
+        if (!remoteFiles.exist(PATH_LOCK_FILE)) {
+            remoteFiles.post(
+                PATH_LOCK_FILE,
+                new ByteArrayInputStream(new byte[0])
+            );
+        }
+    }
+
+    @Override
+    public boolean isLocked() {
+        return remoteFiles.exist(PATH_LOCK_FILE);
+    }
+
+    @Override
+    public void unlock() {
+        remoteFiles.delete(PATH_LOCK_FILE);
     }
 }

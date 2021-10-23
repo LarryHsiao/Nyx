@@ -28,4 +28,10 @@ public interface NyxIndexes {
     void updateAttachments(List<Attachment> newAttachments);
 
     List<Metadata> metadata();
+
+    void lock();
+
+    boolean isLocked();
+
+    void unlock();
 }

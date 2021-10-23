@@ -23,9 +23,15 @@ public class SyncAction implements Action {
 
     @Override
     public void fire() {
+        if (remoteIndexes.isLocked()) {
+            // @todo #109 Invalidate lock file
+            return;
+        }
+        remoteIndexes.lock();
         new SyncTagsAction(nyx.tags(), remoteIndexes).fire();
         new SyncJotsAction(nyx, remoteFiles, remoteIndexes).fire();
         new SyncAttachmentAction(nyx, remoteFiles, remoteIndexes).fire();
         new SyncMetadataAction(nyx.metadataSet(), remoteIndexes, remoteFiles).fire();
+        remoteIndexes.unlock();
     }
 }
