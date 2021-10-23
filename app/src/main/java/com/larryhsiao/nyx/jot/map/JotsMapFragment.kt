@@ -3,7 +3,13 @@ package com.larryhsiao.nyx.jot.map
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.util.Pair
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -12,8 +18,10 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
+import com.larryhsiao.clotho.date.DateCalendar
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
@@ -39,6 +47,8 @@ class JotsMapFragment : NyxFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.dateRangeLiveData().observe(viewLifecycleOwner) { setupDateRangeText(it, view) }
+        setupDateRangeText(kotlin.Pair(0L, 0L), view)
         childFragmentManager.beginTransaction()
             .replace(
                 R.id.jotsMap_mapContainer,
@@ -47,10 +57,45 @@ class JotsMapFragment : NyxFragment() {
                         map = it
                         loadUpMap(it)
                     }
-
                 }
             )
             .commit()
+    }
+
+    private fun setupDateRangeText(it: kotlin.Pair<Long, Long>, view: View) {
+        val dateRangeText = view.findViewById<TextView>(R.id.jotsMap_dateRangeText)
+        val dateRangeIcon = view.findViewById<ImageView>(R.id.jotsMap_dateRangeIcon)
+        if (it.second == 0L && it.first == 0L) {
+            dateRangeText.text = ""
+            dateRangeText.visibility = GONE
+            dateRangeIcon.setImageResource(R.drawable.ic_calendar)
+            dateRangeIcon.setOnClickListener { showDatePicker() }
+        } else {
+            dateRangeText.text = DateRangeText(
+                DateCalendar(it.first),
+                DateCalendar(it.second)
+            ).value()
+            dateRangeText.visibility = VISIBLE
+            dateRangeIcon.setImageResource(R.drawable.ic_cross)
+            dateRangeIcon.setOnClickListener { viewModel.clearDateRange() }
+        }
+        dateRangeText.setOnClickListener { showDatePicker() }
+    }
+
+    private fun showDatePicker() {
+        val datePicker = MaterialDatePicker.Builder.dateRangePicker()
+            .setTitleText(R.string.Select_date_range)
+            .setSelection(
+                Pair(
+                    MaterialDatePicker.todayInUtcMilliseconds(),
+                    MaterialDatePicker.todayInUtcMilliseconds()
+                )
+            )
+            .build()
+        datePicker.addOnPositiveButtonClickListener {
+            viewModel.selectDateRange(it.first, it.second)
+        }
+        datePicker.show(childFragmentManager, null)
     }
 
     override fun onPause() {
@@ -72,7 +117,7 @@ class JotsMapFragment : NyxFragment() {
         map.setOnMarkerClickListener(clusterManager)
         map.setOnInfoWindowClickListener(clusterManager)
         clusterManager.setOnClusterItemInfoWindowClickListener {
-             toJotFragment(it.jot)
+            toJotFragment(it.jot)
         }
         clusterManager.setOnClusterClickListener {
             toJotsFragment(it.items.map { item -> item.jot.id() }.toLongArray())
@@ -85,7 +130,11 @@ class JotsMapFragment : NyxFragment() {
     }
 
 
-    private fun loadUpMapMarkers(map: GoogleMap, clusterManager: ClusterManager<JotMapItem>, jots: List<Jot>) {
+    private fun loadUpMapMarkers(
+        map: GoogleMap,
+        clusterManager: ClusterManager<JotMapItem>,
+        jots: List<Jot>
+    ) {
         val latLngBounds = LatLngBounds.Builder()
         var haveLocation = false
         map.clear()
@@ -99,9 +148,9 @@ class JotsMapFragment : NyxFragment() {
             latLngBounds.include(position)
             haveLocation = true
         }
-        if (lastCameraPosition!=null){
+        if (lastCameraPosition != null) {
             map.moveCamera(CameraUpdateFactory.newCameraPosition(lastCameraPosition))
-        }else {
+        } else {
             if (haveLocation) {
                 map.setMaxZoomPreference(15f)
                 map.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 200))
