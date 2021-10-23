@@ -9,7 +9,6 @@ import com.larryhsiao.nyx.NyxApplication
 import com.larryhsiao.nyx.core.jots.Jot
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class JotsMapViewModel(private val app: NyxApplication) : ViewModel() {
     private val jotsLiveData = MutableLiveData<List<Jot>>()
@@ -23,26 +22,26 @@ class JotsMapViewModel(private val app: NyxApplication) : ViewModel() {
         return dateRange
     }
 
-    fun selectDateRange(from: Long, to:Long) {
+    fun selectDateRange(from: Long, to: Long) {
         dateRange.value = Pair(from, to)
         loadJots()
     }
 
-    fun clearDateRange(){
+    fun clearDateRange() {
         dateRange.value = Pair(0, 0)
         loadJots()
     }
 
     fun loadJots() = viewModelScope.launch(IO) {
-        val dateRange = dateRange.value
+        val dateRange = dateRange.value ?: Pair(0L, 0L)
         jotsLiveData.postValue(
-            if (dateRange != null) {
+            if (dateRange.first == 0L && dateRange.second == 0L) {
+                app.nyx().jots().all()
+            } else {
                 app.nyx().jots().byDateRange(
                     DateCalendar(dateRange.first).value(),
                     DateCalendar(dateRange.second).value()
                 )
-            } else {
-                app.nyx().jots().all()
             }
         )
     }
