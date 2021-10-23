@@ -47,7 +47,7 @@ class JotsMapFragment : NyxFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.dateRangeLiveData().observe(this) { setupDateRangeText(it, view) }
+        viewModel.dateRangeLiveData().observe(viewLifecycleOwner) { setupDateRangeText(it, view) }
         setupDateRangeText(kotlin.Pair(0L, 0L), view)
         childFragmentManager.beginTransaction()
             .replace(

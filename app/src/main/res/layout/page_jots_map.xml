@@ -33,7 +33,7 @@
             android:id="@+id/jotsMap_dateRangeIcon"
             android:layout_width="48dp"
             android:padding="8dp"
-            android:tint="@color/white"
+            app:tint="@color/white"
             android:src="@drawable/ic_calendar"
             android:layout_height="48dp" />
     </LinearLayout>
