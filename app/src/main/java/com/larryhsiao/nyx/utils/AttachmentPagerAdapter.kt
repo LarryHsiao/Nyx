@@ -38,7 +38,7 @@ class AttachmentPagerAdapter(
                 .load(uris[position])
                 .apply{
                     if (blurImage){
-                        transform(BlurTransformation(5))
+                        transform(BlurTransformation(25, 4))
                     }
                 }
                 .placeholder(CircularProgressDrawable(holder.itemView.context))
