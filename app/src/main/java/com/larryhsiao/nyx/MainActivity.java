@@ -35,14 +35,14 @@ public class MainActivity extends AppCompatActivity {
             for (Fragment fragment : navFragment.getChildFragmentManager().getFragments()) {
                 if (fragment instanceof NyxFragment) {
                     final boolean canChange = ((NyxFragment) fragment).preferChangePage(() ->
-                        navController.navigate(item.getItemId())
+                        toNavigationPages(navController, item.getItemId())
                     );
                     if (!canChange) {
                         return false;
                     }
                 }
             }
-            navController.navigate(item.getItemId());
+            toNavigationPages(navController, item.getItemId());
             return true;
         });
         final WeakReference<BottomNavigationView> weakRef = new WeakReference<>(btmNavView);
@@ -68,6 +68,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+    }
+
+    private void toNavigationPages(NavController navController, int itemId) {
+        while (true) {
+            if (!navController.popBackStack()) {
+                break;
+            }
+        }
+        navController.navigate(itemId);
     }
 
     @Override
