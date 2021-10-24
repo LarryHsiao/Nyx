@@ -70,4 +70,19 @@ public class MemoryIndexes implements NyxIndexes {
     public List<Metadata> metadata() {
         return null;
     }
+
+    @Override
+    public void lock() {
+        
+    }
+
+    @Override
+    public boolean isLocked() {
+        return false;
+    }
+
+    @Override
+    public void unlock() {
+
+    }
 }
