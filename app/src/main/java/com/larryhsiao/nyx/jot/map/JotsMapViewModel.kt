@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.larryhsiao.clotho.date.DateCalendar
+import com.larryhsiao.clotho.date.DateEndCalendar
 import com.larryhsiao.nyx.NyxApplication
 import com.larryhsiao.nyx.core.jots.Jot
 import kotlinx.coroutines.Dispatchers.IO
@@ -40,7 +41,7 @@ class JotsMapViewModel(private val app: NyxApplication) : ViewModel() {
             } else {
                 app.nyx().jots().byDateRange(
                     DateCalendar(dateRange.first).value(),
-                    DateCalendar(dateRange.second).value()
+                    DateEndCalendar(dateRange.second).value()
                 )
             }
         )
