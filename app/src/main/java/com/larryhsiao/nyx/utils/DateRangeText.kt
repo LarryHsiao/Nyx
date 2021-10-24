@@ -1,4 +1,4 @@
-package com.larryhsiao.nyx.jot.map
+package com.larryhsiao.nyx.utils
 
 import com.larryhsiao.clotho.Source
 import java.text.SimpleDateFormat
