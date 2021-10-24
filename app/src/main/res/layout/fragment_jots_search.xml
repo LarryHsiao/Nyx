@@ -38,5 +38,11 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintEnd_toEndOf="@id/jotsSearching_jotsRecyclerView"
         app:drawableTopCompat="@drawable/ic_black_hole" />
-
+    <include
+        layout="@layout/date_range_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/jotsSearching_searchKeyword" />
 </androidx.constraintlayout.widget.ConstraintLayout>

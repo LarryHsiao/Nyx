@@ -6,7 +6,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.util.Pair
@@ -26,6 +25,7 @@ import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
 import com.larryhsiao.nyx.core.jots.Jot
+import com.larryhsiao.nyx.utils.DateRangeText
 
 class JotsMapFragment : NyxFragment() {
     private val viewModel by lazy {
@@ -63,8 +63,8 @@ class JotsMapFragment : NyxFragment() {
     }
 
     private fun setupDateRangeText(it: kotlin.Pair<Long, Long>, view: View) {
-        val dateRangeText = view.findViewById<TextView>(R.id.jotsMap_dateRangeText)
-        val dateRangeIcon = view.findViewById<ImageView>(R.id.jotsMap_dateRangeIcon)
+        val dateRangeText = view.findViewById<TextView>(R.id.dateRangeIndicator_dateRangeText)
+        val dateRangeIcon = view.findViewById<ImageView>(R.id.dateRangeIndicator_dateRangeIcon)
         if (it.second == 0L && it.first == 0L) {
             dateRangeText.text = ""
             dateRangeText.visibility = GONE
