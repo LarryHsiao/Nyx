@@ -12,6 +12,10 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -22,6 +26,9 @@ public class SyncAttachmentAction implements Action {
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
     private final NyxIndexes remoteIndexes;
+    private final ExecutorService worker = Executors.newFixedThreadPool(
+        Runtime.getRuntime().availableProcessors() * 2 // @todo #100 Find best thread pool size
+    );
 
     public SyncAttachmentAction(Nyx nyx, RemoteFiles remoteFiles, NyxIndexes remoteIndexes) {
         this.nyx = nyx;
@@ -39,17 +46,33 @@ public class SyncAttachmentAction implements Action {
         final Map<Long, Attachment> remoteAttachments = remoteIndexes.attachments()
             .stream()
             .collect(Collectors.toMap(Attachment::id, Function.identity()));
+        final List<Future<?>> asyncFuture = new ArrayList<>();
         for (Attachment remoteAttachment : remoteAttachments.values()) {
             if (localUpdates.containsKey(remoteAttachment.id())) {
                 final Attachment localAttachment = localUpdates.get(remoteAttachment.id());
                 if (remoteAttachment.version() > localAttachment.version()) {
-                    nyx.attachments().replace(remoteAttachment);
+                    asyncFuture.add(worker.submit(() -> {
+                        try {
+                            nyx.attachments().replace(remoteAttachment);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }));
                 } else if (remoteAttachment.version() < localAttachment.version()) {
                     remoteUpdates.add(localAttachment);
                 }
                 localUpdates.remove(remoteAttachment.id());
             } else {
-                updateLocaleFile(remoteAttachment);
+                asyncFuture.add(worker.submit(() -> {
+                    updateLocaleFile(remoteAttachment);
+                }));
+            }
+        }
+        for (Future<?> future : asyncFuture) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
             }
         }
         remoteUpdates.addAll(localUpdates.values());
@@ -87,12 +110,14 @@ public class SyncAttachmentAction implements Action {
                 true,
                 integer -> null
             ).fire();
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     private void updateRemoteFiles(List<Attachment> remoteUpdates) {
         try {
+            final List<Future<?>> asyncFuture = new ArrayList<>();
             for (Attachment remoteUpdate : remoteUpdates) {
                 final File sourceFile = nyx.files().fileByUri(remoteUpdate.uri());
                 final String fileName = new UriFileName(remoteUpdate.uri()).value();
@@ -102,13 +127,32 @@ public class SyncAttachmentAction implements Action {
                     fileName
                 );
                 if (remoteUpdate.deleted()) {
-                    remoteFiles.delete(remoteFilePath);
+                    asyncFuture.add(
+                        worker.submit(() -> {
+                            try {
+                                remoteFiles.delete(remoteFilePath);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                    );
                 } else {
                     if (!sourceFile.exists()) {
                         continue;
                     }
-                    remoteFiles.post(remoteFilePath, new FileInputStream(sourceFile));
+                    asyncFuture.add(
+                        worker.submit(() -> {
+                            try {
+                                remoteFiles.post(remoteFilePath, new FileInputStream(sourceFile));
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                    );
                 }
+            }
+            for (Future<?> future : asyncFuture) {
+                future.get();
             }
             remoteIndexes.updateAttachments(remoteUpdates);
         } catch (Exception e) {

@@ -13,6 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +29,9 @@ public class SyncJotsAction implements Action {
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
     private final NyxIndexes remoteIndexes;
+    private final ExecutorService worker = Executors.newFixedThreadPool(
+        Runtime.getRuntime().availableProcessors() * 2 // @todo #100 Find best thread pool size
+    );
 
     public SyncJotsAction(
         Nyx nyx, RemoteFiles remoteFiles, NyxIndexes remoteIndexes) {
@@ -42,25 +49,25 @@ public class SyncJotsAction implements Action {
         final Map<Long, JotIndex> remoteJotMap = this.remoteIndexes.jots()
             .stream()
             .collect(Collectors.toMap(JotIndex::id, Function.identity()));
+        final List<Future<?>> asyncFuture = new ArrayList<>();
         for (JotIndex remoteIndex : remoteJotMap.values()) {
             if (localJotMap.containsKey(remoteIndex.id())) {
                 final Jot localJot = localJotMap.get(remoteIndex.id());
                 if (remoteIndex.version() > localJot.version()) {
-                    try {
-                        nyx.jots().replace(toJot(remoteIndex));
-                    } catch (Exception e) { // @todo #101 Failure of jot downloading
-                        e.printStackTrace();
-                    }
+                    asyncFuture.add(worker.submit(() -> nyx.jots().replace(toJot(remoteIndex))));
                 } else if (remoteIndex.version() < localJot.version()) {
                     remoteUpdates.add(localJot);
                 }
                 localJotMap.remove(remoteIndex.id());
             } else {
-                try {
-                    nyx.jots().createWithId(toJot(remoteIndex));
-                } catch (Exception e) { // @todo #102 Failure of jot downloading.
-                    e.printStackTrace();
-                }
+                asyncFuture.add(worker.submit(() -> nyx.jots().createWithId(toJot(remoteIndex))));
+            }
+        }
+        for (Future<?> future : asyncFuture) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
             }
         }
         remoteUpdates.addAll(localJotMap.values()); // New jots at remote
@@ -68,26 +75,42 @@ public class SyncJotsAction implements Action {
     }
 
     private void updateRemotes(List<Jot> remoteUpdates) {
+        final List<Future<?>> asyncFuture = new ArrayList<>();
         for (Jot remoteUpdate : remoteUpdates) {
             if (remoteUpdate.deleted()) {
-                remoteFiles.delete("/" + remoteUpdate.id());// remove jot folder
+                asyncFuture.add(
+                    // remove jot folder
+                    worker.submit(() -> remoteFiles.delete("/" + remoteUpdate.id()))
+                );
             } else {
-                remoteFiles.post(
-                    String.format(CONTENT_FILE_PATH, remoteUpdate.id() + ""),
-                    new ByteArrayInputStream(
-                       new JotJson(remoteUpdate).value().toString().getBytes(StandardCharsets.UTF_8)
-                    )
+                asyncFuture.add(
+                    worker.submit(() -> {
+                        remoteFiles.post(
+                            String.format(CONTENT_FILE_PATH, remoteUpdate.id() + ""),
+                            new ByteArrayInputStream(
+                                new JotJson(remoteUpdate).value().toString()
+                                    .getBytes(StandardCharsets.UTF_8)
+                            )
+                        );
+                        remoteFiles.post(
+                            String.format(TAG_FILE_PATH, remoteUpdate.id() + ""),
+                            new ByteArrayInputStream(
+                                nyx.tags().byJotId(remoteUpdate.id())
+                                    .stream()
+                                    .map(Tag::title)
+                                    .collect(Collectors.joining(","))
+                                    .getBytes()
+                            )
+                        );
+                    })
                 );
-                remoteFiles.post(
-                    String.format(TAG_FILE_PATH, remoteUpdate.id() + ""),
-                    new ByteArrayInputStream(
-                        nyx.tags().byJotId(remoteUpdate.id())
-                            .stream()
-                            .map(Tag::title)
-                            .collect(Collectors.joining(","))
-                            .getBytes()
-                    )
-                );
+            }
+        }
+        for (Future<?> future : asyncFuture) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
             }
         }
         remoteIndexes.updateJots(remoteUpdates);
