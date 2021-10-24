@@ -3,11 +3,13 @@ package com.larryhsiao.nyx.core.sync;
 import com.larryhsiao.clotho.Action;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.jots.Jot;
+import com.larryhsiao.nyx.core.jots.moods.JotJson;
 import com.larryhsiao.nyx.core.jots.moods.JsonJot;
 import com.larryhsiao.nyx.core.tags.Tag;
 
 import javax.json.Json;
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +75,7 @@ public class SyncJotsAction implements Action {
                 remoteFiles.post(
                     String.format(CONTENT_FILE_PATH, remoteUpdate.id() + ""),
                     new ByteArrayInputStream(
-                        remoteUpdate.content().getBytes()
+                       new JotJson(remoteUpdate).value().toString().getBytes(StandardCharsets.UTF_8)
                     )
                 );
                 remoteFiles.post(
