@@ -21,6 +21,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.larryhsiao.clotho.date.DateCalendar
+import com.larryhsiao.clotho.date.DateEndCalendar
 import com.larryhsiao.nyx.NyxFragment
 import com.larryhsiao.nyx.R
 import com.larryhsiao.nyx.ViewModelFactory
@@ -73,7 +74,7 @@ class JotsMapFragment : NyxFragment() {
         } else {
             dateRangeText.text = DateRangeText(
                 DateCalendar(it.first),
-                DateCalendar(it.second)
+                DateEndCalendar(it.second)
             ).value()
             dateRangeText.visibility = VISIBLE
             dateRangeIcon.setImageResource(R.drawable.ic_cross)
@@ -137,7 +138,6 @@ class JotsMapFragment : NyxFragment() {
     ) {
         val latLngBounds = LatLngBounds.Builder()
         var haveLocation = false
-        map.clear()
         clusterManager.clearItems()
         jots.filter {
             !it.location().contentEquals(doubleArrayOf(Double.MIN_VALUE, Double.MIN_VALUE)) &&
@@ -153,9 +153,9 @@ class JotsMapFragment : NyxFragment() {
         } else {
             if (haveLocation) {
                 map.setMaxZoomPreference(15f)
-                map.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 200))
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 200))
             } else {
-                map.animateCamera(CameraUpdateFactory.zoomTo(10f))
+                map.moveCamera(CameraUpdateFactory.zoomTo(10f))
             }
         }
     }
