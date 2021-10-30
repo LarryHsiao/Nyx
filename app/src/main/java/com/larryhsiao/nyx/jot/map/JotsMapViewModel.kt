@@ -37,7 +37,7 @@ class JotsMapViewModel(private val app: NyxApplication) : ViewModel() {
         val dateRange = dateRange.value ?: Pair(0L, 0L)
         jotsLiveData.postValue(
             if (dateRange.first == 0L && dateRange.second == 0L) {
-                app.nyx().jots().all()
+                app.nyx().jots().all().filter { !it.deleted() }
             } else {
                 app.nyx().jots().byDateRange(
                     DateCalendar(dateRange.first).value(),
