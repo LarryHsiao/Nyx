@@ -27,7 +27,7 @@ public class SyncAttachmentAction implements Action {
     private final RemoteFiles remoteFiles;
     private final NyxIndexes remoteIndexes;
     private final ExecutorService worker = Executors.newFixedThreadPool(
-        Runtime.getRuntime().availableProcessors() * 2 // @todo #100 Find best thread pool size
+       2  // @todo #100 Find best thread pool size
     );
 
     public SyncAttachmentAction(Nyx nyx, RemoteFiles remoteFiles, NyxIndexes remoteIndexes) {
