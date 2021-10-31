@@ -28,7 +28,7 @@ class JotsAdapter(
     private val lifeCoroutineScope: CoroutineScope,
     private val itemClicked: (item: Jot) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val dateFormat by lazy { SimpleDateFormat("MM/dd", Locale.US) }
+    private val dateFormat by lazy { SimpleDateFormat("yyyy MM/dd", Locale.US) }
     private val timeFormat by lazy { SimpleDateFormat("HH:mm", Locale.US) }
     private val jots = ArrayList<Jot>()
     private var showDate = false
