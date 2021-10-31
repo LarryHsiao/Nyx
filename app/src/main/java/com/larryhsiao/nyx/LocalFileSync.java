@@ -3,6 +3,7 @@ package com.larryhsiao.nyx;
 import android.content.Context;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
+import com.larryhsiao.aura.images.PngCompress;
 import com.larryhsiao.clotho.dgist.MD5;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.attachments.*;
@@ -11,7 +12,6 @@ import com.larryhsiao.aura.images.JpegCompress;
 import com.larryhsiao.aura.uri.UriMimeType;
 import com.larryhsiao.clotho.Action;
 import com.larryhsiao.clotho.file.ToFile;
-import com.larryhsiao.clotho.source.SingleRefSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -68,9 +68,9 @@ public class LocalFileSync implements Action {
             final String ext = mimeTypeMap.getExtensionFromMimeType(
                 new UriMimeType(context, attachment.uri()).value()
             );
-            if ("jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext)) {
-                compressToInternal(internalRoot, attachment);
-            } else {
+            if ("jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext) || "png".equalsIgnoreCase(ext)) {
+                compressImageToInternal(internalRoot, attachment, ext);
+            }else {
                 copyToInternal(ext, internalRoot, attachment);
             }
         } catch (Exception e) {
@@ -90,7 +90,11 @@ public class LocalFileSync implements Action {
         }
     }
 
-    private void compressToInternal(File internalRoot, Attachment attachment) throws IOException {
+    private void compressImageToInternal(
+        File internalRoot,
+        Attachment attachment,
+        String ext
+    ) throws IOException {
         final File compressTemp = new TempAttachmentFile(context, "compressedTemp").value();
         final File temp;
         if (attachment.uri().startsWith(URI_FILE_TEMP_PROVIDER)) {
@@ -106,10 +110,16 @@ public class LocalFileSync implements Action {
                 it -> null
             ).fire();
         }
-        new JpegCompress(temp, compressTemp, BuildConfig.JPG_COMPRESS_QUALITY).fire();
+        if (ext.equalsIgnoreCase("jpg") || ext.equalsIgnoreCase("jpeg")) {
+            new JpegCompress(temp, compressTemp, BuildConfig.JPG_COMPRESS_QUALITY,
+                BuildConfig.IMAGE_MAXIMUM_SIZE).fire();
+        } else {
+            new PngCompress(temp, compressTemp, BuildConfig.PNG_COMPRESS_QUALITY,
+                BuildConfig.IMAGE_MAXIMUM_SIZE).fire();
+        }
         temp.delete();
         final String fileName = generateFileName(
-            "jpg",
+            ext,
             new MD5(new FileInputStream(compressTemp)).value()
         );
         compressTemp.renameTo(new File(internalRoot, fileName));

@@ -45,6 +45,8 @@ android {
         buildConfigField("String", "DROPBOX_API_KEY", "\"${System.getenv("NYX_DROPBOX_APP_ID")}\"")
         buildConfigField("String", "DROPBOX_API_TOKEN", "\"${System.getenv("NYX_DROPBOX_TOKEN")}\"")
         buildConfigField("int", "JPG_COMPRESS_QUALITY", "85")
+        buildConfigField("int", "PNG_COMPRESS_QUALITY", "85")
+        buildConfigField("int", "IMAGE_MAXIMUM_SIZE", "1920")
     }
     buildTypes {
         debug {
@@ -144,7 +146,7 @@ dependencies {
     implementation 'io.github.ponnamkarthik:richlinkpreview:1.0.9'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.larryhsiao:aura:1.24.2'
+    implementation 'com.larryhsiao:aura:1.24.3'
     implementation platform('com.google.firebase:firebase-bom:28.1.0')
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation 'com.google.firebase:firebase-iid'
