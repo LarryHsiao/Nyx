@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.core.sync;
 
+import com.larryhsiao.clotho.source.ConstSource;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.attachments.Attachment;
 import com.larryhsiao.nyx.core.attachments.AttachmentJson;
@@ -11,12 +12,14 @@ import com.larryhsiao.nyx.core.metadata.MetadataJson;
 import com.larryhsiao.nyx.core.tags.JsonTag;
 import com.larryhsiao.nyx.core.tags.Tag;
 import com.larryhsiao.nyx.core.tags.TagJson;
+import com.larryhsiao.nyx.core.util.FactorySource;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonValue;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -93,9 +96,9 @@ public class RemoteIndexes implements NyxIndexes {
         }
         remoteFiles.post(
             PATH_ATTACHMENT_JSON,
-            new ByteArrayInputStream(
+            new FactorySource<>(unused -> new ByteArrayInputStream(
                 jsonArray.build().toString().getBytes()
-            )
+            ))
         );
     }
 
@@ -109,9 +112,9 @@ public class RemoteIndexes implements NyxIndexes {
         }
         remoteFiles.post(
             PATH_TAG_JSON,
-            new ByteArrayInputStream(
+            new FactorySource<>(unused -> new ByteArrayInputStream(
                 jsonArray.build().toString().getBytes()
-            )
+            ))
         );
     }
 
@@ -138,9 +141,9 @@ public class RemoteIndexes implements NyxIndexes {
         }
         remoteFiles.post(
             PATH_JOT_INDEX_JSON,
-            new ByteArrayInputStream(
+            new FactorySource<>(unused -> new ByteArrayInputStream(
                 jsonArray.build().toString().getBytes()
-            )
+            ))
         );
     }
 
@@ -155,9 +158,9 @@ public class RemoteIndexes implements NyxIndexes {
         }
         remoteFiles.post(
             PATH_METADATA_JSON,
-            new ByteArrayInputStream(
+            new FactorySource<>(unused -> new ByteArrayInputStream(
                 jsonArray.build().toString().getBytes()
-            )
+            ))
         );
     }
 
@@ -179,7 +182,9 @@ public class RemoteIndexes implements NyxIndexes {
         if (!remoteFiles.exist(PATH_LOCK_FILE)) {
             remoteFiles.post(
                 PATH_LOCK_FILE,
-                new ByteArrayInputStream(new byte[0])
+                new FactorySource<>(unused ->
+                    new ByteArrayInputStream(new byte[0])
+                )
             );
         }
     }

@@ -5,6 +5,7 @@ import com.larryhsiao.clotho.file.UriFileName;
 import com.larryhsiao.clotho.io.ProgressedCopy;
 import com.larryhsiao.nyx.core.Nyx;
 import com.larryhsiao.nyx.core.attachments.Attachment;
+import com.larryhsiao.nyx.core.util.FactorySource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +28,7 @@ public class SyncAttachmentAction implements Action {
     private final RemoteFiles remoteFiles;
     private final NyxIndexes remoteIndexes;
     private final ExecutorService worker = Executors.newFixedThreadPool(
-       1  // @todo #100 Find best thread pool size
+        Runtime.getRuntime().availableProcessors() * 2 // @todo #100 Find best thread pool size
     );
 
     public SyncAttachmentAction(Nyx nyx, RemoteFiles remoteFiles, NyxIndexes remoteIndexes) {
@@ -63,9 +64,7 @@ public class SyncAttachmentAction implements Action {
                 }
                 localUpdates.remove(remoteAttachment.id());
             } else {
-                asyncFuture.add(worker.submit(() -> {
-                    updateLocaleFile(remoteAttachment);
-                }));
+                asyncFuture.add(worker.submit(() -> updateLocaleFile(remoteAttachment)));
             }
         }
         for (Future<?> future : asyncFuture) {
@@ -141,13 +140,16 @@ public class SyncAttachmentAction implements Action {
                         continue;
                     }
                     asyncFuture.add(
-                        worker.submit(() -> {
-                            try {
-                                remoteFiles.post(remoteFilePath, new FileInputStream(sourceFile));
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
+                        worker.submit(() -> remoteFiles.post(
+                            remoteFilePath,
+                            new FactorySource<>(unused -> {
+                                try {
+                                    return new FileInputStream(sourceFile);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                        ))
                     );
                 }
             }

@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.core.sync.dropbox;
 
 import com.larryhsiao.clotho.Action;
+import com.larryhsiao.clotho.Source;
 import com.larryhsiao.clotho.io.ProgressedCopy;
 import com.larryhsiao.clotho.stream.StreamString;
 
@@ -16,42 +17,56 @@ public class DBFileUploading implements Action {
     private static final String URL = "https://content.dropboxapi.com/2/files/upload";
     private final String token;
     private final String path;
-    private final InputStream inputStream;
+    private final Source<InputStream> streamSource;
 
-    public DBFileUploading(String token, String path, InputStream inputStream) {
+    public DBFileUploading(String token, String path, Source<InputStream> streamSource) {
         this.token = token;
         this.path = path;
-        this.inputStream = inputStream;
+        this.streamSource = streamSource;
     }
 
     @Override
     public void fire() {
         try {
+            final InputStream stream = streamSource.value();
             final HttpURLConnection conn = (HttpURLConnection) new URL(URL).openConnection();
             conn.addRequestProperty("Authorization", "Bearer " + token);
             conn.addRequestProperty("Content-Type", "application/octet-stream");
-            conn.addRequestProperty("Dropbox-API-Arg", "{\"path\":\"" + path + "\",\"mode\":{\".tag\":\"overwrite\"}}");
+            conn.addRequestProperty("Dropbox-API-Arg",
+                "{\"path\":\"" + path + "\",\"mode\":{\".tag\":\"overwrite\"}}");
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.connect();
             final OutputStream outputStream = conn.getOutputStream();
             new ProgressedCopy(
-                inputStream,
+                stream,
                 outputStream,
                 4096,
                 true,
                 progress -> null
             ).fire();
-            inputStream.close();
+            stream.close();
             outputStream.close();
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException(
-                    "Upload file failure: " + path + "\n" +
-                        new StreamString(conn.getErrorStream()).value()
-                );
+                final String errorMsg = new DBJsonError(
+                    new StreamString(conn.getErrorStream())
+                ).value();
+                if (errorMsg.startsWith("too_many_write_operations/")) {
+                    waitForRetry();
+                    fire();
+                } else {
+                    throw new RuntimeException("Upload file failure: " + path + "\n" + errorMsg);
+                }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void waitForRetry() {
+        try {
+            Thread.sleep(1000L);
+        } catch (Exception ignore) {
         }
     }
 }

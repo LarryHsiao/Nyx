@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.core.sync.dropbox;
 
 import com.larryhsiao.clotho.io.ProgressedCopy;
+import com.larryhsiao.clotho.source.ConstSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,11 +24,11 @@ public class DropboxRemoteFilesTest {
      * Check if we can upload file.
      */
     @Test
-    void upload() throws IOException{
+    void upload() throws IOException {
         new DBFileUploading(
             token,
             remotePath,
-            new ByteArrayInputStream("file text".getBytes())
+            new ConstSource<>(new ByteArrayInputStream("file text".getBytes()))
         ).fire();
         download(); // can be downloaded normally
         Assertions.assertTrue(true);
@@ -54,10 +55,10 @@ public class DropboxRemoteFilesTest {
     @Test
     void delete() {
         new DBFileDeletion(token, remotePath).fire();
-        try{
+        try {
             download();
             Assertions.fail();
-        }catch (Exception e){
+        } catch (Exception e) {
             Assertions.assertTrue(true);
         }
     }

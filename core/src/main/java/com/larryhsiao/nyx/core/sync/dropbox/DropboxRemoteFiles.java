@@ -1,5 +1,6 @@
 package com.larryhsiao.nyx.core.sync.dropbox;
 
+import com.larryhsiao.clotho.Source;
 import com.larryhsiao.nyx.core.sync.RemoteFiles;
 
 import java.io.InputStream;
@@ -20,8 +21,8 @@ public class DropboxRemoteFiles implements RemoteFiles {
     }
 
     @Override
-    public void post(String path, InputStream inputStream) {
-        new DBFileUploading(token, path, inputStream).fire();
+    public void post(String path, Source<InputStream> streamSource) {
+        new DBFileUploading(token, path, streamSource).fire();
     }
 
     @Override
