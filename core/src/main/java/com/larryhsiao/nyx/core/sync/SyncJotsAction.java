@@ -6,6 +6,7 @@ import com.larryhsiao.nyx.core.jots.Jot;
 import com.larryhsiao.nyx.core.jots.moods.JotJson;
 import com.larryhsiao.nyx.core.jots.moods.JsonJot;
 import com.larryhsiao.nyx.core.tags.Tag;
+import com.larryhsiao.nyx.core.util.FactorySource;
 
 import javax.json.Json;
 import java.io.ByteArrayInputStream;
@@ -30,7 +31,7 @@ public class SyncJotsAction implements Action {
     private final RemoteFiles remoteFiles;
     private final NyxIndexes remoteIndexes;
     private final ExecutorService worker = Executors.newFixedThreadPool(
-        1 // @todo #100 Find best thread pool size
+        Runtime.getRuntime().availableProcessors() * 2 // @todo #100 Find best thread pool size
     );
 
     public SyncJotsAction(
@@ -87,20 +88,21 @@ public class SyncJotsAction implements Action {
                     worker.submit(() -> {
                         remoteFiles.post(
                             String.format(CONTENT_FILE_PATH, remoteUpdate.id() + ""),
-                            new ByteArrayInputStream(
-                                new JotJson(remoteUpdate).value().toString()
-                                    .getBytes(StandardCharsets.UTF_8)
-                            )
+                            new FactorySource<>(unused ->
+                                new ByteArrayInputStream(
+                                    new JotJson(remoteUpdate).value().toString()
+                                        .getBytes(StandardCharsets.UTF_8)
+                                ))
                         );
                         remoteFiles.post(
                             String.format(TAG_FILE_PATH, remoteUpdate.id() + ""),
-                            new ByteArrayInputStream(
+                            new FactorySource<>(unused -> new ByteArrayInputStream(
                                 nyx.tags().byJotId(remoteUpdate.id())
                                     .stream()
                                     .map(Tag::title)
                                     .collect(Collectors.joining(","))
                                     .getBytes()
-                            )
+                            ))
                         );
                     })
                 );

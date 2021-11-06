@@ -8,9 +8,11 @@ import android.os.Build;
 import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import com.larryhsiao.nyx.LocalFileSync;
 import com.larryhsiao.nyx.NyxApplication;
 import com.larryhsiao.nyx.R;
 import com.larryhsiao.nyx.core.sync.Syncs;
+import com.larryhsiao.nyx.core.util.ExceptionMessage;
 import org.jetbrains.annotations.NotNull;
 
 import static com.larryhsiao.nyx.NyxApplication.CHANNEL_ID_SYNC;
@@ -28,18 +30,35 @@ public class SyncService extends JobIntentService {
     @Override
     protected void onHandleWork(@NotNull Intent intent) {
         try {
+            final NyxApplication app = ((NyxApplication) getApplication());
+            createNotificationChannel();
             showSyncingNotification();
-            final Syncs syncs = ((NyxApplication) getApplication()).getSyncs();
+            new LocalFileSync(app, app.nyx()).fire();
+            final Syncs syncs = app.getSyncs();
             syncs.sync();
             dismissSyncNotification();
         } catch (Exception e) {
             e.printStackTrace();
-            // @todo #100 Publish failure of syncs.
+            showSyncingFailure(new ExceptionMessage(e).value());
         }
     }
 
+    private void showSyncingFailure(String message){
+        NotificationManagerCompat.from(this).notify(
+            NOTIFICATION_ID_SYNC,
+            new NotificationCompat.Builder(this, CHANNEL_ID_SYNC)
+                .setStyle(new NotificationCompat.BigTextStyle())
+                .setSmallIcon(R.drawable.ic_sync)
+                .setContentTitle(getString(R.string.Sync))
+                .setContentText(getString(R.string.Jotted_sync_failed___, message))
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setAutoCancel(true)
+                .setOngoing(false)
+                .build()
+        );
+    }
+
     private void showSyncingNotification() {
-        createNotificationChannel();
         NotificationManagerCompat.from(this).notify(
             NOTIFICATION_ID_SYNC,
             new NotificationCompat.Builder(this, CHANNEL_ID_SYNC)

@@ -2,6 +2,7 @@ package com.larryhsiao.nyx.core.sync.dropbox;
 
 import com.larryhsiao.clotho.Action;
 import com.larryhsiao.clotho.io.ProgressedCopy;
+import com.larryhsiao.clotho.stream.StreamString;
 
 import java.io.ByteArrayInputStream;
 import java.net.HttpURLConnection;
@@ -36,9 +37,15 @@ public class DBFileDeletion implements Action {
                 progress -> null
             ).fire();
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Delete file failure: code: "+conn.getResponseCode()+", path: " + path);
+                throw new RuntimeException("Delete file failure: code: " + conn.getResponseCode() +
+                    ", path: " + path +
+                    "\n" +
+                    new DBJsonError(
+                        new StreamString(conn.getErrorStream())
+                    ).value()
+                );
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

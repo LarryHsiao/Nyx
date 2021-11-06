@@ -1,5 +1,7 @@
 package com.larryhsiao.nyx.core.sync;
 
+import com.larryhsiao.clotho.Source;
+
 import java.io.InputStream;
 
 /**
@@ -14,7 +16,7 @@ public interface RemoteFiles {
     /**
      * Upload given data, replace exist one.
      */
-    void post(String path, InputStream inputStream);
+    void post(String path, Source<InputStream> streamSource);
 
     /**
      * Delete given file.

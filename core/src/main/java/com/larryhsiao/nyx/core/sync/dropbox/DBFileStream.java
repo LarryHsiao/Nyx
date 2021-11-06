@@ -1,6 +1,7 @@
 package com.larryhsiao.nyx.core.sync.dropbox;
 
 import com.larryhsiao.clotho.Source;
+import com.larryhsiao.clotho.stream.StreamString;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -28,7 +29,11 @@ public class DBFileStream implements Source<InputStream> {
             conn.addRequestProperty("Dropbox-API-Arg", "{\"path\":\"" + path + "\"}");
             conn.connect();
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Download file failure: " + path);
+                throw new RuntimeException("Download file failure: " + "\n" +
+                    new DBJsonError(
+                        new StreamString(conn.getErrorStream())
+                    ).value()
+                );
             }
             return conn.getInputStream();
         }catch (Exception e){
