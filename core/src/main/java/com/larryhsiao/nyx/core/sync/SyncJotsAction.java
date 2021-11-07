@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,15 +29,18 @@ public class SyncJotsAction implements Action {
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
     private final NyxIndexes remoteIndexes;
-    private final ExecutorService worker = Executors.newFixedThreadPool(
-        Runtime.getRuntime().availableProcessors() * 2 // @todo #100 Find best thread pool size
-    );
+    private final ExecutorService worker;
 
     public SyncJotsAction(
-        Nyx nyx, RemoteFiles remoteFiles, NyxIndexes remoteIndexes) {
+        Nyx nyx,
+        RemoteFiles remoteFiles,
+        NyxIndexes remoteIndexes,
+        ExecutorService worker
+    ) {
         this.nyx = nyx;
         this.remoteFiles = remoteFiles;
         this.remoteIndexes = remoteIndexes;
+        this.worker = worker;
     }
 
     @Override
@@ -96,13 +98,15 @@ public class SyncJotsAction implements Action {
                         );
                         remoteFiles.post(
                             String.format(TAG_FILE_PATH, remoteUpdate.id() + ""),
-                            new FactorySource<>(unused -> new ByteArrayInputStream(
-                                nyx.tags().byJotId(remoteUpdate.id())
-                                    .stream()
-                                    .map(Tag::title)
-                                    .collect(Collectors.joining(","))
-                                    .getBytes()
-                            ))
+                            new FactorySource<>(unused ->
+                                new ByteArrayInputStream(
+                                    nyx.tags().byJotId(remoteUpdate.id())
+                                        .stream()
+                                        .map(Tag::title)
+                                        .collect(Collectors.joining(","))
+                                        .getBytes(StandardCharsets.UTF_8)
+                                )
+                            )
                         );
                     })
                 );

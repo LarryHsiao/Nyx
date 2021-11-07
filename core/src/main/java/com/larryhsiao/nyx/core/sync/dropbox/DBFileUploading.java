@@ -18,6 +18,7 @@ public class DBFileUploading implements Action {
     private final String token;
     private final String path;
     private final Source<InputStream> streamSource;
+    private int retryCounter = 0;
 
     public DBFileUploading(String token, String path, Source<InputStream> streamSource) {
         this.token = token;
@@ -54,6 +55,10 @@ public class DBFileUploading implements Action {
                 if (errorMsg.startsWith("too_many_write_operations/")) {
                     waitForRetry();
                     fire();
+                } else if (retryCounter < 3) {
+                    retryCounter++;
+                    waitForRetry();
+                    fire();
                 } else {
                     throw new RuntimeException("Upload file failure: " + path + "\n" + errorMsg);
                 }
@@ -65,7 +70,7 @@ public class DBFileUploading implements Action {
 
     private void waitForRetry() {
         try {
-            Thread.sleep(1000L);
+            Thread.sleep(3000L);
         } catch (Exception ignore) {
         }
     }

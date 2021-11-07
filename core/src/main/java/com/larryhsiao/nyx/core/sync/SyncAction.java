@@ -3,6 +3,9 @@ package com.larryhsiao.nyx.core.sync;
 import com.larryhsiao.clotho.Action;
 import com.larryhsiao.nyx.core.Nyx;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Action for sync local Nyx to remote file-base system.
  */
@@ -28,10 +31,14 @@ public class SyncAction implements Action {
             return;
         }
         remoteIndexes.lock();
+        final ExecutorService worker = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors() * 2 // @todo #100 Find best thread pool size
+        );
         new SyncTagsAction(nyx.tags(), remoteIndexes).fire();
-        new SyncJotsAction(nyx, remoteFiles, remoteIndexes).fire();
-        new SyncAttachmentAction(nyx, remoteFiles, remoteIndexes).fire();
+        new SyncJotsAction(nyx, remoteFiles, remoteIndexes, worker).fire();
+        new SyncAttachmentAction(nyx, remoteFiles, remoteIndexes, worker).fire();
         new SyncMetadataAction(nyx.metadataSet(), remoteIndexes, remoteFiles).fire();
+        worker.shutdown();
         remoteIndexes.unlock();
     }
 }
