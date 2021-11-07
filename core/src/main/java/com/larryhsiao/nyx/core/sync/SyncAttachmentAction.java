@@ -27,14 +27,18 @@ public class SyncAttachmentAction implements Action {
     private final Nyx nyx;
     private final RemoteFiles remoteFiles;
     private final NyxIndexes remoteIndexes;
-    private final ExecutorService worker = Executors.newFixedThreadPool(
-        Runtime.getRuntime().availableProcessors() * 2 // @todo #100 Find best thread pool size
-    );
+    private final ExecutorService worker;
 
-    public SyncAttachmentAction(Nyx nyx, RemoteFiles remoteFiles, NyxIndexes remoteIndexes) {
+    public SyncAttachmentAction(
+        Nyx nyx,
+        RemoteFiles remoteFiles,
+        NyxIndexes remoteIndexes,
+        ExecutorService worker
+    ) {
         this.nyx = nyx;
         this.remoteFiles = remoteFiles;
         this.remoteIndexes = remoteIndexes;
+        this.worker = worker;
     }
 
     @Override
